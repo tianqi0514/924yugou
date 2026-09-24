@@ -1,0 +1,1762 @@
+{
+  "schema_version": "material-application-verification/v1",
+  "database": "report_platform_test",
+  "created_at": "2026-09-24T15:27:59.184519+00:00",
+  "fixed_input_reference": "docs/NEXT-01模型写作包验收.md；S5.2 使用 X001 双来源历史冲突",
+  "project": {
+    "id": "b222c43a-f350-407d-93e7-8ec70ba8e976",
+    "name": "NEXT-02 材料应用 QA 20260924T152738Z",
+    "version": 9
+  },
+  "report": {
+    "id": "adaae578-74d9-4d51-8be0-d00e4ee7cc78",
+    "title": "NEXT-02 材料应用验证稿",
+    "version": 2
+  },
+  "corpus": {
+    "id": "cy_tray_20260918",
+    "version": "v2"
+  },
+  "application": {
+    "chapters": [
+      {
+        "section_id": "S4",
+        "status": "ready",
+        "text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_categories": [
+          "CAT-04",
+          "CAT-09",
+          "CAT-10",
+          "CAT-13",
+          "CAT-15",
+          "CAT-18",
+          "CAT-27"
+        ],
+        "used_record_ids": [
+          "04:000009",
+          "09:000051",
+          "10:000051",
+          "13:000005",
+          "15:000001",
+          "18:000001",
+          "27:000017"
+        ],
+        "issues": [
+          {
+            "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+            "severity": "review",
+            "message": "模板缺少关键覆盖配置，需要人工确认",
+            "item_ids": [
+              "27:000017"
+            ]
+          },
+          {
+            "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "severity": "review",
+            "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+            "item_ids": [
+              "18:000001"
+            ]
+          },
+          {
+            "chunk_id": "C0052",
+            "code": "HISTORICAL_CONDITION_FALSE",
+            "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+            "severity": "review",
+            "slot_id": null
+          },
+          {
+            "chunk_id": "C0052",
+            "code": "HISTORICAL_CONTEXT_EXCLUDED",
+            "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+            "severity": "info",
+            "slot_id": null
+          }
+        ]
+      },
+      {
+        "section_id": "S7.1",
+        "status": "ready",
+        "text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_categories": [
+          "CAT-04",
+          "CAT-09",
+          "CAT-10",
+          "CAT-27"
+        ],
+        "used_record_ids": [
+          "04:000018",
+          "09:000082",
+          "10:000082",
+          "27:000024"
+        ],
+        "issues": [
+          {
+            "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+            "severity": "review",
+            "message": "模板缺少关键覆盖配置，需要人工确认",
+            "item_ids": [
+              "27:000024"
+            ]
+          },
+          {
+            "chunk_id": "C0083",
+            "code": "QUOTE_SCOPE_UNVERIFIED",
+            "message": "历史报价包含范围和有效期尚未由本项目证据确认，候选正文未继承",
+            "severity": "review",
+            "slot_id": null
+          }
+        ]
+      },
+      {
+        "section_id": "S5.2",
+        "status": "ready",
+        "text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_categories": [
+          "CAT-04",
+          "CAT-18",
+          "CAT-23",
+          "CAT-27"
+        ],
+        "used_record_ids": [
+          "04:000013",
+          "18:000006",
+          "18:000007",
+          "23:000000",
+          "27:000019"
+        ],
+        "issues": [
+          {
+            "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+            "severity": "review",
+            "message": "模板缺少关键覆盖配置，需要人工确认",
+            "item_ids": [
+              "27:000019"
+            ]
+          },
+          {
+            "code": "HISTORICAL_CONFLICT",
+            "severity": "review",
+            "message": "X001 是历史资料中未解决的冲突；当前项目如论证同一问题，必须使用新证据核对",
+            "item_ids": [
+              "23:000000"
+            ]
+          },
+          {
+            "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "severity": "review",
+            "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+            "item_ids": [
+              "18:000006"
+            ]
+          },
+          {
+            "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "severity": "review",
+            "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+            "item_ids": [
+              "18:000007"
+            ]
+          },
+          {
+            "code": "POWER_CONFLICT_UNRESOLVED",
+            "severity": "block",
+            "message": "历史配电数据冲突未解决；新项目缺少独立核证，正式交付受阻",
+            "item_ids": [
+              "23:000000"
+            ]
+          }
+        ]
+      }
+    ],
+    "removals": [
+      {
+        "section_id": "S4",
+        "category_id": "CAT-01",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-02",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-03",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-04",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "",
+        "used_record_ids": [
+          "04:000009"
+        ],
+        "chapter_record_ids": [
+          "04:000009"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-05",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-06",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-07",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-08",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-09",
+        "status": "same",
+        "reason": "正文未变，但来源或核对链发生变化",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [
+          "09:000051"
+        ],
+        "chapter_record_ids": [
+          "09:000044",
+          "09:000045",
+          "09:000046",
+          "09:000047",
+          "09:000048",
+          "09:000049",
+          "09:000050",
+          "09:000051",
+          "09:000052",
+          "09:000053",
+          "09:000054"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-10",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "",
+        "used_record_ids": [
+          "10:000051"
+        ],
+        "chapter_record_ids": [
+          "10:000044",
+          "10:000045",
+          "10:000046",
+          "10:000047",
+          "10:000048",
+          "10:000049",
+          "10:000050",
+          "10:000051",
+          "10:000052",
+          "10:000053",
+          "10:000054"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-11",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "not_generated"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-12",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "12:000016",
+          "12:000017",
+          "12:000024",
+          "12:000025",
+          "12:000026",
+          "12:000027",
+          "12:000028",
+          "12:000029",
+          "12:000030",
+          "12:000031",
+          "12:000032",
+          "12:000033",
+          "12:000034",
+          "12:000035",
+          "12:000036",
+          "12:000039",
+          "12:000211",
+          "12:000252",
+          "12:000253",
+          "12:000254",
+          "12:000255",
+          "12:000256",
+          "12:000257",
+          "12:000258",
+          "12:000259",
+          "12:000260",
+          "12:000261",
+          "12:000262"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-13",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "",
+        "used_record_ids": [
+          "13:000005"
+        ],
+        "chapter_record_ids": [
+          "13:000000",
+          "13:000001",
+          "13:000002",
+          "13:000003",
+          "13:000004",
+          "13:000005",
+          "13:000006",
+          "13:000007",
+          "13:000010"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-14",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-15",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "",
+        "used_record_ids": [
+          "15:000001"
+        ],
+        "chapter_record_ids": [
+          "15:000001",
+          "15:000003",
+          "15:000004",
+          "15:000005",
+          "15:000006",
+          "15:000009",
+          "15:000010",
+          "15:000011",
+          "15:000019",
+          "15:000026",
+          "15:000027",
+          "15:000028",
+          "15:000029",
+          "15:000038",
+          "15:000040"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-16",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-17",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-18",
+        "status": "same",
+        "reason": "正文未变，但来源或核对链发生变化",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [
+          "18:000001"
+        ],
+        "chapter_record_ids": [
+          "18:000001"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-19",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "19:000000"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-20",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-21",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-22",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-23",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-24",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "24:000002",
+          "24:000003",
+          "24:000006"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-25",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-26",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "26:000000"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-27",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "",
+        "used_record_ids": [
+          "27:000017"
+        ],
+        "chapter_record_ids": [
+          "27:000017"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-28",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-29",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S4",
+        "category_id": "CAT-30",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "after_text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "not_generated"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-01",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-02",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-03",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-04",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "",
+        "used_record_ids": [
+          "04:000018"
+        ],
+        "chapter_record_ids": [
+          "04:000018"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-05",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-06",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-07",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-08",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-09",
+        "status": "same",
+        "reason": "正文未变，但来源或核对链发生变化",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [
+          "09:000082"
+        ],
+        "chapter_record_ids": [
+          "09:000078",
+          "09:000079",
+          "09:000080",
+          "09:000081",
+          "09:000082"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-10",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "",
+        "used_record_ids": [
+          "10:000082"
+        ],
+        "chapter_record_ids": [
+          "10:000078",
+          "10:000079",
+          "10:000080",
+          "10:000081",
+          "10:000082"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-11",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "not_generated"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-12",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "12:000078",
+          "12:000079",
+          "12:000080",
+          "12:000081",
+          "12:000082",
+          "12:000083",
+          "12:000084",
+          "12:000085",
+          "12:000086",
+          "12:000087",
+          "12:000088",
+          "12:000089",
+          "12:000090",
+          "12:000091",
+          "12:000092",
+          "12:000093",
+          "12:000094",
+          "12:000095",
+          "12:000096",
+          "12:000097",
+          "12:000099",
+          "12:000214",
+          "12:000217",
+          "12:000273",
+          "12:000274",
+          "12:000275"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-13",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "13:000019",
+          "13:000020",
+          "13:000021",
+          "13:000022",
+          "13:000023",
+          "13:000024",
+          "13:000025"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-14",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-15",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "15:000021",
+          "15:000023",
+          "15:000026",
+          "15:000029",
+          "15:000038"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-16",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-17",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-18",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-19",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-20",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-21",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-22",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-23",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-24",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "24:000008"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-25",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-26",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "26:000000"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-27",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "",
+        "used_record_ids": [
+          "27:000024"
+        ],
+        "chapter_record_ids": [
+          "27:000024"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-28",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-29",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S7.1",
+        "category_id": "CAT-30",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "after_text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "not_generated"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-01",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-02",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-03",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-04",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "",
+        "used_record_ids": [
+          "04:000013"
+        ],
+        "chapter_record_ids": [
+          "04:000013"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-05",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-06",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-07",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-08",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-09",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "09:000061",
+          "09:000062",
+          "09:000063",
+          "09:000064"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-10",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "10:000061",
+          "10:000062",
+          "10:000063",
+          "10:000064"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-11",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "not_generated"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-12",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "12:000048",
+          "12:000049",
+          "12:000050",
+          "12:000052",
+          "12:000053",
+          "12:000054",
+          "12:000055",
+          "12:000056",
+          "12:000101",
+          "12:000119",
+          "12:000130",
+          "12:000223",
+          "12:000226",
+          "12:000266"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-13",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "13:000012",
+          "13:000013",
+          "13:000042"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-14",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-15",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "15:000014",
+          "15:000015",
+          "15:000016",
+          "15:000020",
+          "15:000027",
+          "15:000038",
+          "15:000043"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-16",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-17",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-18",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "",
+        "used_record_ids": [
+          "18:000006",
+          "18:000007"
+        ],
+        "chapter_record_ids": [
+          "18:000006",
+          "18:000007"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-19",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-20",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-21",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-22",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-23",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "",
+        "used_record_ids": [
+          "23:000000"
+        ],
+        "chapter_record_ids": [
+          "23:000000"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-24",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-25",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-26",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [
+          "26:000000"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "review"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-27",
+        "status": "blocked",
+        "reason": "移除后当前实现无法成稿；这是实现依赖，不能单独证明语义内容必要",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "",
+        "used_record_ids": [
+          "27:000019"
+        ],
+        "chapter_record_ids": [
+          "27:000019"
+        ],
+        "configured_mode": "auto",
+        "effective_role": "input"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-28",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-29",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "unused"
+      },
+      {
+        "section_id": "S5.2",
+        "category_id": "CAT-30",
+        "status": "not_consumed",
+        "reason": "当前章节写作路径未消费此类记录",
+        "before_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "after_text": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。",
+        "used_record_ids": [],
+        "chapter_record_ids": [],
+        "configured_mode": "auto",
+        "effective_role": "not_generated"
+      }
+    ],
+    "removal_count": 90,
+    "simulation_only": true
+  },
+  "fixed_cases": [
+    {
+      "name": "S4-首年较小值",
+      "status": "ready",
+      "text": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+      "facts": [
+        {
+          "slot_id": "N017",
+          "label": "首年客户需求",
+          "unit": "套",
+          "fact_key": "first_year_demand",
+          "value": "300000",
+          "status": "PROVIDED"
+        },
+        {
+          "slot_id": "N034",
+          "label": "合格能力",
+          "unit": "套",
+          "fact_key": "qualified_capacity",
+          "value": "254016",
+          "status": "PROVIDED"
+        },
+        {
+          "slot_id": "N035",
+          "label": "首年计划销售量",
+          "unit": "套",
+          "fact_key": "planned_sales",
+          "value": "254016",
+          "status": "COMPUTED"
+        }
+      ],
+      "trace": [
+        {
+          "rule_id": "simulation:R006",
+          "name": "示例首年计划销售量",
+          "target": "planned_sales",
+          "expression": "min(first_year_demand, qualified_capacity)",
+          "deps": [
+            "first_year_demand",
+            "qualified_capacity"
+          ],
+          "status": "COMPUTED",
+          "missing": [],
+          "result": "254016",
+          "inputs": {
+            "first_year_demand": "300000",
+            "qualified_capacity": "254016"
+          }
+        }
+      ]
+    },
+    {
+      "name": "S4-有效零值",
+      "status": "ready",
+      "text": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+      "facts": [
+        {
+          "slot_id": "N017",
+          "label": "首年客户需求",
+          "unit": "套",
+          "fact_key": "first_year_demand",
+          "value": "0",
+          "status": "PROVIDED"
+        },
+        {
+          "slot_id": "N034",
+          "label": "合格能力",
+          "unit": "套",
+          "fact_key": "qualified_capacity",
+          "value": "254016",
+          "status": "PROVIDED"
+        },
+        {
+          "slot_id": "N035",
+          "label": "首年计划销售量",
+          "unit": "套",
+          "fact_key": "planned_sales",
+          "value": "0",
+          "status": "COMPUTED"
+        }
+      ],
+      "trace": [
+        {
+          "rule_id": "simulation:R006",
+          "name": "示例首年计划销售量",
+          "target": "planned_sales",
+          "expression": "min(first_year_demand, qualified_capacity)",
+          "deps": [
+            "first_year_demand",
+            "qualified_capacity"
+          ],
+          "status": "COMPUTED",
+          "missing": [],
+          "result": "0",
+          "inputs": {
+            "first_year_demand": "0",
+            "qualified_capacity": "254016"
+          }
+        }
+      ]
+    },
+    {
+      "name": "S4-输入缺失",
+      "status": "blocked",
+      "text": "",
+      "facts": [
+        {
+          "slot_id": "N017",
+          "label": "首年客户需求",
+          "unit": "套",
+          "fact_key": "first_year_demand",
+          "value": null,
+          "status": "UNDEFINED"
+        },
+        {
+          "slot_id": "N034",
+          "label": "合格能力",
+          "unit": "套",
+          "fact_key": "qualified_capacity",
+          "value": "254016",
+          "status": "PROVIDED"
+        },
+        {
+          "slot_id": "N035",
+          "label": "首年计划销售量",
+          "unit": "套",
+          "fact_key": "planned_sales",
+          "value": null,
+          "status": "UNEVALUABLE"
+        }
+      ],
+      "trace": [
+        {
+          "rule_id": "simulation:R006",
+          "name": "示例首年计划销售量",
+          "target": "planned_sales",
+          "expression": "min(first_year_demand, qualified_capacity)",
+          "deps": [
+            "first_year_demand",
+            "qualified_capacity"
+          ],
+          "status": "UNEVALUABLE",
+          "missing": [
+            "first_year_demand"
+          ],
+          "result": null
+        }
+      ]
+    },
+    {
+      "name": "S4-条件变化",
+      "status": "ready",
+      "text": "四、产能测算与交付匹配\n首年客户需求100,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为100,000套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。",
+      "facts": [
+        {
+          "slot_id": "N017",
+          "label": "首年客户需求",
+          "unit": "套",
+          "fact_key": "first_year_demand",
+          "value": "100000",
+          "status": "PROVIDED"
+        },
+        {
+          "slot_id": "N034",
+          "label": "合格能力",
+          "unit": "套",
+          "fact_key": "qualified_capacity",
+          "value": "254016",
+          "status": "PROVIDED"
+        },
+        {
+          "slot_id": "N035",
+          "label": "首年计划销售量",
+          "unit": "套",
+          "fact_key": "planned_sales",
+          "value": "100000",
+          "status": "COMPUTED"
+        }
+      ],
+      "trace": [
+        {
+          "rule_id": "simulation:R006",
+          "name": "示例首年计划销售量",
+          "target": "planned_sales",
+          "expression": "min(first_year_demand, qualified_capacity)",
+          "deps": [
+            "first_year_demand",
+            "qualified_capacity"
+          ],
+          "status": "COMPUTED",
+          "missing": [],
+          "result": "100000",
+          "inputs": {
+            "first_year_demand": "100000",
+            "qualified_capacity": "254016"
+          }
+        }
+      ]
+    },
+    {
+      "name": "S7.1-新供应商",
+      "status": "ready",
+      "text": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。",
+      "facts": [
+        {
+          "slot_id": "supplier_name",
+          "label": "本项目设备供应商",
+          "unit": "",
+          "fact_key": "supplier_name",
+          "value": "新拓设备",
+          "status": "PROVIDED"
+        },
+        {
+          "slot_id": "N080",
+          "label": "自动焊接线购置单价",
+          "unit": "万元/条",
+          "fact_key": "equipment_unit_price",
+          "value": "1234.50",
+          "status": "PROVIDED"
+        }
+      ],
+      "trace": [
+        {
+          "rule_id": "simulation:R006",
+          "name": "示例首年计划销售量",
+          "target": "planned_sales",
+          "expression": "min(first_year_demand, qualified_capacity)",
+          "deps": [
+            "first_year_demand",
+            "qualified_capacity"
+          ],
+          "status": "COMPUTED",
+          "missing": [],
+          "result": "254016",
+          "inputs": {
+            "first_year_demand": "300000",
+            "qualified_capacity": "254016"
+          }
+        }
+      ]
+    }
+  ],
+  "configuration": {
+    "save_version": 1,
+    "restore_version": 2,
+    "project_version_after_restore": 5,
+    "restored": true
+  },
+  "real_model": {
+    "attempts": [
+      {
+        "section_id": "S4",
+        "status": "committed_working_draft",
+        "message": "验收脚本已确认候选，仍待人工核对",
+        "report_version": 1,
+        "event_id": "65ecf2df-b010-4304-8296-b71f0440125a"
+      },
+      {
+        "section_id": "S7.1",
+        "status": "committed_working_draft",
+        "message": "验收脚本已确认候选，仍待人工核对",
+        "report_version": 2,
+        "event_id": "0b4a685c-298c-4e62-9e04-5df5cda8296a"
+      }
+    ],
+    "confirmed_count": 2,
+    "export": {
+      "status": "created",
+      "path": "test-fixtures/material-application/model-preview.zip",
+      "byte_size": 42538
+    }
+  }
+}

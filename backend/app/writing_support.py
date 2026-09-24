@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 
 from .corpus_storage import CorpusArchive, CorpusRecord
 from .db import ProjectFact, RuleRecord, WritingBinding, WritingReference
-from .report_pipeline import model_section
+from .writing_model import ModelInputChanged, generate as generate_model, prepare_input
 from .writing import SLOTS, render_cases
 
 
@@ -121,7 +121,7 @@ def _model_fact_references(text: str, keys: list[str], state: dict[str, dict]) -
     own non-overlapping occurrence, including equal-valued input and result
     facts. Other numeric transformations remain unsupported here.
     """
-    number_pattern = re.compile(r"(?<![\d.,])\d[\d,]*(?:\.\d+)?(?![\d.,])")
+    number_pattern = re.compile(r"(?<![\d.,])[-+]?\d[\d,]*(?:\.\d+)?(?![\d.,])")
     spans: list[tuple[int, int, str]] = []
     for key in keys:
         fact = state.get(key)
@@ -144,8 +144,12 @@ def _model_fact_references(text: str, keys: list[str], state: dict[str, dict]) -
 
 
 def build_candidate(session: Session, pack: dict, state: dict[str, dict], rules: list[RuleRecord],
-                    bindings: dict[str, str], approved_item_ids: list[str], mode: str) -> dict:
+                    bindings: dict[str, str], approved_item_ids: list[str], mode: str,
+                    *, model_context: dict | None = None, expected_input_sha256: str | None = None) -> dict:
     """Make a reviewable candidate; never substitute historical values into a project."""
+    if mode == "model":
+        return build_model_candidate(session, pack, state, rules, bindings, approved_item_ids,
+                                     model_context or {}, expected_input_sha256)
     section_id = pack["section"]["id"]
     if section_id not in GUIDED_SECTIONS:
         raise ValueError("本章尚未完成写作映射与验证")
@@ -157,11 +161,13 @@ def build_candidate(session: Session, pack: dict, state: dict[str, dict], rules:
     if any(item_id not in by_id or by_id[item_id]["decision"] != "selectable" for item_id in approved_item_ids):
         raise ValueError("只能选择本章可复用的结构或受限模式")
     approved = set(approved_item_ids)
+    if any(item_id not in approved for item_id in pack.get("required_item_ids", [])):
+        raise ValueError("本章必需的结构、规则或受限写法尚未启用并确认")
     corpus_id, version = pack["corpus_id"], pack["corpus_version"]
 
     def item(category: int, semantic_id: str) -> dict | None:
         return next((entry for entry in pack["items"] if entry["category_number"] == category and
-                     entry["semantic_id"] == semantic_id), None)
+                     entry["semantic_id"] == semantic_id and entry.get("configured_mode") != "review"), None)
 
     def ref(entry: dict, use: str) -> dict:
         return {**source_ref(corpus_id, version, entry), "use": use}
@@ -192,10 +198,13 @@ def build_candidate(session: Session, pack: dict, state: dict[str, dict], rules:
         chunk_id = GUIDED_SECTIONS[section_id]
         skeleton = item(10, chunk_id)
         raw_chunk = item(9, chunk_id)
-        if skeleton is None or raw_chunk is None or skeleton["item_id"] not in approved:
+        if skeleton is None or skeleton["item_id"] not in approved:
             raise ValueError("请先确认本章切块的可复用槽位")
-        main_refs = [ref(raw_chunk, "source_location_only"), ref(skeleton, "slot_format_only")]
-        used.update({raw_chunk["item_id"], skeleton["item_id"]})
+        main_refs = [ref(skeleton, "slot_format_only")]
+        used.add(skeleton["item_id"])
+        if raw_chunk is not None:
+            main_refs.insert(0, ref(raw_chunk, "source_location_only"))
+            used.add(raw_chunk["item_id"])
         if section_id == "S4":
             rule = item(13, "R006")
             claim = item(15, "L002")
@@ -211,28 +220,7 @@ def build_candidate(session: Session, pack: dict, state: dict[str, dict], rules:
             raise ValueError("项目事实或规则尚不足以起草：" + "；".join(entry["message"] for entry in blockers))
         issues.extend(case_issues)
         fact_keys = list(dict.fromkeys(entry["fact_key"] for entry in block["references"]))
-        if mode == "guided":
-            body_texts = [(block["text"], block["references"], fact_keys)]
-        else:
-            selected_facts = []
-            for key in fact_keys:
-                project_fact = state[key]
-                selected_facts.append({"key": key, "label": project_fact["label"],
-                                       "value": project_fact["value"], "unit": project_fact["unit"],
-                                       "source": project_fact["source"]})
-            generated = model_section(str(pack["section"]["title"]), selected_facts)
-            body_texts = []
-            for paragraph in generated:
-                text = str(paragraph["children"][0]["text"])
-                refs = _model_fact_references(text, paragraph["fact_keys"], state)
-                if "禾进装备" in text and state.get(bindings.get("supplier_name", ""), {}).get("value") != "禾进装备":
-                    raise ValueError("模型候选残留历史供应商名称")
-                if section_id == "S4" and ("已签订单" in text or "需求低于能力" in text):
-                    raise ValueError("模型候选包含未核实订单或失效的条件句")
-                body_texts.append((text, refs, paragraph["fact_keys"]))
-        if mode == "model" and not set(fact_keys).issubset({key for _, _, paragraph_keys in body_texts
-                                                            for key in paragraph_keys}):
-            raise ValueError("模型候选未覆盖本章必需的项目事实")
+        body_texts = [(block["text"], block["references"], fact_keys)]
         for text, references, keys in body_texts:
             paragraph = {"type": "p", "id": str(uuid4()), "section_id": section_id,
                          "source_refs": ([entry for entry in main_refs if entry.get("semantic_id") != "R006"]
@@ -286,7 +274,7 @@ def source_ref(corpus_id: str, version: str, item: dict) -> dict:
     }.items() if value is not None}
 
 
-def package(session: Session, project_id: str, section_id: str) -> dict:
+def package(session: Session, project_id: str, section_id: str, *, apply_settings: bool = True) -> dict:
     reference, archive = accepted_reference(session, project_id)
     template = _record(session, archive.id, 27, section_id)
     outline = _record(session, archive.id, 4, section_id)
@@ -438,7 +426,7 @@ def package(session: Session, project_id: str, section_id: str) -> dict:
         issues.append({"code": "REQUIRED_PATTERN_MISSING", "severity": "block",
                        "message": "本章必需的结构或规则记录缺失，暂不能起草", "item_ids": required_item_ids})
 
-    return {
+    result = {
         "section": {"id": section_id, "title": template.payload.get("title"), "level": template.payload.get("level")},
         "project_id": project_id,
         "corpus_id": archive.id,
@@ -451,3 +439,54 @@ def package(session: Session, project_id: str, section_id: str) -> dict:
                    "status": fact.value_status, "unit": fact.unit, "revision": fact.revision}
                   for fact in facts],
     }
+    if apply_settings:
+        from .writing_materials import apply_package_configuration
+        return apply_package_configuration(session, project_id, section_id, result)
+    return result
+
+
+
+def prepare_model_input(session, pack, state, rules, bindings, approved_item_ids, context):
+    """Reuse existing deterministic eligibility checks, then project reviewed DB fields."""
+    if pack["section"]["id"] not in {"S4", "S7.1"}:
+        raise ValueError("本章不支持模型起草")
+    base = build_candidate(session, pack, state, rules, bindings, approved_item_ids, "guided")
+    keys = list(dict.fromkeys(key for block in base["paragraphs"] for key in block.get("fact_keys", [])))
+    prepared = prepare_input(session, pack, state, rules, bindings, approved_item_ids, keys, context)
+    return prepared, base
+
+
+def build_model_candidate(session, pack, state, rules, bindings, approved_item_ids, context, expected_hash):
+    prepared, base = prepare_model_input(session, pack, state, rules, bindings, approved_item_ids, context)
+    if not expected_hash or expected_hash != prepared["input_sha256"]:
+        raise ModelInputChanged("起草依据已变化，请重新查看后生成")
+    generated, model_call = generate_model(prepared["model_input"])
+    materials = {entry["item_id"]: entry for entry in prepared["model_input"]["materials"]}
+    paragraphs = [base["paragraphs"][0]]
+    usages = []
+    project_refs = {rule["target_key"]: rule for block in base["paragraphs"]
+                    for rule in block.get("project_rule_refs", [])}
+    for part in generated:
+        references = _model_fact_references(part["text"], part["fact_keys"], state)
+        node = {"type": "p", "id": str(uuid4()), "section_id": pack["section"]["id"],
+                "origin": "model", "fact_keys": part["fact_keys"],
+                "children": _inline_facts(part["text"], references),
+                "source_refs": [{**materials[key]["source_ref"], "use": "model_" + materials[key]["role"]}
+                                for key in part["source_item_ids"]]}
+        applicable = [value for key, value in project_refs.items() if key in part["fact_keys"]]
+        if applicable:
+            node["project_rule_refs"] = applicable
+        paragraphs.append(node)
+        usages.append({"paragraph_id": node["id"], "source_item_ids": part["source_item_ids"],
+                       "fact_keys": part["fact_keys"]})
+    used = {ref["record_id"] for block in paragraphs for ref in block["source_refs"]}
+    excluded = {entry["item_id"]: entry["reason"] for entry in prepared["excluded_items"]}
+    return {"paragraphs": paragraphs, "issues": base["issues"], "used_items": sorted(used),
+            "rejected_items": [{"item_id": entry["item_id"], "decision": entry["decision"],
+                                "reason": excluded.get(entry["item_id"], "已发送模型，但未被输出引用")}
+                               for entry in pack["items"] if entry["item_id"] not in used],
+            "source_refs": [{"block_id": block["id"], "section_id": block["section_id"],
+                             "refs": block["source_refs"], "project_rule_refs": block.get("project_rule_refs", [])}
+                            for block in paragraphs],
+            "model_input": prepared["model_input"], "input_sha256": prepared["input_sha256"],
+            "model_call": model_call, "model_usage": usages}

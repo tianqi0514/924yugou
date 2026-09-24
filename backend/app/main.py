@@ -30,7 +30,9 @@ from .model_settings import is_configured, parse_document_page, resolve_model, r
 from .report_pipeline import change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
 from .rules import EvalValue, RuleError, evaluate, parse_expression, sort_rules, unit_dimension
 from .writing import SLOTS, SLOT_BY_ID, render_cases, source_cases
-from .writing_support import GUIDED_SECTIONS, accepted_reference, build_candidate, package as writing_package, sections as writing_sections
+from .writing_support import GUIDED_SECTIONS, accepted_reference, build_candidate, prepare_model_input, package as writing_package, sections as writing_sections
+from .writing_model import ModelInputChanged
+from .writing_materials import router as material_router
 from .corpus_storage import CorpusArchive, CorpusRecord
 
 
@@ -53,6 +55,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="通用专业报告平台", version="0.1.0", lifespan=lifespan)
 app.include_router(model_router)
+app.include_router(material_router)
 corpus = CorpusRepository()
 preview_secret = secrets.token_bytes(32)
 BUILTIN_PROJECT_ID = "92b09c9d-801c-5fcb-90e6-67bbcd5179a6"
@@ -179,9 +182,14 @@ class WritingPackDraft(BaseModel):
     section_id: str = Field(min_length=1, max_length=80)
     approved_item_ids: list[str] = Field(default_factory=list, max_length=80)
     mode: str = "guided"
+    expected_input_sha256: str | None = None
 
 
 class WritingPackCommit(WritingPackDraft):
+    model_input: dict | None = None
+    input_sha256: str | None = None
+    model_call: dict = Field(default_factory=dict)
+    model_usage: list[dict] = Field(default_factory=list)
     paragraphs: list[dict] = Field(min_length=2, max_length=8)
     issues: list[dict] = Field(default_factory=list)
     used_items: list[str] = Field(default_factory=list)
@@ -1438,6 +1446,7 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
                                   "project_rule_refs": block.get("project_rule_refs", [])}
                                  for block in item.content if block.get("source_refs")],
                  "writing_issues": issues,
+                 "writing_model_audits": _model_audits(session, project_id, report_id),
                  "evidence_bindings": evidence_audit,
                  "facts": [{"key": key, "label": facts[key].label, "value": facts[key].value_text, "unit": facts[key].unit,
                             "revision": facts[key].revision, "source": facts[key].source} for key in sorted(used)]}
@@ -1877,6 +1886,41 @@ def writing_source_impact(project_id: str, record_id: str):
         return {"record_id": record_id, "impacts": impacts}
 
 
+def _model_audits(session, project_id: str, report_id: str) -> list[dict]:
+    rows = session.scalars(select(WritingCommitEvent).where(
+        WritingCommitEvent.project_id == project_id, WritingCommitEvent.report_id == report_id,
+        WritingCommitEvent.mode == "model").order_by(WritingCommitEvent.report_version)).all()
+    return [{"event_id": row.id, "report_version": row.report_version, "section_id": row.section_id,
+             "created_at": row.created_at.isoformat(), "model_audit": row.model_audit} for row in rows if row.model_audit]
+
+
+@app.get("/api/projects/{project_id}/reports/{report_id}/writing/model-audits")
+def report_model_audits(project_id: str, report_id: str):
+    with SessionLocal() as session:
+        _report(session, project_id, report_id)
+        return {"audits": _model_audits(session, project_id, report_id)}
+
+
+@app.post("/api/projects/{project_id}/reports/{report_id}/writing/model-input")
+def report_model_input(project_id: str, report_id: str, body: WritingPackDraft):
+    if body.mode != "model":
+        fail("请选择模型起草", 409)
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        require_writable_project(project)
+        report = _report(session, project_id, report_id)
+        try:
+            pack = writing_package(session, project_id, body.section_id)
+            facts, rules, bindings = _writing_rows(session, project_id)
+            state, _ = simulate(facts, rules)
+            prepared, _ = prepare_model_input(session, pack, state, rules, bindings, body.approved_item_ids,
+                                             {"project_version": project.version, "report_id": report.id,
+                                              "report_version": report.version})
+            return prepared
+        except (ValueError, RuleError) as exc:
+            fail(str(exc), 409)
+
+
 @app.post("/api/projects/{project_id}/reports/{report_id}/writing/preview")
 def report_writing_preview(project_id: str, report_id: str, body: WritingPackDraft):
     if body.mode not in {"guided", "model"}:
@@ -1890,12 +1934,20 @@ def report_writing_preview(project_id: str, report_id: str, body: WritingPackDra
             facts, rules, bindings = _writing_rows(session, project_id)
             state, _ = simulate(facts, rules)
             proposal = build_candidate(session, pack, state, rules, bindings,
-                                       body.approved_item_ids, body.mode)
+                                       body.approved_item_ids, body.mode,
+                                       model_context={"project_version": project.version, "report_id": report.id,
+                                                      "report_version": report.version},
+                                       expected_input_sha256=body.expected_input_sha256)
             validate_content([*report.content, *proposal["paragraphs"]])
             _validate_writing_refs(session, project_id, proposal["paragraphs"])
+        except ModelInputChanged as exc:
+            fail(str(exc), 409)
         except (ValueError, RuleError) as exc:
             fail(str(exc), 503 if body.mode == "model" else 409)
         result = {"section_id": body.section_id, "approved_item_ids": body.approved_item_ids,
+                  "expected_input_sha256": body.expected_input_sha256,
+                  "model_input": proposal.get("model_input"), "input_sha256": proposal.get("input_sha256"),
+                  "model_call": proposal.get("model_call", {}), "model_usage": proposal.get("model_usage", []),
                   "mode": body.mode, "paragraphs": proposal["paragraphs"],
                   "issues": proposal["issues"], "used_items": proposal["used_items"],
                   "rejected_items": proposal["rejected_items"],
@@ -1962,12 +2014,15 @@ def report_writing_commit(project_id: str, report_id: str, body: WritingPackComm
                           "project_rule_refs": paragraph.get("project_rule_refs", [])}
                          for paragraph in body.paragraphs],
             issues=body.issues, approved_item_ids=body.approved_item_ids,
+            model_audit={"schema_version": "writing-model-audit/v1", "model_input": body.model_input,
+                         "input_sha256": body.input_sha256, "model_call": body.model_call,
+                         "model_usage": body.model_usage} if body.mode == "model" else {},
         )
         session.add(event)
         session.flush()
         return {"report": _report_dict(report, facts, session),
                 "event_id": event.id, "used_items": body.used_items,
-                "source_refs": event.source_refs, "issues": body.issues}
+                "source_refs": event.source_refs, "issues": body.issues, "model_audit": event.model_audit}
 
 
 @app.get("/api/projects/{project_id}/writing")

@@ -1,0 +1,13 @@
+{
+  "project_id": "b222c43a-f350-407d-93e7-8ec70ba8e976",
+  "report_id": "adaae578-74d9-4d51-8be0-d00e4ee7cc78",
+  "real_browser": true,
+  "project_facts_unchanged": true,
+  "report_version": 2,
+  "cat09_mode_after_reload": "review",
+  "config_version": 3,
+  "zero_display": "min(0, 254016) = 0",
+  "missing_result": "UNEVALUABLE",
+  "purpose_dialog": "CAT-10 inspected",
+  "browser_api_origin": "test server port 8001"
+}

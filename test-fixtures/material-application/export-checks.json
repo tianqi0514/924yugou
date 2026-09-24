@@ -1,0 +1,19 @@
+{
+  "report.docx": {
+    "numeric_values_match": true,
+    "supplier_matches": true,
+    "preview_mark": true
+  },
+  "report.pdf": {
+    "numeric_values_match": true,
+    "supplier_matches": true,
+    "preview_mark": true
+  },
+  "audit.json": {
+    "model_events": 2,
+    "schemas": [
+      "writing-model-audit/v1",
+      "writing-model-audit/v1"
+    ]
+  }
+}

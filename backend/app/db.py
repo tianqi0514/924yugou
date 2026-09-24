@@ -183,6 +183,8 @@ class WritingCommitEvent(Base):
     approved_item_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
+    model_audit: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
 
 class FactEvidenceBinding(Base):
     """A reviewed, exact-value link from one project fact revision to its own original."""
@@ -260,6 +262,7 @@ def init_db() -> None:
     # Existing local installations predate candidate-level provenance. Old candidates
     # remain explicitly unattributed; new candidates always link to their run.
     with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE writing_commit_events ADD COLUMN IF NOT EXISTS model_audit JSON NOT NULL DEFAULT '{}'::json"))
         connection.execute(text("ALTER TABLE writing_references ADD COLUMN IF NOT EXISTS target_report_type varchar(60) NOT NULL DEFAULT 'feasibility'"))
         connection.execute(text("ALTER TABLE extraction_candidates ADD COLUMN IF NOT EXISTS extraction_run_id varchar(36) REFERENCES extraction_runs(id) ON DELETE SET NULL"))
         connection.execute(text("ALTER TABLE extraction_candidates ADD COLUMN IF NOT EXISTS extraction_origin varchar(20) NOT NULL DEFAULT 'UNKNOWN'"))
