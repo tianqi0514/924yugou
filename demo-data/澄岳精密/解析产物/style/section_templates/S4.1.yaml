@@ -1,0 +1,36 @@
+section_id: S4.1
+title: 4.1 交付结论与复议条件
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0053
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0053
+- chunk_id: C0054
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0054
+- chunk_id: C0055
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0055
+tables: []
+argument_patterns:
+- claim_id: L010
+  pattern: 年度平均需求可覆盖依赖规划参数，不证明峰值插单可行。
+  strength: conditional
+  requires_support:
+  - N034
+  - N018
+  - N179
+  - N029
+  - N030
+  - N031
+- claim_id: L011
+  pattern: 原文未设额外占用率淘汰阈值，也未证明低风险。
+  strength: boundary
+  requires_support:
+  - N040
+  - N034
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

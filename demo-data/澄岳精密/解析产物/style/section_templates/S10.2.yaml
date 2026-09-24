@@ -1,0 +1,45 @@
+section_id: S10.2
+title: 10.2 简化静态资金回收
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0128
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0128
+- chunk_id: C0129
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0129
+- chunk_id: C0130
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0130
+- chunk_id: C0131
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0131
+- chunk_id: C0132
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0132
+- chunk_id: C0133
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0133
+tables: []
+argument_patterns:
+- claim_id: L037
+  pattern: 首年未回收且正常年盈余大于零时才使用简式。
+  strength: conditional
+  requires_support:
+  - N147
+  - N165
+  - N166
+  - N170
+  - N171
+- claim_id: L038
+  pattern: 不得生成缺乏税费融资及更新依据的NPV、IRR或偿债结论。
+  strength: undefined
+  requires_support:
+  - N200
+  - N161
+  - N195
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

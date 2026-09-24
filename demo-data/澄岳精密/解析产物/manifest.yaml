@@ -1,0 +1,718 @@
+corpus_id: cy_tray_20260918
+schema_version: cy-corpus-native/1.0
+source_spec_version: '2.0'
+version: v2
+supersedes: v1
+built_at: '2026-09-23T03:29:31.608133+00:00'
+builder: cy-native-export 1.0; existing source-grounded extraction retained
+source_fingerprint: sha256:5c8c9902dc687ff42bc4333166ced872fe9aad40e474f9340a9db58ab53cf9d7
+normalized_fingerprint: sha256:d3c1b4c0204aa34e7ea0cb573d2912cab0a85ffb4fe34afc30658a46ce406763
+status: ready_for_review
+permission: null
+permission_note: 本地测试包，不代表已建立租户ACL或正式授权。
+counts:
+  sections: 49
+  business_chapters: 11
+  chunks: 194
+  tables: 18
+  nodes: 339
+  substantive_nodes: 201
+  structural_token_nodes: 98
+  other_metadata_or_format_nodes: 40
+  rules: 74
+  compute_rules: 62
+  select_rules: 12
+  relations: 1666
+  claims: 48
+  evidence: 12
+  embedded_internal_sources: 11
+  excerpts: 20
+  invariants: 18
+  conflicts: 1
+  gaps: 11
+  mentions: 630
+  undefined_nodes: 10
+  normalized_unicode_characters: 17733
+constraints:
+- 借形不借值：可继承章节骨架、推导逻辑、论证句式；一律不得继承数值
+- 缺值守卫：引用的节点为 undefined 时整个表达式「不可评估」，永不按 0 计算
+- 不许反算：不得由结论倒推中间量
+- 引用即绑定：每处数值必须写成 node 引用，不得写成字面量
+constraint_scope_note: 本包为原文入库快照，保留来源数值用于核验；约束中的不继承数值用于新项目装配。数字引用绑定用于受控写作，不禁止原件归档保留原值。
+frozen_archive: true
+answer_key_used: false
+review_status: not_independently_human_reviewed
+gate_verdict: pass_with_notes
+limitations:
+- 本次仅依据业务原文及其内嵌资料摘录，不读取人工核对说明，也未取得引用内部文件的完整原件。
+- 未调用向量模型。embeddings.parquet为空表，不含伪向量，signature只含结构化匹配特征且vector为null。
+- 规则、关键业务节点和论断已逐项整理并回放；没有独立人工金标，不能由数字占位覆盖宣称语义召回率100%。
+- 日期和期间变化已登记依赖及复核动作，未实现完整日历重排；阶段变化需要重新确认客户预测期间有效性。
+- 数值骨架通过原值回填检查；自由文本语义改写、并发事务、图数据库/MCP服务与完整权限脱敏尚未实现。
+- 归档原文与附录证据不可随新项目改值；新项目应另建scope并复核引用，不能重写历史证据。
+- 原文的配电冲突、融资及专项缺口仍未解决；可抽取和回放不等于项目审批或无条件开工通过。
+source_record_schema: cy-corpus-json/1.0
+artifact_category_count: 30
+format_policy: 原清单原生格式；目录型产物分文件；不增补原文未提供的业务事实
+runtime_storage_deployed: false
+embedding_status: not_generated
+embedding_file_representation: schema_only_parquet
+record_schema_note: 移除原JSON交换层封装；保留上一版业务字段与扩展字段，不宣称规范给出了完整机器schema。
+integrity_index: SHA256SUMS
+self_hash_policy: manifest自身哈希记入SHA256SUMS；manifest内不递归计算自身哈希。
+files:
+- 'no': 1
+  path: manifest.yaml
+  stage: 7
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: PG corpus 表
+  mutability: 冻结
+  agent_access: ① 注入（constraints段）
+  physical_file_count: 1
+  sha256: null
+  byte_size: null
+- 'no': 2
+  path: meta.yaml
+  stage: 2
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: PG corpus_meta
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ① 注入
+  physical_file_count: 1
+  sha256: c1d0767aa9dc905d83a1dc0bfd989a005f13b402d5161a45a04b3be66ef3fd9c
+  byte_size: 965
+- 'no': 3
+  path: provenance.yaml
+  stage: 全程
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: PG corpus_provenance
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ✕
+  physical_file_count: 1
+  sha256: de86f079fab151e1668b4442cb4a10cfc42db5d9dd367779fc22d6fef560e368
+  byte_size: 24104
+- 'no': 4
+  path: outline.yaml
+  stage: 2
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库 :Section
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ① 注入
+  physical_file_count: 1
+  sha256: 1b3004e48c24e64a3605524179692b6a138ace079b0146d7d48fbba7d2522305
+  byte_size: 37373
+- 'no': 5
+  path: source/original.docx
+  stage: 0
+  format: DOCX
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ✕
+  physical_file_count: 1
+  sha256: 5c8c9902dc687ff42bc4333166ced872fe9aad40e474f9340a9db58ab53cf9d7
+  byte_size: 64213
+- 'no': 6
+  path: source/normalized.md
+  stage: 1
+  format: Markdown
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ✕
+  physical_file_count: 1
+  sha256: d3c1b4c0204aa34e7ea0cb573d2912cab0a85ffb4fe34afc30658a46ce406763
+  byte_size: 41419
+- 'no': 7
+  path: source/offset_map.json
+  stage: 1
+  format: JSON
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ✕
+  physical_file_count: 1
+  sha256: 84fdca41611b2be1f9d13005ddfdc36f4e4652af71422cd22a0118da2ba06b5a
+  byte_size: 535340
+- 'no': 8
+  path: source/assets/*
+  stage: 1
+  format: png/csv
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ✕
+  physical_file_count: 18
+  files:
+  - path: source/assets/T00.csv
+    sha256: cfc75351155e4d44e463e53a7dd37af7a9a604f857316d2d06638cc04e1990e3
+    byte_size: 431
+  - path: source/assets/T01.csv
+    sha256: ad909134331b84f1bc89280de39af19d3733b32819134a68fa94706d7d52c2c9
+    byte_size: 934
+  - path: source/assets/T02.csv
+    sha256: 00a2b06b2b73a6009ba9a03887589df99927def1a8b88086f9dec6adada79507
+    byte_size: 276
+  - path: source/assets/T03.csv
+    sha256: 3f5d72c4de80cafc164dbd8ad378fefb5225f8e133ede324e8196589d3f29df0
+    byte_size: 425
+  - path: source/assets/T04.csv
+    sha256: ee040404a39d0716783cb323051cc090601bfd86c9cec90ce56b76855f9590a7
+    byte_size: 483
+  - path: source/assets/T05.csv
+    sha256: 814111fbd5a26897df9f77b63a1cad4719861c2ef8207e34da609719a3bdd7e7
+    byte_size: 323
+  - path: source/assets/T06.csv
+    sha256: ec3b5fef1ecd6e44bc84648369b1ab64c7619cca5542df80e31bc1c00de4e6c0
+    byte_size: 446
+  - path: source/assets/T07.csv
+    sha256: 4c071b01621295cdd83a2cdd766757faebe5afe4977d18f5b3b6988815b2935a
+    byte_size: 157
+  - path: source/assets/T08.csv
+    sha256: fbf27e418aed7be8c39b81183d3cc257698edcbb352eb5b27f860f3be9c1b4d5
+    byte_size: 387
+  - path: source/assets/T09.csv
+    sha256: 7fb5f2b953662e48bbcc9f646971b5211e54a92fa649dbe77d4c6fa31a680176
+    byte_size: 300
+  - path: source/assets/T10.csv
+    sha256: 774c276ceec646b120fadd548d50986951739ba82e935c996af5a4843cf7455a
+    byte_size: 353
+  - path: source/assets/T11.csv
+    sha256: 0cce90558ce9910629931c4df863a253f55515c65074d73a743e307187fe7739
+    byte_size: 455
+  - path: source/assets/T12.csv
+    sha256: deb518092aafda8a714630bb720801ca601643655a5afbf7004377cf3e160e83
+    byte_size: 340
+  - path: source/assets/T13.csv
+    sha256: 45086d5386ba81d5c1e55c1c758173528c40865da050900ba45a521250adec95
+    byte_size: 293
+  - path: source/assets/T14.csv
+    sha256: a664a8c7ada1684b37108074d23c05b62c675ac22122cdfa14144d950d29dc87
+    byte_size: 875
+  - path: source/assets/T15.csv
+    sha256: fcc1d2ca6eea9f8c34e93949964e391f8a666e30a502273ba27c947d2b980f14
+    byte_size: 528
+  - path: source/assets/T16.csv
+    sha256: 8517f17865aef0f30258c5707ba35ab7217f9a91a68417b09d7875a2673a4bae
+    byte_size: 670
+  - path: source/assets/T17.csv
+    sha256: 582e5856cd6b8f12fd9e8ed7baa47c3e2550fdc2465985b7ac1a982f4436d76c
+    byte_size: 1283
+- 'no': 9
+  path: chunks/chunks.jsonl
+  stage: 3
+  format: JSONL
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ✕（含原值）
+  physical_file_count: 1
+  sha256: 4e4f0af24c2749475d710bee0f7e87943c4daae8fefb65f325fdf86ed058b7b3
+  byte_size: 145053
+- 'no': 10
+  path: chunks/skeletons.jsonl
+  stage: 7
+  format: JSONL
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ② corpus_get_chunk
+  physical_file_count: 1
+  sha256: 76da482296508c9444ad7c788434fadc517c29c4ad1a1fbefac722e9fe942650
+  byte_size: 288514
+- 'no': 11
+  path: chunks/embeddings.parquet
+  stage: 3
+  format: Parquet
+  status: not_generated
+  content_status: schema_only_no_embeddings
+  primary: 向量库
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ✕
+  physical_file_count: 1
+  sha256: b76df42871f1429602c3f563f236349d4c92330f4ee74eade102b51548418d11
+  byte_size: 2242
+- 'no': 12
+  path: graph/nodes.yaml
+  stage: 4
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库 :Node
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ② graph_get_node/graph_query
+  physical_file_count: 1
+  sha256: 241c1a9dc83663157918d96e2e045a4f3b703d27a05b85d42298c580306be546
+  byte_size: 504824
+- 'no': 13
+  path: graph/rules.yaml
+  stage: 4
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库 :Rule
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ② graph_explain
+  physical_file_count: 1
+  sha256: d976af94c89185164194dc37205b9790790534db9dbc642b62dedf40fa4660ac
+  byte_size: 140513
+- 'no': 14
+  path: graph/relations.yaml
+  stage: 4
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库 边
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ② graph_impact
+  physical_file_count: 1
+  sha256: b31f9ee3a6a30fd940c2a30cfe083ed8e23b72cddfeac9d7b152722bf2b4a12f
+  byte_size: 545708
+- 'no': 15
+  path: graph/claims.yaml
+  stage: 4
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库 :Claim
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ②+③
+  physical_file_count: 1
+  sha256: 2987ec0024aee0879068f9e9dafaccedd9e1e323fe9f21a02166e451ec7bc0c0
+  byte_size: 51941
+- 'no': 16
+  path: graph/invariants.yaml
+  stage: 6
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库 :Invariant
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ② gate_check
+  physical_file_count: 1
+  sha256: 56f917c192934458c191f2aebab2a955a36f9a6367abdd6948a2dd66202267c6
+  byte_size: 9895
+- 'no': 17
+  path: graph/graph.yaml
+  stage: 4
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ✕（整包不给）
+  physical_file_count: 1
+  sha256: 196cb8373fcacefd5157899d99f56bd9481cb8171ba9ad5f599a6affb5cccd87
+  byte_size: 1323873
+- 'no': 18
+  path: evidence/evidence.yaml
+  stage: 4
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: PG evidence
+  replica: 对象存储
+  mutability: 可更新
+  agent_access: ② evidence_get
+  physical_file_count: 1
+  sha256: 4c53de65af0a6de9259ad93e99628db2de65e0343c46af6b693109d762894fb8
+  byte_size: 24981
+- 'no': 19
+  path: evidence/excerpts/*.md
+  stage: 4
+  format: Markdown
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ② evidence_get(with_excerpt)
+  physical_file_count: 20
+  files:
+  - path: evidence/excerpts/EX-01-01.md
+    sha256: 11570abd81183300bcb9c6432dffb12f8b82c932e52664e748f30cc6db4fec0f
+    byte_size: 374
+  - path: evidence/excerpts/EX-02-01.md
+    sha256: 22327a971cc78685db6db5419ca252fccb3cf29eebb90a6119c9d8fd9e7fe540
+    byte_size: 340
+  - path: evidence/excerpts/EX-02-02.md
+    sha256: 89a3073d099730d82a2560c9bb76e155cb07406686dc2f99230a870437901de5
+    byte_size: 391
+  - path: evidence/excerpts/EX-03-01.md
+    sha256: 9895878ff482ba898b308674ccd59cd3e7d154d45f80c05650fde83557629ec6
+    byte_size: 269
+  - path: evidence/excerpts/EX-03-02.md
+    sha256: b45ba12f971a0bc4d9e5e44b3e45ddf42a9bf65569bf38f7686a02d8ce2fd6ef
+    byte_size: 295
+  - path: evidence/excerpts/EX-04-01.md
+    sha256: a0869dfc7230b8e96c35b54d0f55074f52692e5b53aefdc58b64900d72854cd9
+    byte_size: 345
+  - path: evidence/excerpts/EX-04-02.md
+    sha256: 408f15d988b63b7eb460d3f229ee4fffda3f91fdd897d9859b6c64a4422fef47
+    byte_size: 269
+  - path: evidence/excerpts/EX-05-01.md
+    sha256: f45b2f7bf3a2eacb3effe4626d7a6a1e4390b2a31f25da0f7941a7bc68acd16a
+    byte_size: 341
+  - path: evidence/excerpts/EX-05-02.md
+    sha256: 53bd4a1128b7d26101f2a35da86aaf17f41054814d4bb47d833f0015fb41a7fd
+    byte_size: 268
+  - path: evidence/excerpts/EX-05-03.md
+    sha256: 7662d47898e9f5b51507e02b85af5af73d1a73fef586d4333504c273f8b495b2
+    byte_size: 259
+  - path: evidence/excerpts/EX-05-04.md
+    sha256: cf80303dc1a260bb445ff7cbe07aa8fcfa98b3529a1eca8d2a4e097e3e77dfba
+    byte_size: 291
+  - path: evidence/excerpts/EX-05-05.md
+    sha256: a9fa77ba8f66a984dfe61ffba7ebb2357b3093e1908e371da9168d1fd693950b
+    byte_size: 393
+  - path: evidence/excerpts/EX-06A-01.md
+    sha256: e74c17c42e276ff7587f7f0e9a5c36d6d0f4a14837189dff1b44ae285cdbb9ef
+    byte_size: 184
+  - path: evidence/excerpts/EX-06B-01.md
+    sha256: c1184aa505eb555895b4898164f6584ab6026d156f994c0d1aa6989af1f03d8c
+    byte_size: 203
+  - path: evidence/excerpts/EX-07-01.md
+    sha256: a1c4e1011cb9f03d054120be32fdf24d015ec60c60d059f7728cb7de26e1b051
+    byte_size: 288
+  - path: evidence/excerpts/EX-08-01.md
+    sha256: 2abe94e3eeac7b79fc3f0bd65d8da7060c0416160f6eab7e5b022bfb860c8cbb
+    byte_size: 369
+  - path: evidence/excerpts/EX-08-02.md
+    sha256: 09e03c1c905860c8c8ac2a7c01bdbb81941cfc9d74dd01de52a88d50707c7fe9
+    byte_size: 354
+  - path: evidence/excerpts/EX-09-01.md
+    sha256: 9ffd8fe8b439550a0216a8318db62dec12aede83557227e69caf03a575a32830
+    byte_size: 259
+  - path: evidence/excerpts/EX-10-01.md
+    sha256: e30da4f04fc75dba215a3dfb39f56bba6cbb6f14f46b2b07cb16afb93dcbdb2c
+    byte_size: 331
+  - path: evidence/excerpts/EX-10-02.md
+    sha256: 1eaec9dd60ea8a9e88a6c3b12b84a1ec5df9b0eca08b33e11bd3c04897166e9a
+    byte_size: 240
+- 'no': 20
+  path: reasoning/derivation.yaml
+  stage: 5
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库+对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ② graph_explain
+  physical_file_count: 1
+  sha256: ffa39989e2a56a4ea06ea8e7c3d438638f1600834f10b321876f174163486e7a
+  byte_size: 264226
+- 'no': 21
+  path: reasoning/decisions.yaml
+  stage: 5
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: PG decisions
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ② graph_why
+  physical_file_count: 1
+  sha256: 0a7fb62503fd5b76a4c5b616f278e729bd9abfc05b208294732bb569abfbf717
+  byte_size: 16380
+- 'no': 22
+  path: reasoning/trace.jsonl
+  stage: 5
+  format: JSONL
+  status: generated
+  content_status: populated
+  primary: 事件流
+  replica: 对象存储
+  mutability: 追加
+  agent_access: ✕
+  physical_file_count: 1
+  sha256: 862096cf8c60782106c0cc3b19c08fdf4d6f4dbb8b896ca4f704ba5e16cbe168
+  byte_size: 41704
+- 'no': 23
+  path: quality/conflicts.yaml
+  stage: 6
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库 :Conflict
+  replica: 对象存储
+  mutability: 可更新
+  agent_access: ③ 内嵌
+  physical_file_count: 1
+  sha256: efede00f8b7846b79085e69178c8be4e4dd84c4ae2e9b8e3c390f228fbc67e60
+  byte_size: 1613
+- 'no': 24
+  path: quality/gaps.yaml
+  stage: 6
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 图库 :Gap
+  replica: 对象存储
+  mutability: 可更新
+  agent_access: ③ 内嵌
+  physical_file_count: 1
+  sha256: 819ea7bb4efab6edd7839ac16b03a53d389b92527f0caf44ca17322e5e05deab
+  byte_size: 11261
+- 'no': 25
+  path: quality/gate_report.yaml
+  stage: 6
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: PG gate_report
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ① 仅结论行
+  physical_file_count: 1
+  sha256: 3c0c6da663c9aea22de469a1e39457567f91260242a647e1c4462d654c2e4eb3
+  byte_size: 10914
+- 'no': 26
+  path: style/style_profile.yaml
+  stage: 7
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: PG style_profile
+  replica: 对象存储
+  mutability: 可更新
+  agent_access: ① 注入
+  physical_file_count: 1
+  sha256: 4af99d5dad0041dd4040e7fbba8368135eac73c9520bd93f6ba50de963a076dc
+  byte_size: 8263
+- 'no': 27
+  path: style/section_templates/*.yaml
+  stage: 7
+  format: YAML
+  status: generated
+  content_status: populated
+  primary: 对象存储
+  replica: null
+  mutability: 冻结
+  agent_access: ② corpus_get_skeleton
+  physical_file_count: 49
+  files:
+  - path: style/section_templates/FRONT.yaml
+    sha256: 8fb4a2f771d2b26eb42ccd10ab67f07ca6fc5c90e9703b89a1005214cf11c369
+    byte_size: 1097
+  - path: style/section_templates/READ.H1.yaml
+    sha256: 6bb5664a8cc22f66f4e22d680e64cddf667f94c302f4cb958874e5f75a810b26
+    byte_size: 946
+  - path: style/section_templates/READ.yaml
+    sha256: 5adeb3881abd05593e70bb32ef3fce1a7e66ea8a90844dbbf83eeb072b049f24
+    byte_size: 1025
+  - path: style/section_templates/S1.yaml
+    sha256: 7282bafbe6620d8c9fdb87bfe387f9e8c97eb7ed1f4df0c13282b584f1875736
+    byte_size: 922
+  - path: style/section_templates/S10.1.yaml
+    sha256: 5a1fdba9f1a69c8bc9db1601d8a5a9568950f089f6b01c52f17f0b1995195fd8
+    byte_size: 1212
+  - path: style/section_templates/S10.2.yaml
+    sha256: 4b01cda8b202ea5a91b9ff7e6f1b03705d055076f3179b421bbaa13a08b33c52
+    byte_size: 1148
+  - path: style/section_templates/S10.yaml
+    sha256: 2fa24d25d9e6dc86128adba8b569d812a9b935ad8c61f6c57b5dbcfabb5cce04
+    byte_size: 2143
+  - path: style/section_templates/S11.1.yaml
+    sha256: 487aa9f45d9552a3f15b66e3ae9da9c73f506e63853ebf6162bd8451871d1fcb
+    byte_size: 956
+  - path: style/section_templates/S11.2.yaml
+    sha256: 3ab822d901071b68edd294def0055da34c1a4e75d5a411529362b791ffc9bd02
+    byte_size: 914
+  - path: style/section_templates/S11.3.yaml
+    sha256: fb6dea1c45c7926405f44d73f457bbae33c67812affb73d38092a0f775132367
+    byte_size: 2100
+  - path: style/section_templates/S11.yaml
+    sha256: 05082714372fedf0857d00f1dfcc1e9b9177fb22c0b248a1c24fcde29730f03b
+    byte_size: 3522
+  - path: style/section_templates/S2.1.yaml
+    sha256: af42747c1fdbf86faefccba745e77baa7232f634c945429f5843bb82d03635d5
+    byte_size: 1129
+  - path: style/section_templates/S2.2.yaml
+    sha256: 3bb72c047faac905c363a77a2452afc04d93c09642b4cb4b09df39313bfce2cb
+    byte_size: 1100
+  - path: style/section_templates/S2.yaml
+    sha256: e35ed19b4e23f7c4e9aac07b7f1bd091b2966ec842fed38a87077e2257404923
+    byte_size: 2012
+  - path: style/section_templates/S3.1.yaml
+    sha256: 84c8e7af4de11d33786c1843718d37a2368246d1797adc40c49bdcc2db903558
+    byte_size: 1894
+  - path: style/section_templates/S3.yaml
+    sha256: cc1f90522dd36698437f4e1ea2ecf8c1c95d11651765ef0548804cd3c7ca6dc0
+    byte_size: 1970
+  - path: style/section_templates/S4.1.yaml
+    sha256: 2ff1b325d71108f0d212221e65a06ae71854b24ed05ce3dea3aac7c7046cc6b2
+    byte_size: 911
+  - path: style/section_templates/S4.yaml
+    sha256: f40b0c883259fa74341f7747cb541462edc8d7090aad0bc4add4b23c9a1578c4
+    byte_size: 1826
+  - path: style/section_templates/S5.1.yaml
+    sha256: 17df877a1c4b5a108250c99af018ca0893454b78a81f05a6e38c8246c8f8e305
+    byte_size: 1191
+  - path: style/section_templates/S5.2.yaml
+    sha256: 8ada8ed669ce117b59f4b3482425a2279cb764bd4dd5efaf4104000cf436bfc5
+    byte_size: 1156
+  - path: style/section_templates/S5.yaml
+    sha256: 03be0e4149d6f13a0953a92c23943b0c43a4c4661d6a4a74305e1e1f5eb63dda
+    byte_size: 2109
+  - path: style/section_templates/S6.1.yaml
+    sha256: d314eec2508c5e391cd09b67db0f482725b384e04da7e408c09491b7f0b99252
+    byte_size: 1163
+  - path: style/section_templates/S6.2.yaml
+    sha256: cd8f3a32021658c1b5b5e22c20dbe97069a309265d289e7c9dbcaaab9fcf93dc
+    byte_size: 1233
+  - path: style/section_templates/S6.yaml
+    sha256: 806e3035e9e1be86418f7fc0e6a1ea277efb2d71fa1aa77e91374921da4e2699
+    byte_size: 2194
+  - path: style/section_templates/S7.1.yaml
+    sha256: 670d0b06c06586463e557aa801eddac8d655e1c4a1dc414b4524f970d4d6afb0
+    byte_size: 1024
+  - path: style/section_templates/S7.2.yaml
+    sha256: 5588b0076dd6129030cc88da15973a701cffc72304a430b0ec07d01c32306676
+    byte_size: 926
+  - path: style/section_templates/S7.3.yaml
+    sha256: 8c337e04c6a906e169186f4fa2b9c48f272853af04cdbb496a8d532729f75c7f
+    byte_size: 1414
+  - path: style/section_templates/S7.4.yaml
+    sha256: e7024fedc6ac8138207ed0ee26e4270bb1a10fd7a2cae2462682d2a379af04d3
+    byte_size: 923
+  - path: style/section_templates/S7.yaml
+    sha256: 1d89c25fb01c955e8542b2f475b0973ed4f4ad7cd311b0029332b32c793055d5
+    byte_size: 3521
+  - path: style/section_templates/S8.1.yaml
+    sha256: 90a9c43e5f5eb7b8624ec0e4d95395362afaec359ef422fadcb0a8ca01421eca
+    byte_size: 1365
+  - path: style/section_templates/S8.2.yaml
+    sha256: f2a69803c1a7f6f91ac7643754304a32112814053bec46f047831dde110b6a2c
+    byte_size: 718
+  - path: style/section_templates/S8.yaml
+    sha256: 509a30156a781d155eab234eab2833b503fc2d787cbb5de38869e4153092a38d
+    byte_size: 1866
+  - path: style/section_templates/S9.1.yaml
+    sha256: 1b1f7b951ee388eb1e0eca945e9c76a9e51acde77d800c930e4601820567ee7c
+    byte_size: 1076
+  - path: style/section_templates/S9.2.yaml
+    sha256: eafaa1acd6ebb8dffdb953ec5786700d548b438550453450007852e695a961c3
+    byte_size: 1129
+  - path: style/section_templates/S9.yaml
+    sha256: 3079f5b1e43d9c945d53227637e292c47eaa9a8aacad1e0b20f2678c81bf6ef8
+    byte_size: 1979
+  - path: style/section_templates/SA.H1.yaml
+    sha256: 5b9355875bbc07c25fb3898bbaf5c6d6d419f5042c28538d5f225d38a97fd53c
+    byte_size: 707
+  - path: style/section_templates/SA.yaml
+    sha256: 8b30ecea3760d1fd8f5aa7bd78e344bfb91b65189379b611e63a473abae67b20
+    byte_size: 1185
+  - path: style/section_templates/SB.1.yaml
+    sha256: 8755a3be8db0ca5f9983200c1ea98934d61766f25a2c0bbeaf1a087dcbed54e3
+    byte_size: 486
+  - path: style/section_templates/SB.10.yaml
+    sha256: 46d3a9d4910b03f6e99e817eb242f41aa928a81ca6992119ff5f61994725c6c7
+    byte_size: 569
+  - path: style/section_templates/SB.2.yaml
+    sha256: 7c26606275d053759a4bfbf037437d88fb935078af52bd5b8675bf3b9c3d731f
+    byte_size: 576
+  - path: style/section_templates/SB.3.yaml
+    sha256: e1f4746872987e87a5989cdb7457348e0aa90df312429466028af0e07fbb4654
+    byte_size: 567
+  - path: style/section_templates/SB.4.yaml
+    sha256: e2bbe47c2d289f4f6c7ea2413b13717af2df47c6503fd34a14e790f90a3ffa45
+    byte_size: 561
+  - path: style/section_templates/SB.5.yaml
+    sha256: c8f488702c5d135d228c004cd40d2e5eef9e16fff21d4c49beb612b10cb6e7f5
+    byte_size: 810
+  - path: style/section_templates/SB.6.yaml
+    sha256: 4bf0d0eab747d57b105c9cbe197332c915a13ef42c87b299f21e0c99eb070c14
+    byte_size: 648
+  - path: style/section_templates/SB.7.yaml
+    sha256: 40f54b327ceda4f9940272c54318ad12272d2fc47196c1cfbfdb3903efe29856
+    byte_size: 615
+  - path: style/section_templates/SB.8.yaml
+    sha256: d6f58009e8ae4474c8d0251b5a22682ffb271c583caac54acc11389db11eb090
+    byte_size: 564
+  - path: style/section_templates/SB.9.yaml
+    sha256: 6bb868a6f6a9b328b53983f1182c92dc8fbe418855c8f6d30ac1e564ff5ae5be
+    byte_size: 487
+  - path: style/section_templates/SB.H11.yaml
+    sha256: 3d13dc022b1ddadbcefda717b00592b2750bb9efa18f56b7a69780681bd41afe
+    byte_size: 656
+  - path: style/section_templates/SB.yaml
+    sha256: 0c7d9db88b99fd2e433c0349c79bd386ba697758488efd78c581df04821c787d
+    byte_size: 3525
+- 'no': 28
+  path: index/node_index.json
+  stage: 7
+  format: JSON
+  status: generated
+  content_status: populated
+  primary: PG node_mention
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ② corpus_where_used
+  physical_file_count: 1
+  sha256: 1378cf7d99c841cd82fa71ee49ce5460f6a7e8aaef325222944a883128192436
+  byte_size: 1236781
+- 'no': 29
+  path: index/term_index.json
+  stage: 7
+  format: JSON
+  status: generated
+  content_status: populated
+  primary: PG term
+  replica: 对象存储
+  mutability: 可更新
+  agent_access: ① 术语段
+  physical_file_count: 1
+  sha256: 1c960b9286d4e4f93ce34326257ec20b8efb6825170ad494735e1cbde470ac18
+  byte_size: 19844
+- 'no': 30
+  path: index/signature.yaml
+  stage: 7
+  format: YAML
+  status: generated
+  content_status: 结构化特征已生成，向量未计算
+  primary: 向量库+PG
+  replica: 对象存储
+  mutability: 冻结
+  agent_access: ✕
+  physical_file_count: 1
+  sha256: d7443bea1199e22e3af09908e1653acecb4ca6db45b65ea2d1d1cd005bc78d0b
+  byte_size: 1221
+physical_artifact_file_count: 114
+delivery_support_files:
+- README.md
+- validate_package.py
+- SHA256SUMS
+delivery_file_count: 117
+format_conversion_status: validated

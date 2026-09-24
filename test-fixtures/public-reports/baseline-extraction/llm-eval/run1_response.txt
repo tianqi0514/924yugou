@@ -1,0 +1,179 @@
+{
+  "facts": [
+    {
+      "id": "project_name",
+      "status": "found",
+      "value": "平谷区马昌营公共交通枢纽工程",
+      "unit": null,
+      "source_ref": "p6-b5"
+    },
+    {
+      "id": "project_owner",
+      "status": "found",
+      "value": "北京市平谷区交通局",
+      "unit": null,
+      "source_ref": "p6-b7"
+    },
+    {
+      "id": "location",
+      "status": "found",
+      "value": "平谷区马昌营镇、峪口镇、大兴庄镇三镇交界处",
+      "unit": null,
+      "source_ref": "p6-b9"
+    },
+    {
+      "id": "total_land_area",
+      "status": "found",
+      "value": "73431.105",
+      "unit": "㎡",
+      "source_ref": "p6-b11"
+    },
+    {
+      "id": "construction_land_area",
+      "status": "found",
+      "value": "54088.771",
+      "unit": "㎡",
+      "source_ref": "p6-b15"
+    },
+    {
+      "id": "green_expropriated_area",
+      "status": "found",
+      "value": "3105.104",
+      "unit": "㎡",
+      "source_ref": "p6-b16"
+    },
+    {
+      "id": "road_expropriated_area",
+      "status": "found",
+      "value": "16237.23",
+      "unit": "㎡",
+      "source_ref": "p6-b16"
+    },
+    {
+      "id": "total_building_area",
+      "status": "found",
+      "value": "17268.25",
+      "unit": "㎡",
+      "source_ref": "p6-b17"
+    },
+    {
+      "id": "aboveground_building_area",
+      "status": "found",
+      "value": "15756.25",
+      "unit": "㎡",
+      "source_ref": "p6-b17"
+    },
+    {
+      "id": "underground_building_area",
+      "status": "found",
+      "value": "1512",
+      "unit": "㎡",
+      "source_ref": "p7-b2"
+    },
+    {
+      "id": "floor_area_ratio",
+      "status": "found",
+      "value": "0.291",
+      "unit": null,
+      "source_ref": "p7-b22"
+    },
+    {
+      "id": "green_rate",
+      "status": "found",
+      "value": "20",
+      "unit": "%",
+      "source_ref": "p7-b23"
+    },
+    {
+      "id": "building_density",
+      "status": "found",
+      "value": "16.65",
+      "unit": "%",
+      "source_ref": "p7-b24"
+    },
+    {
+      "id": "car_parking_spaces",
+      "status": "found",
+      "value": "149",
+      "unit": "辆",
+      "source_ref": "p7-b25"
+    },
+    {
+      "id": "underground_car_parking_spaces",
+      "status": "missing",
+      "value": null,
+      "unit": null,
+      "source_ref": "p7-b27"
+    },
+    {
+      "id": "construction_duration",
+      "status": "found",
+      "value": "12",
+      "unit": "个月",
+      "source_ref": "p8-b3"
+    },
+    {
+      "id": "planned_start_month",
+      "status": "found",
+      "value": "2025-12",
+      "unit": null,
+      "source_ref": "p8-b3"
+    },
+    {
+      "id": "planned_completion_month",
+      "status": "found",
+      "value": "2026-11",
+      "unit": null,
+      "source_ref": "p8-b4"
+    },
+    {
+      "id": "total_investment",
+      "status": "found",
+      "value": "31255.57",
+      "unit": "万元",
+      "source_ref": "p8-b6"
+    },
+    {
+      "id": "engineering_cost",
+      "status": "found",
+      "value": "22122.45",
+      "unit": "万元",
+      "source_ref": "p8-b6"
+    },
+    {
+      "id": "other_construction_cost",
+      "status": "found",
+      "value": "2701.55",
+      "unit": "万元",
+      "source_ref": "p8-b6"
+    },
+    {
+      "id": "contingency_cost",
+      "status": "found",
+      "value": "1241.20",
+      "unit": "万元",
+      "source_ref": "p8-b7"
+    },
+    {
+      "id": "land_acquisition_cost",
+      "status": "found",
+      "value": "5190.37",
+      "unit": "万元",
+      "source_ref": "p8-b7"
+    },
+    {
+      "id": "profitability_analysis",
+      "status": "not_applicable",
+      "value": "不涉及盈利能力分析",
+      "unit": null,
+      "source_ref": "p177-b28"
+    },
+    {
+      "id": "annual_ticket_revenue",
+      "status": "unknown",
+      "value": null,
+      "unit": null,
+      "source_ref": null
+    }
+  ]
+}

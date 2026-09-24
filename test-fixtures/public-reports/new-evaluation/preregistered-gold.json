@@ -1,0 +1,35 @@
+{
+  "protocol": "2026-09-24 新页留出验证；模型/OCR 调用前仅据 PDF 原件可视页预先固定以下核对点。按物理页码定位。核对点是刻意选取的少量原子事实，不是整页事实全集。",
+  "pages": [
+    {
+      "file": "03_taizhou_audit.pdf",
+      "report_type": "专项审计调查报告",
+      "physical_page": 3,
+      "source_mode": "scanned_image",
+      "gold": [
+        {"id": "A1", "label": "泰州市小微企业贷款余额", "value": "4131.41", "unit": "亿元", "scope": "2023年6月末", "visual_locator": "第3页中部，（二）金融机构扶持基本情况首句", "source_quote": "2023年6月末，泰州市小微企业贷款余额4131.41亿元"},
+        {"id": "A2", "label": "当年小微企业首贷户数", "value": "1760", "unit": "户", "scope": "2023年6月末", "visual_locator": "第3页中部，（二）金融机构扶持基本情况首句续", "source_quote": "当年小微企业首贷户数为1760户"},
+        {"id": "A3", "label": "小微企业信用贷款余额", "value": "369.04", "unit": "亿元", "scope": "2023年6月末", "visual_locator": "第3页中部，（二）金融机构扶持基本情况其中分项", "source_quote": "小微企业信用贷款余额369.04亿元"},
+        {"id": "A4", "label": "小微企业中长期贷款余额", "value": "1909.44", "unit": "亿元", "scope": "2023年6月末", "visual_locator": "第3页中部，（二）金融机构扶持基本情况其中分项", "source_quote": "中长期贷款余额1909.44亿元"},
+        {"id": "A5", "label": "普惠型小微企业贷款余额", "value": "1674.78", "unit": "亿元", "scope": "2023年6月末", "visual_locator": "第3页中部，（二）金融机构扶持基本情况其中分项", "source_quote": "普惠型小微企业贷款余额1674.78亿元"},
+        {"id": "A6", "label": "政府性融资担保机构数量", "value": "10", "unit": "家", "scope": "泰州市，2023年6月末", "visual_locator": "第3页中下部，（二）末段", "source_quote": "10家政府性融资担保机构"},
+        {"id": "A7", "label": "泰州市产融综合服务平台入驻企业", "value": "96205", "unit": "户", "scope": "截至2023年6月末", "visual_locator": "第3页下部，（三）金融服务平台基本情况首句", "source_quote": "入驻企业96205户"}
+      ]
+    },
+    {
+      "file": "04_jinjiang_accident.pdf",
+      "report_type": "事故调查报告",
+      "physical_page": 6,
+      "source_mode": "text_pdf",
+      "gold": [
+        {"id": "J1", "label": "安装施工承揽方", "value": "漳州芗城区顺航建筑劳务有限公司", "unit": "", "scope": "立乔公司光伏发电项目", "visual_locator": "第6页首段", "source_quote": "由漳州芗城区顺航建筑劳务有限公司承揽立乔公司光伏发电项目的安装施工任务"},
+        {"id": "J2", "label": "施工现场安全设施和防护用品责任方", "value": "漳州芗城区顺航建筑劳务有限公司", "unit": "", "scope": "立乔公司光伏发电项目", "visual_locator": "第6页首段", "source_quote": "施工现场的安全设施和安全防护用品由漳州芗城区顺航建筑劳务有限公司负责"},
+        {"id": "J3", "label": "人员进场施工时间", "value": "2025年7月中旬", "unit": "", "scope": "邹*杰开始组织人员", "visual_locator": "第6页首段中部", "source_quote": "2025年7月中旬，邹*杰开始组织人员进场施工"},
+        {"id": "J4", "label": "事故现场", "value": "福建省立乔建设发展有限公司5号车间屋面", "unit": "", "scope": "事发项目", "visual_locator": "第6页第二段开头", "source_quote": "事故现场位于福建省立乔建设发展有限公司5号车间屋面"},
+        {"id": "J5", "label": "屋面临时走道板", "value": "未铺设", "unit": "", "scope": "事发时屋面安装光伏板", "visual_locator": "第6页第二段中部", "source_quote": "未铺设临时走道板"},
+        {"id": "J6", "label": "施工现场安全绳配备", "value": "未配备", "unit": "", "scope": "事发时工人", "visual_locator": "第6页第二段中部", "source_quote": "施工现场未给工人配备安全绳"},
+        {"id": "J7", "label": "采光板破口距车间内部地面", "value": "11.8", "unit": "米", "scope": "事发采光板", "visual_locator": "第6页第二段末尾", "source_quote": "采光板破口处距车间内部地面约11.8米"}
+      ]
+    }
+  ]
+}

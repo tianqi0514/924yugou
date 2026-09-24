@@ -1,0 +1,260 @@
+{
+  "source_file": "01_beijing_feasibility.pdf",
+  "sha256": "4406b7c6b40fade73a785342962d2cd47f87f67e04e4e7a5c905cbb0089a551c",
+  "pdf_pages": 205,
+  "native_text_pages": 205,
+  "ocr_required_pages": [],
+  "heading_candidates": 151,
+  "table_candidates": 70,
+  "table_value_candidates": 165,
+  "table_pages": 52,
+  "contents_pages": [
+    4,
+    5
+  ],
+  "gold_passed": 11,
+  "gold_total": 11,
+  "cross_type": [
+    {
+      "source_file": "02_jiangmen_eia.pdf",
+      "pdf_pages": 65,
+      "native_text_pages": 64,
+      "ocr_required_pages": [
+        2
+      ],
+      "heading_candidates": 8,
+      "table_candidates": 114,
+      "table_value_candidates": 0
+    },
+    {
+      "source_file": "03_taizhou_audit.pdf",
+      "pdf_pages": 8,
+      "native_text_pages": 0,
+      "ocr_required_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "heading_candidates": 0,
+      "table_candidates": 0,
+      "table_value_candidates": 0
+    },
+    {
+      "source_file": "04_jinjiang_accident.pdf",
+      "pdf_pages": 15,
+      "native_text_pages": 15,
+      "ocr_required_pages": [],
+      "heading_candidates": 24,
+      "table_candidates": 0,
+      "table_value_candidates": 0
+    }
+  ],
+  "audit_page_2_text_status": "ocr_required",
+  "checks": [
+    {
+      "id": "project_name",
+      "kind": "page_text",
+      "passed": true,
+      "pdf_page": 6,
+      "block_ids": [
+        0,
+        5
+      ]
+    },
+    {
+      "id": "construction_period",
+      "kind": "page_text",
+      "passed": true,
+      "pdf_page": 8,
+      "block_ids": [
+        3
+      ]
+    },
+    {
+      "id": "total_investment_narrative",
+      "kind": "page_text",
+      "passed": true,
+      "pdf_page": 8,
+      "block_ids": [
+        6
+      ]
+    },
+    {
+      "id": "chapter_1",
+      "kind": "heading_candidate",
+      "passed": true,
+      "pdf_page": 6,
+      "block_ids": [
+        2
+      ]
+    },
+    {
+      "id": "chapter_2",
+      "kind": "heading_candidate",
+      "passed": true,
+      "pdf_page": 16,
+      "block_ids": [
+        2
+      ]
+    },
+    {
+      "id": "chapter_10",
+      "kind": "heading_candidate",
+      "passed": true,
+      "pdf_page": 191,
+      "block_ids": [
+        2
+      ]
+    },
+    {
+      "id": "technical_land_area",
+      "kind": "table_value_candidate",
+      "passed": true,
+      "pdf_page": 7,
+      "matches": [
+        {
+          "pdf_page": 7,
+          "table_id": "p7-t1",
+          "row_index": 1,
+          "label": "用地总面积",
+          "value": "73431.105",
+          "unit": "㎡",
+          "status": "numeric_candidate",
+          "label_bbox": [
+            145.56,
+            349.8,
+            287.4,
+            405.48
+          ],
+          "value_bbox": [
+            287.4,
+            349.8,
+            371.4,
+            405.48
+          ]
+        }
+      ]
+    },
+    {
+      "id": "technical_building_area",
+      "kind": "table_value_candidate",
+      "passed": true,
+      "pdf_page": 7,
+      "matches": [
+        {
+          "pdf_page": 7,
+          "table_id": "p7-t1",
+          "row_index": 5,
+          "label": "总建筑面积",
+          "value": "17268.25",
+          "unit": "㎡",
+          "status": "numeric_candidate",
+          "label_bbox": [
+            145.56,
+            464.64,
+            287.4,
+            484.32
+          ],
+          "value_bbox": [
+            287.4,
+            464.64,
+            371.4,
+            484.32
+          ]
+        }
+      ]
+    },
+    {
+      "id": "technical_parking",
+      "kind": "table_value_candidate",
+      "passed": true,
+      "pdf_page": 7,
+      "matches": [
+        {
+          "pdf_page": 7,
+          "table_id": "p7-t1",
+          "row_index": 11,
+          "label": "机动车位停车位",
+          "value": "149",
+          "unit": "辆",
+          "status": "numeric_candidate",
+          "label_bbox": [
+            145.56,
+            582.84,
+            287.4,
+            602.52
+          ],
+          "value_bbox": [
+            287.4,
+            582.84,
+            371.4,
+            602.52
+          ]
+        }
+      ]
+    },
+    {
+      "id": "investment_engineering",
+      "kind": "table_value_candidate",
+      "passed": true,
+      "pdf_page": 177,
+      "matches": [
+        {
+          "pdf_page": 177,
+          "table_id": "p177-t1",
+          "row_index": 1,
+          "label": "工程费",
+          "value": "22122.45",
+          "unit": "万元",
+          "status": "numeric_candidate",
+          "label_bbox": [
+            131.16,
+            360.6,
+            319.2,
+            378.84
+          ],
+          "value_bbox": [
+            353.76,
+            360.6,
+            450.36,
+            378.84
+          ]
+        }
+      ]
+    },
+    {
+      "id": "investment_total",
+      "kind": "table_value_candidate",
+      "passed": true,
+      "pdf_page": 177,
+      "matches": [
+        {
+          "pdf_page": 177,
+          "table_id": "p177-t1",
+          "row_index": 12,
+          "label": "总投资",
+          "value": "31255.57",
+          "unit": "万元",
+          "status": "numeric_candidate",
+          "label_bbox": [
+            131.16,
+            561.36,
+            319.2,
+            580.44
+          ],
+          "value_bbox": [
+            353.76,
+            561.36,
+            450.36,
+            580.44
+          ]
+        }
+      ]
+    }
+  ]
+}

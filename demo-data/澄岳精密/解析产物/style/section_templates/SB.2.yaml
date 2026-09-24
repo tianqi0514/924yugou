@@ -1,0 +1,20 @@
+section_id: SB.2
+title: B.2 [资料02] 装备方案预比较与能力说明
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0162
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0162
+- chunk_id: C0163
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0163
+- chunk_id: C0164
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0164
+tables: []
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

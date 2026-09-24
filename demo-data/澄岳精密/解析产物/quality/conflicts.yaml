@@ -1,0 +1,69 @@
+- id: X001
+  what: 同一接入点、同一统计基准、同一扣减范围，可用有功余量800kW与650kW不一致
+  type: same_caliber_different_value
+  nodes:
+  - N050
+  - N051
+  canonical_node: N052
+  evidence:
+  - EV-06A
+  - EV-06B
+  source_locations:
+  - block_id: B0063
+    chunk_id: C0063
+    page: 7
+    span:
+    - 5270
+    - 5394
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 68
+      body_index: 74
+      xpath: /w:document/w:body/w:p[69]
+      index_base: 0
+  - block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5396
+    - 5531
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+  - block_id: B0179
+    chunk_id: C0179
+    page: 18
+    span:
+    - 16564
+    - 16636
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 195
+      body_index: 213
+      xpath: /w:document/w:body/w:p[196]
+      index_base: 0
+  - block_id: B0180
+    chunk_id: C0180
+    page: 18
+    span:
+    - 16638
+    - 16713
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 196
+      body_index: 214
+      xpath: /w:document/w:body/w:p[197]
+      index_base: 0
+  status: open
+  owner: 设备能源室 / 运营部
+  resolution: null
+  resolution_required: 联合复测，说明差异并明确替代版本；不得自动取新、取大或均值
+  blocking_scope:
+  - 确定性配电适配结论
+  - 无条件采购或开工建议
+  does_not_block:
+  - 披露冲突的内部预审稿
+  - 原文假设下名义产能与设备购置费回放

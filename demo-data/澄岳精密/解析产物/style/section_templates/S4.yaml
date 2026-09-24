@@ -1,0 +1,74 @@
+section_id: S4
+title: 四、产能测算与交付匹配
+level: 1
+reusable: true
+paragraph_order:
+- chunk_id: C0045
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0045
+- chunk_id: C0046
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0046
+- chunk_id: C0047
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0047
+- chunk_id: C0048
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0048
+- chunk_id: C0049
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0049
+- chunk_id: C0050
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0050
+- chunk_id: C0051
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0051
+- chunk_id: C0052
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0052
+- chunk_id: C0053
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0053
+- chunk_id: C0054
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0054
+- chunk_id: C0055
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0055
+tables:
+- table_id: T04
+  caption: 表4-1 产能测算输入
+  columns:
+  - 参数
+  - 采用值
+  - 定义
+  chunk_id: C0047
+argument_patterns:
+- claim_id: L010
+  pattern: 年度平均需求可覆盖依赖规划参数，不证明峰值插单可行。
+  strength: conditional
+  requires_support:
+  - N034
+  - N018
+  - N179
+  - N029
+  - N030
+  - N031
+- claim_id: L011
+  pattern: 原文未设额外占用率淘汰阈值，也未证明低风险。
+  strength: boundary
+  requires_support:
+  - N040
+  - N034
+- claim_id: L012
+  pattern: 爬坡已反映在客户导入量，设备时长变化另算。
+  strength: boundary
+  requires_support:
+  - N035
+  - N017
+  - N034
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

@@ -1,0 +1,41 @@
+section_id: S7.4
+title: 7.4 精度与变更原则
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0097
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0097
+- chunk_id: C0098
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0098
+- chunk_id: C0099
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0099
+tables: []
+argument_patterns:
+- claim_id: L026
+  pattern: 完整精度计算，仅展示时四舍五入。
+  strength: boundary
+  requires_support:
+  - N113
+  - N114
+  - N042
+- claim_id: L027
+  pattern: 纯报价变化不自动改变产能或经营单耗；超期需重询。
+  strength: boundary
+  requires_support:
+  - N080
+  - N100
+  - N111
+  - N113
+  - N114
+  - N147
+  - N029
+  - N115
+  - N116
+  - N099
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

@@ -1,0 +1,49 @@
+section_id: S5.2
+title: 5.2 配电资料分歧与用能预算
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0062
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0062
+- chunk_id: C0063
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0063
+- chunk_id: C0064
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0064
+- chunk_id: C0065
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0065
+tables: []
+argument_patterns:
+- claim_id: L015
+  pattern: 同口径分歧未解释，较新或较大不能自动胜出。
+  strength: conflicted
+  requires_support:
+  - N050
+  - N051
+  - N052
+- claim_id: L016
+  pattern: 两条条件分支不能替代唯一适配结论。
+  strength: conflicted
+  requires_support:
+  - N050
+  - N051
+  - N053
+  - N054
+  - N055
+  - N056
+  - N163
+- claim_id: L017
+  pattern: 年度内部电量预算达标不证明瞬时负荷可接入。
+  strength: boundary
+  requires_support:
+  - N131
+  - N057
+  - N184
+  - N053
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

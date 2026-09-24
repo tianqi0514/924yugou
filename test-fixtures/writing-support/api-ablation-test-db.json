@@ -1,0 +1,4588 @@
+{
+  "schema_version": "writing-support-ablation/1.0",
+  "database": "report_platform_test",
+  "scope": "writing_package_boundary_mask_only",
+  "studies": [
+    {
+      "project_id": "9c481516-8593-47cc-aa46-d01a78f88276",
+      "report_id": "e3462da0-ca2d-4aea-ac24-7c259b225808",
+      "section_id": "S4",
+      "baseline": {
+        "used_items": [
+          "04:000009",
+          "09:000051",
+          "10:000051",
+          "13:000005",
+          "15:000001",
+          "18:000001",
+          "27:000017"
+        ],
+        "candidate": {
+          "text": [
+            "四、产能测算与交付匹配",
+            "首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。",
+            "上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+          ],
+          "source_refs": [
+            {
+              "record_id": "04:000009",
+              "use": "section_structure"
+            },
+            {
+              "record_id": "27:000017",
+              "use": "section_structure"
+            },
+            {
+              "record_id": "09:000051",
+              "use": "source_location_only"
+            },
+            {
+              "record_id": "10:000051",
+              "use": "slot_format_only"
+            },
+            {
+              "record_id": "13:000005",
+              "use": "rule_pattern_only"
+            },
+            {
+              "record_id": "15:000001",
+              "use": "historical_claim_pattern_only"
+            },
+            {
+              "record_id": "18:000001",
+              "use": "historical_evidence_limitation"
+            }
+          ],
+          "issue_codes": [
+            "TEMPLATE_COVERAGE_UNSPECIFIED",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_CONDITION_FALSE",
+            "HISTORICAL_CONTEXT_EXCLUDED"
+          ]
+        }
+      },
+      "masks": [
+        {
+          "category_number": 4,
+          "removed_item_ids": [
+            "04:000009"
+          ],
+          "response": {
+            "status_code": 200,
+            "body": {
+              "section_id": "S4",
+              "approved_item_ids": [
+                "27:000017",
+                "10:000044",
+                "10:000045",
+                "10:000046",
+                "10:000047",
+                "10:000048",
+                "10:000049",
+                "10:000050",
+                "10:000051",
+                "10:000052",
+                "10:000053",
+                "10:000054",
+                "13:000005",
+                "15:000001",
+                "26:000000"
+              ],
+              "mode": "guided",
+              "paragraphs": [
+                {
+                  "type": "h2",
+                  "id": "26e580ac-0891-4eac-bbd8-80f14db8a859",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-27",
+                      "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+                      "record_id": "27:000017",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "四、产能测算与交付匹配"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "11cc887d-2efc-4e1b-837d-4a5223969ab6",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "origin": "guided",
+                  "fact_keys": [
+                    "first_year_demand",
+                    "qualified_capacity",
+                    "planned_sales"
+                  ],
+                  "children": [
+                    {
+                      "text": "首年客户需求"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "first_year_demand",
+                      "display": "300,000",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套，规划合格能力"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "qualified_capacity",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套；按两者较小值，首年计划销售量为"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "planned_sales",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套。"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "5070354e-91e0-48d6-9d7d-7606a1f32b0e",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-18",
+                      "artifact_id": "ART-29858a6e153e0a101205a44c",
+                      "record_id": "18:000001",
+                      "semantic_id": "EV-01",
+                      "use": "historical_evidence_limitation"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+                    }
+                  ]
+                }
+              ],
+              "issues": [
+                {
+                  "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+                  "severity": "review",
+                  "message": "模板缺少关键覆盖配置，需要人工确认",
+                  "item_ids": [
+                    "27:000017"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000001"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000002"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000003"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000004"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000005"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000006"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000007"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000010"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000011"
+                  ]
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONDITION_FALSE",
+                  "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+                  "severity": "review",
+                  "slot_id": null
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONTEXT_EXCLUDED",
+                  "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+                  "severity": "info",
+                  "slot_id": null
+                }
+              ],
+              "used_items": [
+                "09:000051",
+                "10:000051",
+                "13:000005",
+                "15:000001",
+                "18:000001",
+                "27:000017"
+              ],
+              "rejected_items": [
+                {
+                  "item_id": "09:000044",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000044",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000045",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000045",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000046",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000046",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000047",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000047",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000048",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000048",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000049",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000049",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000050",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000050",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000052",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000052",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000053",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000053",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000054",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000054",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "12:000016",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000017",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000024",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000025",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000026",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000027",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000028",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000029",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000030",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000031",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000032",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000033",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000034",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000035",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000036",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000039",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000211",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000252",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000253",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000254",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000255",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000256",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000257",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000258",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000259",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000260",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000261",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000262",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000000",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000001",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000002",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000003",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000004",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000006",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000007",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000010",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000003",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000004",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000005",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000006",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000009",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000010",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000011",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000019",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000026",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000027",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000028",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000029",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000038",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000040",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000000",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000002",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000001",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000002",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000003",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000003",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000004",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000004",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000005",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000006",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000005",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000007",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000008",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000009",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000010",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000011",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000006",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000012",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000007",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000013",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000010",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000017",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000011",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000018",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000019",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000002",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000003",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000006",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "26:000000",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                }
+              ],
+              "source_refs": [
+                {
+                  "block_id": "26e580ac-0891-4eac-bbd8-80f14db8a859",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-27",
+                      "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+                      "record_id": "27:000017",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "project_rule_refs": []
+                },
+                {
+                  "block_id": "11cc887d-2efc-4e1b-837d-4a5223969ab6",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "block_id": "5070354e-91e0-48d6-9d7d-7606a1f32b0e",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-18",
+                      "artifact_id": "ART-29858a6e153e0a101205a44c",
+                      "record_id": "18:000001",
+                      "semantic_id": "EV-01",
+                      "use": "historical_evidence_limitation"
+                    }
+                  ],
+                  "project_rule_refs": []
+                }
+              ],
+              "base_version": 0,
+              "project_version": 5,
+              "corpus_id": "cy_tray_20260918",
+              "corpus_version": "v2",
+              "expires_at": 1790235869,
+              "preview_token": "17d32a9ac89b20f53b9cf06455b28c30a70cf7b675582f30562d0603a16948bc"
+            }
+          },
+          "text_changed": false,
+          "source_refs_changed": true,
+          "issues_changed": false,
+          "classification": "observable_text_or_audit_change"
+        },
+        {
+          "category_number": 27,
+          "removed_item_ids": [
+            "27:000017"
+          ],
+          "response": {
+            "status_code": 200,
+            "body": {
+              "section_id": "S4",
+              "approved_item_ids": [
+                "04:000009",
+                "10:000044",
+                "10:000045",
+                "10:000046",
+                "10:000047",
+                "10:000048",
+                "10:000049",
+                "10:000050",
+                "10:000051",
+                "10:000052",
+                "10:000053",
+                "10:000054",
+                "13:000005",
+                "15:000001",
+                "26:000000"
+              ],
+              "mode": "guided",
+              "paragraphs": [
+                {
+                  "type": "h2",
+                  "id": "a70ea294-7bbc-4a4b-b7b5-9e9b81915817",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-04",
+                      "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+                      "record_id": "04:000009",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "四、产能测算与交付匹配"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "972bd393-50c6-4f05-a02d-167d44374c7d",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "origin": "guided",
+                  "fact_keys": [
+                    "first_year_demand",
+                    "qualified_capacity",
+                    "planned_sales"
+                  ],
+                  "children": [
+                    {
+                      "text": "首年客户需求"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "first_year_demand",
+                      "display": "300,000",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套，规划合格能力"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "qualified_capacity",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套；按两者较小值，首年计划销售量为"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "planned_sales",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套。"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "93375103-9ef7-45cf-88b0-4d542fa528ca",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-18",
+                      "artifact_id": "ART-29858a6e153e0a101205a44c",
+                      "record_id": "18:000001",
+                      "semantic_id": "EV-01",
+                      "use": "historical_evidence_limitation"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+                    }
+                  ]
+                }
+              ],
+              "issues": [
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000001"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000002"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000003"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000004"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000005"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000006"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000007"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000010"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000011"
+                  ]
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONDITION_FALSE",
+                  "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+                  "severity": "review",
+                  "slot_id": null
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONTEXT_EXCLUDED",
+                  "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+                  "severity": "info",
+                  "slot_id": null
+                }
+              ],
+              "used_items": [
+                "04:000009",
+                "09:000051",
+                "10:000051",
+                "13:000005",
+                "15:000001",
+                "18:000001"
+              ],
+              "rejected_items": [
+                {
+                  "item_id": "09:000044",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000044",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000045",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000045",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000046",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000046",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000047",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000047",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000048",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000048",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000049",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000049",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000050",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000050",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000052",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000052",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000053",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000053",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000054",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000054",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "12:000016",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000017",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000024",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000025",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000026",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000027",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000028",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000029",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000030",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000031",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000032",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000033",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000034",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000035",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000036",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000039",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000211",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000252",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000253",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000254",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000255",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000256",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000257",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000258",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000259",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000260",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000261",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000262",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000000",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000001",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000002",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000003",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000004",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000006",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000007",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000010",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000003",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000004",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000005",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000006",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000009",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000010",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000011",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000019",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000026",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000027",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000028",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000029",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000038",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000040",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000000",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000002",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000001",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000002",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000003",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000003",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000004",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000004",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000005",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000006",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000005",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000007",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000008",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000009",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000010",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000011",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000006",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000012",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000007",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000013",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000010",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000017",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000011",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000018",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000019",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000002",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000003",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000006",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "26:000000",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                }
+              ],
+              "source_refs": [
+                {
+                  "block_id": "a70ea294-7bbc-4a4b-b7b5-9e9b81915817",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-04",
+                      "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+                      "record_id": "04:000009",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "project_rule_refs": []
+                },
+                {
+                  "block_id": "972bd393-50c6-4f05-a02d-167d44374c7d",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "block_id": "93375103-9ef7-45cf-88b0-4d542fa528ca",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-18",
+                      "artifact_id": "ART-29858a6e153e0a101205a44c",
+                      "record_id": "18:000001",
+                      "semantic_id": "EV-01",
+                      "use": "historical_evidence_limitation"
+                    }
+                  ],
+                  "project_rule_refs": []
+                }
+              ],
+              "base_version": 0,
+              "project_version": 5,
+              "corpus_id": "cy_tray_20260918",
+              "corpus_version": "v2",
+              "expires_at": 1790235869,
+              "preview_token": "2b11358d7e1eeb8214dfc84e12e76d4695934f7cf1350c0317d8e93b5b7e22eb"
+            }
+          },
+          "text_changed": false,
+          "source_refs_changed": true,
+          "issues_changed": true,
+          "classification": "observable_text_or_audit_change"
+        },
+        {
+          "category_number": 10,
+          "removed_item_ids": [
+            "10:000044",
+            "10:000045",
+            "10:000046",
+            "10:000047",
+            "10:000048",
+            "10:000049",
+            "10:000050",
+            "10:000051",
+            "10:000052",
+            "10:000053",
+            "10:000054"
+          ],
+          "response": {
+            "status_code": 409,
+            "body": {
+              "detail": "请先确认本章切块的可复用槽位"
+            }
+          },
+          "classification": "implementation_coupling"
+        },
+        {
+          "category_number": 13,
+          "removed_item_ids": [
+            "13:000000",
+            "13:000001",
+            "13:000002",
+            "13:000003",
+            "13:000004",
+            "13:000005",
+            "13:000006",
+            "13:000007",
+            "13:000010"
+          ],
+          "response": {
+            "status_code": 409,
+            "body": {
+              "detail": "请先确认 min 规则与‘需求不是订单’的受限写法"
+            }
+          },
+          "classification": "implementation_coupling"
+        },
+        {
+          "category_number": 15,
+          "removed_item_ids": [
+            "15:000001",
+            "15:000003",
+            "15:000004",
+            "15:000005",
+            "15:000006",
+            "15:000009",
+            "15:000010",
+            "15:000011",
+            "15:000019",
+            "15:000026",
+            "15:000027",
+            "15:000028",
+            "15:000029",
+            "15:000038",
+            "15:000040"
+          ],
+          "response": {
+            "status_code": 409,
+            "body": {
+              "detail": "请先确认 min 规则与‘需求不是订单’的受限写法"
+            }
+          },
+          "classification": "implementation_coupling"
+        },
+        {
+          "category_number": 9,
+          "removed_item_ids": [
+            "09:000044",
+            "09:000045",
+            "09:000046",
+            "09:000047",
+            "09:000048",
+            "09:000049",
+            "09:000050",
+            "09:000051",
+            "09:000052",
+            "09:000053",
+            "09:000054"
+          ],
+          "response": {
+            "status_code": 409,
+            "body": {
+              "detail": "请先确认本章切块的可复用槽位"
+            }
+          },
+          "classification": "implementation_coupling"
+        },
+        {
+          "category_number": 18,
+          "removed_item_ids": [
+            "18:000001",
+            "18:000002",
+            "18:000003",
+            "18:000004",
+            "18:000005",
+            "18:000006",
+            "18:000007",
+            "18:000010",
+            "18:000011"
+          ],
+          "response": {
+            "status_code": 200,
+            "body": {
+              "section_id": "S4",
+              "approved_item_ids": [
+                "04:000009",
+                "27:000017",
+                "10:000044",
+                "10:000045",
+                "10:000046",
+                "10:000047",
+                "10:000048",
+                "10:000049",
+                "10:000050",
+                "10:000051",
+                "10:000052",
+                "10:000053",
+                "10:000054",
+                "13:000005",
+                "15:000001",
+                "26:000000"
+              ],
+              "mode": "guided",
+              "paragraphs": [
+                {
+                  "type": "h2",
+                  "id": "a291bcda-b0a4-4c71-a139-c9c732fa2dda",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-04",
+                      "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+                      "record_id": "04:000009",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-27",
+                      "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+                      "record_id": "27:000017",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "四、产能测算与交付匹配"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "99d22dc7-1fa9-4aff-878e-4280f44a7f31",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "origin": "guided",
+                  "fact_keys": [
+                    "first_year_demand",
+                    "qualified_capacity",
+                    "planned_sales"
+                  ],
+                  "children": [
+                    {
+                      "text": "首年客户需求"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "first_year_demand",
+                      "display": "300,000",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套，规划合格能力"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "qualified_capacity",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套；按两者较小值，首年计划销售量为"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "planned_sales",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套。"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "178d6004-5edf-44f0-8271-d1496ce59128",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+                    }
+                  ]
+                }
+              ],
+              "issues": [
+                {
+                  "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+                  "severity": "review",
+                  "message": "模板缺少关键覆盖配置，需要人工确认",
+                  "item_ids": [
+                    "27:000017"
+                  ]
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONDITION_FALSE",
+                  "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+                  "severity": "review",
+                  "slot_id": null
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONTEXT_EXCLUDED",
+                  "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+                  "severity": "info",
+                  "slot_id": null
+                }
+              ],
+              "used_items": [
+                "04:000009",
+                "09:000051",
+                "10:000051",
+                "13:000005",
+                "15:000001",
+                "27:000017"
+              ],
+              "rejected_items": [
+                {
+                  "item_id": "09:000044",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000044",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000045",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000045",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000046",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000046",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000047",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000047",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000048",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000048",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000049",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000049",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000050",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000050",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000052",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000052",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000053",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000053",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000054",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000054",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "12:000016",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000017",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000024",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000025",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000026",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000027",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000028",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000029",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000030",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000031",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000032",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000033",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000034",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000035",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000036",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000039",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000211",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000252",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000253",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000254",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000255",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000256",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000257",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000258",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000259",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000260",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000261",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000262",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000000",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000001",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000002",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000003",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000004",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000006",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000007",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000010",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000003",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000004",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000005",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000006",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000009",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000010",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000011",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000019",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000026",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000027",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000028",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000029",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000038",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000040",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000000",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000001",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000002",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000003",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000004",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000005",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000006",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000007",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000008",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000009",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000010",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000011",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000012",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000013",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000017",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000018",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000019",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000002",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000003",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000006",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "26:000000",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                }
+              ],
+              "source_refs": [
+                {
+                  "block_id": "a291bcda-b0a4-4c71-a139-c9c732fa2dda",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-04",
+                      "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+                      "record_id": "04:000009",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-27",
+                      "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+                      "record_id": "27:000017",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "project_rule_refs": []
+                },
+                {
+                  "block_id": "99d22dc7-1fa9-4aff-878e-4280f44a7f31",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "block_id": "178d6004-5edf-44f0-8271-d1496ce59128",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    }
+                  ],
+                  "project_rule_refs": []
+                }
+              ],
+              "base_version": 0,
+              "project_version": 5,
+              "corpus_id": "cy_tray_20260918",
+              "corpus_version": "v2",
+              "expires_at": 1790235870,
+              "preview_token": "484e7138e46d1f0c4e5d54690ab44c08d4e960ac2d0800ead97d913eb103a5d6"
+            }
+          },
+          "text_changed": false,
+          "source_refs_changed": true,
+          "issues_changed": true,
+          "classification": "observable_text_or_audit_change"
+        },
+        {
+          "category_number": 12,
+          "removed_item_ids": [
+            "12:000016",
+            "12:000017",
+            "12:000024",
+            "12:000025",
+            "12:000026",
+            "12:000027",
+            "12:000028",
+            "12:000029",
+            "12:000030",
+            "12:000031",
+            "12:000032",
+            "12:000033",
+            "12:000034",
+            "12:000035",
+            "12:000036",
+            "12:000039",
+            "12:000211",
+            "12:000252",
+            "12:000253",
+            "12:000254",
+            "12:000255",
+            "12:000256",
+            "12:000257",
+            "12:000258",
+            "12:000259",
+            "12:000260",
+            "12:000261",
+            "12:000262"
+          ],
+          "response": {
+            "status_code": 200,
+            "body": {
+              "section_id": "S4",
+              "approved_item_ids": [
+                "04:000009",
+                "27:000017",
+                "10:000044",
+                "10:000045",
+                "10:000046",
+                "10:000047",
+                "10:000048",
+                "10:000049",
+                "10:000050",
+                "10:000051",
+                "10:000052",
+                "10:000053",
+                "10:000054",
+                "13:000005",
+                "15:000001",
+                "26:000000"
+              ],
+              "mode": "guided",
+              "paragraphs": [
+                {
+                  "type": "h2",
+                  "id": "51a0a703-a3cd-458a-acd6-2a4e8850892d",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-04",
+                      "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+                      "record_id": "04:000009",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-27",
+                      "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+                      "record_id": "27:000017",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "四、产能测算与交付匹配"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "2ec3b102-b90b-4c11-a82a-789caffe36d2",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "origin": "guided",
+                  "fact_keys": [
+                    "first_year_demand",
+                    "qualified_capacity",
+                    "planned_sales"
+                  ],
+                  "children": [
+                    {
+                      "text": "首年客户需求"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "first_year_demand",
+                      "display": "300,000",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套，规划合格能力"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "qualified_capacity",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套；按两者较小值，首年计划销售量为"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "planned_sales",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套。"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "b1fbc83c-c401-4815-bbca-64b81495d98a",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-18",
+                      "artifact_id": "ART-29858a6e153e0a101205a44c",
+                      "record_id": "18:000001",
+                      "semantic_id": "EV-01",
+                      "use": "historical_evidence_limitation"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+                    }
+                  ]
+                }
+              ],
+              "issues": [
+                {
+                  "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+                  "severity": "review",
+                  "message": "模板缺少关键覆盖配置，需要人工确认",
+                  "item_ids": [
+                    "27:000017"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000001"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000002"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000003"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000004"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000005"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000006"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000007"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000010"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000011"
+                  ]
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONDITION_FALSE",
+                  "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+                  "severity": "review",
+                  "slot_id": null
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONTEXT_EXCLUDED",
+                  "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+                  "severity": "info",
+                  "slot_id": null
+                }
+              ],
+              "used_items": [
+                "04:000009",
+                "09:000051",
+                "10:000051",
+                "13:000005",
+                "15:000001",
+                "18:000001",
+                "27:000017"
+              ],
+              "rejected_items": [
+                {
+                  "item_id": "09:000044",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000044",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000045",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000045",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000046",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000046",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000047",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000047",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000048",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000048",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000049",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000049",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000050",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000050",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000052",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000052",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000053",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000053",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000054",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000054",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "13:000000",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000001",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000002",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000003",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000004",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000006",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000007",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000010",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000003",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000004",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000005",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000006",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000009",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000010",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000011",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000019",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000026",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000027",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000028",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000029",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000038",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000040",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000000",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000002",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000001",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000002",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000003",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000003",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000004",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000004",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000005",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000006",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000005",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000007",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000008",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000009",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000010",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000011",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000006",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000012",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000007",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000013",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000010",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000017",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000011",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000018",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000019",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000002",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000003",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000006",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "26:000000",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                }
+              ],
+              "source_refs": [
+                {
+                  "block_id": "51a0a703-a3cd-458a-acd6-2a4e8850892d",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-04",
+                      "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+                      "record_id": "04:000009",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-27",
+                      "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+                      "record_id": "27:000017",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "project_rule_refs": []
+                },
+                {
+                  "block_id": "2ec3b102-b90b-4c11-a82a-789caffe36d2",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "block_id": "b1fbc83c-c401-4815-bbca-64b81495d98a",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-18",
+                      "artifact_id": "ART-29858a6e153e0a101205a44c",
+                      "record_id": "18:000001",
+                      "semantic_id": "EV-01",
+                      "use": "historical_evidence_limitation"
+                    }
+                  ],
+                  "project_rule_refs": []
+                }
+              ],
+              "base_version": 0,
+              "project_version": 5,
+              "corpus_id": "cy_tray_20260918",
+              "corpus_version": "v2",
+              "expires_at": 1790235871,
+              "preview_token": "a3219e3416c3d32122c51347d782e73e9bbe8ed9ef8efb4aea261d65f25149e4"
+            }
+          },
+          "text_changed": false,
+          "source_refs_changed": false,
+          "issues_changed": false,
+          "classification": "no_observed_candidate_change"
+        },
+        {
+          "category_number": 26,
+          "removed_item_ids": [
+            "26:000000"
+          ],
+          "response": {
+            "status_code": 200,
+            "body": {
+              "section_id": "S4",
+              "approved_item_ids": [
+                "04:000009",
+                "27:000017",
+                "10:000044",
+                "10:000045",
+                "10:000046",
+                "10:000047",
+                "10:000048",
+                "10:000049",
+                "10:000050",
+                "10:000051",
+                "10:000052",
+                "10:000053",
+                "10:000054",
+                "13:000005",
+                "15:000001"
+              ],
+              "mode": "guided",
+              "paragraphs": [
+                {
+                  "type": "h2",
+                  "id": "5d963a31-2d1f-415e-bc1a-b9a172a47843",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-04",
+                      "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+                      "record_id": "04:000009",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-27",
+                      "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+                      "record_id": "27:000017",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "四、产能测算与交付匹配"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "40d212f5-a23b-4db8-9327-8335a2841cda",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "origin": "guided",
+                  "fact_keys": [
+                    "first_year_demand",
+                    "qualified_capacity",
+                    "planned_sales"
+                  ],
+                  "children": [
+                    {
+                      "text": "首年客户需求"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "first_year_demand",
+                      "display": "300,000",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套，规划合格能力"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "qualified_capacity",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套；按两者较小值，首年计划销售量为"
+                    },
+                    {
+                      "type": "fact_ref",
+                      "fact_key": "planned_sales",
+                      "display": "254,016",
+                      "children": [
+                        {
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "text": "套。"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "96343b63-0334-421d-b031-0da48be83508",
+                  "section_id": "S4",
+                  "source_refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-18",
+                      "artifact_id": "ART-29858a6e153e0a101205a44c",
+                      "record_id": "18:000001",
+                      "semantic_id": "EV-01",
+                      "use": "historical_evidence_limitation"
+                    }
+                  ],
+                  "origin": "guided",
+                  "children": [
+                    {
+                      "text": "上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+                    }
+                  ]
+                }
+              ],
+              "issues": [
+                {
+                  "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+                  "severity": "review",
+                  "message": "模板缺少关键覆盖配置，需要人工确认",
+                  "item_ids": [
+                    "27:000017"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000001"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000002"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000003"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000004"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000005"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000006"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000007"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000010"
+                  ]
+                },
+                {
+                  "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+                  "severity": "review",
+                  "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+                  "item_ids": [
+                    "18:000011"
+                  ]
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONDITION_FALSE",
+                  "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+                  "severity": "review",
+                  "slot_id": null
+                },
+                {
+                  "chunk_id": "C0052",
+                  "code": "HISTORICAL_CONTEXT_EXCLUDED",
+                  "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+                  "severity": "info",
+                  "slot_id": null
+                }
+              ],
+              "used_items": [
+                "04:000009",
+                "09:000051",
+                "10:000051",
+                "13:000005",
+                "15:000001",
+                "18:000001",
+                "27:000017"
+              ],
+              "rejected_items": [
+                {
+                  "item_id": "09:000044",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000044",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000045",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000045",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000046",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000046",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000047",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000047",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000048",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000048",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000049",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000049",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000050",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000050",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000052",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000052",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000053",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000053",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "09:000054",
+                  "reason": "历史文字、数值与专有名称不得直接进入新项目",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "10:000054",
+                  "reason": "已勾选，但本次候选未消费",
+                  "decision": "selectable"
+                },
+                {
+                  "item_id": "12:000016",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000017",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000024",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000025",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000026",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000027",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000028",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000029",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000030",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000031",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000032",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000033",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000034",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000035",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000036",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000039",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000211",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000252",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000253",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000254",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000255",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000256",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000257",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000258",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000259",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000260",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000261",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "12:000262",
+                  "reason": "节点的历史 value 和审核状态不可继承；需要映射项目事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000000",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000001",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000002",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000003",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000004",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000006",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000007",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "13:000010",
+                  "reason": "需确认当前项目有同单位、同依赖的受限规则；历史结果不得继承",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000003",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000004",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000005",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000006",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000009",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000010",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000011",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000019",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000026",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000027",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000028",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000029",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000038",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "15:000040",
+                  "reason": "仅作写法提醒；原论断未经独立核实，新项目须重新确认事实与证据",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000000",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000002",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000001",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000002",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000003",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000003",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000004",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000004",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000005",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000006",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000005",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000007",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000008",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000009",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000010",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000011",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000006",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000012",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000007",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000013",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000010",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000017",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "18:000011",
+                  "reason": "仅供查证历史论断；不能证明当前项目的事实",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000018",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "19:000019",
+                  "reason": "只有摘录，完整原件是否存在须单独核验",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000002",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000003",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                },
+                {
+                  "item_id": "24:000006",
+                  "reason": "不可视作当前项目已经解决或自动适用",
+                  "decision": "review_only"
+                }
+              ],
+              "source_refs": [
+                {
+                  "block_id": "5d963a31-2d1f-415e-bc1a-b9a172a47843",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-04",
+                      "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+                      "record_id": "04:000009",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-27",
+                      "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+                      "record_id": "27:000017",
+                      "semantic_id": "S4",
+                      "use": "section_structure"
+                    }
+                  ],
+                  "project_rule_refs": []
+                },
+                {
+                  "block_id": "40d212f5-a23b-4db8-9327-8335a2841cda",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-09",
+                      "artifact_id": "ART-42dd923169efb572267f7ada",
+                      "record_id": "09:000051",
+                      "semantic_id": "C0052",
+                      "use": "source_location_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-10",
+                      "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+                      "record_id": "10:000051",
+                      "semantic_id": "C0052",
+                      "use": "slot_format_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-13",
+                      "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+                      "record_id": "13:000005",
+                      "semantic_id": "R006",
+                      "use": "rule_pattern_only"
+                    }
+                  ],
+                  "project_rule_refs": [
+                    {
+                      "rule_id": "bfbe8d86-e04a-4031-807c-3b8664801e49",
+                      "expression": "min(first_year_demand, qualified_capacity)",
+                      "target_key": "planned_sales",
+                      "deps": [
+                        "first_year_demand",
+                        "qualified_capacity"
+                      ],
+                      "input_fact_revisions": [
+                        {
+                          "fact_key": "first_year_demand",
+                          "revision": 1,
+                          "value": "300000"
+                        },
+                        {
+                          "fact_key": "qualified_capacity",
+                          "revision": 1,
+                          "value": "254016"
+                        }
+                      ],
+                      "target_fact_revision": 1
+                    }
+                  ]
+                },
+                {
+                  "block_id": "96343b63-0334-421d-b031-0da48be83508",
+                  "section_id": "S4",
+                  "refs": [
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-15",
+                      "artifact_id": "ART-a8f45403e16d825f94907566",
+                      "record_id": "15:000001",
+                      "semantic_id": "L002",
+                      "use": "historical_claim_pattern_only"
+                    },
+                    {
+                      "corpus_id": "cy_tray_20260918",
+                      "corpus_version": "v2",
+                      "category_id": "CAT-18",
+                      "artifact_id": "ART-29858a6e153e0a101205a44c",
+                      "record_id": "18:000001",
+                      "semantic_id": "EV-01",
+                      "use": "historical_evidence_limitation"
+                    }
+                  ],
+                  "project_rule_refs": []
+                }
+              ],
+              "base_version": 0,
+              "project_version": 5,
+              "corpus_id": "cy_tray_20260918",
+              "corpus_version": "v2",
+              "expires_at": 1790235871,
+              "preview_token": "04ecf14fcc0e1af5b31838220037a248bf53ea47fdcd536fca7750b72507b15f"
+            }
+          },
+          "text_changed": false,
+          "source_refs_changed": false,
+          "issues_changed": false,
+          "classification": "no_observed_candidate_change"
+        }
+      ]
+    },
+    {
+      "project_id": "38770876-c219-452e-a50d-74e4f1cc5ec1",
+      "report_id": "aee76035-6240-49b3-9897-c80bcdce529b",
+      "section_id": "S5.2",
+      "baseline": {
+        "used_items": [
+          "04:000013",
+          "18:000006",
+          "18:000007",
+          "23:000000",
+          "27:000019"
+        ],
+        "candidate": {
+          "text": [
+            "5.2 配电资料分歧与用能预算",
+            "历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。"
+          ],
+          "source_refs": [
+            {
+              "record_id": "04:000013",
+              "use": "section_structure"
+            },
+            {
+              "record_id": "27:000019",
+              "use": "section_structure"
+            },
+            {
+              "record_id": "23:000000",
+              "use": "historical_conflict_disclosure"
+            },
+            {
+              "record_id": "18:000006",
+              "use": "historical_evidence_only"
+            },
+            {
+              "record_id": "18:000007",
+              "use": "historical_evidence_only"
+            }
+          ],
+          "issue_codes": [
+            "TEMPLATE_COVERAGE_UNSPECIFIED",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "HISTORICAL_CONFLICT",
+            "POWER_CONFLICT_UNRESOLVED"
+          ]
+        }
+      },
+      "masks": [
+        {
+          "category_number": 23,
+          "removed_item_ids": [
+            "23:000000"
+          ],
+          "response": {
+            "status_code": 409,
+            "body": {
+              "detail": "配电冲突的双来源未齐备，不能形成披露"
+            }
+          },
+          "classification": "implementation_coupling"
+        },
+        {
+          "category_number": 18,
+          "removed_item_ids": [
+            "18:000001",
+            "18:000003",
+            "18:000005",
+            "18:000006",
+            "18:000007",
+            "18:000008",
+            "18:000009"
+          ],
+          "response": {
+            "status_code": 409,
+            "body": {
+              "detail": "配电冲突的双来源未齐备，不能形成披露"
+            }
+          },
+          "classification": "implementation_coupling"
+        }
+      ]
+    }
+  ]
+}

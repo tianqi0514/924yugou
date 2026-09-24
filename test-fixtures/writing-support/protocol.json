@@ -1,0 +1,89 @@
+{
+  "schema_version": "writing-support-protocol/1.0",
+  "frozen_on": "2026-09-24",
+  "status": "design_only_not_executed",
+  "study_question": "冻结的 30 类历史产物中，哪些逻辑信息实际改善新项目的可核对写作？",
+  "unit_of_analysis": "category_number × scenario_id × package_variant × report_version",
+  "source_authority": "manifest.yaml 的 files 编号；corpus_categories / corpus_artifacts / corpus_records 中的不可变版本与稳定 ID",
+  "fixed_controls": [
+    "同一空白 QA 项目起点、同一轮项目事实值及事实水位",
+    "同一章节目标与人工确认的项目规则；历史规则只能提供候选，不可替代项目规则批准",
+    "同一语料版本、来源摘要、模型配置标识与起草参数；密钥不得进入实验记录",
+    "三种工作包一律执行相同的引用校验、缺值闸门和人工核对；不得对某组放宽安全规则"
+  ],
+  "package_variants": [
+    {
+      "id": "minimal_information_contract",
+      "description": "已有必要性评估的最小逻辑信息假设，项目事实与经确认的项目规则单独提供；不把原文件名作为运行时必填形式",
+      "category_numbers": [1, 2, 3, 5, 6, 9, 12, 18]
+    },
+    {
+      "id": "applicable_conditional",
+      "description": "最小信息加上适用的条件类；每条条件类记录必须先做项目类型、章节、脱敏、证据状态及人工审核检查，未通过者拒用并留理由",
+      "category_numbers": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 26, 27, 29]
+    },
+    {
+      "id": "all_available",
+      "description": "30 类全部可核对，但未生成向量只提供状态，历史轨迹只供审计，可重建投影不提升权威性；仍按相同适用和安全检查拒用不合格记录",
+      "category_numbers": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    }
+  ],
+  "usage_event_contract": {
+    "required_fields": ["run_id", "project_id", "report_id", "report_version", "section_id", "fact_watermark", "corpus_id", "corpus_version", "category_number", "artifact_id", "record_id", "semantic_id", "stage", "decision", "reason_code", "source_location", "target_block_id", "changed_outcome"],
+    "stages_that_can_support_writing_contribution": ["WORK_PACKAGE_SELECTION", "CANDIDATE_COMPOSITION", "HUMAN_REVIEW", "EDITOR_BINDING", "GATE_CHECK", "EXPORT_AUDIT"],
+    "stages_that_do_not_prove_writing_contribution": ["IMPORT", "SYSTEM_BOOTSTRAP", "BROWSE", "GRAPH_RENDER", "BLIND_BULK_LOAD"],
+    "decisions": ["included", "rejected", "consulted", "cited", "blocked"],
+    "rule": "仅 included/cited/blocked 且能定位到正文块、审查决定或闸门结果的事件计入写作贡献；consulted 只证明被查看。仅装载工作包而无选择/结果变化不计入。拒用事件用于解释边界，不计为正贡献。",
+    "no_secret_fields": true
+  },
+  "outcome_metrics": [
+    {"id": "chapter_coverage", "unit": "经人工确认的目标要点数/预注册目标要点数", "note": "样本模板 must_cover 为空，不能把模板内部计数冒充人工金标"},
+    {"id": "fact_traceability", "unit": "可从最终事实性表达回查项目事实修订、规则版本及来源的条数/事实性表达条数"},
+    {"id": "claim_evidence_traceability", "unit": "可回查论断、证据记录及源位置的条数/候选论断条数"},
+    {"id": "numeric_and_condition_correctness", "unit": "预注册案例逐项通过/失败，记录计算值与失效条件句"},
+    {"id": "historical_leakage", "unit": "旧供应商、旧报价、旧销量、无证据范围或不适用术语残留处数"},
+    {"id": "conflict_and_gap_disclosure", "unit": "需要披露而正确呈现的冲突/缺口数，以及被错误宣称已解决数"},
+    {"id": "human_edits", "unit": "确认候选到可核对工作稿的人工 AST 编辑次数与人工耗时；耗时只作描述性记录"},
+    {"id": "plate_roundtrip", "unit": "保存刷新后的节点/引用/表格/来源 ID 一致数，未知节点丢失数"},
+    {"id": "gate_and_export", "unit": "工作稿、预审和正式导出的预期闸门/实际闸门一致数"}
+  ],
+  "ablation_rules": {
+    "method": "在已组装的章节工作包候选选择层遮蔽目标类别，保留相同项目事实、模型和安全闸门；逐类记录实际文本/审核/闸门差异",
+    "architecture_coupling_rule": "若遮蔽后仅因代码固定依赖而崩溃，记为 implementation_coupling，不能记为该类写作必需",
+    "equivalent_replacement_rule": "若同等字段可从权威对象重建且结果与审计回链不退化，记为可重建投影；旧快照仍原样保留",
+    "unsupported_rule": "单个历史样本、无完整原始证据或无人审金标时，质量改善只能陈述于本测试范围，不得外推为跨行业准确率",
+    "not_run_label": "not_run"
+  },
+  "categories": [
+    {"number": 1, "path": "manifest.yaml", "prior_hypothesis": "core_information", "actual": "not_run"},
+    {"number": 2, "path": "meta.yaml", "prior_hypothesis": "core_information", "actual": "not_run"},
+    {"number": 3, "path": "provenance.yaml", "prior_hypothesis": "core_information", "actual": "not_run"},
+    {"number": 4, "path": "outline.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 5, "path": "source/original.docx", "prior_hypothesis": "core_information", "actual": "not_run"},
+    {"number": 6, "path": "source/normalized.md", "prior_hypothesis": "core_information", "actual": "not_run"},
+    {"number": 7, "path": "source/offset_map.json", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 8, "path": "source/assets/*", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 9, "path": "chunks/chunks.jsonl", "prior_hypothesis": "core_information", "actual": "not_run"},
+    {"number": 10, "path": "chunks/skeletons.jsonl", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 11, "path": "chunks/embeddings.parquet", "prior_hypothesis": "not_generated", "actual": "not_run"},
+    {"number": 12, "path": "graph/nodes.yaml", "prior_hypothesis": "core_information", "actual": "not_run"},
+    {"number": 13, "path": "graph/rules.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 14, "path": "graph/relations.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 15, "path": "graph/claims.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 16, "path": "graph/invariants.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 17, "path": "graph/graph.yaml", "prior_hypothesis": "rebuildable_projection", "actual": "not_run"},
+    {"number": 18, "path": "evidence/evidence.yaml", "prior_hypothesis": "core_information", "actual": "not_run"},
+    {"number": 19, "path": "evidence/excerpts/*.md", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 20, "path": "reasoning/derivation.yaml", "prior_hypothesis": "rebuildable_projection", "actual": "not_run"},
+    {"number": 21, "path": "reasoning/decisions.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 22, "path": "reasoning/trace.jsonl", "prior_hypothesis": "historical_archive", "actual": "not_run"},
+    {"number": 23, "path": "quality/conflicts.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 24, "path": "quality/gaps.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 25, "path": "quality/gate_report.yaml", "prior_hypothesis": "rebuildable_projection", "actual": "not_run"},
+    {"number": 26, "path": "style/style_profile.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 27, "path": "style/section_templates/*.yaml", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 28, "path": "index/node_index.json", "prior_hypothesis": "rebuildable_projection", "actual": "not_run"},
+    {"number": 29, "path": "index/term_index.json", "prior_hypothesis": "conditional", "actual": "not_run"},
+    {"number": 30, "path": "index/signature.yaml", "prior_hypothesis": "rebuildable_projection", "actual": "not_run"}
+  ]
+}

@@ -1,0 +1,770 @@
+{
+  "captured_at": "2026-09-24T01:32:02.385741+00:00",
+  "project_id": "929588cd-4999-4f8e-92db-957c041b059c",
+  "documents": [
+    {
+      "filename": "01_beijing_feasibility.pdf",
+      "pages": [
+        {
+          "page": 7,
+          "segments": [
+            {
+              "ref": "p7-s1",
+              "text": "平谷区马昌营公共交通枢纽工程项目建议书（代可行性研究报告）15756.25 平方米，地下总建筑面积1512 平方米。交通枢纽楼总建筑面积12630平方米，变电室700 平方米，维修工房700 平方米，雨棚608.25 平方米，衔接盖板2630 平方米，地上建筑物占地面积9007 平方米。枢纽包含换乘大厅、旅游集散厅、枢纽办公、公交办公、公安用房、枢纽配套用房等。场站面积2.7 万平方米，包含公交、旅游大巴、小汽车停车场地，设置10条公交线路，安排10 个公交发车位及5 个落客位，驻车数约96 辆。围绕一级旅游服务中转需求，预留旅游大巴线路4-5 条，到发车位4-5 个，大巴停车位50个；149 个P+R 车位及租赁小汽车车位。本项目建设内容包括同步实施室外铺装、管线、绿化、照明，以及红线外市政配套工程。技术经济指标如表1-1 所示。"
+            },
+            {
+              "ref": "p7-s2",
+              "text": "表1-1 技术经济指标表序号项目数量单位备注1用地总面积73431.105㎡"
+            },
+            {
+              "ref": "p7-s3",
+              "text": "备注:包括建设用地面积、代征绿地面积、代征道路面积2建设用地面积54088.771㎡3代征绿地面积3105.104㎡4代征道路面积16237.23㎡5总建筑面积17268.25㎡6地上建筑面积15756.25㎡计容建筑面积7地下建筑面积1512㎡8容积率0.291-限值：0.39绿地率20%10建筑密度16.65%11机动车位停车位149辆12地上机动车位停车位149辆13地下机动车位停车位-辆14非机动车204辆15公交停车位96辆16旅游大巴停车位50辆17衔接盖板2630㎡18人防异地建设787.81㎡19建筑高度16m限值：16 米公司质量方针：打造行业精品创造客户价值2"
+            }
+          ],
+          "candidates": [
+            {
+              "id": "a771674b-0870-417a-9306-ec973b9cb165",
+              "label": "总建筑面积",
+              "value": "17268.25",
+              "unit": "平方米",
+              "data_type": "decimal",
+              "source_ref": "p7-s3",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "9b022fee-9ef2-46a3-aca2-eca9102e6090",
+              "label": "地上建筑面积",
+              "value": "15756.25",
+              "unit": "平方米",
+              "data_type": "decimal",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "f96c16ac-14f1-4dfb-b909-5025b2811d9c",
+              "label": "地下建筑面积",
+              "value": "1512",
+              "unit": "平方米",
+              "data_type": "decimal",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "32a2f67f-7fec-45c0-86e1-4f74fa95ee92",
+              "label": "交通枢纽楼总建筑面积",
+              "value": "12630",
+              "unit": "平方米",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "7f81946f-ab18-4748-b3d4-7f066d2c6096",
+              "label": "变电室面积",
+              "value": "700",
+              "unit": "平方米",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "ae64d5bc-eb94-4fb7-9e90-536fa47b90a4",
+              "label": "维修工房面积",
+              "value": "700",
+              "unit": "平方米",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "75f28bc4-886e-4fa4-acbf-0604ee50eb59",
+              "label": "雨棚面积",
+              "value": "608.25",
+              "unit": "平方米",
+              "data_type": "decimal",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "17b46f9a-b752-4fdf-91b6-1ffdf9b71380",
+              "label": "衔接盖板面积",
+              "value": "2630",
+              "unit": "平方米",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "e4f811ee-6219-4773-920b-6f2c030797d2",
+              "label": "场站面积",
+              "value": "2.7",
+              "unit": "万平方米",
+              "data_type": "decimal",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "86858260-ee20-4865-ae37-2827d62339f4",
+              "label": "公交线路数量",
+              "value": "10",
+              "unit": "条",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "8f9db136-0330-445c-9133-4f2adeeb0c57",
+              "label": "公交发车位数量",
+              "value": "10",
+              "unit": "个",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "6056d643-d47b-49c4-b51d-e707f7bd9201",
+              "label": "落客位数量",
+              "value": "5",
+              "unit": "个",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "31fb1ecc-a0f9-4216-b318-32cc708d9aae",
+              "label": "驻车数",
+              "value": "96",
+              "unit": "辆",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "109251ca-91da-4020-acdc-30f34ac18bae",
+              "label": "P+R车位数量",
+              "value": "149",
+              "unit": "个",
+              "data_type": "integer",
+              "source_ref": "p7-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "5f0da3e6-b493-4782-b20c-f71440da24ec",
+              "label": "用地总面积",
+              "value": "73431.105",
+              "unit": "平方米",
+              "data_type": "decimal",
+              "source_ref": "p7-s2",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "2f15a14d-6239-43e6-b43e-f831d5400df6",
+              "label": "容积率",
+              "value": "0.29",
+              "unit": "",
+              "data_type": "decimal",
+              "source_ref": "p7-s3",
+              "source_valid": false,
+              "review_status": "APPROVED"
+            }
+          ]
+        },
+        {
+          "page": 8,
+          "segments": [
+            {
+              "ref": "p8-s1",
+              "text": "平谷区马昌营公共交通枢纽工程项目建议书（代可行性研究报告）"
+            },
+            {
+              "ref": "p8-s2",
+              "text": "（五）建设周期"
+            },
+            {
+              "ref": "p8-s3",
+              "text": "本项目施工周期预计为12 个月，项目拟于2025 年12 月开工，2026 年11月底完工。"
+            },
+            {
+              "ref": "p8-s4",
+              "text": "（六）项目总投资与资金筹措方案"
+            },
+            {
+              "ref": "p8-s5",
+              "text": "本项目总投资估算为31255.57 万元，其中工程费22122.45 万元，工程建设其他费2701.55 万元，预备费1241.20 万元，征地拆迁费5190.37 万元。"
+            },
+            {
+              "ref": "p8-s6",
+              "text": "本项目建设投资拟申请平谷区财政资金及专项债资金解决。"
+            },
+            {
+              "ref": "p8-s7",
+              "text": "（七）绩效目标"
+            },
+            {
+              "ref": "p8-s8",
+              "text": "项目建成后，项目建设单位将建立涵盖公交枢纽站线路覆盖率、质量管理等维度的绩效评估方案。"
+            },
+            {
+              "ref": "p8-s9",
+              "text": "二、项目单位概况"
+            },
+            {
+              "ref": "p8-s10",
+              "text": "本项目建设单位为北京市平谷区交通局，其主要职责如下："
+            },
+            {
+              "ref": "p8-s11",
+              "text": "（一）贯彻落实国家和本市关于交通运输方面的法律法规规章和政策，起草本区相关行政措施草案，并组织实施。对交通运输行业改革与发展中的重大问题进行调查研究，并提出对策建议。"
+            },
+            {
+              "ref": "p8-s12",
+              "text": "（二）组织编制本区交通运输基础设施建设和交通运输行业的中长期发展规划。参与编制综合交通规划、交通专项规划、城市轨道交通建设规划及相关规划实施的评估工作。负责区管道路建设项目规划设计方案中交通内容的审查。参与交通运输基础设施建设项目初步设计的审查。统筹推进区级重大交通运输基础设施建设。"
+            },
+            {
+              "ref": "p8-s13",
+              "text": "（三）组织编制区级交通运输基础设施建设项目前期工作建议计划和年度建设建议计划。组织编制区级交通运输基础设施维修养护以及交通运输行业年度计划，并组织实施和监督管理。负责提出本区交通运输基础设施建设和维修养护财政性资金安排意见。负责区域轨道交通和其他公共交通特许经营项目的具体实施和监督管理工作。"
+            },
+            {
+              "ref": "p8-s14",
+              "text": "（四）负责推进区域交通一体化协同发展。负责本行政区域内铁路、邮政等综合运输的协调工作。组织拟订各类重点交通运输服务保障方案，并监督实施。参与编制现代物流业发展规划并提出有关政策建议。公司质量方针：打造行业精品创造客户价值3"
+            }
+          ],
+          "candidates": [
+            {
+              "id": "b395ebc4-2f43-4ce5-9f62-449ad614e859",
+              "label": "项目名称",
+              "value": "平谷区马昌营公共交通枢纽工程项目建议书（代可行性研究报告）",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p8-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "372f79ed-6db4-4587-83a1-ccc40f49602b",
+              "label": "施工周期",
+              "value": "12",
+              "unit": "月",
+              "data_type": "integer",
+              "source_ref": "p8-s3",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "e844555b-d394-4227-8bdf-e29d9934a427",
+              "label": "计划开工时间",
+              "value": "2025-12",
+              "unit": "",
+              "data_type": "date",
+              "source_ref": "p8-s3",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "8b5e611c-4817-4085-b774-b5d7d7787830",
+              "label": "计划完工时间",
+              "value": "2026-11",
+              "unit": "",
+              "data_type": "date",
+              "source_ref": "p8-s3",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "454062b0-6469-4b6f-a4b7-1dc076054b5f",
+              "label": "项目总投资估算",
+              "value": "31255.57",
+              "unit": "万元",
+              "data_type": "decimal",
+              "source_ref": "p8-s5",
+              "source_valid": true,
+              "review_status": "APPROVED"
+            },
+            {
+              "id": "a5e77507-0125-409c-95c0-3178b0b883af",
+              "label": "工程费",
+              "value": "22122.45",
+              "unit": "万元",
+              "data_type": "decimal",
+              "source_ref": "p8-s5",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "34fe6fc6-b308-4003-aafc-28bdfec54c0b",
+              "label": "工程建设其他费",
+              "value": "2701.55",
+              "unit": "万元",
+              "data_type": "decimal",
+              "source_ref": "p8-s5",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "f0c066aa-2203-45ed-95cb-ab9dbe259d23",
+              "label": "预备费",
+              "value": "1241.20",
+              "unit": "万元",
+              "data_type": "decimal",
+              "source_ref": "p8-s5",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "93bd08a9-9f8f-4ec4-b3bf-59c425767675",
+              "label": "征地拆迁费",
+              "value": "5190.37",
+              "unit": "万元",
+              "data_type": "decimal",
+              "source_ref": "p8-s5",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "0e5dfdd4-a0ce-4894-9270-efcc0f826da9",
+              "label": "资金来源",
+              "value": "平谷区财政资金及专项债资金",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p8-s6",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "50bafc91-1ac9-472a-81d5-c4b5ff997bbd",
+              "label": "绩效评估维度",
+              "value": "公交枢纽站线路覆盖率、质量管理等",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p8-s8",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "5cb37186-8116-456e-a256-fea8125945f7",
+              "label": "建设单位",
+              "value": "北京市平谷区交通局",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p8-s10",
+              "source_valid": true,
+              "review_status": "PENDING"
+            }
+          ]
+        }
+      ],
+      "sha256": "4406b7c6b40fade73a785342962d2cd47f87f67e04e4e7a5c905cbb0089a551c"
+    },
+    {
+      "filename": "02_jiangmen_eia.pdf",
+      "pages": [
+        {
+          "page": 5,
+          "segments": [
+            {
+              "ref": "p5-s1",
+              "text": "一、建设项目基本情况建设项目名称广东旗山再生资源有限公司金属废料分选与筛分30000 吨建设项目项目代码2509-440783-04-01-133743建设单位联系人莫伟锋联系方式建设地点开平市水口镇东乐路387 号地理坐标（纬度：22 度27 分56.02 秒，经度：112 度47 分37.91 秒）"
+            },
+            {
+              "ref": "p5-s2",
+              "text": "三十九、废弃资源综合利用业42—85、金属废料和碎屑加工处理421；非金属废料和碎屑加工处理422（421和422 均不含原料为危险废物的，均国民经济行业类别"
+            },
+            {
+              "ref": "p5-s3",
+              "text": "建设项目行业类别"
+            },
+            {
+              "ref": "p5-s4",
+              "text": "4210 金属废料和碎屑加工处理、3029 其他水泥类似制品制造"
+            },
+            {
+              "ref": "p5-s5",
+              "text": "不含仅分拣、破碎的）；二十七、非金属矿物制品业30—55、石膏、水泥制品及类似制品制造302建设性质"
+            },
+            {
+              "ref": "p5-s6",
+              "text": "建设项目申报情形"
+            },
+            {
+              "ref": "p5-s7",
+              "text": "新建（迁建）改建扩建技术改造"
+            },
+            {
+              "ref": "p5-s8",
+              "text": "首次申报项目不予批准后再次申报项目超五年重新审核项目重大变动重新报批项目项目审批（核准/备案）部门（选填）/项目审批（核准/备案）文号（选填）/总投资（万元）500环保投资（万元）17环保投资占比（%）3.4施工工期6 个月"
+            },
+            {
+              "ref": "p5-s9",
+              "text": "用地（用海）是否开工建设否是："
+            },
+            {
+              "ref": "p5-s10",
+              "text": "面积（m2）8606.63专项评价设置情况无"
+            },
+            {
+              "ref": "p5-s11",
+              "text": "规划情况无规划环境影响评价情况无规划及规划环境影响评价符合性分析无"
+            },
+            {
+              "ref": "p5-s12",
+              "text": "1"
+            }
+          ],
+          "candidates": [
+            {
+              "id": "3ef2cb30-aeb7-468c-907f-31d78d08fb67",
+              "label": "项目名称",
+              "value": "广东旗山再生资源有限公司金属废料分选与筛分30000吨建设项目",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "d9bfe8d1-ca8f-4c3d-8bb1-6a4a32e27ed7",
+              "label": "项目代码",
+              "value": "2509-440783-04-01-133743",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "9cffdf6b-04c9-4648-ac68-825025e05f40",
+              "label": "建设地点",
+              "value": "开平市水口镇东乐路387号",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "162efb34-ea55-444e-a71b-70fa06ab3b54",
+              "label": "纬度",
+              "value": "22.465561",
+              "unit": "度",
+              "data_type": "decimal",
+              "source_ref": "p5-s1",
+              "source_valid": false,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "a0ccffb0-207d-418c-a1c2-2047bef8d7f8",
+              "label": "经度",
+              "value": "112.793864",
+              "unit": "度",
+              "data_type": "decimal",
+              "source_ref": "p5-s1",
+              "source_valid": false,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "2795f5df-e170-4ee4-8753-717d3a34d036",
+              "label": "行业类别",
+              "value": "4210 金属废料和碎屑加工处理",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s4",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "e50557f7-6395-49fe-85cb-6df390fb3c08",
+              "label": "建设性质",
+              "value": "新建（迁建）",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s7",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "b84ca9c8-9123-4f06-be44-84e7e26c8b89",
+              "label": "总投资",
+              "value": "500",
+              "unit": "万元",
+              "data_type": "integer",
+              "source_ref": "p5-s8",
+              "source_valid": true,
+              "review_status": "APPROVED"
+            },
+            {
+              "id": "95d379e4-716f-484d-8133-db6828988cc9",
+              "label": "环保投资",
+              "value": "17",
+              "unit": "万元",
+              "data_type": "integer",
+              "source_ref": "p5-s8",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "80a66e62-5a85-412c-9743-c88e7956063e",
+              "label": "环保投资占比",
+              "value": "3.4",
+              "unit": "%",
+              "data_type": "decimal",
+              "source_ref": "p5-s8",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "0d95b8c5-aa9b-4efc-ae4e-749d258ff61e",
+              "label": "施工工期",
+              "value": "6",
+              "unit": "个月",
+              "data_type": "integer",
+              "source_ref": "p5-s8",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "b3bc4be5-8d8a-4bcd-ab43-6dd1353573f7",
+              "label": "用地面积",
+              "value": "8606.63",
+              "unit": "m2",
+              "data_type": "decimal",
+              "source_ref": "p5-s10",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "fd4f30ac-d30b-4e29-b3f5-4abc4c3a21be",
+              "label": "纬度",
+              "value": "22度27分56.02秒",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "37a5f491-7669-41f1-b79a-a1132a310834",
+              "label": "经度",
+              "value": "112度47分37.91秒",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "ac265d81-e3a6-445b-8efe-21458fdb3cc0",
+              "label": "行业类别",
+              "value": "4210金属废料和碎屑加工处理",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s4",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "621b480c-e22b-43fd-9d93-1d149da59d67",
+              "label": "申报情形",
+              "value": "首次申报项目",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s8",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "2cbdd31c-cac5-4e36-bde8-9bfc89d407b6",
+              "label": "是否开工建设",
+              "value": "否",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p5-s9",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "2063b7f7-03fb-4632-b8ce-a4e0e16fd849",
+              "label": "面积",
+              "value": "8606.63",
+              "unit": "m2",
+              "data_type": "decimal",
+              "source_ref": "p5-s10",
+              "source_valid": true,
+              "review_status": "PENDING"
+            }
+          ]
+        }
+      ],
+      "sha256": "2649027d0995f4de3ca8dd8f822ba3e9535322abfb46589fce371da161fa8846"
+    },
+    {
+      "filename": "04_jinjiang_accident.pdf",
+      "pages": [
+        {
+          "page": 3,
+          "segments": [
+            {
+              "ref": "p3-s1",
+              "text": "2025 年8 月2 日6 时59 分许，位于晋江市英林镇的福建省立乔建设发展有限公司（晋江市华斯达服饰有限公司）屋顶900KW 分布式光伏发电项目施工过程中发生一起高坠事故，造成1 人死亡，直接经济损失为77.0239 万元。"
+            },
+            {
+              "ref": "p3-s2",
+              "text": "根据《生产安全事故报告和调查处理条例》（国务院令第493号）的有关规定，晋江市人民政府组成了以晋江市应急管理局牵头（应急管理局一名领导担任组长），晋江市纪委监委、晋江市发展和改革局、晋江市工业和信息化局、晋江市公安局、晋江市住房和城乡建设局、晋江市总工会、晋江市英林镇人民政府和漳州市芗城区应急管理局等单位人员参加的事故调查组，并邀请晋江市人民检察院派员参加。泉州市安全生产委员会于2025 年8月12 日下发《一般生产安全事故查处挂牌督办通知书》（泉安委督〔2025〕24 号）对该起事故进行挂牌督办。由于该起事故案情较为复杂，事故调查组于2025 年9 月22 日向晋江市人民政府申请延长事故调查期限，晋江市人民政府于2025 年9 月29 日同意事故调查组延长该起事故调查期限60 日。调查组通过现场勘察、调取监控、调查询问、查阅有关资料、委托专家组技术分析等多方调查取证，查明事故发生的经过、原因、人员伤亡和直接经济损失，认定事故性质和责任，提出了对相关责任者的处理建议和事故整改与防范措施。"
+            },
+            {
+              "ref": "p3-s3",
+              "text": "经调查认定，本起事故系一起因作业人员未按照规定佩戴、使用劳动防护用品，现场安全措施缺失，现场安全管理和隐患排"
+            }
+          ],
+          "candidates": [
+            {
+              "id": "82221ee9-8b21-46a1-aadb-30a5fe2148c4",
+              "label": "事故日期",
+              "value": "2025-08-02",
+              "unit": "",
+              "data_type": "date",
+              "source_ref": "p3-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "eb131e0d-d9f7-43c1-859e-d5471dd76369",
+              "label": "事故时间",
+              "value": "06:59",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p3-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "e75c9665-f996-4aa6-8590-3dcc3975d7fb",
+              "label": "事故地点",
+              "value": "晋江市英林镇",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p3-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "26e7126d-a4c1-445d-912c-75dea2f9c589",
+              "label": "项目名称",
+              "value": "屋顶900KW分布式光伏发电项目",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p3-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "c63f1a80-1006-4a0d-9f8c-b1a7d2a0f3ff",
+              "label": "事故类型",
+              "value": "高坠事故",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p3-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "2150825b-440c-4d62-be02-c25bd0384384",
+              "label": "死亡人数",
+              "value": "1",
+              "unit": "人",
+              "data_type": "integer",
+              "source_ref": "p3-s1",
+              "source_valid": true,
+              "review_status": "APPROVED"
+            },
+            {
+              "id": "d47fdf91-e751-4cef-8db9-dae8c42b1c96",
+              "label": "直接经济损失",
+              "value": "77.0239",
+              "unit": "万元",
+              "data_type": "decimal",
+              "source_ref": "p3-s1",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "ebc1d2b8-46f2-47f3-8f2f-fcc8d36dfbea",
+              "label": "挂牌督办日期",
+              "value": "2025-08-12",
+              "unit": "",
+              "data_type": "date",
+              "source_ref": "p3-s2",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "2ed1c1e2-8671-4037-afcd-58ddef7388da",
+              "label": "延长调查期限申请日期",
+              "value": "2025-09-22",
+              "unit": "",
+              "data_type": "date",
+              "source_ref": "p3-s2",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "6f49a1dc-26c6-4599-91b0-b9348aa0e7e1",
+              "label": "同意延长调查期限日期",
+              "value": "2025-09-29",
+              "unit": "",
+              "data_type": "date",
+              "source_ref": "p3-s2",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "cb409175-c8ae-4c7c-91a0-592edf703f89",
+              "label": "延长调查期限",
+              "value": "60",
+              "unit": "日",
+              "data_type": "integer",
+              "source_ref": "p3-s2",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "6b6ca075-3896-4f96-a623-8f10eae845c9",
+              "label": "事故原因-未佩戴劳动防护用品",
+              "value": "作业人员未按照规定佩戴、使用劳动防护用品",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p3-s3",
+              "source_valid": true,
+              "review_status": "PENDING"
+            },
+            {
+              "id": "6469f79e-303d-4e4e-81ee-d2c8b4c371ea",
+              "label": "事故原因-现场安全措施缺失",
+              "value": "现场安全措施缺失",
+              "unit": "",
+              "data_type": "text",
+              "source_ref": "p3-s3",
+              "source_valid": true,
+              "review_status": "PENDING"
+            }
+          ]
+        }
+      ],
+      "sha256": "eb6655da71f0d11b8a41c3bc5320a53fd4307fec370018150a037978927d69c4"
+    }
+  ]
+}

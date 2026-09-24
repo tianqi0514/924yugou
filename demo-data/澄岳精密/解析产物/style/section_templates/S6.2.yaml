@@ -1,0 +1,50 @@
+section_id: S6.2
+title: 6.2 定员与组织
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0072
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0072
+- chunk_id: C0073
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0073
+- chunk_id: C0074
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0074
+- chunk_id: C0075
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0075
+- chunk_id: C0076
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0076
+- chunk_id: C0077
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0077
+tables:
+- table_id: T07
+  caption: 表6-2 新增定员及年度人工费用
+  columns:
+  - 类别
+  - 人数口径
+  - 人数（人）
+  chunk_id: C0075
+argument_patterns:
+- claim_id: L020
+  pattern: 首年全员到岗费用不随首年销量比例缩减。
+  strength: boundary
+  requires_support:
+  - N076
+  - N077
+  - N078
+  - N035
+- claim_id: L021
+  pattern: 正式采购和现场施工前提交配电及专项复核。
+  strength: conditional
+  requires_support:
+  - N193
+  - N056
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

@@ -1,0 +1,403 @@
+{
+  "model": "deepseek-v4-flash-0731",
+  "prompt_version": 2,
+  "source_sha256": "4406b7c6b40fade73a785342962d2cd47f87f67e04e4e7a5c905cbb0089a551c",
+  "prompt_sha256": "db6239f0fa28fda999cde5026394d9fa5670a9e7b064e118a9a500e8ff61f056",
+  "source_records": 118,
+  "elapsed_seconds": 4.54,
+  "usage": {
+    "prompt_tokens": 5966,
+    "total_tokens": 7222,
+    "completion_tokens": 1256,
+    "prompt_tokens_details": {
+      "cached_tokens": 5632,
+      "created_cache_tokens": 256,
+      "multimodal_tokens": null
+    }
+  },
+  "fields": 25,
+  "passed": 24,
+  "status_correct": 25,
+  "value_correct": 25,
+  "unit_correct": 25,
+  "source_valid": 24,
+  "unexpected_ids": [],
+  "checks": [
+    {
+      "id": "project_name",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "project_name",
+        "status": "found",
+        "value": "平谷区马昌营公共交通枢纽工程",
+        "unit": null,
+        "source_ref": "p6-b5"
+      }
+    },
+    {
+      "id": "project_owner",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "project_owner",
+        "status": "found",
+        "value": "北京市平谷区交通局",
+        "unit": null,
+        "source_ref": "p6-b7"
+      }
+    },
+    {
+      "id": "location",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "location",
+        "status": "found",
+        "value": "平谷区马昌营镇、峪口镇、大兴庄镇三镇交界处",
+        "unit": null,
+        "source_ref": "p6-b9"
+      }
+    },
+    {
+      "id": "total_land_area",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "total_land_area",
+        "status": "found",
+        "value": "73431.105",
+        "unit": "㎡",
+        "source_ref": "p7-t1-r1"
+      }
+    },
+    {
+      "id": "construction_land_area",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "construction_land_area",
+        "status": "found",
+        "value": "54088.771",
+        "unit": "㎡",
+        "source_ref": "p7-t1-r2"
+      }
+    },
+    {
+      "id": "green_expropriated_area",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "green_expropriated_area",
+        "status": "found",
+        "value": "3105.104",
+        "unit": "㎡",
+        "source_ref": "p7-t1-r3"
+      }
+    },
+    {
+      "id": "road_expropriated_area",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "road_expropriated_area",
+        "status": "found",
+        "value": "16237.23",
+        "unit": "㎡",
+        "source_ref": "p7-t1-r4"
+      }
+    },
+    {
+      "id": "total_building_area",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "total_building_area",
+        "status": "found",
+        "value": "17268.25",
+        "unit": "㎡",
+        "source_ref": "p7-t1-r5"
+      }
+    },
+    {
+      "id": "aboveground_building_area",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "aboveground_building_area",
+        "status": "found",
+        "value": "15756.25",
+        "unit": "㎡",
+        "source_ref": "p7-t1-r6"
+      }
+    },
+    {
+      "id": "underground_building_area",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "underground_building_area",
+        "status": "found",
+        "value": "1512",
+        "unit": "㎡",
+        "source_ref": "p7-t1-r7"
+      }
+    },
+    {
+      "id": "floor_area_ratio",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "floor_area_ratio",
+        "status": "found",
+        "value": "0.291",
+        "unit": null,
+        "source_ref": "p7-t1-r8"
+      }
+    },
+    {
+      "id": "green_rate",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "green_rate",
+        "status": "found",
+        "value": "20",
+        "unit": "%",
+        "source_ref": "p7-t1-r9"
+      }
+    },
+    {
+      "id": "building_density",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "building_density",
+        "status": "found",
+        "value": "16.65",
+        "unit": "%",
+        "source_ref": "p7-t1-r10"
+      }
+    },
+    {
+      "id": "car_parking_spaces",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "car_parking_spaces",
+        "status": "found",
+        "value": "149",
+        "unit": "辆",
+        "source_ref": "p7-t1-r11"
+      }
+    },
+    {
+      "id": "underground_car_parking_spaces",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "underground_car_parking_spaces",
+        "status": "missing",
+        "value": null,
+        "unit": "辆",
+        "source_ref": "p7-t1-r13"
+      }
+    },
+    {
+      "id": "construction_duration",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "construction_duration",
+        "status": "found",
+        "value": "12",
+        "unit": "个月",
+        "source_ref": "p8-b3"
+      }
+    },
+    {
+      "id": "planned_start_month",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "planned_start_month",
+        "status": "found",
+        "value": "2025-12",
+        "unit": null,
+        "source_ref": "p8-b3"
+      }
+    },
+    {
+      "id": "planned_completion_month",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": false,
+      "passed": false,
+      "actual": {
+        "id": "planned_completion_month",
+        "status": "found",
+        "value": "2026-11",
+        "unit": null,
+        "source_ref": "p8-b4"
+      }
+    },
+    {
+      "id": "total_investment",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "total_investment",
+        "status": "found",
+        "value": "31255.57",
+        "unit": "万元",
+        "source_ref": "p177-t1-r12"
+      }
+    },
+    {
+      "id": "engineering_cost",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "engineering_cost",
+        "status": "found",
+        "value": "22122.45",
+        "unit": "万元",
+        "source_ref": "p177-t1-r1"
+      }
+    },
+    {
+      "id": "other_construction_cost",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "other_construction_cost",
+        "status": "found",
+        "value": "2701.55",
+        "unit": "万元",
+        "source_ref": "p177-t1-r9"
+      }
+    },
+    {
+      "id": "contingency_cost",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "contingency_cost",
+        "status": "found",
+        "value": "1241.20",
+        "unit": "万元",
+        "source_ref": "p177-t1-r10"
+      }
+    },
+    {
+      "id": "land_acquisition_cost",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "land_acquisition_cost",
+        "status": "found",
+        "value": "5190.37",
+        "unit": "万元",
+        "source_ref": "p177-t1-r11"
+      }
+    },
+    {
+      "id": "profitability_analysis",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "profitability_analysis",
+        "status": "not_applicable",
+        "value": null,
+        "unit": null,
+        "source_ref": "p177-b28"
+      }
+    },
+    {
+      "id": "annual_ticket_revenue",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "annual_ticket_revenue",
+        "status": "unknown",
+        "value": null,
+        "unit": null,
+        "source_ref": null
+      }
+    }
+  ],
+  "scoring_version": 3
+}

@@ -1,0 +1,419 @@
+- id: INV_SOURCE_HASH
+  family: source_integrity
+  description: 原件字节校验与封装一致
+  origin: extraction_engineering
+  expr: null
+  nodes: []
+  source_locations: []
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_SOURCE_SPANS
+  family: source_integrity
+  description: 所有块与引用字符区间可回到规范化原文
+  origin: extraction_engineering
+  expr: null
+  nodes: []
+  source_locations: []
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_PLACEHOLDER_ROUNDTRIP
+  family: source_integrity
+  description: 每个占位符按节点完整精度及局部格式渲染，恢复原数字和表述
+  origin: extraction_engineering
+  expr: null
+  nodes: []
+  source_locations: []
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_SKELETON_NUMBER_MASK
+  family: source_integrity
+  description: 骨架文本移除占位符后无阿拉伯数字残留
+  origin: extraction_engineering
+  expr: null
+  nodes: []
+  source_locations: []
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_AREA_SUM
+  family: area
+  description: 分区面积合计等于改造计费面积
+  origin: source_explicit
+  expr: area_prod+area_turn+area_lane+area_support == area
+  nodes:
+  - N043
+  - N044
+  - N045
+  - N046
+  - N042
+  source_locations:
+  - block_id: B0058
+    chunk_id: C0058
+    page: 7
+    span:
+    - 4786
+    - 4907
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 63
+      body_index: 68
+      xpath: /w:document/w:body/w:p[64]
+      index_base: 0
+  - block_id: B0061
+    chunk_id: C0061
+    page: 7
+    span:
+    - 5123
+    - 5248
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 66
+      body_index: 72
+      xpath: /w:document/w:body/w:p[67]
+      index_base: 0
+  - block_id: B0060
+    chunk_id: C0060
+    page: 7
+    span:
+    - 4925
+    - 5121
+    source_locator:
+      part: word/document.xml
+      table_index: 5
+      body_index: 70
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[6]
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_FACTORY_AREA
+  family: area
+  description: 厂房总面积等于改造面积加旧仓储
+  origin: source_explicit
+  expr: factory_area == area+old_storage_area
+  nodes: []
+  source_locations:
+  - block_id: B0058
+    chunk_id: C0058
+    page: 7
+    span:
+    - 4786
+    - 4907
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 63
+      body_index: 68
+      xpath: /w:document/w:body/w:p[64]
+      index_base: 0
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_HISTORICAL_SUM
+  family: historical
+  description: 旧业务厂内与外协交付汇总等于历史需求
+  origin: source_explicit
+  expr: old_factory+old_outsource == old_demand
+  nodes: []
+  source_locations:
+  - block_id: B0189
+    chunk_id: C0189
+    page: 19
+    span:
+    - 17268
+    - 17381
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 206
+      body_index: 224
+      xpath: /w:document/w:body/w:p[207]
+      index_base: 0
+  tolerance: 0
+  on_violation: review_historical_source
+- id: INV_INVESTMENT_SUM
+  family: cost
+  description: 建设投资保留完整精度，按工程费加其他费加预备费汇总
+  origin: source_explicit
+  expr: construction == engineering+other_capex+reserve
+  nodes: []
+  source_locations:
+  - block_id: B0090
+    chunk_id: C0090
+    page: 10
+    span:
+    - 7762
+    - 7864
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 98
+      body_index: 108
+      xpath: /w:document/w:body/w:p[99]
+      index_base: 0
+  - block_id: B0095
+    chunk_id: C0095
+    page: 10
+    span:
+    - 8021
+    - 8331
+    source_locator:
+      part: word/document.xml
+      table_index: 10
+      body_index: 113
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[11]
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_FUNDING_SUM
+  family: funding
+  description: 融资前需求=建设投资+正常年净营运资金
+  origin: source_explicit
+  expr: funding == construction+working_capital
+  nodes: []
+  source_locations:
+  - block_id: B0117
+    chunk_id: C0117
+    page: 12
+    span:
+    - 10250
+    - 10311
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 127
+      body_index: 140
+      xpath: /w:document/w:body/w:p[128]
+      index_base: 0
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_SALES_CAP
+  family: capacity
+  description: 两期销量同时受对应需求与合格能力约束
+  origin: source_explicit
+  expr: sales_normal <= min(demand_normal,capacity) and sales_first <= min(demand_first,capacity)
+  nodes: []
+  source_locations:
+  - block_id: B0033
+    chunk_id: C0033
+    page: 4
+    span:
+    - 2504
+    - 2627
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 35
+      body_index: 38
+      xpath: /w:document/w:body/w:p[36]
+      index_base: 0
+  - block_id: B0102
+    chunk_id: C0102
+    page: 11
+    span:
+    - 8722
+    - 8853
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 111
+      body_index: 122
+      xpath: /w:document/w:body/w:p[112]
+      index_base: 0
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_YEAR_SEPARATION
+  family: identity
+  description: 历史交付、首年需求、首年销量以及同值异义费用不合并节点
+  origin: source_grounded_engineering
+  expr: null
+  nodes: []
+  source_locations:
+  - block_id: B0031
+    chunk_id: C0031
+    page: 4
+    span:
+    - 2345
+    - 2486
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 33
+      body_index: 36
+      xpath: /w:document/w:body/w:p[34]
+      index_base: 0
+  - block_id: B0087
+    chunk_id: C0087
+    page: 9
+    span:
+    - 7569
+    - 7729
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 94
+      body_index: 104
+      xpath: /w:document/w:body/w:p[95]
+      index_base: 0
+  - block_id: B0121
+    chunk_id: C0121
+    page: 12
+    span:
+    - 10579
+    - 10693
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 131
+      body_index: 144
+      xpath: /w:document/w:body/w:p[132]
+      index_base: 0
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_POWER_UNRESOLVED
+  family: conflict
+  description: 800/650两观察值并存，不自动形成唯一采用值
+  origin: source_explicit
+  expr: null
+  nodes: []
+  source_locations:
+  - block_id: B0063
+    chunk_id: C0063
+    page: 7
+    span:
+    - 5270
+    - 5394
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 68
+      body_index: 74
+      xpath: /w:document/w:body/w:p[69]
+      index_base: 0
+  - block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5396
+    - 5531
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_UNKNOWN_NOT_ZERO
+  family: missing_value
+  description: 建设期利息及含融资成本总资金保持待测而非0
+  origin: source_explicit
+  expr: null
+  nodes: []
+  source_locations:
+  - block_id: B0121
+    chunk_id: C0121
+    page: 12
+    span:
+    - 10579
+    - 10693
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 131
+      body_index: 144
+      xpath: /w:document/w:body/w:p[132]
+      index_base: 0
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_DAG_REPLAY
+  family: execution
+  description: 74条抽取规则按依赖有向无环次序完成基线回放
+  origin: extraction_engineering
+  expr: null
+  nodes: []
+  source_locations: []
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_MISSING_PROPAGATION
+  family: missing_value
+  description: 模拟必要速率缺失时，依赖链不可按零继续计算
+  origin: spec_and_extraction_engineering
+  expr: null
+  nodes: []
+  source_locations: []
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_FORMULA_GUARDS
+  family: applicability
+  description: 单套贡献及正常年盈余前提不成立，不套用旧式
+  origin: source_explicit
+  expr: null
+  nodes: []
+  source_locations:
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11114
+    - 11268
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+  - block_id: B0132
+    chunk_id: C0132
+    page: 13
+    span:
+    - 11517
+    - 11637
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 143
+      body_index: 157
+      xpath: /w:document/w:body/w:p[144]
+      index_base: 0
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_NO_INVENTED_PRICE_EFFECT
+  family: applicability
+  description: 设备涨价不自动改变速率、售价、材料、固定维护及历史事实
+  origin: source_explicit
+  expr: null
+  nodes: []
+  source_locations:
+  - block_id: B0099
+    chunk_id: C0099
+    page: 10
+    span:
+    - 8565
+    - 8689
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 107
+      body_index: 118
+      xpath: /w:document/w:body/w:p[108]
+      index_base: 0
+  - block_id: B0110
+    chunk_id: C0110
+    page: 11
+    span:
+    - 9617
+    - 9722
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 119
+      body_index: 131
+      xpath: /w:document/w:body/w:p[120]
+      index_base: 0
+  - block_id: B0151
+    chunk_id: C0151
+    page: 15
+    span:
+    - 13641
+    - 13721
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 164
+      body_index: 181
+      xpath: /w:document/w:body/w:p[165]
+      index_base: 0
+  tolerance: 0
+  on_violation: block_extraction
+- id: INV_REFERENTIAL_INTEGRITY
+  family: schema
+  description: 跨节点、规则、证据、论断、章节、切块引用均存在
+  origin: extraction_engineering
+  expr: null
+  nodes: []
+  source_locations: []
+  tolerance: 0
+  on_violation: block_extraction

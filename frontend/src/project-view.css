@@ -1,0 +1,8 @@
+.project-summary{display:flex;align-items:center;gap:8px;margin:-6px 0 16px;color:#6f7e92;font-size:11px}
+.project-summary span{padding:5px 9px;border:1px solid #e5eaf2;border-radius:6px;background:#fff}
+.project-more{border-top:1px solid #edf1f6;padding-top:11px}
+.project-more summary{cursor:pointer;color:#5075b8;font-size:12px}
+.project-more[open]{display:grid;gap:12px}
+.project-more[open] summary{margin-bottom:2px}
+.project-fact-meta{color:#78889c;font-size:11px}
+@media(max-width:560px){.project-summary{flex-wrap:wrap}}

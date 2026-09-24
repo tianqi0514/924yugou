@@ -1,0 +1,400 @@
+verdict: pass_with_notes
+scope: corpus_extraction_and_baseline_replay
+project_approval_verdict: not_assessed
+unconditional_implementation_allowed: false
+evaluated_at: '2026-09-23T03:08:46.249025+00:00'
+source_as_of: '2026-09-18'
+tests:
+- invariant_id: INV_SOURCE_HASH
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157254+00:00'
+- invariant_id: INV_SOURCE_SPANS
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157425+00:00'
+- invariant_id: INV_PLACEHOLDER_ROUNDTRIP
+  status: pass
+  detail:
+    mention_count: 630
+    chunk_count: 194
+    differences: []
+    chunk_differences: []
+  evaluated_at: '2026-09-23T03:08:46.157434+00:00'
+- invariant_id: INV_SKELETON_NUMBER_MASK
+  status: pass
+  detail:
+    unmasked_chunks: []
+    scope: 只检验骨架正文；非完全身份脱敏、非ACL部署验证
+  evaluated_at: '2026-09-23T03:08:46.157437+00:00'
+- invariant_id: INV_AREA_SUM
+  status: pass
+  detail:
+    sum: '4800'
+  evaluated_at: '2026-09-23T03:08:46.157451+00:00'
+- invariant_id: INV_FACTORY_AREA
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157456+00:00'
+- invariant_id: INV_HISTORICAL_SUM
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157460+00:00'
+- invariant_id: INV_INVESTMENT_SUM
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157466+00:00'
+- invariant_id: INV_FUNDING_SUM
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157470+00:00'
+- invariant_id: INV_SALES_CAP
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157475+00:00'
+- invariant_id: INV_YEAR_SEPARATION
+  status: pass
+  detail: 金额或数量相等不是事实身份等同的依据。
+  evaluated_at: '2026-09-23T03:08:46.157482+00:00'
+- invariant_id: INV_POWER_UNRESOLVED
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157486+00:00'
+- invariant_id: INV_UNKNOWN_NOT_ZERO
+  status: pass
+  detail: null
+  evaluated_at: '2026-09-23T03:08:46.157490+00:00'
+- invariant_id: INV_DAG_REPLAY
+  status: pass
+  detail:
+    rule_count: 74
+    unresolved: []
+  evaluated_at: '2026-09-23T03:08:46.157498+00:00'
+- invariant_id: INV_MISSING_PROPAGATION
+  status: pass
+  detail:
+    test: missing_rate
+    source_basis:
+    - block_id: B0048
+      chunk_id: C0048
+      page: 6
+      span:
+      - 4051
+      - 4141
+      source_locator:
+        part: word/document.xml
+        paragraph_index: 52
+        body_index: 57
+        xpath: /w:document/w:body/w:p[53]
+        index_base: 0
+    - block_id: B0054
+      chunk_id: C0054
+      page: 6
+      span:
+      - 4507
+      - 4636
+      source_locator:
+        part: word/document.xml
+        paragraph_index: 58
+        body_index: 63
+        xpath: /w:document/w:body/w:p[59]
+        index_base: 0
+    input_override:
+      N029: null
+    expected_undefined:
+    - N034
+    - N036
+    - N035
+    - N147
+    - N170
+    actual_undefined:
+    - N034
+    - N036
+    - N035
+    - N147
+    - N170
+    passed: true
+  evaluated_at: '2026-09-23T03:08:46.158229+00:00'
+- invariant_id: INV_FORMULA_GUARDS
+  status: pass
+  detail:
+    test: nonpositive_contribution
+    input_override:
+      N115: '1000'
+    purpose: 执行原文收支平衡及回收期适用前提的守卫；不是原文情景或答案
+    actual_contribution: '-57.80'
+    breakeven: null
+    payback: null
+    passed: true
+  evaluated_at: '2026-09-23T03:08:46.158958+00:00'
+- invariant_id: INV_NO_INVENTED_PRICE_EFFECT
+  status: pass
+  detail:
+    test: weld_quote_independence
+    input_override:
+      N080: '1481'
+    unchanged:
+    - N029
+    - N115
+    - N116
+    - N134
+    - N103
+    - N107
+    - N020
+    passed: true
+  evaluated_at: '2026-09-23T03:08:46.159677+00:00'
+- invariant_id: INV_REFERENTIAL_INTEGRITY
+  status: pass
+  detail:
+    dangling_references: []
+  evaluated_at: '2026-09-23T03:08:46.160210+00:00'
+guard_tests:
+- test: missing_rate
+  source_basis:
+  - block_id: B0048
+    chunk_id: C0048
+    page: 6
+    span:
+    - 4051
+    - 4141
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 52
+      body_index: 57
+      xpath: /w:document/w:body/w:p[53]
+      index_base: 0
+  - block_id: B0054
+    chunk_id: C0054
+    page: 6
+    span:
+    - 4507
+    - 4636
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 58
+      body_index: 63
+      xpath: /w:document/w:body/w:p[59]
+      index_base: 0
+  input_override:
+    N029: null
+  expected_undefined:
+  - N034
+  - N036
+  - N035
+  - N147
+  - N170
+  actual_undefined:
+  - N034
+  - N036
+  - N035
+  - N147
+  - N170
+  passed: true
+- test: nonpositive_contribution
+  input_override:
+    N115: '1000'
+  purpose: 执行原文收支平衡及回收期适用前提的守卫；不是原文情景或答案
+  actual_contribution: '-57.80'
+  breakeven: null
+  payback: null
+  passed: true
+- test: weld_quote_independence
+  input_override:
+    N080: '1481'
+  unchanged:
+  - N029
+  - N115
+  - N116
+  - N134
+  - N103
+  - N107
+  - N020
+  passed: true
+invariant_violations: []
+baseline_replay:
+  rules_executed: 74
+  undefined_rule_results: []
+  all_bound_displays_match_source: true
+  rendered_mentions: 630
+  rendered_chunks: 194
+  mismatches: []
+conflicts:
+- X001
+gaps:
+- G001
+- G002
+- G003
+- G004
+- G005
+- G006
+- G007
+- G008
+- G009
+- G010
+- G011
+undefined_nodes:
+- id: N052
+  label: 待确认的可用有功余量
+  value: null
+  instruction: 保持UNDEFINED，联合复测并明确替代关系后才能采用。
+- id: N156
+  label: 贷款利率
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+- id: N157
+  label: 贷款期限
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+- id: N158
+  label: 还本安排
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+- id: N159
+  label: 建设期提款节奏
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+- id: N160
+  label: 其他融资费用
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+- id: N161
+  label: 建设期利息
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+- id: N162
+  label: 含融资成本的总资金需求
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+- id: N163
+  label: 变压器增容及外线追加投资
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+- id: N164
+  label: 增容工程追加工期
+  value: null
+  instruction: 缺值不得按0或估计值代替；原文未提供可执行测算所需的完整依据。
+unbound_nodes: []
+source_span_only_nodes:
+- N009
+- N010
+- N012
+- N038
+- N039
+- N052
+- N156
+- N157
+- N158
+- N159
+- N160
+- N161
+- N162
+- N163
+- N164
+- N181
+- N183
+- N184
+- N191
+- N193
+- N194
+- N195
+- N196
+- N197
+- N198
+- N199
+- N200
+literal_numbers_found_in_skeleton: []
+embedding_status: not_generated
+limitations:
+- 本次仅依据业务原文及其内嵌资料摘录，不读取人工核对说明，也未取得引用内部文件的完整原件。
+- 未调用向量模型。embeddings.parquet为空表，不含伪向量，signature只含结构化匹配特征且vector为null。
+- 规则、关键业务节点和论断已逐项整理并回放；没有独立人工金标，不能由数字占位覆盖宣称语义召回率100%。
+- 日期和期间变化已登记依赖及复核动作，未实现完整日历重排；阶段变化需要重新确认客户预测期间有效性。
+- 数值骨架通过原值回填检查；自由文本语义改写、并发事务、图数据库/MCP服务与完整权限脱敏尚未实现。
+- 归档原文与附录证据不可随新项目改值；新项目应另建scope并复核引用，不能重写历史证据。
+- 原文的配电冲突、融资及专项缺口仍未解决；可抽取和回放不等于项目审批或无条件开工通过。
+business_threshold_checks:
+- node_id: N179
+  label: 基准年度需求覆盖
+  value: true
+  rule_id: R063
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N180
+  label: 融资前投资控制满足
+  value: true
+  rule_id: R064
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N181
+  label: 意向融资上限满足
+  value: true
+  rule_id: R065
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N182
+  label: 实施计划期限满足
+  value: true
+  rule_id: R066
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N183
+  label: 简化回收期初筛满足
+  value: true
+  rule_id: R067
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N184
+  label: 年度内部用电预算满足
+  value: true
+  rule_id: R068
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N185
+  label: A方案需求覆盖
+  value: false
+  rule_id: R069
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N186
+  label: A方案资金控制满足
+  value: true
+  rule_id: R070
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N187
+  label: A方案期限满足
+  value: true
+  rule_id: R071
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N188
+  label: C方案需求覆盖
+  value: true
+  rule_id: R072
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N189
+  label: C方案资金控制满足
+  value: false
+  rule_id: R073
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+- node_id: N190
+  label: C方案期限满足
+  value: false
+  rule_id: R074
+  note: 原文情景约束结果；备选方案不满足不等于抽取错误。
+format_conversion_validation:
+  status: validated
+  scope: native_formats_and_lossless_repackaging
+  evaluated_at: '2026-09-23T03:32:42.523521+00:00'
+  artifact_categories: 30
+  artifact_files: 114
+  nodes: 339
+  rules_replayed: 74
+  chunks_restored: 194
+  mentions_restored: 630
+  excerpt_spans_verified: 20
+  table_csv_files: 18
+  section_template_files: 49
+  original_docx_hash_verified: true
+  normalized_text_unchanged: true
+  offsets_and_indexes_verified: true
+  merged_graph_matches: true
+  file_references_verified: true
+  parquet:
+    row_count: 0
+    vector_count: 0
+    status: not_generated
+    schema_tree_verified: true
+    engine_check: not_installed; checked_Thrift_footer_and_schema_tree
+  note: Mechanical checks only; no independent semantic gold set or project approval.

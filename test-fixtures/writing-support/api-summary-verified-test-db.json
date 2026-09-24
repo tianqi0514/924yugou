@@ -1,0 +1,4516 @@
+{
+  "schema_version": "writing-support-summary/1.0",
+  "source": "captured_actual_api_bodies",
+  "run_count": 21,
+  "runs": [
+    {
+      "run_id": "WS-C0052-BASE::minimal_information_contract",
+      "scenario_id": "WS-C0052-BASE",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "4040fcd0-e3b8-425a-a88e-8247ba162d47",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-BASE::applicable_conditional",
+      "scenario_id": "WS-C0052-BASE",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "4f218dc2-460a-4a10-9d67-026d6f2e080f",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONDITION_FALSE",
+          "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+          "severity": "review",
+          "slot_id": null
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": 503,
+      "model_preview_elapsed_ms": 832,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "254016"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "cc8d91d0-392f-411d-863e-bddabd685386",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "cc8d91d0-392f-411d-863e-bddabd685386",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "300000"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_preview_audit",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "cc8d91d0-392f-411d-863e-bddabd685386",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "300000"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        },
+        {
+          "name": "synthetic_input_not_verified_evidence",
+          "passed": true,
+          "observed": {
+            "first_year_demand": "UNVERIFIED",
+            "qualified_capacity": "UNVERIFIED"
+          }
+        },
+        {
+          "name": "formal_export_blocked_without_project_original",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-BASE::all_available",
+      "scenario_id": "WS-C0052-BASE",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "541a03e3-5c61-4e40-8391-f52cb272a243",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONDITION_FALSE",
+          "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+          "severity": "review",
+          "slot_id": null
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "254016"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "4012c40b-bb9f-406b-814f-7efbb1853c04",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "4012c40b-bb9f-406b-814f-7efbb1853c04",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "300000"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_preview_audit",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "4012c40b-bb9f-406b-814f-7efbb1853c04",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "300000"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        },
+        {
+          "name": "synthetic_input_not_verified_evidence",
+          "passed": true,
+          "observed": {
+            "first_year_demand": "UNVERIFIED",
+            "qualified_capacity": "UNVERIFIED"
+          }
+        },
+        {
+          "name": "formal_export_blocked_without_project_original",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-ZERO::minimal_information_contract",
+      "scenario_id": "WS-C0052-ZERO",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "29740480-f900-4970-a7dd-bd0c4ed40b1f",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-ZERO::applicable_conditional",
+      "scenario_id": "WS-C0052-ZERO",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "f3e653bb-4d00-4a00-af49-01355f1c106d",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "0"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "d036684f-10c3-4f5f-8932-68d2562f97ca",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "d036684f-10c3-4f5f-8932-68d2562f97ca",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "0"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_preview_audit",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "d036684f-10c3-4f5f-8932-68d2562f97ca",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "0"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "zero_is_value_in_text",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        },
+        {
+          "name": "synthetic_input_not_verified_evidence",
+          "passed": true,
+          "observed": {
+            "first_year_demand": "UNVERIFIED",
+            "qualified_capacity": "UNVERIFIED"
+          }
+        },
+        {
+          "name": "formal_export_blocked_without_project_original",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-ZERO::all_available",
+      "scenario_id": "WS-C0052-ZERO",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "3e929793-6589-40e9-8cde-761ea75fac2a",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "0"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "09fc3e1e-5d90-46c4-b404-48bc0dec459b",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "09fc3e1e-5d90-46c4-b404-48bc0dec459b",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "0"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_preview_audit",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "09fc3e1e-5d90-46c4-b404-48bc0dec459b",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "0"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "zero_is_value_in_text",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        },
+        {
+          "name": "synthetic_input_not_verified_evidence",
+          "passed": true,
+          "observed": {
+            "first_year_demand": "UNVERIFIED",
+            "qualified_capacity": "UNVERIFIED"
+          }
+        },
+        {
+          "name": "formal_export_blocked_without_project_original",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-MISSING::minimal_information_contract",
+      "scenario_id": "WS-C0052-MISSING",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "98bcce5f-5733-4793-ac13-775e20f5c6a1",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-MISSING::applicable_conditional",
+      "scenario_id": "WS-C0052-MISSING",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "bd5486af-a333-4c5d-b443-48f69e01572d",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "项目事实或规则尚不足以起草：首年客户需求尚无可用的项目值；首年计划销售量尚无可用的项目值"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "missing_dependency_unevaluable",
+          "passed": true,
+          "observed": {
+            "id": "dd6e8552-53ad-4764-97fe-67488d248a89",
+            "key": "planned_sales",
+            "label": "首年计划销售量",
+            "data_type": "integer",
+            "value": null,
+            "status": "UNEVALUABLE",
+            "unit": "套",
+            "caliber": "本项目待确认",
+            "as_of": "",
+            "source": "",
+            "revision": 0,
+            "updated_at": "2026-09-24T07:42:58.360277+00:00"
+          }
+        },
+        {
+          "name": "missing_dependency_preview_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-MISSING::all_available",
+      "scenario_id": "WS-C0052-MISSING",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "7fd97f52-6b9f-4919-84bd-609806ae90b5",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "项目事实或规则尚不足以起草：首年客户需求尚无可用的项目值；首年计划销售量尚无可用的项目值"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "missing_dependency_unevaluable",
+          "passed": true,
+          "observed": {
+            "id": "85afbf75-04db-420a-b16b-45bd1b020365",
+            "key": "planned_sales",
+            "label": "首年计划销售量",
+            "data_type": "integer",
+            "value": null,
+            "status": "UNEVALUABLE",
+            "unit": "套",
+            "caliber": "本项目待确认",
+            "as_of": "",
+            "source": "",
+            "revision": 0,
+            "updated_at": "2026-09-24T07:42:58.876560+00:00"
+          }
+        },
+        {
+          "name": "missing_dependency_preview_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0083-IDENTITY::minimal_information_contract",
+      "scenario_id": "WS-C0083-IDENTITY",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "5fc60dc8-760c-4e3f-b732-07113826150b",
+      "section_id": "S7.1",
+      "package_item_count": 52,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0083-IDENTITY::applicable_conditional",
+      "scenario_id": "WS-C0083-IDENTITY",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "ddf1661a-aa29-4e20-87de-e8dc1d357923",
+      "section_id": "S7.1",
+      "package_item_count": 52,
+      "preview_used_item_count": 4,
+      "preview_source_ref_count": 4,
+      "persisted_source_ref_count": 4,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000024"
+          ]
+        },
+        {
+          "chunk_id": "C0083",
+          "code": "QUOTE_SCOPE_UNVERIFIED",
+          "message": "历史报价包含范围和有效期尚未由本项目证据确认，候选正文未继承",
+          "severity": "review",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "new_supplier_and_price_only",
+          "passed": true,
+          "observed": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。"
+        },
+        {
+          "name": "quote_scope_review_flag",
+          "passed": true,
+          "observed": [
+            "QUOTE_SCOPE_UNVERIFIED",
+            "TEMPLATE_COVERAGE_UNSPECIFIED"
+          ]
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        },
+        {
+          "name": "synthetic_input_not_verified_evidence",
+          "passed": true,
+          "observed": {
+            "supplier_name": "UNVERIFIED",
+            "equipment_unit_price": "UNVERIFIED"
+          }
+        },
+        {
+          "name": "formal_export_blocked_without_project_original",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0083-IDENTITY::all_available",
+      "scenario_id": "WS-C0083-IDENTITY",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "285a2460-0d6a-4f0c-b1b9-7a21eb733f6d",
+      "section_id": "S7.1",
+      "package_item_count": 52,
+      "preview_used_item_count": 4,
+      "preview_source_ref_count": 4,
+      "persisted_source_ref_count": 4,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000024"
+          ]
+        },
+        {
+          "chunk_id": "C0083",
+          "code": "QUOTE_SCOPE_UNVERIFIED",
+          "message": "历史报价包含范围和有效期尚未由本项目证据确认，候选正文未继承",
+          "severity": "review",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "new_supplier_and_price_only",
+          "passed": true,
+          "observed": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。"
+        },
+        {
+          "name": "quote_scope_review_flag",
+          "passed": true,
+          "observed": [
+            "QUOTE_SCOPE_UNVERIFIED",
+            "TEMPLATE_COVERAGE_UNSPECIFIED"
+          ]
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        },
+        {
+          "name": "synthetic_input_not_verified_evidence",
+          "passed": true,
+          "observed": {
+            "supplier_name": "UNVERIFIED",
+            "equipment_unit_price": "UNVERIFIED"
+          }
+        },
+        {
+          "name": "formal_export_blocked_without_project_original",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-X001-CONFLICT::minimal_information_contract",
+      "scenario_id": "WS-X001-CONFLICT",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "af1db73f-0769-40ba-8fb2-7d3f2c71bee0",
+      "section_id": "S5.2",
+      "package_item_count": 38,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-X001-CONFLICT::applicable_conditional",
+      "scenario_id": "WS-X001-CONFLICT",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "bc215107-f5f2-4527-a272-ee3ee6466fcd",
+      "section_id": "S5.2",
+      "package_item_count": 38,
+      "preview_used_item_count": 5,
+      "preview_source_ref_count": 5,
+      "persisted_source_ref_count": 5,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000019"
+          ]
+        },
+        {
+          "code": "HISTORICAL_CONFLICT",
+          "severity": "review",
+          "message": "X001 是历史资料中未解决的冲突；当前项目如论证同一问题，必须使用新证据核对",
+          "item_ids": [
+            "23:000000"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "POWER_CONFLICT_UNRESOLVED",
+          "severity": "block",
+          "message": "历史配电数据冲突未解决；新项目缺少独立核证，正式交付受阻",
+          "item_ids": [
+            "23:000000"
+          ]
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "historical_conflict_open_two_sources",
+          "passed": true,
+          "observed": {
+            "id": "X001",
+            "type": "same_caliber_different_value",
+            "what": "同一接入点、同一统计基准、同一扣减范围，可用有功余量800kW与650kW不一致",
+            "nodes": [
+              "N050",
+              "N051"
+            ],
+            "owner": "设备能源室 / 运营部",
+            "status": "open",
+            "evidence": [
+              "EV-06A",
+              "EV-06B"
+            ],
+            "resolution": null,
+            "linked_nodes": [
+              {
+                "id": "N050",
+                "key": "power_a",
+                "kind": "quantity",
+                "role": "observation",
+                "unit": "kW",
+                "as_of": "2026-09-01",
+                "label": "资料06A记载可用有功余量",
+                "scope": "corpus:cy_tray_20260918",
+                "value": 800,
+                "period": "本项目基准情景",
+                "source": [
+                  "EV-06A"
+                ],
+                "status": "provided",
+                "caliber": "二号厂房同一接入点，2026-09-01，扣除已投运及已批准项目后",
+                "section": "SB",
+                "editable": false,
+                "mentions": [
+                  "M0153",
+                  "M0169",
+                  "M0172",
+                  "M0180",
+                  "M0220",
+                  "M0223",
+                  "M0388"
+                ],
+                "confidence": null,
+                "inheritable": "form_only",
+                "decimal_value": "800",
+                "source_decimal": "800",
+                "confidence_note": "未做统计校准，不提供伪概率",
+                "source_locations": [
+                  {
+                    "page": 18,
+                    "span": [
+                      16564,
+                      16636
+                    ],
+                    "block_id": "B0179",
+                    "chunk_id": "C0179",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[196]",
+                      "body_index": 213,
+                      "index_base": 0,
+                      "paragraph_index": 195
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 14,
+                    "span": [
+                      11933,
+                      11936
+                    ],
+                    "block_id": "B0137",
+                    "chunk_id": "C0137",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[15]/w:tr[4]/w:tc[2]",
+                      "row_index": 3,
+                      "cell_index": 1,
+                      "index_base": 0,
+                      "table_index": 14
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 15,
+                    "span": [
+                      13458,
+                      13461
+                    ],
+                    "block_id": "B0150",
+                    "chunk_id": "C0150",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[17]/w:tr[4]/w:tc[1]",
+                      "row_index": 3,
+                      "cell_index": 0,
+                      "index_base": 0,
+                      "table_index": 16
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 16,
+                    "span": [
+                      14309,
+                      14312
+                    ],
+                    "block_id": "B0155",
+                    "chunk_id": "C0155",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[18]/w:tr[7]/w:tc[4]",
+                      "row_index": 6,
+                      "cell_index": 3,
+                      "index_base": 0,
+                      "table_index": 17
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 3,
+                    "span": [
+                      1743,
+                      1746
+                    ],
+                    "block_id": "B0024",
+                    "chunk_id": "C0024",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[26]",
+                      "body_index": 27,
+                      "index_base": 0,
+                      "paragraph_index": 25
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 7,
+                    "span": [
+                      5336,
+                      5339
+                    ],
+                    "block_id": "B0063",
+                    "chunk_id": "C0063",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[69]",
+                      "body_index": 74,
+                      "index_base": 0,
+                      "paragraph_index": 68
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 7,
+                    "span": [
+                      5417,
+                      5420
+                    ],
+                    "block_id": "B0064",
+                    "chunk_id": "C0064",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[70]",
+                      "body_index": 75,
+                      "index_base": 0,
+                      "paragraph_index": 69
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 18,
+                    "span": [
+                      16614,
+                      16617
+                    ],
+                    "block_id": "B0179",
+                    "chunk_id": "C0179",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[196]",
+                      "body_index": 213,
+                      "index_base": 0,
+                      "paragraph_index": 195
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  }
+                ],
+                "document_coverage": "bound"
+              },
+              {
+                "id": "N051",
+                "key": "power_b",
+                "kind": "quantity",
+                "role": "observation",
+                "unit": "kW",
+                "as_of": "2026-09-01",
+                "label": "资料06B记载可用有功余量",
+                "scope": "corpus:cy_tray_20260918",
+                "value": 650,
+                "period": "本项目基准情景",
+                "source": [
+                  "EV-06B"
+                ],
+                "status": "provided",
+                "caliber": "二号厂房同一接入点，2026-09-01，扣除已投运及已批准项目后",
+                "section": "SB",
+                "editable": false,
+                "mentions": [
+                  "M0154",
+                  "M0170",
+                  "M0173",
+                  "M0181",
+                  "M0221",
+                  "M0225",
+                  "M0389"
+                ],
+                "confidence": null,
+                "inheritable": "form_only",
+                "decimal_value": "650",
+                "source_decimal": "650",
+                "confidence_note": "未做统计校准，不提供伪概率",
+                "source_locations": [
+                  {
+                    "page": 18,
+                    "span": [
+                      16638,
+                      16713
+                    ],
+                    "block_id": "B0180",
+                    "chunk_id": "C0180",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[197]",
+                      "body_index": 214,
+                      "index_base": 0,
+                      "paragraph_index": 196
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 14,
+                    "span": [
+                      11939,
+                      11942
+                    ],
+                    "block_id": "B0137",
+                    "chunk_id": "C0137",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[15]/w:tr[4]/w:tc[2]",
+                      "row_index": 3,
+                      "cell_index": 1,
+                      "index_base": 0,
+                      "table_index": 14
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 15,
+                    "span": [
+                      13462,
+                      13465
+                    ],
+                    "block_id": "B0150",
+                    "chunk_id": "C0150",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[17]/w:tr[4]/w:tc[1]",
+                      "row_index": 3,
+                      "cell_index": 0,
+                      "index_base": 0,
+                      "table_index": 16
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 16,
+                    "span": [
+                      14380,
+                      14383
+                    ],
+                    "block_id": "B0155",
+                    "chunk_id": "C0155",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[18]/w:tr[8]/w:tc[4]",
+                      "row_index": 7,
+                      "cell_index": 3,
+                      "index_base": 0,
+                      "table_index": 17
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 3,
+                    "span": [
+                      1749,
+                      1752
+                    ],
+                    "block_id": "B0024",
+                    "chunk_id": "C0024",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[26]",
+                      "body_index": 27,
+                      "index_base": 0,
+                      "paragraph_index": 25
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 7,
+                    "span": [
+                      5342,
+                      5345
+                    ],
+                    "block_id": "B0063",
+                    "chunk_id": "C0063",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[69]",
+                      "body_index": 74,
+                      "index_base": 0,
+                      "paragraph_index": 68
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 7,
+                    "span": [
+                      5433,
+                      5436
+                    ],
+                    "block_id": "B0064",
+                    "chunk_id": "C0064",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[70]",
+                      "body_index": 75,
+                      "index_base": 0,
+                      "paragraph_index": 69
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 18,
+                    "span": [
+                      16670,
+                      16673
+                    ],
+                    "block_id": "B0180",
+                    "chunk_id": "C0180",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[197]",
+                      "body_index": 214,
+                      "index_base": 0,
+                      "paragraph_index": 196
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  }
+                ],
+                "document_coverage": "bound"
+              }
+            ],
+            "blocking_scope": [
+              "确定性配电适配结论",
+              "无条件采购或开工建议"
+            ],
+            "canonical_node": "N052",
+            "does_not_block": [
+              "披露冲突的内部预审稿",
+              "原文假设下名义产能与设备购置费回放"
+            ],
+            "linked_evidence": [
+              {
+                "id": "EV-06A",
+                "as_of": "2026-09-01",
+                "owner": "设备能源室",
+                "title": "接入点配电可用余量初查表",
+                "issuer": null,
+                "version": null,
+                "excerpts": [
+                  {
+                    "id": "EX-06A-01",
+                    "page": 18,
+                    "path": "evidence/excerpts/EX-06A-01.md",
+                    "span": [
+                      16564,
+                      16636
+                    ],
+                    "evidence_id": "EV-06A",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[196]",
+                      "body_index": 213,
+                      "index_base": 0,
+                      "paragraph_index": 195
+                    },
+                    "source_text_sha256": "e74c17c42e276ff7587f7f0e9a5c36d6d0f4a14837189dff1b44ae285cdbb9ef"
+                  }
+                ],
+                "fictional": true,
+                "formed_at": "2026-09-08",
+                "adopted_for": "800kW；与06B存在差异",
+                "credibility": "本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺",
+                "excerpt_ids": [
+                  "EX-06A-01"
+                ],
+                "limitations": [
+                  "只有目录和摘录，未获得完整原始文件",
+                  "不得推断未展示资料内容"
+                ],
+                "source_type": "embedded_internal_excerpt",
+                "valid_until": null,
+                "document_number": "CY-DL-2026-0908",
+                "source_document": "source/original.docx",
+                "excerpt_locations": [
+                  {
+                    "page": 18,
+                    "span": [
+                      16564,
+                      16636
+                    ],
+                    "block_id": "B0179",
+                    "chunk_id": "C0179",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[196]",
+                      "body_index": 213,
+                      "index_base": 0,
+                      "paragraph_index": 195
+                    }
+                  }
+                ],
+                "register_location": {
+                  "page": 16,
+                  "span": [
+                    14262,
+                    14293
+                  ],
+                  "block_id": "B0155",
+                  "chunk_id": "C0155",
+                  "source_locator": {
+                    "part": "word/document.xml",
+                    "xpath": "/w:document/w:body/w:tbl[18]/w:tr[7]/w:tc[2]",
+                    "row_index": 6,
+                    "cell_index": 1,
+                    "index_base": 0,
+                    "table_index": 17
+                  }
+                },
+                "validity_evaluation": {
+                  "rule": "缺失有效期不得解释成永不过期",
+                  "as_of": "2026-09-18",
+                  "status": "not_stated"
+                },
+                "original_document_available": false
+              },
+              {
+                "id": "EV-06B",
+                "as_of": "2026-09-01",
+                "owner": "运营部",
+                "title": "接入点负荷复核记录",
+                "issuer": null,
+                "version": null,
+                "excerpts": [
+                  {
+                    "id": "EX-06B-01",
+                    "page": 18,
+                    "path": "evidence/excerpts/EX-06B-01.md",
+                    "span": [
+                      16638,
+                      16713
+                    ],
+                    "evidence_id": "EV-06B",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[197]",
+                      "body_index": 214,
+                      "index_base": 0,
+                      "paragraph_index": 196
+                    },
+                    "source_text_sha256": "c1184aa505eb555895b4898164f6584ab6026d156f994c0d1aa6989af1f03d8c"
+                  }
+                ],
+                "fictional": true,
+                "formed_at": "2026-09-16",
+                "adopted_for": "650kW；未说明对06A的替代关系",
+                "credibility": "本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺",
+                "excerpt_ids": [
+                  "EX-06B-01"
+                ],
+                "limitations": [
+                  "只有目录和摘录，未获得完整原始文件",
+                  "不得推断未展示资料内容"
+                ],
+                "source_type": "embedded_internal_excerpt",
+                "valid_until": null,
+                "document_number": "CY-FH-2026-0916",
+                "source_document": "source/original.docx",
+                "excerpt_locations": [
+                  {
+                    "page": 18,
+                    "span": [
+                      16638,
+                      16713
+                    ],
+                    "block_id": "B0180",
+                    "chunk_id": "C0180",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[197]",
+                      "body_index": 214,
+                      "index_base": 0,
+                      "paragraph_index": 196
+                    }
+                  }
+                ],
+                "register_location": {
+                  "page": 16,
+                  "span": [
+                    14336,
+                    14364
+                  ],
+                  "block_id": "B0155",
+                  "chunk_id": "C0155",
+                  "source_locator": {
+                    "part": "word/document.xml",
+                    "xpath": "/w:document/w:body/w:tbl[18]/w:tr[8]/w:tc[2]",
+                    "row_index": 7,
+                    "cell_index": 1,
+                    "index_base": 0,
+                    "table_index": 17
+                  }
+                },
+                "validity_evaluation": {
+                  "rule": "缺失有效期不得解释成永不过期",
+                  "as_of": "2026-09-18",
+                  "status": "not_stated"
+                },
+                "original_document_available": false
+              }
+            ],
+            "source_locations": [
+              {
+                "page": 7,
+                "span": [
+                  5270,
+                  5394
+                ],
+                "block_id": "B0063",
+                "chunk_id": "C0063",
+                "source_locator": {
+                  "part": "word/document.xml",
+                  "xpath": "/w:document/w:body/w:p[69]",
+                  "body_index": 74,
+                  "index_base": 0,
+                  "paragraph_index": 68
+                }
+              },
+              {
+                "page": 7,
+                "span": [
+                  5396,
+                  5531
+                ],
+                "block_id": "B0064",
+                "chunk_id": "C0064",
+                "source_locator": {
+                  "part": "word/document.xml",
+                  "xpath": "/w:document/w:body/w:p[70]",
+                  "body_index": 75,
+                  "index_base": 0,
+                  "paragraph_index": 69
+                }
+              },
+              {
+                "page": 18,
+                "span": [
+                  16564,
+                  16636
+                ],
+                "block_id": "B0179",
+                "chunk_id": "C0179",
+                "source_locator": {
+                  "part": "word/document.xml",
+                  "xpath": "/w:document/w:body/w:p[196]",
+                  "body_index": 213,
+                  "index_base": 0,
+                  "paragraph_index": 195
+                }
+              },
+              {
+                "page": 18,
+                "span": [
+                  16638,
+                  16713
+                ],
+                "block_id": "B0180",
+                "chunk_id": "C0180",
+                "source_locator": {
+                  "part": "word/document.xml",
+                  "xpath": "/w:document/w:body/w:p[197]",
+                  "body_index": 214,
+                  "index_base": 0,
+                  "paragraph_index": 196
+                }
+              }
+            ],
+            "resolution_required": "联合复测，说明差异并明确替代版本；不得自动取新、取大或均值"
+          }
+        },
+        {
+          "name": "no_project_power_fact",
+          "passed": true,
+          "observed": []
+        },
+        {
+          "name": "conflict_disclosed_without_determinate_conclusion",
+          "passed": true,
+          "observed": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。"
+        },
+        {
+          "name": "formal_review_and_export_blocked",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "WS-X001-CONFLICT::all_available",
+      "scenario_id": "WS-X001-CONFLICT",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "7b26763a-222b-4a7f-b55a-86531fb16a09",
+      "section_id": "S5.2",
+      "package_item_count": 38,
+      "preview_used_item_count": 5,
+      "preview_source_ref_count": 5,
+      "persisted_source_ref_count": 5,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000019"
+          ]
+        },
+        {
+          "code": "HISTORICAL_CONFLICT",
+          "severity": "review",
+          "message": "X001 是历史资料中未解决的冲突；当前项目如论证同一问题，必须使用新证据核对",
+          "item_ids": [
+            "23:000000"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "POWER_CONFLICT_UNRESOLVED",
+          "severity": "block",
+          "message": "历史配电数据冲突未解决；新项目缺少独立核证，正式交付受阻",
+          "item_ids": [
+            "23:000000"
+          ]
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "historical_conflict_open_two_sources",
+          "passed": true,
+          "observed": {
+            "id": "X001",
+            "type": "same_caliber_different_value",
+            "what": "同一接入点、同一统计基准、同一扣减范围，可用有功余量800kW与650kW不一致",
+            "nodes": [
+              "N050",
+              "N051"
+            ],
+            "owner": "设备能源室 / 运营部",
+            "status": "open",
+            "evidence": [
+              "EV-06A",
+              "EV-06B"
+            ],
+            "resolution": null,
+            "linked_nodes": [
+              {
+                "id": "N050",
+                "key": "power_a",
+                "kind": "quantity",
+                "role": "observation",
+                "unit": "kW",
+                "as_of": "2026-09-01",
+                "label": "资料06A记载可用有功余量",
+                "scope": "corpus:cy_tray_20260918",
+                "value": 800,
+                "period": "本项目基准情景",
+                "source": [
+                  "EV-06A"
+                ],
+                "status": "provided",
+                "caliber": "二号厂房同一接入点，2026-09-01，扣除已投运及已批准项目后",
+                "section": "SB",
+                "editable": false,
+                "mentions": [
+                  "M0153",
+                  "M0169",
+                  "M0172",
+                  "M0180",
+                  "M0220",
+                  "M0223",
+                  "M0388"
+                ],
+                "confidence": null,
+                "inheritable": "form_only",
+                "decimal_value": "800",
+                "source_decimal": "800",
+                "confidence_note": "未做统计校准，不提供伪概率",
+                "source_locations": [
+                  {
+                    "page": 18,
+                    "span": [
+                      16564,
+                      16636
+                    ],
+                    "block_id": "B0179",
+                    "chunk_id": "C0179",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[196]",
+                      "body_index": 213,
+                      "index_base": 0,
+                      "paragraph_index": 195
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 14,
+                    "span": [
+                      11933,
+                      11936
+                    ],
+                    "block_id": "B0137",
+                    "chunk_id": "C0137",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[15]/w:tr[4]/w:tc[2]",
+                      "row_index": 3,
+                      "cell_index": 1,
+                      "index_base": 0,
+                      "table_index": 14
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 15,
+                    "span": [
+                      13458,
+                      13461
+                    ],
+                    "block_id": "B0150",
+                    "chunk_id": "C0150",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[17]/w:tr[4]/w:tc[1]",
+                      "row_index": 3,
+                      "cell_index": 0,
+                      "index_base": 0,
+                      "table_index": 16
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 16,
+                    "span": [
+                      14309,
+                      14312
+                    ],
+                    "block_id": "B0155",
+                    "chunk_id": "C0155",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[18]/w:tr[7]/w:tc[4]",
+                      "row_index": 6,
+                      "cell_index": 3,
+                      "index_base": 0,
+                      "table_index": 17
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 3,
+                    "span": [
+                      1743,
+                      1746
+                    ],
+                    "block_id": "B0024",
+                    "chunk_id": "C0024",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[26]",
+                      "body_index": 27,
+                      "index_base": 0,
+                      "paragraph_index": 25
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 7,
+                    "span": [
+                      5336,
+                      5339
+                    ],
+                    "block_id": "B0063",
+                    "chunk_id": "C0063",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[69]",
+                      "body_index": 74,
+                      "index_base": 0,
+                      "paragraph_index": 68
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 7,
+                    "span": [
+                      5417,
+                      5420
+                    ],
+                    "block_id": "B0064",
+                    "chunk_id": "C0064",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[70]",
+                      "body_index": 75,
+                      "index_base": 0,
+                      "paragraph_index": 69
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 18,
+                    "span": [
+                      16614,
+                      16617
+                    ],
+                    "block_id": "B0179",
+                    "chunk_id": "C0179",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[196]",
+                      "body_index": 213,
+                      "index_base": 0,
+                      "paragraph_index": 195
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  }
+                ],
+                "document_coverage": "bound"
+              },
+              {
+                "id": "N051",
+                "key": "power_b",
+                "kind": "quantity",
+                "role": "observation",
+                "unit": "kW",
+                "as_of": "2026-09-01",
+                "label": "资料06B记载可用有功余量",
+                "scope": "corpus:cy_tray_20260918",
+                "value": 650,
+                "period": "本项目基准情景",
+                "source": [
+                  "EV-06B"
+                ],
+                "status": "provided",
+                "caliber": "二号厂房同一接入点，2026-09-01，扣除已投运及已批准项目后",
+                "section": "SB",
+                "editable": false,
+                "mentions": [
+                  "M0154",
+                  "M0170",
+                  "M0173",
+                  "M0181",
+                  "M0221",
+                  "M0225",
+                  "M0389"
+                ],
+                "confidence": null,
+                "inheritable": "form_only",
+                "decimal_value": "650",
+                "source_decimal": "650",
+                "confidence_note": "未做统计校准，不提供伪概率",
+                "source_locations": [
+                  {
+                    "page": 18,
+                    "span": [
+                      16638,
+                      16713
+                    ],
+                    "block_id": "B0180",
+                    "chunk_id": "C0180",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[197]",
+                      "body_index": 214,
+                      "index_base": 0,
+                      "paragraph_index": 196
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 14,
+                    "span": [
+                      11939,
+                      11942
+                    ],
+                    "block_id": "B0137",
+                    "chunk_id": "C0137",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[15]/w:tr[4]/w:tc[2]",
+                      "row_index": 3,
+                      "cell_index": 1,
+                      "index_base": 0,
+                      "table_index": 14
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 15,
+                    "span": [
+                      13462,
+                      13465
+                    ],
+                    "block_id": "B0150",
+                    "chunk_id": "C0150",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[17]/w:tr[4]/w:tc[1]",
+                      "row_index": 3,
+                      "cell_index": 0,
+                      "index_base": 0,
+                      "table_index": 16
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 16,
+                    "span": [
+                      14380,
+                      14383
+                    ],
+                    "block_id": "B0155",
+                    "chunk_id": "C0155",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:tbl[18]/w:tr[8]/w:tc[4]",
+                      "row_index": 7,
+                      "cell_index": 3,
+                      "index_base": 0,
+                      "table_index": 17
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 3,
+                    "span": [
+                      1749,
+                      1752
+                    ],
+                    "block_id": "B0024",
+                    "chunk_id": "C0024",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[26]",
+                      "body_index": 27,
+                      "index_base": 0,
+                      "paragraph_index": 25
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 7,
+                    "span": [
+                      5342,
+                      5345
+                    ],
+                    "block_id": "B0063",
+                    "chunk_id": "C0063",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[69]",
+                      "body_index": 74,
+                      "index_base": 0,
+                      "paragraph_index": 68
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 7,
+                    "span": [
+                      5433,
+                      5436
+                    ],
+                    "block_id": "B0064",
+                    "chunk_id": "C0064",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[70]",
+                      "body_index": 75,
+                      "index_base": 0,
+                      "paragraph_index": 69
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  },
+                  {
+                    "page": 18,
+                    "span": [
+                      16670,
+                      16673
+                    ],
+                    "block_id": "B0180",
+                    "chunk_id": "C0180",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[197]",
+                      "body_index": 214,
+                      "index_base": 0,
+                      "paragraph_index": 196
+                    },
+                    "span_convention": "unicode_codepoint_0_based_end_exclusive"
+                  }
+                ],
+                "document_coverage": "bound"
+              }
+            ],
+            "blocking_scope": [
+              "确定性配电适配结论",
+              "无条件采购或开工建议"
+            ],
+            "canonical_node": "N052",
+            "does_not_block": [
+              "披露冲突的内部预审稿",
+              "原文假设下名义产能与设备购置费回放"
+            ],
+            "linked_evidence": [
+              {
+                "id": "EV-06A",
+                "as_of": "2026-09-01",
+                "owner": "设备能源室",
+                "title": "接入点配电可用余量初查表",
+                "issuer": null,
+                "version": null,
+                "excerpts": [
+                  {
+                    "id": "EX-06A-01",
+                    "page": 18,
+                    "path": "evidence/excerpts/EX-06A-01.md",
+                    "span": [
+                      16564,
+                      16636
+                    ],
+                    "evidence_id": "EV-06A",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[196]",
+                      "body_index": 213,
+                      "index_base": 0,
+                      "paragraph_index": 195
+                    },
+                    "source_text_sha256": "e74c17c42e276ff7587f7f0e9a5c36d6d0f4a14837189dff1b44ae285cdbb9ef"
+                  }
+                ],
+                "fictional": true,
+                "formed_at": "2026-09-08",
+                "adopted_for": "800kW；与06B存在差异",
+                "credibility": "本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺",
+                "excerpt_ids": [
+                  "EX-06A-01"
+                ],
+                "limitations": [
+                  "只有目录和摘录，未获得完整原始文件",
+                  "不得推断未展示资料内容"
+                ],
+                "source_type": "embedded_internal_excerpt",
+                "valid_until": null,
+                "document_number": "CY-DL-2026-0908",
+                "source_document": "source/original.docx",
+                "excerpt_locations": [
+                  {
+                    "page": 18,
+                    "span": [
+                      16564,
+                      16636
+                    ],
+                    "block_id": "B0179",
+                    "chunk_id": "C0179",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[196]",
+                      "body_index": 213,
+                      "index_base": 0,
+                      "paragraph_index": 195
+                    }
+                  }
+                ],
+                "register_location": {
+                  "page": 16,
+                  "span": [
+                    14262,
+                    14293
+                  ],
+                  "block_id": "B0155",
+                  "chunk_id": "C0155",
+                  "source_locator": {
+                    "part": "word/document.xml",
+                    "xpath": "/w:document/w:body/w:tbl[18]/w:tr[7]/w:tc[2]",
+                    "row_index": 6,
+                    "cell_index": 1,
+                    "index_base": 0,
+                    "table_index": 17
+                  }
+                },
+                "validity_evaluation": {
+                  "rule": "缺失有效期不得解释成永不过期",
+                  "as_of": "2026-09-18",
+                  "status": "not_stated"
+                },
+                "original_document_available": false
+              },
+              {
+                "id": "EV-06B",
+                "as_of": "2026-09-01",
+                "owner": "运营部",
+                "title": "接入点负荷复核记录",
+                "issuer": null,
+                "version": null,
+                "excerpts": [
+                  {
+                    "id": "EX-06B-01",
+                    "page": 18,
+                    "path": "evidence/excerpts/EX-06B-01.md",
+                    "span": [
+                      16638,
+                      16713
+                    ],
+                    "evidence_id": "EV-06B",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[197]",
+                      "body_index": 214,
+                      "index_base": 0,
+                      "paragraph_index": 196
+                    },
+                    "source_text_sha256": "c1184aa505eb555895b4898164f6584ab6026d156f994c0d1aa6989af1f03d8c"
+                  }
+                ],
+                "fictional": true,
+                "formed_at": "2026-09-16",
+                "adopted_for": "650kW；未说明对06A的替代关系",
+                "credibility": "本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺",
+                "excerpt_ids": [
+                  "EX-06B-01"
+                ],
+                "limitations": [
+                  "只有目录和摘录，未获得完整原始文件",
+                  "不得推断未展示资料内容"
+                ],
+                "source_type": "embedded_internal_excerpt",
+                "valid_until": null,
+                "document_number": "CY-FH-2026-0916",
+                "source_document": "source/original.docx",
+                "excerpt_locations": [
+                  {
+                    "page": 18,
+                    "span": [
+                      16638,
+                      16713
+                    ],
+                    "block_id": "B0180",
+                    "chunk_id": "C0180",
+                    "source_locator": {
+                      "part": "word/document.xml",
+                      "xpath": "/w:document/w:body/w:p[197]",
+                      "body_index": 214,
+                      "index_base": 0,
+                      "paragraph_index": 196
+                    }
+                  }
+                ],
+                "register_location": {
+                  "page": 16,
+                  "span": [
+                    14336,
+                    14364
+                  ],
+                  "block_id": "B0155",
+                  "chunk_id": "C0155",
+                  "source_locator": {
+                    "part": "word/document.xml",
+                    "xpath": "/w:document/w:body/w:tbl[18]/w:tr[8]/w:tc[2]",
+                    "row_index": 7,
+                    "cell_index": 1,
+                    "index_base": 0,
+                    "table_index": 17
+                  }
+                },
+                "validity_evaluation": {
+                  "rule": "缺失有效期不得解释成永不过期",
+                  "as_of": "2026-09-18",
+                  "status": "not_stated"
+                },
+                "original_document_available": false
+              }
+            ],
+            "source_locations": [
+              {
+                "page": 7,
+                "span": [
+                  5270,
+                  5394
+                ],
+                "block_id": "B0063",
+                "chunk_id": "C0063",
+                "source_locator": {
+                  "part": "word/document.xml",
+                  "xpath": "/w:document/w:body/w:p[69]",
+                  "body_index": 74,
+                  "index_base": 0,
+                  "paragraph_index": 68
+                }
+              },
+              {
+                "page": 7,
+                "span": [
+                  5396,
+                  5531
+                ],
+                "block_id": "B0064",
+                "chunk_id": "C0064",
+                "source_locator": {
+                  "part": "word/document.xml",
+                  "xpath": "/w:document/w:body/w:p[70]",
+                  "body_index": 75,
+                  "index_base": 0,
+                  "paragraph_index": 69
+                }
+              },
+              {
+                "page": 18,
+                "span": [
+                  16564,
+                  16636
+                ],
+                "block_id": "B0179",
+                "chunk_id": "C0179",
+                "source_locator": {
+                  "part": "word/document.xml",
+                  "xpath": "/w:document/w:body/w:p[196]",
+                  "body_index": 213,
+                  "index_base": 0,
+                  "paragraph_index": 195
+                }
+              },
+              {
+                "page": 18,
+                "span": [
+                  16638,
+                  16713
+                ],
+                "block_id": "B0180",
+                "chunk_id": "C0180",
+                "source_locator": {
+                  "part": "word/document.xml",
+                  "xpath": "/w:document/w:body/w:p[197]",
+                  "body_index": 214,
+                  "index_base": 0,
+                  "paragraph_index": 196
+                }
+              }
+            ],
+            "resolution_required": "联合复测，说明差异并明确替代版本；不得自动取新、取大或均值"
+          }
+        },
+        {
+          "name": "no_project_power_fact",
+          "passed": true,
+          "observed": []
+        },
+        {
+          "name": "conflict_disclosed_without_determinate_conclusion",
+          "passed": true,
+          "observed": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。"
+        },
+        {
+          "name": "formal_review_and_export_blocked",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "WS-L002-CLAIM::minimal_information_contract",
+      "scenario_id": "WS-L002-CLAIM",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "7e37960b-4933-4997-88f4-51cb1ab92e58",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-L002-CLAIM::applicable_conditional",
+      "scenario_id": "WS-L002-CLAIM",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "1f6ece01-77b3-47cc-8824-eb4330944d57",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONDITION_FALSE",
+          "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+          "severity": "review",
+          "slot_id": null
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "254016"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "fd8baf5e-d23e-4611-a15d-4f26fb4543f5",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "fd8baf5e-d23e-4611-a15d-4f26fb4543f5",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "300000"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_preview_audit",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "fd8baf5e-d23e-4611-a15d-4f26fb4543f5",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "300000"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "historical_claim_and_excerpt_boundary",
+          "passed": true,
+          "observed": {
+            "claim": "source_asserted_not_independently_verified",
+            "evidence_original_available": false
+          }
+        },
+        {
+          "name": "caution_not_order_assertion",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        },
+        {
+          "name": "synthetic_input_not_verified_evidence",
+          "passed": true,
+          "observed": {
+            "first_year_demand": "UNVERIFIED",
+            "qualified_capacity": "UNVERIFIED"
+          }
+        },
+        {
+          "name": "formal_export_blocked_without_project_original",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-L002-CLAIM::all_available",
+      "scenario_id": "WS-L002-CLAIM",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "f21b4a2f-b69e-47a8-99b7-a882a552650c",
+      "section_id": "S4",
+      "package_item_count": 82,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONDITION_FALSE",
+          "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+          "severity": "review",
+          "slot_id": null
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "preview_export_status_code": 200,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "254016"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "44832f86-d5c2-48a3-bf4b-36fdf05372d0",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "44832f86-d5c2-48a3-bf4b-36fdf05372d0",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "300000"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_preview_audit",
+          "passed": true,
+          "observed": [
+            {
+              "rule_id": "44832f86-d5c2-48a3-bf4b-36fdf05372d0",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "target_key": "planned_sales",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ],
+              "input_fact_revisions": [
+                {
+                  "fact_key": "first_year_demand",
+                  "revision": 1,
+                  "value": "300000"
+                },
+                {
+                  "fact_key": "qualified_capacity",
+                  "revision": 1,
+                  "value": "254016"
+                }
+              ],
+              "target_fact_revision": 1
+            }
+          ]
+        },
+        {
+          "name": "historical_claim_and_excerpt_boundary",
+          "passed": true,
+          "observed": {
+            "claim": "source_asserted_not_independently_verified",
+            "evidence_original_available": false
+          }
+        },
+        {
+          "name": "caution_not_order_assertion",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "preview_zip_labeled",
+          "passed": true,
+          "observed": {
+            "status": 200,
+            "delivery_status": "preview_only",
+            "docx_label": true,
+            "pdf_label": true
+          }
+        },
+        {
+          "name": "synthetic_input_not_verified_evidence",
+          "passed": true,
+          "observed": {
+            "first_year_demand": "UNVERIFIED",
+            "qualified_capacity": "UNVERIFIED"
+          }
+        },
+        {
+          "name": "formal_export_blocked_without_project_original",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-NEG-ACCIDENT::minimal_information_contract",
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "dfc0d1f1-8cfe-4b7e-a104-64fcdbffd7e6",
+      "section_id": null,
+      "package_item_count": 0,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "澄岳精密语料仅适用于可研/建设类写作试验；其他类型不可套用"
+        }
+      },
+      "preview_error": null,
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "cross_type_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    },
+    {
+      "run_id": "WS-NEG-ACCIDENT::applicable_conditional",
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "adac71e1-9e9f-4265-b3d5-dbbfa70f6be9",
+      "section_id": null,
+      "package_item_count": 0,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "澄岳精密语料仅适用于可研/建设类写作试验；其他类型不可套用"
+        }
+      },
+      "preview_error": null,
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "cross_type_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    },
+    {
+      "run_id": "WS-NEG-ACCIDENT::all_available",
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "06d3247e-8856-487f-8724-5f788f87697b",
+      "section_id": null,
+      "package_item_count": 0,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "澄岳精密语料仅适用于可研/建设类写作试验；其他类型不可套用"
+        }
+      },
+      "preview_error": null,
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "preview_export_status_code": null,
+      "model_preview_status_code": null,
+      "model_preview_elapsed_ms": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "cross_type_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "number": 1,
+      "path": "manifest.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "category_id": "CAT-01",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 2,
+      "path": "meta.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "category_id": "CAT-02",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 3,
+      "path": "provenance.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "category_id": "CAT-03",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 4,
+      "path": "outline.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-04",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 18,
+      "preview_used": 10,
+      "preview_source_ref": 10,
+      "report_source_ref": 10,
+      "report_use_roles": {
+        "section_structure": 10
+      },
+      "rejected": 0,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "04:000009",
+        "04:000013",
+        "04:000018"
+      ],
+      "persisted_record_ids": [
+        "04:000009",
+        "04:000013",
+        "04:000018"
+      ],
+      "rejected_record_ids": [],
+      "artifact_ids": [
+        "ART-871ba9a6c0c6e86eec6bc7c6"
+      ],
+      "persisted_sections": [
+        "S4",
+        "S5.2",
+        "S7.1"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 5,
+      "path": "source/original.docx",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "category_id": "CAT-05",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 6,
+      "path": "source/normalized.md",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "category_id": "CAT-06",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 7,
+      "path": "source/offset_map.json",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-07",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 8,
+      "path": "source/assets/*",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-08",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 9,
+      "path": "chunks/chunks.jsonl",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "category_id": "CAT-09",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 159,
+      "preview_used": 8,
+      "preview_source_ref": 8,
+      "report_source_ref": 8,
+      "report_use_roles": {
+        "source_location_only": 8
+      },
+      "rejected": 76,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "09:000044",
+        "09:000045",
+        "09:000046",
+        "09:000047",
+        "09:000048",
+        "09:000049",
+        "09:000050",
+        "09:000051",
+        "09:000052",
+        "09:000053",
+        "09:000054",
+        "09:000061",
+        "09:000062",
+        "09:000063",
+        "09:000064",
+        "09:000078",
+        "09:000079",
+        "09:000080",
+        "09:000081",
+        "09:000082"
+      ],
+      "persisted_record_ids": [
+        "09:000051",
+        "09:000082"
+      ],
+      "rejected_record_ids": [
+        "09:000044",
+        "09:000045",
+        "09:000046",
+        "09:000047",
+        "09:000048",
+        "09:000049",
+        "09:000050",
+        "09:000052",
+        "09:000053",
+        "09:000054",
+        "09:000061",
+        "09:000062",
+        "09:000063",
+        "09:000064",
+        "09:000078",
+        "09:000079",
+        "09:000080",
+        "09:000081"
+      ],
+      "artifact_ids": [
+        "ART-42dd923169efb572267f7ada"
+      ],
+      "persisted_sections": [
+        "S4",
+        "S7.1"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 10,
+      "path": "chunks/skeletons.jsonl",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-10",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 159,
+      "preview_used": 8,
+      "preview_source_ref": 8,
+      "report_source_ref": 8,
+      "report_use_roles": {
+        "slot_format_only": 8
+      },
+      "rejected": 76,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "10:000044",
+        "10:000045",
+        "10:000046",
+        "10:000047",
+        "10:000048",
+        "10:000049",
+        "10:000050",
+        "10:000051",
+        "10:000052",
+        "10:000053",
+        "10:000054",
+        "10:000061",
+        "10:000062",
+        "10:000063",
+        "10:000064",
+        "10:000078",
+        "10:000079",
+        "10:000080",
+        "10:000081",
+        "10:000082"
+      ],
+      "persisted_record_ids": [
+        "10:000051",
+        "10:000082"
+      ],
+      "rejected_record_ids": [
+        "10:000044",
+        "10:000045",
+        "10:000046",
+        "10:000047",
+        "10:000048",
+        "10:000049",
+        "10:000050",
+        "10:000052",
+        "10:000053",
+        "10:000054",
+        "10:000061",
+        "10:000062",
+        "10:000063",
+        "10:000064",
+        "10:000078",
+        "10:000079",
+        "10:000080",
+        "10:000081"
+      ],
+      "artifact_ids": [
+        "ART-5f87595c805d3cdd2f47c7f9"
+      ],
+      "persisted_sections": [
+        "S4",
+        "S7.1"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 11,
+      "path": "chunks/embeddings.parquet",
+      "prior_hypothesis": "not_generated",
+      "actual": "not_run",
+      "category_id": "CAT-11",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 12,
+      "path": "graph/nodes.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "category_id": "CAT-12",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 456,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 248,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "12:000016",
+        "12:000017",
+        "12:000024",
+        "12:000025",
+        "12:000026",
+        "12:000027",
+        "12:000028",
+        "12:000029",
+        "12:000030",
+        "12:000031",
+        "12:000032",
+        "12:000033",
+        "12:000034",
+        "12:000035",
+        "12:000036",
+        "12:000039",
+        "12:000048",
+        "12:000049",
+        "12:000050",
+        "12:000052",
+        "12:000053",
+        "12:000054",
+        "12:000055",
+        "12:000056",
+        "12:000078",
+        "12:000079",
+        "12:000080",
+        "12:000081",
+        "12:000082",
+        "12:000083",
+        "12:000084",
+        "12:000085",
+        "12:000086",
+        "12:000087",
+        "12:000088",
+        "12:000089",
+        "12:000090",
+        "12:000091",
+        "12:000092",
+        "12:000093",
+        "12:000094",
+        "12:000095",
+        "12:000096",
+        "12:000097",
+        "12:000099",
+        "12:000101",
+        "12:000119",
+        "12:000130",
+        "12:000211",
+        "12:000214",
+        "12:000217",
+        "12:000223",
+        "12:000226",
+        "12:000252",
+        "12:000253",
+        "12:000254",
+        "12:000255",
+        "12:000256",
+        "12:000257",
+        "12:000258",
+        "12:000259",
+        "12:000260",
+        "12:000261",
+        "12:000262",
+        "12:000266",
+        "12:000273",
+        "12:000274",
+        "12:000275"
+      ],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [
+        "12:000016",
+        "12:000017",
+        "12:000024",
+        "12:000025",
+        "12:000026",
+        "12:000027",
+        "12:000028",
+        "12:000029",
+        "12:000030",
+        "12:000031",
+        "12:000032",
+        "12:000033",
+        "12:000034",
+        "12:000035",
+        "12:000036",
+        "12:000039",
+        "12:000048",
+        "12:000049",
+        "12:000050",
+        "12:000052",
+        "12:000053",
+        "12:000054",
+        "12:000055",
+        "12:000056",
+        "12:000078",
+        "12:000079",
+        "12:000080",
+        "12:000081",
+        "12:000082",
+        "12:000083",
+        "12:000084",
+        "12:000085",
+        "12:000086",
+        "12:000087",
+        "12:000088",
+        "12:000089",
+        "12:000090",
+        "12:000091",
+        "12:000092",
+        "12:000093",
+        "12:000094",
+        "12:000095",
+        "12:000096",
+        "12:000097",
+        "12:000099",
+        "12:000101",
+        "12:000119",
+        "12:000130",
+        "12:000211",
+        "12:000214",
+        "12:000217",
+        "12:000223",
+        "12:000226",
+        "12:000252",
+        "12:000253",
+        "12:000254",
+        "12:000255",
+        "12:000256",
+        "12:000257",
+        "12:000258",
+        "12:000259",
+        "12:000260",
+        "12:000261",
+        "12:000262",
+        "12:000266",
+        "12:000273",
+        "12:000274",
+        "12:000275"
+      ],
+      "artifact_ids": [
+        "ART-16b72560898b761567249eff"
+      ],
+      "persisted_sections": [],
+      "observed_use": "rejected_or_guarded",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 13,
+      "path": "graph/rules.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-13",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 138,
+      "preview_used": 6,
+      "preview_source_ref": 6,
+      "report_source_ref": 6,
+      "report_use_roles": {
+        "rule_pattern_only": 6
+      },
+      "rejected": 68,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "13:000000",
+        "13:000001",
+        "13:000002",
+        "13:000003",
+        "13:000004",
+        "13:000005",
+        "13:000006",
+        "13:000007",
+        "13:000010",
+        "13:000012",
+        "13:000013",
+        "13:000019",
+        "13:000020",
+        "13:000021",
+        "13:000022",
+        "13:000023",
+        "13:000024",
+        "13:000025",
+        "13:000042"
+      ],
+      "persisted_record_ids": [
+        "13:000005"
+      ],
+      "rejected_record_ids": [
+        "13:000000",
+        "13:000001",
+        "13:000002",
+        "13:000003",
+        "13:000004",
+        "13:000006",
+        "13:000007",
+        "13:000010",
+        "13:000012",
+        "13:000013",
+        "13:000019",
+        "13:000020",
+        "13:000021",
+        "13:000022",
+        "13:000023",
+        "13:000024",
+        "13:000025",
+        "13:000042"
+      ],
+      "artifact_ids": [
+        "ART-c191d8c31faa00e38b4f4f9d"
+      ],
+      "persisted_sections": [
+        "S4"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 14,
+      "path": "graph/relations.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-14",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 15,
+      "path": "graph/claims.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-15",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 216,
+      "preview_used": 6,
+      "preview_source_ref": 6,
+      "report_source_ref": 6,
+      "report_use_roles": {
+        "historical_claim_pattern_only": 6
+      },
+      "rejected": 108,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "15:000001",
+        "15:000003",
+        "15:000004",
+        "15:000005",
+        "15:000006",
+        "15:000009",
+        "15:000010",
+        "15:000011",
+        "15:000014",
+        "15:000015",
+        "15:000016",
+        "15:000019",
+        "15:000020",
+        "15:000021",
+        "15:000023",
+        "15:000026",
+        "15:000027",
+        "15:000028",
+        "15:000029",
+        "15:000038",
+        "15:000040",
+        "15:000043"
+      ],
+      "persisted_record_ids": [
+        "15:000001"
+      ],
+      "rejected_record_ids": [
+        "15:000003",
+        "15:000004",
+        "15:000005",
+        "15:000006",
+        "15:000009",
+        "15:000010",
+        "15:000011",
+        "15:000014",
+        "15:000015",
+        "15:000016",
+        "15:000019",
+        "15:000020",
+        "15:000021",
+        "15:000023",
+        "15:000026",
+        "15:000027",
+        "15:000028",
+        "15:000029",
+        "15:000038",
+        "15:000040",
+        "15:000043"
+      ],
+      "artifact_ids": [
+        "ART-a8f45403e16d825f94907566"
+      ],
+      "persisted_sections": [
+        "S4"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 16,
+      "path": "graph/invariants.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-16",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 17,
+      "path": "graph/graph.yaml",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "category_id": "CAT-17",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 18,
+      "path": "evidence/evidence.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "category_id": "CAT-18",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 18,
+      "preview_used": 10,
+      "preview_source_ref": 10,
+      "report_source_ref": 10,
+      "report_use_roles": {
+        "historical_evidence_limitation": 6,
+        "historical_evidence_only": 4
+      },
+      "rejected": 0,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "18:000001",
+        "18:000006",
+        "18:000007"
+      ],
+      "persisted_record_ids": [
+        "18:000001",
+        "18:000006",
+        "18:000007"
+      ],
+      "rejected_record_ids": [],
+      "artifact_ids": [
+        "ART-29858a6e153e0a101205a44c"
+      ],
+      "persisted_sections": [
+        "S4",
+        "S5.2"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 19,
+      "path": "evidence/excerpts/*.md",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-19",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 12,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 6,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "19:000000"
+      ],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [
+        "19:000000"
+      ],
+      "artifact_ids": [
+        "ART-1bd6421359be4605ec4c86ff"
+      ],
+      "persisted_sections": [],
+      "observed_use": "rejected_or_guarded",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 20,
+      "path": "reasoning/derivation.yaml",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "category_id": "CAT-20",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 21,
+      "path": "reasoning/decisions.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-21",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 22,
+      "path": "reasoning/trace.jsonl",
+      "prior_hypothesis": "historical_archive",
+      "actual": "not_run",
+      "category_id": "CAT-22",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 23,
+      "path": "quality/conflicts.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-23",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 3,
+      "preview_used": 2,
+      "preview_source_ref": 2,
+      "report_source_ref": 2,
+      "report_use_roles": {
+        "historical_conflict_disclosure": 2
+      },
+      "rejected": 0,
+      "run_ids": [
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available"
+      ],
+      "package_record_ids": [
+        "23:000000"
+      ],
+      "persisted_record_ids": [
+        "23:000000"
+      ],
+      "rejected_record_ids": [],
+      "artifact_ids": [
+        "ART-1c1b94983b67d1e4402dcfa7"
+      ],
+      "persisted_sections": [
+        "S5.2"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 24,
+      "path": "quality/gaps.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-24",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 39,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 20,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "24:000002",
+        "24:000003",
+        "24:000006",
+        "24:000008"
+      ],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [
+        "24:000002",
+        "24:000003",
+        "24:000006",
+        "24:000008"
+      ],
+      "artifact_ids": [
+        "ART-2c1250f795a8849a725e8b26"
+      ],
+      "persisted_sections": [],
+      "observed_use": "rejected_or_guarded",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 25,
+      "path": "quality/gate_report.yaml",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "category_id": "CAT-25",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 26,
+      "path": "style/style_profile.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-26",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 18,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 10,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "26:000000"
+      ],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [
+        "26:000000"
+      ],
+      "artifact_ids": [
+        "ART-e8f777b5079467645378b110"
+      ],
+      "persisted_sections": [],
+      "observed_use": "rejected_or_guarded",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 27,
+      "path": "style/section_templates/*.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-27",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 18,
+      "preview_used": 10,
+      "preview_source_ref": 10,
+      "report_source_ref": 10,
+      "report_use_roles": {
+        "section_structure": 10
+      },
+      "rejected": 0,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "package_record_ids": [
+        "27:000017",
+        "27:000019",
+        "27:000024"
+      ],
+      "persisted_record_ids": [
+        "27:000017",
+        "27:000019",
+        "27:000024"
+      ],
+      "rejected_record_ids": [],
+      "artifact_ids": [
+        "ART-00cdeb7cff39ec000c9cda12",
+        "ART-34039296b971b009b87f04b0",
+        "ART-44b798ad7800ecc5d76a18db"
+      ],
+      "persisted_sections": [
+        "S4",
+        "S5.2",
+        "S7.1"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 28,
+      "path": "index/node_index.json",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "category_id": "CAT-28",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 29,
+      "path": "index/term_index.json",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "category_id": "CAT-29",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 30,
+      "path": "index/signature.yaml",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "category_id": "CAT-30",
+      "corpus_id": "cy_tray_20260918",
+      "corpus_version": "v2",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "package_record_ids": [],
+      "persisted_record_ids": [],
+      "rejected_record_ids": [],
+      "artifact_ids": [],
+      "persisted_sections": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    }
+  ],
+  "variant_comparisons": [
+    {
+      "scenario_id": "WS-C0052-BASE",
+      "left_run_id": "WS-C0052-BASE::minimal_information_contract",
+      "right_run_id": "WS-C0052-BASE::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-BASE",
+      "left_run_id": "WS-C0052-BASE::minimal_information_contract",
+      "right_run_id": "WS-C0052-BASE::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-BASE",
+      "left_run_id": "WS-C0052-BASE::applicable_conditional",
+      "right_run_id": "WS-C0052-BASE::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-ZERO",
+      "left_run_id": "WS-C0052-ZERO::minimal_information_contract",
+      "right_run_id": "WS-C0052-ZERO::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-ZERO",
+      "left_run_id": "WS-C0052-ZERO::minimal_information_contract",
+      "right_run_id": "WS-C0052-ZERO::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-ZERO",
+      "left_run_id": "WS-C0052-ZERO::applicable_conditional",
+      "right_run_id": "WS-C0052-ZERO::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-MISSING",
+      "left_run_id": "WS-C0052-MISSING::minimal_information_contract",
+      "right_run_id": "WS-C0052-MISSING::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-MISSING",
+      "left_run_id": "WS-C0052-MISSING::minimal_information_contract",
+      "right_run_id": "WS-C0052-MISSING::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-MISSING",
+      "left_run_id": "WS-C0052-MISSING::applicable_conditional",
+      "right_run_id": "WS-C0052-MISSING::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0083-IDENTITY",
+      "left_run_id": "WS-C0083-IDENTITY::minimal_information_contract",
+      "right_run_id": "WS-C0083-IDENTITY::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0083-IDENTITY",
+      "left_run_id": "WS-C0083-IDENTITY::minimal_information_contract",
+      "right_run_id": "WS-C0083-IDENTITY::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0083-IDENTITY",
+      "left_run_id": "WS-C0083-IDENTITY::applicable_conditional",
+      "right_run_id": "WS-C0083-IDENTITY::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-X001-CONFLICT",
+      "left_run_id": "WS-X001-CONFLICT::minimal_information_contract",
+      "right_run_id": "WS-X001-CONFLICT::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-X001-CONFLICT",
+      "left_run_id": "WS-X001-CONFLICT::minimal_information_contract",
+      "right_run_id": "WS-X001-CONFLICT::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-X001-CONFLICT",
+      "left_run_id": "WS-X001-CONFLICT::applicable_conditional",
+      "right_run_id": "WS-X001-CONFLICT::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-L002-CLAIM",
+      "left_run_id": "WS-L002-CLAIM::minimal_information_contract",
+      "right_run_id": "WS-L002-CLAIM::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-L002-CLAIM",
+      "left_run_id": "WS-L002-CLAIM::minimal_information_contract",
+      "right_run_id": "WS-L002-CLAIM::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-L002-CLAIM",
+      "left_run_id": "WS-L002-CLAIM::applicable_conditional",
+      "right_run_id": "WS-L002-CLAIM::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "left_run_id": "WS-NEG-ACCIDENT::minimal_information_contract",
+      "right_run_id": "WS-NEG-ACCIDENT::applicable_conditional",
+      "same_facts_and_mode": false,
+      "same_candidate": null,
+      "same_issues": null,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "left_run_id": "WS-NEG-ACCIDENT::minimal_information_contract",
+      "right_run_id": "WS-NEG-ACCIDENT::all_available",
+      "same_facts_and_mode": false,
+      "same_candidate": null,
+      "same_issues": null,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "left_run_id": "WS-NEG-ACCIDENT::applicable_conditional",
+      "right_run_id": "WS-NEG-ACCIDENT::all_available",
+      "same_facts_and_mode": false,
+      "same_candidate": null,
+      "same_issues": null,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    }
+  ],
+  "limitations": [
+    "API source_refs and used_items prove observable consumption, not semantic correctness.",
+    "A category with no observed use is not proven unnecessary; single-corpus results do not generalize across report types.",
+    "Final necessity classes require controlled ablation and independent human review."
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "file": "04_jinjiang_accident.pdf",
+  "source_sha256": "eb6655da71f0d11b8a41c3bc5320a53fd4307fec370018150a037978927d69c4",
+  "physical_page": 6,
+  "captured_at_utc": "2026-09-24T03:05:45.047959+00:00",
+  "segments": [
+    {
+      "ref": "p6-s1",
+      "page": 6,
+      "text": "事发前，漳州市宇飞新能源科技有限公司又与漳州芗城区顺航建筑劳务有限公司就事发项目签订《光伏电站施工劳务承包合同》，由漳州芗城区顺航建筑劳务有限公司承揽立乔公司光伏发电项目的安装施工任务，工程款将按瓦计算。施工现场的安全设施和安全防护用品由漳州芗城区顺航建筑劳务有限公司负责。2025 年7 月中旬，邹*杰开始组织人员进场施工，邹*杰并负责日常施工现场安全管理；项目进场施工时，漳州市宇飞新能源科技有限公司安排人员到现场向邹*杰交代施工内容，施工期间并安排人员负责项目质量和进度管理，但日常未安排人员常驻施工现场负责安全管理。",
+      "block_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "bbox": [
+        79.34,
+        119.27,
+        521.68,
+        388.46
+      ]
+    },
+    {
+      "ref": "p6-s2",
+      "page": 6,
+      "text": "事故现场位于福建省立乔建设发展有限公司5 号车间屋面（见图1），该车间为单层钢结构，屋盖由屋面彩钢板和采光板、型钢屋架、钢檩条组成。事发时，漳州芗城区顺航建筑劳务有限公司的黄*华等工人直接在未铺设临时走道板、未设臵安全警示标志的屋面安装光伏板；施工现场未给工人配备安全绳；邹*杰、黄*华、邹*文、林*龙、陈*元、陈*元均未取得高处作业特种作业操作证，事发时未按规定佩戴、使用安全帽、安全带、安全绳等劳动防护用品。采光板破口处距车间内部地面约11.8 米，破口的采光板为车间西侧北面第二跨中间靠近屋脊的第一块（见图2）。",
+      "block_ids": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "bbox": [
+        79.34,
+        398.87,
+        529.54,
+        668.59
+      ]
+    }
+  ],
+  "model_call": {
+    "model_id": "dd06373f-4046-4b4f-bb3b-4a297f436e9a",
+    "model": "deepseek-v4-flash-0731",
+    "model_version": "deepseek-v4-flash-0731",
+    "source": "saved",
+    "protocol": "chat",
+    "temperature": 0,
+    "max_tokens": 3000,
+    "response_id": "chatcmpl-af20c1e8e8be314f"
+  },
+  "candidates": [
+    {
+      "label": "合同签订方",
+      "value_text": "漳州市宇飞新能源科技有限公司与漳州芗城区顺航建筑劳务有限公司",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s1",
+      "source_valid": false
+    },
+    {
+      "label": "合同类型",
+      "value_text": "光伏电站施工劳务承包合同",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s1",
+      "source_valid": true
+    },
+    {
+      "label": "承揽方",
+      "value_text": "漳州芗城区顺航建筑劳务有限公司",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s1",
+      "source_valid": true
+    },
+    {
+      "label": "工程款计算方式",
+      "value_text": "按瓦计算",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s1",
+      "source_valid": true
+    },
+    {
+      "label": "安全设施负责方",
+      "value_text": "漳州芗城区顺航建筑劳务有限公司",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s1",
+      "source_valid": true
+    },
+    {
+      "label": "进场施工时间",
+      "value_text": "2025年7月中旬",
+      "unit": "",
+      "data_type": "date",
+      "source_ref": "p6-s1",
+      "source_valid": true
+    },
+    {
+      "label": "施工组织者",
+      "value_text": "邹*杰",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s1",
+      "source_valid": true
+    },
+    {
+      "label": "日常安全管理负责人",
+      "value_text": "邹*杰",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s1",
+      "source_valid": true
+    },
+    {
+      "label": "事故现场位置",
+      "value_text": "福建省立乔建设发展有限公司5号车间屋面",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s2",
+      "source_valid": true
+    },
+    {
+      "label": "车间结构类型",
+      "value_text": "单层钢结构",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s2",
+      "source_valid": true
+    },
+    {
+      "label": "屋盖组成",
+      "value_text": "屋面彩钢板和采光板、型钢屋架、钢檩条",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s2",
+      "source_valid": true
+    },
+    {
+      "label": "采光板破口距地面高度",
+      "value_text": "11.8",
+      "unit": "米",
+      "data_type": "decimal",
+      "source_ref": "p6-s2",
+      "source_valid": true
+    },
+    {
+      "label": "破口采光板位置",
+      "value_text": "车间西侧北面第二跨中间靠近屋脊的第一块",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s2",
+      "source_valid": true
+    },
+    {
+      "label": "未取得高处作业证人员",
+      "value_text": "邹*杰、黄*华、邹*文、林*龙、陈*元、陈*元",
+      "unit": "",
+      "data_type": "text",
+      "source_ref": "p6-s2",
+      "source_valid": true
+    }
+  ],
+  "parse_status": "READY",
+  "preregistered_gold_sha256": "e87495704d157cf383dd98af12420e7df57a8c766d1f24b5e0f1a68ff27811cf"
+}

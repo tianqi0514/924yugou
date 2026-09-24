@@ -1,0 +1,22 @@
+{
+  "source_file": "02_jiangmen_eia.pdf",
+  "sha256": "2649027d0995f4de3ca8dd8f822ba3e9535322abfb46589fce371da161fa8846",
+  "source_pages": [5],
+  "note": "只从环评报告表 PDF 实体页 5 的基本情况表抽取；包含多组键值、复选框和未知字段。",
+  "fields": [
+    {"id": "project_name", "label": "建设项目名称", "status": "found", "value": "广东旗山再生资源有限公司金属废料分选与筛分30000吨建设项目", "unit": "", "allowed_refs": ["p5-t1-r0"]},
+    {"id": "project_code", "label": "项目代码", "status": "found", "value": "2509-440783-04-01-133743", "unit": "", "allowed_refs": ["p5-t1-r1"]},
+    {"id": "location", "label": "建设地点", "status": "found", "value": "开平市水口镇东乐路387号", "unit": "", "allowed_refs": ["p5-t1-r3"]},
+    {"id": "construction_nature", "label": "建设性质中被选中的选项", "status": "found", "value": "新建（迁建）", "unit": "", "allowed_refs": ["p5-t1-r6"]},
+    {"id": "application_kind", "label": "申报情形中被选中的选项", "status": "found", "value": "首次申报项目", "unit": "", "allowed_refs": ["p5-t1-r6"]},
+    {"id": "total_investment", "label": "总投资", "status": "found", "value": "500", "unit": "万元", "allowed_refs": ["p5-t1-r8"]},
+    {"id": "environmental_investment", "label": "环保投资", "status": "found", "value": "17", "unit": "万元", "allowed_refs": ["p5-t1-r8"]},
+    {"id": "environmental_investment_ratio", "label": "环保投资占比", "status": "found", "value": "3.4", "unit": "%", "allowed_refs": ["p5-t1-r9"]},
+    {"id": "construction_duration", "label": "施工工期", "status": "found", "value": "6", "unit": "个月", "allowed_refs": ["p5-t1-r9"]},
+    {"id": "land_area", "label": "用地面积", "status": "found", "value": "8606.63", "unit": "㎡", "allowed_refs": ["p5-t1-r10"]},
+    {"id": "has_started", "label": "是否开工建设中被选中的选项", "status": "found", "value": "否", "unit": "", "allowed_refs": ["p5-t1-r10"]},
+    {"id": "special_assessment", "label": "专项评价设置情况", "status": "found", "value": "无", "unit": "", "allowed_refs": ["p5-t1-r11"]},
+    {"id": "planning_status", "label": "规划情况", "status": "found", "value": "无", "unit": "", "allowed_refs": ["p5-t1-r12"]},
+    {"id": "annual_emission", "label": "年排放量", "status": "unknown", "value": null, "unit": ""}
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "facts": [
+    {
+      "id": "project_name",
+      "status": "found",
+      "value": "广东旗山再生资源有限公司金属废料分选与筛分30000 吨建设项目",
+      "unit": null,
+      "source_ref": "p5-t1-r0"
+    },
+    {
+      "id": "project_code",
+      "status": "found",
+      "value": "2509-440783-04-01-133743",
+      "unit": null,
+      "source_ref": "p5-t1-r1"
+    },
+    {
+      "id": "location",
+      "status": "found",
+      "value": "开平市水口镇东乐路387 号",
+      "unit": null,
+      "source_ref": "p5-t1-r3"
+    },
+    {
+      "id": "construction_nature",
+      "status": "found",
+      "value": "新建（迁建）",
+      "unit": null,
+      "source_ref": "p5-t1-r6"
+    },
+    {
+      "id": "application_kind",
+      "status": "found",
+      "value": "首次申报项目",
+      "unit": null,
+      "source_ref": "p5-t1-r6"
+    },
+    {
+      "id": "total_investment",
+      "status": "found",
+      "value": 500,
+      "unit": "万元",
+      "source_ref": "p5-t1-r8"
+    },
+    {
+      "id": "environmental_investment",
+      "status": "found",
+      "value": 17,
+      "unit": "万元",
+      "source_ref": "p5-t1-r8"
+    },
+    {
+      "id": "environmental_investment_ratio",
+      "status": "found",
+      "value": 3.4,
+      "unit": "%",
+      "source_ref": "p5-t1-r9"
+    },
+    {
+      "id": "construction_duration",
+      "status": "found",
+      "value": "6 个月",
+      "unit": "月",
+      "source_ref": "p5-t1-r9"
+    },
+    {
+      "id": "land_area",
+      "status": "found",
+      "value": 8606.63,
+      "unit": "㎡",
+      "source_ref": "p5-t1-r10"
+    },
+    {
+      "id": "has_started",
+      "status": "found",
+      "value": "否",
+      "unit": null,
+      "source_ref": "p5-t1-r10"
+    },
+    {
+      "id": "special_assessment",
+      "status": "found",
+      "value": "无",
+      "unit": null,
+      "source_ref": "p5-t1-r11"
+    },
+    {
+      "id": "planning_status",
+      "status": "found",
+      "value": "无",
+      "unit": null,
+      "source_ref": "p5-t1-r12"
+    },
+    {
+      "id": "annual_emission",
+      "status": "unknown",
+      "value": null,
+      "unit": null,
+      "source_ref": null
+    }
+  ]
+}

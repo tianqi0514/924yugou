@@ -1,0 +1,50 @@
+section_id: S5.1
+title: 5.1 厂房面积与改造范围
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0057
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0057
+- chunk_id: C0058
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0058
+- chunk_id: C0059
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0059
+- chunk_id: C0060
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0060
+- chunk_id: C0061
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0061
+tables:
+- table_id: T05
+  caption: 表5-1 本项目使用面积分配
+  columns:
+  - 区域
+  - 面积（平方米）
+  - 主要用途
+  chunk_id: C0060
+argument_patterns:
+- claim_id: L013
+  pattern: 改造计费面积不等于厂房总面积，不含旧仓储。
+  strength: boundary
+  requires_support:
+  - N041
+  - N042
+  - N048
+- claim_id: L014
+  pattern: 费用更新不能替代面积分配一致性检查。
+  strength: conditional
+  requires_support:
+  - N042
+  - N043
+  - N044
+  - N045
+  - N046
+  - N101
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

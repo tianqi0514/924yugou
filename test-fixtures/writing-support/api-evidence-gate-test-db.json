@@ -1,0 +1,620 @@
+{
+  "schema_version": "writing-support-evidence-gate/1.0",
+  "test_database": "report_platform_test",
+  "synthetic_qa_only": true,
+  "project_id": "662e23da-0044-4561-856c-dbd56ad520c8",
+  "report_id": "62d887ec-9e5d-440a-b95c-64388671f50a",
+  "document_id": "2d3f0a5e-1bc3-4335-a6ed-6deaf0eafddb",
+  "document_sha256": "a4691714fb5c3d63c79db5a51923427ac4c52f1e3b4554f5d147c1184b7e8715",
+  "source_segments": [
+    {
+      "ref": "d-p1",
+      "text": "QA 合成输入说明"
+    },
+    {
+      "ref": "d-p2",
+      "text": "仅供软件流程验证；以下数值不是独立核实的商业证据。"
+    },
+    {
+      "ref": "d-p3",
+      "text": "首年客户需求 300000 套。"
+    },
+    {
+      "ref": "d-p4",
+      "text": "规划合格能力 254016 套。"
+    }
+  ],
+  "facts": [
+    {
+      "key": "first_year_demand",
+      "value": "300000",
+      "revision": 1,
+      "status": "PROVIDED"
+    },
+    {
+      "key": "qualified_capacity",
+      "value": "254016",
+      "revision": 1,
+      "status": "PROVIDED"
+    },
+    {
+      "key": "planned_sales",
+      "value": "254016",
+      "revision": 1,
+      "status": "COMPUTED"
+    },
+    {
+      "key": "supplier_name",
+      "value": null,
+      "revision": 0,
+      "status": "UNDEFINED"
+    },
+    {
+      "key": "equipment_unit_price",
+      "value": null,
+      "revision": 0,
+      "status": "UNDEFINED"
+    }
+  ],
+  "computed_direct_bind_status": 409,
+  "fact_bindings": {
+    "first_year_demand": {
+      "fact_key": "first_year_demand",
+      "fact_revision": 1,
+      "status": "SOURCE_LOCATOR_REVIEWED",
+      "document_id": "2d3f0a5e-1bc3-4335-a6ed-6deaf0eafddb",
+      "source_refs": [
+        "d-p3"
+      ],
+      "project_version": 6
+    },
+    "qualified_capacity": {
+      "fact_key": "qualified_capacity",
+      "fact_revision": 1,
+      "status": "SOURCE_LOCATOR_REVIEWED",
+      "document_id": "2d3f0a5e-1bc3-4335-a6ed-6deaf0eafddb",
+      "source_refs": [
+        "d-p4"
+      ],
+      "project_version": 7
+    }
+  },
+  "persisted_report_version": 1,
+  "review_status": 200,
+  "review_body": {
+    "id": "62d887ec-9e5d-440a-b95c-64388671f50a",
+    "project_id": "662e23da-0044-4561-856c-dbd56ad520c8",
+    "title": "S4 合成证据闸门验证",
+    "version": 1,
+    "content": [
+      {
+        "type": "h1",
+        "children": [
+          {
+            "text": "S4 合成证据闸门验证"
+          }
+        ]
+      },
+      {
+        "type": "p",
+        "children": [
+          {
+            "text": ""
+          }
+        ]
+      },
+      {
+        "type": "h2",
+        "id": "0d5a3799-ed46-4e30-b83b-0a8eb0705979",
+        "section_id": "S4",
+        "source_refs": [
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-04",
+            "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+            "record_id": "04:000009",
+            "semantic_id": "S4",
+            "use": "section_structure"
+          },
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-27",
+            "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+            "record_id": "27:000017",
+            "semantic_id": "S4",
+            "use": "section_structure"
+          }
+        ],
+        "origin": "guided",
+        "children": [
+          {
+            "text": "四、产能测算与交付匹配"
+          }
+        ]
+      },
+      {
+        "type": "p",
+        "id": "7119714a-bcba-4218-901a-6aed3fa04673",
+        "section_id": "S4",
+        "source_refs": [
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-09",
+            "artifact_id": "ART-42dd923169efb572267f7ada",
+            "record_id": "09:000051",
+            "semantic_id": "C0052",
+            "use": "source_location_only"
+          },
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-10",
+            "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+            "record_id": "10:000051",
+            "semantic_id": "C0052",
+            "use": "slot_format_only"
+          },
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-13",
+            "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+            "record_id": "13:000005",
+            "semantic_id": "R006",
+            "use": "rule_pattern_only"
+          }
+        ],
+        "origin": "guided",
+        "fact_keys": [
+          "first_year_demand",
+          "qualified_capacity",
+          "planned_sales"
+        ],
+        "children": [
+          {
+            "text": "首年客户需求"
+          },
+          {
+            "type": "fact_ref",
+            "fact_key": "first_year_demand",
+            "display": "300,000",
+            "children": [
+              {
+                "text": ""
+              }
+            ]
+          },
+          {
+            "text": "套，规划合格能力"
+          },
+          {
+            "type": "fact_ref",
+            "fact_key": "qualified_capacity",
+            "display": "254,016",
+            "children": [
+              {
+                "text": ""
+              }
+            ]
+          },
+          {
+            "text": "套；按两者较小值，首年计划销售量为"
+          },
+          {
+            "type": "fact_ref",
+            "fact_key": "planned_sales",
+            "display": "254,016",
+            "children": [
+              {
+                "text": ""
+              }
+            ]
+          },
+          {
+            "text": "套。"
+          }
+        ],
+        "project_rule_refs": [
+          {
+            "rule_id": "e5958165-e49e-4056-846b-f589eeefe07c",
+            "expression": "min(first_year_demand, qualified_capacity)",
+            "target_key": "planned_sales",
+            "deps": [
+              "first_year_demand",
+              "qualified_capacity"
+            ],
+            "input_fact_revisions": [
+              {
+                "fact_key": "first_year_demand",
+                "revision": 1,
+                "value": "300000"
+              },
+              {
+                "fact_key": "qualified_capacity",
+                "revision": 1,
+                "value": "254016"
+              }
+            ],
+            "target_fact_revision": 1
+          }
+        ]
+      },
+      {
+        "type": "p",
+        "id": "75cc47e6-fecd-47a0-811d-140eb1717704",
+        "section_id": "S4",
+        "source_refs": [
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-15",
+            "artifact_id": "ART-a8f45403e16d825f94907566",
+            "record_id": "15:000001",
+            "semantic_id": "L002",
+            "use": "historical_claim_pattern_only"
+          },
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-18",
+            "artifact_id": "ART-29858a6e153e0a101205a44c",
+            "record_id": "18:000001",
+            "semantic_id": "EV-01",
+            "use": "historical_evidence_limitation"
+          }
+        ],
+        "origin": "guided",
+        "children": [
+          {
+            "text": "上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+          }
+        ]
+      }
+    ],
+    "bound_facts": {
+      "qualified_capacity": {
+        "value": "254016",
+        "revision": 1
+      },
+      "planned_sales": {
+        "value": "254016",
+        "revision": 1
+      },
+      "first_year_demand": {
+        "value": "300000",
+        "revision": 1
+      }
+    },
+    "reviewed": true,
+    "issues": [
+      {
+        "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+        "severity": "review",
+        "message": "模板缺少关键覆盖配置，需要人工确认",
+        "item_ids": [
+          "27:000017"
+        ],
+        "section_id": "S4",
+        "report_version": 1
+      },
+      {
+        "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+        "severity": "review",
+        "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+        "item_ids": [
+          "18:000001"
+        ],
+        "section_id": "S4",
+        "report_version": 1
+      },
+      {
+        "chunk_id": "C0052",
+        "code": "HISTORICAL_CONDITION_FALSE",
+        "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+        "severity": "review",
+        "slot_id": null,
+        "section_id": "S4",
+        "report_version": 1
+      }
+    ],
+    "fact_impacts": [],
+    "facts": [
+      {
+        "id": "c63f5fcb-9974-43c5-8c47-dd4b159a4204",
+        "key": "first_year_demand",
+        "label": "首年客户需求",
+        "data_type": "integer",
+        "value": "300000",
+        "status": "PROVIDED",
+        "unit": "套",
+        "caliber": "本项目待确认",
+        "as_of": "",
+        "source": "QA合成原件；非商业真实性认证",
+        "revision": 1,
+        "updated_at": "2026-09-24T07:45:12.149890+00:00"
+      },
+      {
+        "id": "575dcb8e-3618-479e-95dc-c5ab12186bc2",
+        "key": "planned_sales",
+        "label": "首年计划销售量",
+        "data_type": "integer",
+        "value": "254016",
+        "status": "COMPUTED",
+        "unit": "套",
+        "caliber": "本项目待确认",
+        "as_of": "",
+        "source": "",
+        "revision": 1,
+        "updated_at": "2026-09-24T07:45:12.193391+00:00"
+      },
+      {
+        "id": "cdb21869-b539-4f33-9f83-307aa994f423",
+        "key": "qualified_capacity",
+        "label": "合格能力",
+        "data_type": "integer",
+        "value": "254016",
+        "status": "PROVIDED",
+        "unit": "套",
+        "caliber": "本项目待确认",
+        "as_of": "",
+        "source": "QA合成原件；非商业真实性认证",
+        "revision": 1,
+        "updated_at": "2026-09-24T07:45:12.196258+00:00"
+      }
+    ],
+    "updated_at": "2026-09-24T07:45:13.048501+00:00"
+  },
+  "export_status": 200,
+  "export_error": null,
+  "audit": {
+    "report_id": "62d887ec-9e5d-440a-b95c-64388671f50a",
+    "project_id": "662e23da-0044-4561-856c-dbd56ad520c8",
+    "report_version": 1,
+    "content_sha256": "c03fe97a4490842783d9ccf17e13a090469a730df071f7130cdd4f7552754e7d",
+    "delivery_status": "source_locator_reviewed",
+    "delivery_note": "项目原文位置由操作者核对；不代表原件真实性经独立认证",
+    "source_refs": [
+      {
+        "block_id": "0d5a3799-ed46-4e30-b83b-0a8eb0705979",
+        "section_id": "S4",
+        "refs": [
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-04",
+            "artifact_id": "ART-871ba9a6c0c6e86eec6bc7c6",
+            "record_id": "04:000009",
+            "semantic_id": "S4",
+            "use": "section_structure"
+          },
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-27",
+            "artifact_id": "ART-44b798ad7800ecc5d76a18db",
+            "record_id": "27:000017",
+            "semantic_id": "S4",
+            "use": "section_structure"
+          }
+        ],
+        "project_rule_refs": []
+      },
+      {
+        "block_id": "7119714a-bcba-4218-901a-6aed3fa04673",
+        "section_id": "S4",
+        "refs": [
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-09",
+            "artifact_id": "ART-42dd923169efb572267f7ada",
+            "record_id": "09:000051",
+            "semantic_id": "C0052",
+            "use": "source_location_only"
+          },
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-10",
+            "artifact_id": "ART-5f87595c805d3cdd2f47c7f9",
+            "record_id": "10:000051",
+            "semantic_id": "C0052",
+            "use": "slot_format_only"
+          },
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-13",
+            "artifact_id": "ART-c191d8c31faa00e38b4f4f9d",
+            "record_id": "13:000005",
+            "semantic_id": "R006",
+            "use": "rule_pattern_only"
+          }
+        ],
+        "project_rule_refs": [
+          {
+            "rule_id": "e5958165-e49e-4056-846b-f589eeefe07c",
+            "expression": "min(first_year_demand, qualified_capacity)",
+            "target_key": "planned_sales",
+            "deps": [
+              "first_year_demand",
+              "qualified_capacity"
+            ],
+            "input_fact_revisions": [
+              {
+                "fact_key": "first_year_demand",
+                "revision": 1,
+                "value": "300000"
+              },
+              {
+                "fact_key": "qualified_capacity",
+                "revision": 1,
+                "value": "254016"
+              }
+            ],
+            "target_fact_revision": 1
+          }
+        ]
+      },
+      {
+        "block_id": "75cc47e6-fecd-47a0-811d-140eb1717704",
+        "section_id": "S4",
+        "refs": [
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-15",
+            "artifact_id": "ART-a8f45403e16d825f94907566",
+            "record_id": "15:000001",
+            "semantic_id": "L002",
+            "use": "historical_claim_pattern_only"
+          },
+          {
+            "corpus_id": "cy_tray_20260918",
+            "corpus_version": "v2",
+            "category_id": "CAT-18",
+            "artifact_id": "ART-29858a6e153e0a101205a44c",
+            "record_id": "18:000001",
+            "semantic_id": "EV-01",
+            "use": "historical_evidence_limitation"
+          }
+        ],
+        "project_rule_refs": []
+      }
+    ],
+    "writing_issues": [
+      {
+        "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+        "severity": "review",
+        "message": "模板缺少关键覆盖配置，需要人工确认",
+        "item_ids": [
+          "27:000017"
+        ],
+        "section_id": "S4",
+        "report_version": 1
+      },
+      {
+        "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+        "severity": "review",
+        "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+        "item_ids": [
+          "18:000001"
+        ],
+        "section_id": "S4",
+        "report_version": 1
+      },
+      {
+        "chunk_id": "C0052",
+        "code": "HISTORICAL_CONDITION_FALSE",
+        "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+        "severity": "review",
+        "slot_id": null,
+        "section_id": "S4",
+        "report_version": 1
+      }
+    ],
+    "evidence_bindings": [
+      {
+        "fact_key": "first_year_demand",
+        "fact_revision": 1,
+        "status": "source_locator_reviewed",
+        "document_id": "2d3f0a5e-1bc3-4335-a6ed-6deaf0eafddb",
+        "document_sha256": "a4691714fb5c3d63c79db5a51923427ac4c52f1e3b4554f5d147c1184b7e8715",
+        "source_refs": [
+          "d-p3"
+        ],
+        "bound_at": "2026-09-24T07:45:12.337311+00:00",
+        "project_rule": null,
+        "input_fact_refs": []
+      },
+      {
+        "fact_key": "planned_sales",
+        "fact_revision": 1,
+        "status": "derived_from_reviewed_inputs",
+        "document_id": null,
+        "document_sha256": null,
+        "source_refs": [],
+        "bound_at": null,
+        "project_rule": {
+          "rule_id": "e5958165-e49e-4056-846b-f589eeefe07c",
+          "expression": "min(first_year_demand, qualified_capacity)",
+          "target_key": "planned_sales",
+          "deps": [
+            "first_year_demand",
+            "qualified_capacity"
+          ]
+        },
+        "input_fact_refs": [
+          {
+            "fact_key": "first_year_demand",
+            "fact_revision": 1,
+            "status": "source_locator_reviewed",
+            "document_id": "2d3f0a5e-1bc3-4335-a6ed-6deaf0eafddb",
+            "document_sha256": "a4691714fb5c3d63c79db5a51923427ac4c52f1e3b4554f5d147c1184b7e8715",
+            "source_refs": [
+              "d-p3"
+            ],
+            "bound_at": "2026-09-24T07:45:12.337311+00:00"
+          },
+          {
+            "fact_key": "qualified_capacity",
+            "fact_revision": 1,
+            "status": "source_locator_reviewed",
+            "document_id": "2d3f0a5e-1bc3-4335-a6ed-6deaf0eafddb",
+            "document_sha256": "a4691714fb5c3d63c79db5a51923427ac4c52f1e3b4554f5d147c1184b7e8715",
+            "source_refs": [
+              "d-p4"
+            ],
+            "bound_at": "2026-09-24T07:45:12.356791+00:00"
+          }
+        ]
+      },
+      {
+        "fact_key": "qualified_capacity",
+        "fact_revision": 1,
+        "status": "source_locator_reviewed",
+        "document_id": "2d3f0a5e-1bc3-4335-a6ed-6deaf0eafddb",
+        "document_sha256": "a4691714fb5c3d63c79db5a51923427ac4c52f1e3b4554f5d147c1184b7e8715",
+        "source_refs": [
+          "d-p4"
+        ],
+        "bound_at": "2026-09-24T07:45:12.356791+00:00",
+        "project_rule": null,
+        "input_fact_refs": []
+      }
+    ],
+    "facts": [
+      {
+        "key": "first_year_demand",
+        "label": "首年客户需求",
+        "value": "300000",
+        "unit": "套",
+        "revision": 1,
+        "source": "QA合成原件；非商业真实性认证"
+      },
+      {
+        "key": "planned_sales",
+        "label": "首年计划销售量",
+        "value": "254016",
+        "unit": "套",
+        "revision": 1,
+        "source": ""
+      },
+      {
+        "key": "qualified_capacity",
+        "label": "合格能力",
+        "value": "254016",
+        "unit": "套",
+        "revision": 1,
+        "source": "QA合成原件；非商业真实性认证"
+      }
+    ],
+    "docx_sha256": "75131ffbbec6f287ae0585c4c7fa5ee5cc0528a5b0e2ec452bdf800705b4dd9c",
+    "pdf_sha256": "61e4239f4d2e5fc7d997871bed335fc026c5863c582966f5c76a539542062b9a"
+  },
+  "docx_text": "S4 合成证据闸门验证\n\n四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。\n事实依据\n首年客户需求：300000套。来源：QA合成原件；非商业真实性认证\n首年计划销售量：254016套。来源：\n合格能力：254016套。来源：QA合成原件；非商业真实性认证",
+  "pdf_text": "第 1 页\nS4 合成证据闸门验证\n四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。\n事实依据\n首年客户需求：300000套。来源：QA合成原件；非商业真实性认证\n首年计划销售量：254016套。来源：\n合格能力：254016套。来源：QA合成原件；非商业真实性认证\n"
+}

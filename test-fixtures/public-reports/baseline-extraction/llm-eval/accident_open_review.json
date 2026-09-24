@@ -1,0 +1,35 @@
+{
+  "reviewer": "manual source comparison",
+  "rubric": "Item numbers are one-based positions in the frozen model response. A valid fact must have the right field meaning and direct source support. A valid causal edge requires the cited source to explicitly assert that direction, not merely list both events in the same paragraph.",
+  "facts": {
+    "total": 18,
+    "supported_for_candidate_review": [1, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 17, 18],
+    "needs_revision": {
+      "2": "The location value includes the project description and phrase '施工过程中'; it cannot be used as a clean location field.",
+      "9": "The source says '漳州市芗城区人'; the label '籍贯' is a stronger classification than this excerpt establishes.",
+      "16": "The output says '转包', whereas the excerpt says '发包'; the legal/business characterization changed."
+    },
+    "atomicity_issue": "The 900KW capacity is buried in a location value, and direct cause events are merged into one paragraph candidate. These are not usable as individual graph nodes without splitting and review."
+  },
+  "relations": {
+    "total": 13,
+    "explicitly_supported": [2, 3, 7, 8],
+    "unsupported_causality": {
+      "1": "The source lists missing PPE and stepping on the panel, but does not assert that missing PPE caused the step.",
+      "4": "Unqualified contracting and failure to stop violations are co-listed as indirect causes.",
+      "5": "Unqualified contracting and missing procedures are co-listed; this causal link is not explicit.",
+      "6": "Missing training and missing safeguards are co-listed; the asserted direction is not explicit.",
+      "9": "Unqualified contracting and missing procedures are co-listed; this causal link is not explicit.",
+      "10": "Missing training and walkway/warning omissions are co-listed; this causal link is not explicit.",
+      "11": "Missing PPE provision and workers not wearing PPE are co-listed; the asserted direction is not explicit.",
+      "12": "Inspection weakness concerns listed hazards, but the output turns it into a direct causal edge to uncertified work.",
+      "13": "The stated result '事故隐患未被及时发现和消除' does not occur in the cited excerpt."
+    }
+  },
+  "relations_v2": {
+    "total": 3,
+    "explicitly_supported": [1, 2, 3],
+    "quote_present_in_source": [1, 2, 3],
+    "remaining_issue": "Edges 2 and 3 still combine multiple result events into one target, so graph nodes require an atomic split and review. This is a prompt refinement on the same sample, not an independent accuracy test."
+  }
+}

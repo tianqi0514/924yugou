@@ -1,0 +1,25 @@
+section_id: SB.H11
+title: 资料使用终止说明
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0193
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0193
+- chunk_id: C0194
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0194
+tables: []
+argument_patterns:
+- claim_id: L048
+  pattern: 未提供的签字合同、授信、试车记录与专项文件不得视为已有。
+  strength: limited
+  requires_support:
+  - N194
+  - N195
+  - N193
+  - N012
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

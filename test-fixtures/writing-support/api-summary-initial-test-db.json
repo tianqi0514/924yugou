@@ -1,0 +1,2601 @@
+{
+  "schema_version": "writing-support-summary/1.0",
+  "source": "captured_actual_api_bodies",
+  "run_count": 21,
+  "runs": [
+    {
+      "run_id": "WS-C0052-BASE::minimal_information_contract",
+      "scenario_id": "WS-C0052-BASE",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "46cdaa4d-3c65-42a3-8121-131de5729642",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-BASE::applicable_conditional",
+      "scenario_id": "WS-C0052-BASE",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "6518b8c7-9d31-4493-beed-fe48ec8b24ce",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000002"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000004"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000010"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000011"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONDITION_FALSE",
+          "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+          "severity": "review",
+          "slot_id": null
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 200,
+      "export_status_code": 200,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "254016"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "6a2ef0b2-2250-4749-a347-b44e9fe4e816",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": false,
+          "observed": []
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-BASE::all_available",
+      "scenario_id": "WS-C0052-BASE",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "c55dde72-4520-44f1-8a97-3a37386b0881",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000002"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000004"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000010"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000011"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONDITION_FALSE",
+          "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+          "severity": "review",
+          "slot_id": null
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 200,
+      "export_status_code": 200,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "254016"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "3b0aabfd-f6c7-43d1-b8dd-12df93a9b940",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": false,
+          "observed": []
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-ZERO::minimal_information_contract",
+      "scenario_id": "WS-C0052-ZERO",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "da99dfc4-80a3-498f-97ed-fc4c96843dbc",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-ZERO::applicable_conditional",
+      "scenario_id": "WS-C0052-ZERO",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "fa5719c9-ef63-405f-a9a9-c826a4562653",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000002"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000004"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000010"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000011"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 200,
+      "export_status_code": 200,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "0"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "c1b063cc-3764-4762-b080-c1a84e5b6def",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": false,
+          "observed": []
+        },
+        {
+          "name": "zero_is_value_in_text",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-ZERO::all_available",
+      "scenario_id": "WS-C0052-ZERO",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "7be8ce9f-ccca-4388-aea0-852f40b8b118",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000002"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000004"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000010"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000011"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 200,
+      "export_status_code": 200,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "0"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "9f69a726-3ed1-4101-aee5-e123876396e0",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": false,
+          "observed": []
+        },
+        {
+          "name": "zero_is_value_in_text",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求0套，规划合格能力254,016套；按两者较小值，首年计划销售量为0套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-MISSING::minimal_information_contract",
+      "scenario_id": "WS-C0052-MISSING",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "5abdc590-e278-472f-bf3f-b4f05bf037c4",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-MISSING::applicable_conditional",
+      "scenario_id": "WS-C0052-MISSING",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "cfb63b87-0462-48ee-b1e4-370e3c726ddb",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "项目事实或规则尚不足以起草：首年客户需求尚无可用的项目值；首年计划销售量尚无可用的项目值"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "missing_dependency_unevaluable",
+          "passed": true,
+          "observed": {
+            "id": "552b5e9b-4eae-4e20-8aff-c60000acc50e",
+            "key": "planned_sales",
+            "label": "首年计划销售量",
+            "data_type": "integer",
+            "value": null,
+            "status": "UNEVALUABLE",
+            "unit": "套",
+            "caliber": "本项目待确认",
+            "as_of": "",
+            "source": "",
+            "revision": 0,
+            "updated_at": "2026-09-24T07:25:54.480408+00:00"
+          }
+        },
+        {
+          "name": "missing_dependency_preview_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0052-MISSING::all_available",
+      "scenario_id": "WS-C0052-MISSING",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "25791286-6eda-427b-84c3-89a89778091b",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "项目事实或规则尚不足以起草：首年客户需求尚无可用的项目值；首年计划销售量尚无可用的项目值"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "missing_dependency_unevaluable",
+          "passed": true,
+          "observed": {
+            "id": "51070493-c020-45e4-95a0-a7bd0e52be0b",
+            "key": "planned_sales",
+            "label": "首年计划销售量",
+            "data_type": "integer",
+            "value": null,
+            "status": "UNEVALUABLE",
+            "unit": "套",
+            "caliber": "本项目待确认",
+            "as_of": "",
+            "source": "",
+            "revision": 0,
+            "updated_at": "2026-09-24T07:25:55.766323+00:00"
+          }
+        },
+        {
+          "name": "missing_dependency_preview_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0083-IDENTITY::minimal_information_contract",
+      "scenario_id": "WS-C0083-IDENTITY",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "bf475351-9110-4894-944a-8a233be64b36",
+      "section_id": "S7.1",
+      "package_item_count": 68,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0083-IDENTITY::applicable_conditional",
+      "scenario_id": "WS-C0083-IDENTITY",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "655d35ef-22c7-4e0c-8435-d8c75c95c7c7",
+      "section_id": "S7.1",
+      "package_item_count": 68,
+      "preview_used_item_count": 4,
+      "preview_source_ref_count": 4,
+      "persisted_source_ref_count": 4,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000024"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000004"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "chunk_id": "C0083",
+          "code": "QUOTE_SCOPE_UNVERIFIED",
+          "message": "历史报价包含范围和有效期尚未由本项目证据确认，候选正文未继承",
+          "severity": "review",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 200,
+      "export_status_code": 200,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "new_supplier_and_price_only",
+          "passed": true,
+          "observed": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。"
+        },
+        {
+          "name": "quote_scope_review_flag",
+          "passed": true,
+          "observed": [
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "QUOTE_SCOPE_UNVERIFIED",
+            "TEMPLATE_COVERAGE_UNSPECIFIED"
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-C0083-IDENTITY::all_available",
+      "scenario_id": "WS-C0083-IDENTITY",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "e0429761-48fc-4cac-b131-be5e746acab9",
+      "section_id": "S7.1",
+      "package_item_count": 68,
+      "preview_used_item_count": 4,
+      "preview_source_ref_count": 4,
+      "persisted_source_ref_count": 4,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000024"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000004"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "chunk_id": "C0083",
+          "code": "QUOTE_SCOPE_UNVERIFIED",
+          "message": "历史报价包含范围和有效期尚未由本项目证据确认，候选正文未继承",
+          "severity": "review",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 200,
+      "export_status_code": 200,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "new_supplier_and_price_only",
+          "passed": true,
+          "observed": "7.1 编制范围及购置费\n本项目设备供应商为新拓设备，自动焊接线单价为12,345,000元/条，折合1,234.50万元/条。"
+        },
+        {
+          "name": "quote_scope_review_flag",
+          "passed": true,
+          "observed": [
+            "HISTORICAL_EVIDENCE_INCOMPLETE",
+            "QUOTE_SCOPE_UNVERIFIED",
+            "TEMPLATE_COVERAGE_UNSPECIFIED"
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-X001-CONFLICT::minimal_information_contract",
+      "scenario_id": "WS-X001-CONFLICT",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "cc8980d0-2c9c-4048-b27d-7d2df0406505",
+      "section_id": "S5.2",
+      "package_item_count": 56,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-X001-CONFLICT::applicable_conditional",
+      "scenario_id": "WS-X001-CONFLICT",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "3e45f1d0-94aa-46f4-8020-5c26413afe6f",
+      "section_id": "S5.2",
+      "package_item_count": 56,
+      "preview_used_item_count": 5,
+      "preview_source_ref_count": 5,
+      "persisted_source_ref_count": 5,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000019"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-07 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000008"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-08 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000009"
+          ]
+        },
+        {
+          "code": "HISTORICAL_CONFLICT",
+          "severity": "review",
+          "message": "X001 是历史资料中未解决的冲突；当前项目如论证同一问题，必须使用新证据核对",
+          "item_ids": [
+            "23:000000"
+          ]
+        },
+        {
+          "code": "POWER_CONFLICT_UNRESOLVED",
+          "severity": "block",
+          "message": "历史配电数据冲突未解决；新项目缺少独立核证，正式交付受阻",
+          "item_ids": [
+            "23:000000"
+          ]
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "historical_conflict_open_two_sources",
+          "passed": false,
+          "observed": {}
+        },
+        {
+          "name": "no_project_power_fact",
+          "passed": true,
+          "observed": []
+        },
+        {
+          "name": "conflict_disclosed_without_determinate_conclusion",
+          "passed": true,
+          "observed": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。"
+        },
+        {
+          "name": "formal_review_and_export_blocked",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-X001-CONFLICT::all_available",
+      "scenario_id": "WS-X001-CONFLICT",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "5f377d33-a5d6-4054-a220-f4f1dbe0cf10",
+      "section_id": "S5.2",
+      "package_item_count": 56,
+      "preview_used_item_count": 5,
+      "preview_source_ref_count": 5,
+      "persisted_source_ref_count": 5,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000019"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-07 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000008"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-08 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000009"
+          ]
+        },
+        {
+          "code": "HISTORICAL_CONFLICT",
+          "severity": "review",
+          "message": "X001 是历史资料中未解决的冲突；当前项目如论证同一问题，必须使用新证据核对",
+          "item_ids": [
+            "23:000000"
+          ]
+        },
+        {
+          "code": "POWER_CONFLICT_UNRESOLVED",
+          "severity": "block",
+          "message": "历史配电数据冲突未解决；新项目缺少独立核证，正式交付受阻",
+          "item_ids": [
+            "23:000000"
+          ]
+        }
+      ],
+      "review_status_code": 400,
+      "export_status_code": 409,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "historical_conflict_open_two_sources",
+          "passed": false,
+          "observed": {}
+        },
+        {
+          "name": "no_project_power_fact",
+          "passed": true,
+          "observed": []
+        },
+        {
+          "name": "conflict_disclosed_without_determinate_conclusion",
+          "passed": true,
+          "observed": "5.2 配电资料分歧与用能预算\n历史参考资料对同一接入点的配电余量存在未解决分歧；该历史数据不作为本项目参数，本章节暂不作配电适配结论。"
+        },
+        {
+          "name": "formal_review_and_export_blocked",
+          "passed": true,
+          "observed": [
+            400,
+            409
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "WS-L002-CLAIM::minimal_information_contract",
+      "scenario_id": "WS-L002-CLAIM",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "36d57864-ffef-4f8c-b781-c518639b4cb4",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": null,
+      "preview_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "请先确认本章的目录与模板结构"
+        }
+      },
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "minimal_variant_implementation_coupling",
+          "passed": null,
+          "observed": 409,
+          "note": "A fixed implementation dependency failure cannot prove category necessity."
+        }
+      ]
+    },
+    {
+      "run_id": "WS-L002-CLAIM::applicable_conditional",
+      "scenario_id": "WS-L002-CLAIM",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "13d4dd98-0025-4a4a-8f62-ece785d0ddc9",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000002"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000004"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000010"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000011"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONDITION_FALSE",
+          "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+          "severity": "review",
+          "slot_id": null
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 200,
+      "export_status_code": 200,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "254016"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "093aa209-bc83-42f0-88b5-6499974d6214",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": false,
+          "observed": []
+        },
+        {
+          "name": "historical_claim_and_excerpt_boundary",
+          "passed": false,
+          "observed": {
+            "claim": null,
+            "evidence_original_available": null
+          }
+        },
+        {
+          "name": "caution_not_order_assertion",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        }
+      ]
+    },
+    {
+      "run_id": "WS-L002-CLAIM::all_available",
+      "scenario_id": "WS-L002-CLAIM",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "b2218e62-7720-4261-bd72-1eaa6249b5bb",
+      "section_id": "S4",
+      "package_item_count": 106,
+      "preview_used_item_count": 7,
+      "preview_source_ref_count": 7,
+      "persisted_source_ref_count": 7,
+      "commit_observed": true,
+      "reference_error": null,
+      "preview_error": null,
+      "issues": [
+        {
+          "code": "TEMPLATE_COVERAGE_UNSPECIFIED",
+          "severity": "review",
+          "message": "模板缺少关键覆盖配置，需要人工确认",
+          "item_ids": [
+            "27:000017"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-01 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000001"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-02 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000002"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-03 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000003"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-04 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000004"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-05 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000005"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06A 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000006"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-06B 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000007"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-09 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000010"
+          ]
+        },
+        {
+          "code": "HISTORICAL_EVIDENCE_INCOMPLETE",
+          "severity": "review",
+          "message": "EV-10 仅有历史摘录，没有完整原件；不能证明当前项目",
+          "item_ids": [
+            "18:000011"
+          ]
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONDITION_FALSE",
+          "message": "历史句子“需求低于能力”在本项目不成立；已排除该句，需复核新的业务判断",
+          "severity": "review",
+          "slot_id": null
+        },
+        {
+          "chunk_id": "C0052",
+          "code": "HISTORICAL_CONTEXT_EXCLUDED",
+          "message": "历史“爬坡率”和设备可用时长叙述未在本项目核对，候选正文未继承",
+          "severity": "info",
+          "slot_id": null
+        }
+      ],
+      "review_status_code": 200,
+      "export_status_code": 200,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "project_min_result",
+          "passed": true,
+          "observed": "254016"
+        },
+        {
+          "name": "condition_and_historical_value_safe",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        },
+        {
+          "name": "project_rule_exists",
+          "passed": true,
+          "observed": [
+            {
+              "id": "26dbf961-ea60-431a-a409-88067fae8969",
+              "name": "首年计划销售量",
+              "target_key": "planned_sales",
+              "expression": "min(first_year_demand, qualified_capacity)",
+              "deps": [
+                "first_year_demand",
+                "qualified_capacity"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "project_rule_in_candidate",
+          "passed": false,
+          "observed": []
+        },
+        {
+          "name": "historical_claim_and_excerpt_boundary",
+          "passed": false,
+          "observed": {
+            "claim": null,
+            "evidence_original_available": null
+          }
+        },
+        {
+          "name": "caution_not_order_assertion",
+          "passed": true,
+          "observed": "四、产能测算与交付匹配\n首年客户需求300,000套，规划合格能力254,016套；按两者较小值，首年计划销售量为254,016套。\n上述需求仅作为本项目测算输入，不能据此认定已有已签订单或最低采购承诺。"
+        }
+      ]
+    },
+    {
+      "run_id": "WS-NEG-ACCIDENT::minimal_information_contract",
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "package_variant": "minimal_information_contract",
+      "status": "captured",
+      "project_id": "9b3f070f-87cb-40d8-b529-0cb8d53b9e8d",
+      "section_id": null,
+      "package_item_count": 0,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "澄岳精密语料仅适用于可研/建设类写作试验；其他类型不可套用"
+        }
+      },
+      "preview_error": null,
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "cross_type_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    },
+    {
+      "run_id": "WS-NEG-ACCIDENT::applicable_conditional",
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "package_variant": "applicable_conditional",
+      "status": "captured",
+      "project_id": "b394b649-28a9-4a26-ad7a-58cc897af793",
+      "section_id": null,
+      "package_item_count": 0,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "澄岳精密语料仅适用于可研/建设类写作试验；其他类型不可套用"
+        }
+      },
+      "preview_error": null,
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "cross_type_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    },
+    {
+      "run_id": "WS-NEG-ACCIDENT::all_available",
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "package_variant": "all_available",
+      "status": "captured",
+      "project_id": "46af02de-9007-44e7-9c71-52d238e95ef2",
+      "section_id": null,
+      "package_item_count": 0,
+      "preview_used_item_count": 0,
+      "preview_source_ref_count": 0,
+      "persisted_source_ref_count": 0,
+      "commit_observed": false,
+      "reference_error": {
+        "status_code": 409,
+        "body": {
+          "detail": "澄岳精密语料仅适用于可研/建设类写作试验；其他类型不可套用"
+        }
+      },
+      "preview_error": null,
+      "issues": [],
+      "review_status_code": null,
+      "export_status_code": null,
+      "integrity_errors": [],
+      "preregistered_technical_checks": [
+        {
+          "name": "cross_type_rejected",
+          "passed": true,
+          "observed": 409
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "number": 1,
+      "path": "manifest.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 2,
+      "path": "meta.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 3,
+      "path": "provenance.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 4,
+      "path": "outline.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 18,
+      "preview_used": 10,
+      "preview_source_ref": 10,
+      "report_source_ref": 10,
+      "report_use_roles": {
+        "section_structure": 10
+      },
+      "rejected": 0,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 5,
+      "path": "source/original.docx",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 6,
+      "path": "source/normalized.md",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 7,
+      "path": "source/offset_map.json",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 8,
+      "path": "source/assets/*",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 9,
+      "path": "chunks/chunks.jsonl",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "package_visible": 159,
+      "preview_used": 8,
+      "preview_source_ref": 8,
+      "report_source_ref": 8,
+      "report_use_roles": {
+        "source_location_only": 8
+      },
+      "rejected": 76,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 10,
+      "path": "chunks/skeletons.jsonl",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 159,
+      "preview_used": 8,
+      "preview_source_ref": 8,
+      "report_source_ref": 8,
+      "report_use_roles": {
+        "slot_format_only": 8
+      },
+      "rejected": 76,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 11,
+      "path": "chunks/embeddings.parquet",
+      "prior_hypothesis": "not_generated",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 12,
+      "path": "graph/nodes.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "package_visible": 456,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 248,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "rejected_or_guarded",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 13,
+      "path": "graph/rules.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 138,
+      "preview_used": 6,
+      "preview_source_ref": 6,
+      "report_source_ref": 6,
+      "report_use_roles": {
+        "rule_pattern_only": 6
+      },
+      "rejected": 68,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 14,
+      "path": "graph/relations.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 15,
+      "path": "graph/claims.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 216,
+      "preview_used": 6,
+      "preview_source_ref": 6,
+      "report_source_ref": 6,
+      "report_use_roles": {
+        "historical_claim_pattern_only": 6
+      },
+      "rejected": 108,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 16,
+      "path": "graph/invariants.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 17,
+      "path": "graph/graph.yaml",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 18,
+      "path": "evidence/evidence.yaml",
+      "prior_hypothesis": "core_information",
+      "actual": "not_run",
+      "package_visible": 144,
+      "preview_used": 10,
+      "preview_source_ref": 10,
+      "report_source_ref": 10,
+      "report_use_roles": {
+        "historical_evidence_limitation": 6,
+        "historical_evidence_only": 4
+      },
+      "rejected": 68,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 19,
+      "path": "evidence/excerpts/*.md",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 276,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 150,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "rejected_or_guarded",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 20,
+      "path": "reasoning/derivation.yaml",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 21,
+      "path": "reasoning/decisions.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 22,
+      "path": "reasoning/trace.jsonl",
+      "prior_hypothesis": "historical_archive",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 23,
+      "path": "quality/conflicts.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 3,
+      "preview_used": 2,
+      "preview_source_ref": 2,
+      "report_source_ref": 2,
+      "report_use_roles": {
+        "historical_conflict_disclosure": 2
+      },
+      "rejected": 0,
+      "run_ids": [
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 24,
+      "path": "quality/gaps.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 39,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 20,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "rejected_or_guarded",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 25,
+      "path": "quality/gate_report.yaml",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 26,
+      "path": "style/style_profile.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 18,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 10,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "rejected_or_guarded",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 27,
+      "path": "style/section_templates/*.yaml",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 18,
+      "preview_used": 10,
+      "preview_source_ref": 10,
+      "report_source_ref": 10,
+      "report_use_roles": {
+        "section_structure": 10
+      },
+      "rejected": 0,
+      "run_ids": [
+        "WS-C0052-BASE::minimal_information_contract",
+        "WS-C0052-BASE::applicable_conditional",
+        "WS-C0052-BASE::all_available",
+        "WS-C0052-ZERO::minimal_information_contract",
+        "WS-C0052-ZERO::applicable_conditional",
+        "WS-C0052-ZERO::all_available",
+        "WS-C0052-MISSING::minimal_information_contract",
+        "WS-C0052-MISSING::applicable_conditional",
+        "WS-C0052-MISSING::all_available",
+        "WS-C0083-IDENTITY::minimal_information_contract",
+        "WS-C0083-IDENTITY::applicable_conditional",
+        "WS-C0083-IDENTITY::all_available",
+        "WS-X001-CONFLICT::minimal_information_contract",
+        "WS-X001-CONFLICT::applicable_conditional",
+        "WS-X001-CONFLICT::all_available",
+        "WS-L002-CLAIM::minimal_information_contract",
+        "WS-L002-CLAIM::applicable_conditional",
+        "WS-L002-CLAIM::all_available"
+      ],
+      "observed_use": "persisted_report_reference",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 28,
+      "path": "index/node_index.json",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 29,
+      "path": "index/term_index.json",
+      "prior_hypothesis": "conditional",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    },
+    {
+      "number": 30,
+      "path": "index/signature.yaml",
+      "prior_hypothesis": "rebuildable_projection",
+      "actual": "not_run",
+      "package_visible": 0,
+      "preview_used": 0,
+      "preview_source_ref": 0,
+      "report_source_ref": 0,
+      "report_use_roles": {},
+      "rejected": 0,
+      "run_ids": [],
+      "observed_use": "not_run_or_not_selected",
+      "necessity_conclusion": "unproven_without_controlled_ablation_and_human_review"
+    }
+  ],
+  "variant_comparisons": [
+    {
+      "scenario_id": "WS-C0052-BASE",
+      "left_run_id": "WS-C0052-BASE::minimal_information_contract",
+      "right_run_id": "WS-C0052-BASE::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-BASE",
+      "left_run_id": "WS-C0052-BASE::minimal_information_contract",
+      "right_run_id": "WS-C0052-BASE::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-BASE",
+      "left_run_id": "WS-C0052-BASE::applicable_conditional",
+      "right_run_id": "WS-C0052-BASE::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-ZERO",
+      "left_run_id": "WS-C0052-ZERO::minimal_information_contract",
+      "right_run_id": "WS-C0052-ZERO::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-ZERO",
+      "left_run_id": "WS-C0052-ZERO::minimal_information_contract",
+      "right_run_id": "WS-C0052-ZERO::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-ZERO",
+      "left_run_id": "WS-C0052-ZERO::applicable_conditional",
+      "right_run_id": "WS-C0052-ZERO::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-MISSING",
+      "left_run_id": "WS-C0052-MISSING::minimal_information_contract",
+      "right_run_id": "WS-C0052-MISSING::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-MISSING",
+      "left_run_id": "WS-C0052-MISSING::minimal_information_contract",
+      "right_run_id": "WS-C0052-MISSING::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0052-MISSING",
+      "left_run_id": "WS-C0052-MISSING::applicable_conditional",
+      "right_run_id": "WS-C0052-MISSING::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0083-IDENTITY",
+      "left_run_id": "WS-C0083-IDENTITY::minimal_information_contract",
+      "right_run_id": "WS-C0083-IDENTITY::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0083-IDENTITY",
+      "left_run_id": "WS-C0083-IDENTITY::minimal_information_contract",
+      "right_run_id": "WS-C0083-IDENTITY::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-C0083-IDENTITY",
+      "left_run_id": "WS-C0083-IDENTITY::applicable_conditional",
+      "right_run_id": "WS-C0083-IDENTITY::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-X001-CONFLICT",
+      "left_run_id": "WS-X001-CONFLICT::minimal_information_contract",
+      "right_run_id": "WS-X001-CONFLICT::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-X001-CONFLICT",
+      "left_run_id": "WS-X001-CONFLICT::minimal_information_contract",
+      "right_run_id": "WS-X001-CONFLICT::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-X001-CONFLICT",
+      "left_run_id": "WS-X001-CONFLICT::applicable_conditional",
+      "right_run_id": "WS-X001-CONFLICT::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-L002-CLAIM",
+      "left_run_id": "WS-L002-CLAIM::minimal_information_contract",
+      "right_run_id": "WS-L002-CLAIM::applicable_conditional",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-L002-CLAIM",
+      "left_run_id": "WS-L002-CLAIM::minimal_information_contract",
+      "right_run_id": "WS-L002-CLAIM::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": false,
+      "same_issues": false,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-L002-CLAIM",
+      "left_run_id": "WS-L002-CLAIM::applicable_conditional",
+      "right_run_id": "WS-L002-CLAIM::all_available",
+      "same_facts_and_mode": true,
+      "same_candidate": true,
+      "same_issues": true,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "left_run_id": "WS-NEG-ACCIDENT::minimal_information_contract",
+      "right_run_id": "WS-NEG-ACCIDENT::applicable_conditional",
+      "same_facts_and_mode": false,
+      "same_candidate": null,
+      "same_issues": null,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "left_run_id": "WS-NEG-ACCIDENT::minimal_information_contract",
+      "right_run_id": "WS-NEG-ACCIDENT::all_available",
+      "same_facts_and_mode": false,
+      "same_candidate": null,
+      "same_issues": null,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    },
+    {
+      "scenario_id": "WS-NEG-ACCIDENT",
+      "left_run_id": "WS-NEG-ACCIDENT::applicable_conditional",
+      "right_run_id": "WS-NEG-ACCIDENT::all_available",
+      "same_facts_and_mode": false,
+      "same_candidate": null,
+      "same_issues": null,
+      "interpretation": "descriptive_only; implementation failure and model variance are not evidence of information necessity"
+    }
+  ],
+  "limitations": [
+    "API source_refs and used_items prove observable consumption, not semantic correctness.",
+    "A category with no observed use is not proven unnecessary; single-corpus results do not generalize across report types.",
+    "Final necessity classes require controlled ablation and independent human review."
+  ]
+}

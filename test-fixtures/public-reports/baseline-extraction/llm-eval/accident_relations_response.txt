@@ -1,0 +1,95 @@
+{
+  "edges": [
+    {
+      "from": "黄*华未按规定佩戴、使用劳动防护用品",
+      "relation": "导致",
+      "to": "黄*华踩踏到屋面采光板",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p9-s3"]
+    },
+    {
+      "from": "黄*华踩踏到屋面采光板",
+      "relation": "致使",
+      "to": "采光板断开",
+      "edge_type": "direct_cause",
+      "source_refs": ["p9-s3"]
+    },
+    {
+      "from": "采光板断开",
+      "relation": "导致",
+      "to": "黄*华从屋面掉落至地面死亡",
+      "edge_type": "direct_cause",
+      "source_refs": ["p9-s3"]
+    },
+    {
+      "from": "福建省立乔建设发展有限公司将光伏发电项目发包给不具备相应资质的漳州市宇飞新能源科技有限公司",
+      "relation": "导致",
+      "to": "未能有效制止光伏发电项目施工现场的违法违规行为",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p9-s4"]
+    },
+    {
+      "from": "漳州市宇飞新能源科技有限公司不具备相应资质违规承揽立乔公司光伏发电项目",
+      "relation": "导致",
+      "to": "未建立安全生产规章制度和操作规程",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p9-s5", "p10-s1"]
+    },
+    {
+      "from": "漳州市宇飞新能源科技有限公司未依规对从业人员开展安全教育培训",
+      "relation": "导致",
+      "to": "作业现场未按规定落实安全防护措施、设置安全警示标志",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p10-s1"]
+    },
+    {
+      "from": "漳州市宇飞新能源科技有限公司对作业现场疏于管理",
+      "relation": "导致",
+      "to": "未持有高处作业特种作业操作证的人员从事高处作业",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p10-s1"]
+    },
+    {
+      "from": "漳州市宇飞新能源科技有限公司对作业现场疏于管理",
+      "relation": "导致",
+      "to": "现场作业人员未按规定佩戴、使用劳动防护用品",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p10-s1"]
+    },
+    {
+      "from": "漳州芗城区顺航建筑劳务有限公司不具备相应资质违规承揽立乔公司光伏发电项目",
+      "relation": "导致",
+      "to": "未建立安全生产规章制度和操作规程",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p10-s2"]
+    },
+    {
+      "from": "漳州芗城区顺航建筑劳务有限公司未依规对从业人员开展安全教育培训",
+      "relation": "导致",
+      "to": "未在屋面设置临时走道板、安全警示标志",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p10-s2"]
+    },
+    {
+      "from": "漳州芗城区顺航建筑劳务有限公司未依规为从业人员配备劳动防护用品",
+      "relation": "导致",
+      "to": "从业人员未按规定佩戴、使用劳动防护用品",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p10-s2"]
+    },
+    {
+      "from": "漳州芗城区顺航建筑劳务有限公司对事故隐患排查督促、检查不力",
+      "relation": "导致",
+      "to": "未持有高处作业特种作业操作证的人员从事高处作业",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p10-s2"]
+    },
+    {
+      "from": "英林镇人民政府对辖区内生产经营单位安全生产状况监督检查不到位",
+      "relation": "导致",
+      "to": "事故隐患未被及时发现和消除",
+      "edge_type": "indirect_cause",
+      "source_refs": ["p10-s3"]
+    }
+  ]
+}

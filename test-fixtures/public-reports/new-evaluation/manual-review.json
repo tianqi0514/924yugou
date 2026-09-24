@@ -1,0 +1,58 @@
+{
+  "method": "一位审查员对两个固定 PDF 物理页、14 个预注册核对点和 30 条模型候选逐项回到原件/抽取片段复核。hit 是字段对象、值、单位匹配，且所引同一片段直接支持；时间、约数等限定语即使在同段，也仍需审核员填入结构化事实后才能写作。partial 不计命中。候选 direct 只表示该页及所引片段直接支持，不表示候选已经可无审核进入项目事实。",
+  "gold_review": [
+    {"id": "A1", "candidate_index": 10, "status": "hit", "same_segment_direct": true, "note": "OCR 原文同段含 2023年6月末、泰州市、小微企业贷款余额、4131.41亿元。"},
+    {"id": "A2", "candidate_index": 11, "status": "hit", "same_segment_direct": true, "note": "原件为“小微企业法人首贷户数”；预注册标签少写“法人”，模型标签更准确，按原件核对后计命中，不更改预注册文件。"},
+    {"id": "A3", "candidate_index": 12, "status": "hit", "same_segment_direct": true, "note": "OCR 同段含信用贷款余额 369.04 亿元。"},
+    {"id": "A4", "candidate_index": 13, "status": "hit", "same_segment_direct": true, "note": "OCR 同段含中长期贷款余额 1909.44 亿元，承接小微企业主语。"},
+    {"id": "A5", "candidate_index": 14, "status": "hit", "same_segment_direct": true, "note": "OCR 同段含普惠型小微企业贷款余额 1674.78 亿元。"},
+    {"id": "A6", "candidate_index": null, "status": "miss", "same_segment_direct": false, "note": "原件及 OCR 均含 10 家政府性融资担保机构，但 16 条候选中没有该事实。"},
+    {"id": "A7", "candidate_index": null, "status": "miss", "same_segment_direct": false, "note": "原件及 OCR 均含平台入驻企业 96205 户，但 16 条候选中没有该事实。"},
+    {"id": "J1", "candidate_index": 3, "status": "hit", "same_segment_direct": true, "note": "p6-s1 直接说明顺航公司承揽安装施工。"},
+    {"id": "J2", "candidate_index": 5, "status": "partial", "same_segment_direct": true, "note": "候选只命名“安全设施负责方”，预注册还包括安全防护用品；同一句原文覆盖两者，但候选字段范围较窄。"},
+    {"id": "J3", "candidate_index": 6, "status": "hit", "same_segment_direct": true, "note": "p6-s1 包含 2025 年 7 月中旬组织进场施工。"},
+    {"id": "J4", "candidate_index": 9, "status": "hit", "same_segment_direct": true, "note": "p6-s2 直接给出 5 号车间屋面。"},
+    {"id": "J5", "candidate_index": null, "status": "miss", "same_segment_direct": false, "note": "p6-s2 明确“未铺设临时走道板”，候选没有独立提取。"},
+    {"id": "J6", "candidate_index": null, "status": "miss", "same_segment_direct": false, "note": "p6-s2 明确“未给工人配备安全绳”，候选没有独立提取。"},
+    {"id": "J7", "candidate_index": 12, "status": "hit", "same_segment_direct": true, "note": "p6-s2 包含采光板破口距内部地面约 11.8 米；“约”应在事实口径中保留。"}
+  ],
+  "candidate_review": {
+    "04_jinjiang_accident.pdf#page=6": [
+      {"index": 1, "status": "needs_edit", "reason": "把两个签约方合成一个值，且连接词不在原文连续出现；source_valid=false。"},
+      {"index": 2, "status": "direct", "reason": "合同名称在 p6-s1。"},
+      {"index": 3, "status": "direct", "reason": "承揽方在 p6-s1。"},
+      {"index": 4, "status": "direct", "reason": "工程款按瓦计算在 p6-s1。"},
+      {"index": 5, "status": "direct", "reason": "安全设施负责方在 p6-s1；未完整覆盖防护用品这一预注册字段。"},
+      {"index": 6, "status": "direct", "reason": "进场时间在 p6-s1。"},
+      {"index": 7, "status": "direct", "reason": "施工组织者在 p6-s1。"},
+      {"index": 8, "status": "direct", "reason": "日常安全管理负责人在 p6-s1。"},
+      {"index": 9, "status": "direct", "reason": "现场位置在 p6-s2。"},
+      {"index": 10, "status": "direct", "reason": "车间结构在 p6-s2。"},
+      {"index": 11, "status": "direct", "reason": "屋盖组成在 p6-s2，作为列表字段可核对。"},
+      {"index": 12, "status": "direct", "reason": "11.8 米在 p6-s2，但须保留“约”这一限定。"},
+      {"index": 13, "status": "direct", "reason": "破口位置在 p6-s2。"},
+      {"index": 14, "status": "needs_edit", "reason": "六个姓名合并为一条候选，原件有两次相同脱敏名“陈*元”；无法仅凭脱敏名判定人员身份，须拆分并核对。"}
+    ],
+    "03_taizhou_audit.pdf#page=3": [
+      {"index": 1, "status": "missing_context", "reason": "本页从上页段落中途开始；“兴化市占比”的分母与时点不在本页。"},
+      {"index": 2, "status": "missing_context", "reason": "“医药高新区占比”的分母与时点不在本页。"},
+      {"index": 3, "status": "missing_context", "reason": "“海陵区占比”的分母与时点不在本页。"},
+      {"index": 4, "status": "missing_context", "reason": "“姜堰区占比”的分母与时点不在本页。"},
+      {"index": 5, "status": "direct", "reason": "重点扶持专精特新企业数，OCR 与图像一致。"},
+      {"index": 6, "status": "direct", "reason": "重点扶持科技小巨人企业数，OCR 与图像一致。"},
+      {"index": 7, "status": "direct", "reason": "重点扶持绿色环保企业数，OCR 与图像一致。"},
+      {"index": 8, "status": "direct", "reason": "重点扶持科技型中小企业数，OCR 与图像一致。"},
+      {"index": 9, "status": "direct", "reason": "重点扶持高新技术企业数，OCR 与图像一致。"},
+      {"index": 10, "status": "direct", "reason": "4131.41 亿元，2023 年 6 月末。"},
+      {"index": 11, "status": "direct", "reason": "1760 户，候选准确保留“法人”限定。"},
+      {"index": 12, "status": "direct", "reason": "369.04 亿元。"},
+      {"index": 13, "status": "direct", "reason": "1909.44 亿元。"},
+      {"index": 14, "status": "direct", "reason": "1674.78 亿元。"},
+      {"index": 15, "status": "missing_context", "reason": "候选数值正确，但未明确“与 2022 年 12 月末相比”。"},
+      {"index": 16, "status": "missing_context", "reason": "候选数值正确，但未明确“与 2022 年 12 月末相比”。"}
+    ]
+  },
+  "ocr_review": {
+    "03_taizhou_audit.pdf#page=3": "扫描页 OCR 返回 674 字符；预注册 7 个事实的数值、单位及所在句均与图像一致。OCR 把百分号写为 LaTeX 转义，原件第一行从上一页承接；本轮未对全页 OCR 做逐字错误统计。OCR 只有一个整页片段 p3-ocr1，同段核对虽可完成，精确引用仍需段落或行级定位。"
+  }
+}

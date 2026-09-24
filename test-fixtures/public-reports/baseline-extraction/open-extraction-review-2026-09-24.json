@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "note": "按固定快照逐条人工复核；候选编号是各页从 1 开始的顺序。gold 来自本轮开放式抽取之前建立的核对点，只取抽取页中明确存在的 found 项。first_pass_count 是首次抽取返回的候选数，已与全链路验证原始快照的候选 ID 核对。usable 要求当前 source_ref 的单个片段直接支持字段含义、值和单位；needs_context 表示值正确但字段名在相邻片段。",
+  "documents": [
+    {
+      "source_file": "01_beijing_feasibility.pdf",
+      "gold_file": "llm-beijing-gold.json",
+      "gold_ids": ["project_name", "project_owner", "total_land_area", "construction_land_area", "green_expropriated_area", "road_expropriated_area", "total_building_area", "aboveground_building_area", "underground_building_area", "floor_area_ratio", "green_rate", "building_density", "car_parking_spaces", "construction_duration", "planned_start_month", "planned_completion_month", "total_investment", "engineering_cost", "other_construction_cost", "contingency_cost", "land_acquisition_cost"],
+      "gold_matches": {
+        "project_owner": "8:12",
+        "total_land_area": "7:15",
+        "total_building_area": "7:1",
+        "aboveground_building_area": "7:2",
+        "underground_building_area": "7:3",
+        "construction_duration": "8:2",
+        "planned_start_month": "8:3",
+        "planned_completion_month": "8:4",
+        "total_investment": "8:5",
+        "engineering_cost": "8:6",
+        "other_construction_cost": "8:7",
+        "contingency_cost": "8:8",
+        "land_acquisition_cost": "8:9"
+      },
+      "gold_misses": {
+        "project_name": "模型把项目名称与报告类型后缀合并。",
+        "construction_land_area": "表中有值，候选未提取。",
+        "green_expropriated_area": "表中有值，候选未提取。",
+        "road_expropriated_area": "表中有值，候选未提取。",
+        "floor_area_ratio": "候选把 0.291 截为 0.29。",
+        "green_rate": "表中有值，候选未提取。",
+        "building_density": "表中有值，候选未提取。",
+        "car_parking_spaces": "候选的 P+R 车位与表中机动车位停车位不是同一个字段。"
+      },
+      "candidate_reviews": {
+        "7": {
+          "first_pass_count": 16,
+          "usable": [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15],
+          "needs_context": {"2": "值在 p7-s1，字段名在同页 p7-s3 的表格行。"},
+          "needs_edit": {"14": "149 个 P+R 车位及租赁小汽车车位为合并叙述，单称 P+R 数量会丢限定。", "16": "原文为 0.291，模型输出 0.29。"},
+          "unsupported": {},
+          "duplicate": {}
+        },
+        "8": {
+          "first_pass_count": 12,
+          "usable": [2, 3, 4, 5, 6, 7, 8, 9, 12],
+          "needs_context": {},
+          "needs_edit": {"1": "项目名混入项目建议书报告类型后缀。", "10": "原文为拟申请资金，候选漏掉计划状态。", "11": "原文为将建立的绩效评估方案，候选漏掉未来时态。"},
+          "unsupported": {},
+          "duplicate": {}
+        }
+      }
+    },
+    {
+      "source_file": "02_jiangmen_eia.pdf",
+      "gold_file": "llm-eia-gold.json",
+      "gold_ids": ["project_name", "project_code", "location", "construction_nature", "application_kind", "total_investment", "environmental_investment", "environmental_investment_ratio", "construction_duration", "land_area", "has_started", "special_assessment", "planning_status"],
+      "gold_matches": {
+        "project_name": "5:1",
+        "project_code": "5:2",
+        "location": "5:3",
+        "construction_nature": "5:7",
+        "application_kind": "5:16",
+        "total_investment": "5:8",
+        "environmental_investment": "5:9",
+        "environmental_investment_ratio": "5:10",
+        "construction_duration": "5:11",
+        "land_area": "5:12",
+        "has_started": "5:17"
+      },
+      "gold_misses": {
+        "special_assessment": "原文显示无，模型未单独抽取。",
+        "planning_status": "原文显示无，模型未单独抽取。"
+      },
+      "candidate_reviews": {
+        "5": {
+          "first_pass_count": 12,
+          "usable": [1, 2, 3, 8, 9, 10, 11, 13, 14, 17],
+          "needs_context": {"7": "勾选值在 p5-s7，建设性质字段名在 p5-s5。", "12": "面积值在 p5-s10，用地字段名在 p5-s9。", "16": "勾选值在 p5-s8，申报情形字段名在 p5-s6。"},
+          "needs_edit": {"6": "同处还列有 3029 类别，候选只列 4210，且源片段没有字段名。"},
+          "unsupported": {"4": "将度分秒换算为十进制度，原文未直接给该小数。", "5": "将度分秒换算为十进制度，原文未直接给该小数。"},
+          "duplicate": {"15": "重复的 4210 行业类别候选，且同样不完整。", "18": "与用地面积数值重复，字段名仅为面积。"}
+        }
+      }
+    },
+    {
+      "source_file": "04_jinjiang_accident.pdf",
+      "gold_file": "llm-accident-gold.json",
+      "gold_ids": ["date", "accident_time", "location", "project_capacity", "death_count", "direct_loss"],
+      "gold_matches": {
+        "date": "3:1",
+        "accident_time": "3:2",
+        "location": "3:3",
+        "death_count": "3:6",
+        "direct_loss": "3:7"
+      },
+      "gold_misses": {
+        "project_capacity": "900 kW 藏在项目名称中，没有独立的能力事实候选。"
+      },
+      "candidate_reviews": {
+        "3": {
+          "first_pass_count": 13,
+          "usable": [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+          "needs_context": {},
+          "needs_edit": {"4": "项目名称省略前缀，并把 900 kW 能力混在名称里。"},
+          "unsupported": {},
+          "duplicate": {}
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+section_id: S3
+title: 三、工艺路径与备选方案
+level: 1
+reusable: true
+paragraph_order:
+- chunk_id: C0036
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0036
+- chunk_id: C0037
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0037
+- chunk_id: C0038
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0038
+- chunk_id: C0039
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0039
+- chunk_id: C0040
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0040
+- chunk_id: C0041
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0041
+- chunk_id: C0042
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0042
+- chunk_id: C0043
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0043
+- chunk_id: C0044
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0044
+tables:
+- table_id: T03
+  caption: 表3-1 备选方案预比较
+  columns:
+  - 项目
+  - A：旧线强化
+  - B：新增两条线
+  - C：新建三线单元
+  chunk_id: C0042
+argument_patterns:
+- claim_id: L005
+  pattern: 最终合格率含允许返修后的结果，不再乘首检合格率。
+  strength: boundary
+  requires_support:
+  - N031
+  - N011
+- claim_id: L006
+  pattern: 约定两线速率边界内不另作瓶颈；超边界重校。
+  strength: conditional
+  requires_support:
+  - N029
+  - N025
+  - N196
+- claim_id: L007
+  pattern: 规划速率和合格率不是量产实测成绩。
+  strength: conditional
+  requires_support:
+  - N194
+  - N029
+  - N031
+- claim_id: L008
+  pattern: 仅有方案级估值，不反推设备与费用分项。
+  strength: limited
+  requires_support:
+  - N173
+  - N174
+  - N176
+  - N177
+- claim_id: L009
+  pattern: 独立约束不可相互抵销。
+  strength: boundary
+  requires_support:
+  - N179
+  - N180
+  - N182
+  - N191
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

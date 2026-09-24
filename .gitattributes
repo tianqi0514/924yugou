@@ -1,0 +1,3 @@
+# Frozen source bytes must survive checkout unchanged for SHA-256 verification.
+/demo-data/** -text -whitespace
+/test-fixtures/** -text

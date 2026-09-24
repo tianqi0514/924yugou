@@ -1,0 +1,9 @@
+.document-list{min-height:0}
+.document-main>.workspace-card{min-height:0}
+.document-source-scroll{max-height:46vh;min-height:125px;overflow:auto;overscroll-behavior:contain;padding:0 4px;border-top:1px solid #eef1f6}
+.document-source-scroll .document-segment:last-child{border-bottom:0}
+.candidate-support{margin:10px 0;border-top:1px solid #edf1f6;padding-top:9px}
+.candidate-support summary{color:#5075b8;font-size:11px;cursor:pointer}
+.candidate-support label{display:grid;gap:5px;color:#8290a5;font-size:10px;margin-top:10px}
+.candidate-support select{border:1px solid #dfe6ef;border-radius:6px;padding:7px;color:#334762;font-size:12px;background:#fff;min-width:0}
+@media(max-width:950px){.document-source-scroll{max-height:42vh}}

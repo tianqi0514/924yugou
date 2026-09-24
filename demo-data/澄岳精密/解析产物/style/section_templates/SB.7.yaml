@@ -1,0 +1,23 @@
+section_id: SB.7
+title: B.7 [资料07] 现场踏勘问题清单
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0183
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0183
+- chunk_id: C0184
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0184
+tables: []
+argument_patterns:
+- claim_id: L047
+  pattern: 仅踏勘，未形成全部专项最终结论。
+  strength: limited
+  requires_support:
+  - N193
+  - N103
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

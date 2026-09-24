@@ -1,0 +1,47 @@
+section_id: S9.2
+title: 9.2 资金来源与控制边界
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0118
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0118
+- chunk_id: C0119
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0119
+- chunk_id: C0120
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0120
+- chunk_id: C0121
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0121
+tables: []
+argument_patterns:
+- claim_id: L032
+  pattern: 数值相同的规模上限与资金来源上限是独立约束。
+  strength: boundary
+  requires_support:
+  - N151
+  - N150
+  - N148
+  - N149
+- claim_id: L033
+  pattern: 超过意向上限部分列待补资金，不自动增加资金。
+  strength: conditional
+  requires_support:
+  - N152
+  - N149
+  - N155
+  - N148
+- claim_id: L034
+  pattern: 融资前缺口零不证明融资落实。
+  strength: undefined
+  requires_support:
+  - N195
+  - N161
+  - N162
+  - N155
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

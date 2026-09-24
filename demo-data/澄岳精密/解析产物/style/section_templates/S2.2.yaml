@@ -1,0 +1,43 @@
+section_id: S2.2
+title: 2.2 边界与产销口径
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0032
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0032
+- chunk_id: C0033
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0033
+- chunk_id: C0034
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0034
+- chunk_id: C0035
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0035
+tables: []
+argument_patterns:
+- claim_id: L001
+  pattern: 新增产线与旧业务分开核算，不自动外协补缺。
+  strength: context
+  requires_support:
+  - N009
+  - N199
+- claim_id: L003
+  pattern: 年度实物净变化为零，不代表营运资金无库存占用。
+  strength: boundary
+  requires_support:
+  - N024
+  - N146
+- claim_id: L004
+  pattern: 需求或产品改变后，不自动认定新增收入。
+  strength: conditional
+  requires_support:
+  - N018
+  - N029
+  - N116
+  - N115
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

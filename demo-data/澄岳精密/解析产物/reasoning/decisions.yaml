@@ -1,0 +1,639 @@
+- id: DEC001
+  node_id: N179
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R063
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4259
+    - 4379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0054
+    chunk_id: C0054
+    page: 6
+    span:
+    - 4507
+    - 4636
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 58
+      body_index: 63
+      xpath: /w:document/w:body/w:p[59]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3393
+    - 3394
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 4
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[5]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: 基准年度需求覆盖 = 正常年合格产能>=正常年合计需求。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N034
+  - N018
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC002
+  node_id: N180
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R064
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12919
+    - 13068
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3420
+    - 3421
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 5
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[6]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: 融资前投资控制满足 = 融资前项目资金需求<=融资前投资控制上限。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N147
+  - N150
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC003
+  node_id: N181
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R065
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10455
+    - 10577
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: 意向融资上限满足 = 拟需借款<=银行意向融资上限。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N152
+  - N149
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC004
+  node_id: N182
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R066
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0068
+    chunk_id: C0068
+    page: 8
+    span:
+    - 5689
+    - 5806
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 74
+      body_index: 80
+      xpath: /w:document/w:body/w:p[75]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3447
+    - 3448
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 6
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[7]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: 实施计划期限满足 = 实施期限<=实施期限上限。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N063
+  - N172
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC005
+  node_id: N183
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R067
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0132
+    chunk_id: C0132
+    page: 13
+    span:
+    - 11517
+    - 11637
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 143
+      body_index: 157
+      xpath: /w:document/w:body/w:p[144]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: 简化回收期初筛满足 = 简化静态资金回收期<=静态回收期初筛上限。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N170
+  - N171
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC006
+  node_id: N184
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R068
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0065
+    chunk_id: C0065
+    page: 7
+    span:
+    - 5533
+    - 5659
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 70
+      body_index: 76
+      xpath: /w:document/w:body/w:p[71]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: 年度内部用电预算满足 = 正常年生产用电量<=年度内部用电预算。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N131
+  - N057
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC007
+  node_id: N185
+  record_type: source_judgment_with_replay
+  chosen: false
+  rule: R069
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3389
+    - 3390
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 4
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[5]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: A方案需求覆盖 = A方案合格能力>=正常年合计需求。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N173
+  - N018
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC008
+  node_id: N186
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R070
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3416
+    - 3417
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 5
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[6]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: A方案资金控制满足 = A方案融资前资金需求<=融资前投资控制上限。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N174
+  - N150
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC009
+  node_id: N187
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R071
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3443
+    - 3444
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 6
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[7]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: A方案期限满足 = A方案实施期<=实施期限上限。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N175
+  - N172
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC010
+  node_id: N188
+  record_type: source_judgment_with_replay
+  chosen: true
+  rule: R072
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3397
+    - 3398
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 4
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[5]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: C方案需求覆盖 = C方案合格能力>=正常年合计需求。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N176
+  - N018
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC011
+  node_id: N189
+  record_type: source_judgment_with_replay
+  chosen: false
+  rule: R073
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3424
+    - 3425
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 5
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[6]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: C方案资金控制满足 = C方案融资前资金需求<=融资前投资控制上限。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N177
+  - N150
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC012
+  node_id: N190
+  record_type: source_judgment_with_replay
+  chosen: false
+  rule: R074
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3451
+    - 3452
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 6
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[7]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  reason: C方案期限满足 = C方案实施期<=实施期限上限。任一依赖缺失时不可评估。
+  rejected: []
+  revisit_if:
+  - N178
+  - N172
+  decision_date: '2026-09-18'
+  date_basis: 报告编制基准日；不声称独立审批时点
+  authority: 原文内部预审测算，不代表本次抽取批准项目
+  replayed_at: '2026-09-23T03:08:46.059557+00:00'
+- id: DEC013
+  node_id: N191
+  record_type: source_recorded_choice
+  chosen: B：新增两条线
+  basis:
+  - EV-02
+  - EV-08
+  source_locations:
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3196
+    - 3498
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      body_index: 48
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]
+  - block_id: B0044
+    chunk_id: C0044
+    page: 5
+    span:
+    - 3609
+    - 3726
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 47
+      body_index: 51
+      xpath: /w:document/w:body/w:p[48]
+      index_base: 0
+  - block_id: B0148
+    chunk_id: C0148
+    page: 15
+    span:
+    - 13180
+    - 13298
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 161
+      body_index: 177
+      xpath: /w:document/w:body/w:p[162]
+      index_base: 0
+  reason: 原文将B列为本轮深化对象；需求、资金、实施期限分别满足基准约束，但配电及专项前提未闭合。
+  rejected:
+  - option: A：旧线强化
+    why: 21万套方案级能力不能覆盖24万套基准需求
+    basis_nodes:
+    - N173
+    - N018
+  - option: C：新建三线单元
+    why: 1.04亿元方案级需求与18个月实施期分别超出9000万元、12个月边界
+    basis_nodes:
+    - N177
+    - N178
+    - N150
+    - N172
+  revisit_if:
+  - N018
+  - N034
+  - N147
+  - N063
+  - N170
+  - N056
+  - N193
+  decision_date: null
+  date_note: 原文说明依据预审纪要，但未给出这条决定的独立签字时间。
+- id: DEC014
+  node_id: N056
+  record_type: source_recorded_deferred_decision
+  chosen: 待联合复测
+  reason: 800kW和650kW同统计基准、同接入点且无替代声明，不自动选较新或较大值。
+  basis:
+  - EV-06A
+  - EV-06B
+  source_locations:
+  - block_id: B0063
+    chunk_id: C0063
+    page: 7
+    span:
+    - 5270
+    - 5394
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 68
+      body_index: 74
+      xpath: /w:document/w:body/w:p[69]
+      index_base: 0
+  - block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5396
+    - 5531
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+  rejected: []
+  revisit_if:
+  - 联合复测报告及原记录差异、替代关系说明
+  decision_date: null
+- id: DEC015
+  node_id: N192
+  record_type: source_conditional_recommendation
+  chosen: 有条件进入下一阶段
+  reason: 可继续技术商务深化，不批准全面开工；配电、专项、融资条款等继续待核。
+  basis:
+  - EV-08
+  source_locations:
+  - block_id: B0148
+    chunk_id: C0148
+    page: 15
+    span:
+    - 13180
+    - 13298
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 161
+      body_index: 177
+      xpath: /w:document/w:body/w:p[162]
+      index_base: 0
+  rejected: []
+  revisit_if:
+  - G001
+  - G002
+  - G003
+  - G004
+  - G005
+  - G006
+  - G007
+  - G008
+  - G009
+  - G010
+  - G011
+  - X001
+  decision_date: null

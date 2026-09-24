@@ -1,0 +1,32 @@
+title: 电池托盘焊接与检测技改项目
+document_type: 可行性研究报告·内部评审稿
+industry: 制造业·新能源汽车零部件
+industry_classification_origin: 依据原文业务内容的描述性分类，非外部行业代码
+project_type: 现有厂房内新增焊接与检测线的技术改造
+project_number: CY-JG-2026-017
+business_entity: 澄岳精密零部件有限公司
+location: 滨川制造产业园现有厂区二号厂房
+location_is_fictional: true
+compiled_by:
+- 项目工程部
+- 财务管理部
+- 销售管理部
+as_of: '2026-09-18'
+version: V1.0
+language: zh-CN
+currency: CNY
+scale_refs:
+  line_count: N025
+  capacity: N034
+  area: N042
+  construction: N114
+  funding: N147
+legal_region: null
+masking:
+  deployment_status: not_deployed
+  suggested_hide_fields:
+  - business_entity
+  - location
+  - project_number
+  basis: 仅说明建议暴露范围，未实际实现运行态ACL；所有原件均是测试数据
+fictional: true

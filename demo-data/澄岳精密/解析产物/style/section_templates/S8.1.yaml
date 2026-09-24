@@ -1,0 +1,55 @@
+section_id: S8.1
+title: 8.1 收入及成本口径
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0101
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0101
+- chunk_id: C0102
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0102
+- chunk_id: C0103
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0103
+- chunk_id: C0104
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0104
+- chunk_id: C0105
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0105
+- chunk_id: C0106
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0106
+- chunk_id: C0107
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0107
+tables:
+- table_id: T11
+  caption: 表8-1 单套变动成本测算
+  columns:
+  - 项目
+  - 元/合格销售套
+  - 正常年金额（万元）
+  - 取值依据
+  chunk_id: C0106
+argument_patterns:
+- claim_id: L028
+  pattern: 目标售价未锁定，销量以需求和能力较小值计。
+  strength: conditional
+  requires_support:
+  - N036
+  - N035
+  - N115
+  - N012
+- claim_id: L029
+  pattern: 不得重复除以合格率；质量变化需重验单耗。
+  strength: conditional
+  requires_support:
+  - N123
+  - N031
+  - N197
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

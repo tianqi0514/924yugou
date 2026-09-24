@@ -1,0 +1,23 @@
+section_id: SB.6
+title: B.6 [资料06A]、[资料06B] 配电资料
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0178
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0178
+- chunk_id: C0179
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0179
+- chunk_id: C0180
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0180
+- chunk_id: C0181
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0181
+tables: []
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

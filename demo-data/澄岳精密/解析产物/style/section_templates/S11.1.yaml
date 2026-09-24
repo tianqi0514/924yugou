@@ -1,0 +1,40 @@
+section_id: S11.1
+title: 11.1 主要风险及处置
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0135
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0135
+- chunk_id: C0136
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0136
+- chunk_id: C0137
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0137
+- chunk_id: C0138
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0138
+tables:
+- table_id: T14
+  caption: 表11-1 关键风险与待核事项
+  columns:
+  - 事项
+  - 当前信息
+  - 影响及处理
+  chunk_id: C0137
+argument_patterns:
+- claim_id: L039
+  pattern: 可继续条件下计算，不能凭余量推定增容费用工期。
+  strength: conditional
+  requires_support:
+  - N056
+  - N100
+  - N034
+  - N163
+  - N164
+  - N099
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

@@ -1,0 +1,29 @@
+section_id: S8.2
+title: 8.2 固定付现成本
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0108
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0108
+- chunk_id: C0109
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0109
+- chunk_id: C0110
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0110
+tables: []
+argument_patterns:
+- claim_id: L030
+  pattern: 维护费独立固定；线数班次变化需重算人员。
+  strength: boundary
+  requires_support:
+  - N134
+  - N080
+  - N025
+  - N027
+  - N078
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

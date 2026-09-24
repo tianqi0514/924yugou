@@ -1,0 +1,265 @@
+{
+  "captured_at": "2026-09-24T01:32:02.385741+00:00",
+  "scope": "已抽取的四个 PDF 物理页；仅评价明确存在的 found 核对点",
+  "documents": [
+    {
+      "source_file": "01_beijing_feasibility.pdf",
+      "pages": [
+        7,
+        8
+      ],
+      "sha256": "4406b7c6b40fade73a785342962d2cd47f87f67e04e4e7a5c905cbb0089a551c",
+      "gold_total": 21,
+      "value_hits": 13,
+      "direct_hits": 12,
+      "gold_misses": {
+        "project_name": "模型把项目名称与报告类型后缀合并。",
+        "construction_land_area": "表中有值，候选未提取。",
+        "green_expropriated_area": "表中有值，候选未提取。",
+        "road_expropriated_area": "表中有值，候选未提取。",
+        "floor_area_ratio": "候选把 0.291 截为 0.29。",
+        "green_rate": "表中有值，候选未提取。",
+        "building_density": "表中有值，候选未提取。",
+        "car_parking_spaces": "候选的 P+R 车位与表中机动车位停车位不是同一个字段。"
+      },
+      "candidate_total": 28,
+      "source_gate_pass": 27,
+      "review_counts": {
+        "usable": 22,
+        "needs_context": 1,
+        "needs_edit": 5
+      },
+      "candidate_issues": [
+        {
+          "page": 7,
+          "candidate_index": 2,
+          "label": "地上建筑面积",
+          "value": "15756.25",
+          "category": "needs_context",
+          "reason": "值在 p7-s1，字段名在同页 p7-s3 的表格行。"
+        },
+        {
+          "page": 7,
+          "candidate_index": 14,
+          "label": "P+R车位数量",
+          "value": "149",
+          "category": "needs_edit",
+          "reason": "149 个 P+R 车位及租赁小汽车车位为合并叙述，单称 P+R 数量会丢限定。"
+        },
+        {
+          "page": 7,
+          "candidate_index": 16,
+          "label": "容积率",
+          "value": "0.29",
+          "category": "needs_edit",
+          "reason": "原文为 0.291，模型输出 0.29。"
+        },
+        {
+          "page": 8,
+          "candidate_index": 1,
+          "label": "项目名称",
+          "value": "平谷区马昌营公共交通枢纽工程项目建议书（代可行性研究报告）",
+          "category": "needs_edit",
+          "reason": "项目名混入项目建议书报告类型后缀。"
+        },
+        {
+          "page": 8,
+          "candidate_index": 10,
+          "label": "资金来源",
+          "value": "平谷区财政资金及专项债资金",
+          "category": "needs_edit",
+          "reason": "原文为拟申请资金，候选漏掉计划状态。"
+        },
+        {
+          "page": 8,
+          "candidate_index": 11,
+          "label": "绩效评估维度",
+          "value": "公交枢纽站线路覆盖率、质量管理等",
+          "category": "needs_edit",
+          "reason": "原文为将建立的绩效评估方案，候选漏掉未来时态。"
+        }
+      ],
+      "first_pass": {
+        "gold_total": 21,
+        "value_hits": 13,
+        "direct_hits": 12,
+        "candidate_total": 28,
+        "source_gate_pass": 27,
+        "review_counts": {
+          "usable": 22,
+          "needs_context": 1,
+          "needs_edit": 5
+        }
+      }
+    },
+    {
+      "source_file": "02_jiangmen_eia.pdf",
+      "pages": [
+        5
+      ],
+      "sha256": "2649027d0995f4de3ca8dd8f822ba3e9535322abfb46589fce371da161fa8846",
+      "gold_total": 13,
+      "value_hits": 11,
+      "direct_hits": 8,
+      "gold_misses": {
+        "special_assessment": "原文显示无，模型未单独抽取。",
+        "planning_status": "原文显示无，模型未单独抽取。"
+      },
+      "candidate_total": 18,
+      "source_gate_pass": 16,
+      "review_counts": {
+        "usable": 10,
+        "needs_context": 3,
+        "needs_edit": 1,
+        "unsupported": 2,
+        "duplicate": 2
+      },
+      "candidate_issues": [
+        {
+          "page": 5,
+          "candidate_index": 7,
+          "label": "建设性质",
+          "value": "新建（迁建）",
+          "category": "needs_context",
+          "reason": "勾选值在 p5-s7，建设性质字段名在 p5-s5。"
+        },
+        {
+          "page": 5,
+          "candidate_index": 12,
+          "label": "用地面积",
+          "value": "8606.63",
+          "category": "needs_context",
+          "reason": "面积值在 p5-s10，用地字段名在 p5-s9。"
+        },
+        {
+          "page": 5,
+          "candidate_index": 16,
+          "label": "申报情形",
+          "value": "首次申报项目",
+          "category": "needs_context",
+          "reason": "勾选值在 p5-s8，申报情形字段名在 p5-s6。"
+        },
+        {
+          "page": 5,
+          "candidate_index": 6,
+          "label": "行业类别",
+          "value": "4210 金属废料和碎屑加工处理",
+          "category": "needs_edit",
+          "reason": "同处还列有 3029 类别，候选只列 4210，且源片段没有字段名。"
+        },
+        {
+          "page": 5,
+          "candidate_index": 4,
+          "label": "纬度",
+          "value": "22.465561",
+          "category": "unsupported",
+          "reason": "将度分秒换算为十进制度，原文未直接给该小数。"
+        },
+        {
+          "page": 5,
+          "candidate_index": 5,
+          "label": "经度",
+          "value": "112.793864",
+          "category": "unsupported",
+          "reason": "将度分秒换算为十进制度，原文未直接给该小数。"
+        },
+        {
+          "page": 5,
+          "candidate_index": 15,
+          "label": "行业类别",
+          "value": "4210金属废料和碎屑加工处理",
+          "category": "duplicate",
+          "reason": "重复的 4210 行业类别候选，且同样不完整。"
+        },
+        {
+          "page": 5,
+          "candidate_index": 18,
+          "label": "面积",
+          "value": "8606.63",
+          "category": "duplicate",
+          "reason": "与用地面积数值重复，字段名仅为面积。"
+        }
+      ],
+      "first_pass": {
+        "gold_total": 13,
+        "value_hits": 9,
+        "direct_hits": 7,
+        "candidate_total": 12,
+        "source_gate_pass": 10,
+        "review_counts": {
+          "usable": 7,
+          "needs_context": 2,
+          "needs_edit": 1,
+          "unsupported": 2
+        }
+      }
+    },
+    {
+      "source_file": "04_jinjiang_accident.pdf",
+      "pages": [
+        3
+      ],
+      "sha256": "eb6655da71f0d11b8a41c3bc5320a53fd4307fec370018150a037978927d69c4",
+      "gold_total": 6,
+      "value_hits": 5,
+      "direct_hits": 5,
+      "gold_misses": {
+        "project_capacity": "900 kW 藏在项目名称中，没有独立的能力事实候选。"
+      },
+      "candidate_total": 13,
+      "source_gate_pass": 13,
+      "review_counts": {
+        "usable": 12,
+        "needs_edit": 1
+      },
+      "candidate_issues": [
+        {
+          "page": 3,
+          "candidate_index": 4,
+          "label": "项目名称",
+          "value": "屋顶900KW分布式光伏发电项目",
+          "category": "needs_edit",
+          "reason": "项目名称省略前缀，并把 900 kW 能力混在名称里。"
+        }
+      ],
+      "first_pass": {
+        "gold_total": 6,
+        "value_hits": 5,
+        "direct_hits": 5,
+        "candidate_total": 13,
+        "source_gate_pass": 13,
+        "review_counts": {
+          "usable": 12,
+          "needs_edit": 1
+        }
+      }
+    }
+  ],
+  "total": {
+    "gold_total": 40,
+    "value_hits": 29,
+    "direct_hits": 25,
+    "candidate_total": 59,
+    "source_gate_pass": 56,
+    "review_counts": {
+      "usable": 44,
+      "needs_context": 4,
+      "needs_edit": 7,
+      "unsupported": 2,
+      "duplicate": 2
+    },
+    "first_pass": {
+      "gold_total": 40,
+      "value_hits": 27,
+      "direct_hits": 24,
+      "candidate_total": 53,
+      "source_gate_pass": 50,
+      "review_counts": {
+        "usable": 41,
+        "needs_context": 3,
+        "needs_edit": 7,
+        "unsupported": 2
+      }
+    }
+  }
+}

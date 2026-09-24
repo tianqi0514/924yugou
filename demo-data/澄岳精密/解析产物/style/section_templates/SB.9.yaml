@@ -1,0 +1,17 @@
+section_id: SB.9
+title: B.9 [资料09] 2025年旧业务经营摘要
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0188
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0188
+- chunk_id: C0189
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0189
+tables: []
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

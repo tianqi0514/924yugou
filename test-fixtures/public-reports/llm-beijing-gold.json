@@ -1,0 +1,33 @@
+{
+  "source_file": "01_beijing_feasibility.pdf",
+  "sha256": "4406b7c6b40fade73a785342962d2cd47f87f67e04e4e7a5c905cbb0089a551c",
+  "source_pages": [6, 7, 8, 177],
+  "note": "人工从指定 PDF 页标注；评价受限片段的字段识别与证据定位，不代表整份报告自动抽取准确率。",
+  "fields": [
+    {"id": "project_name", "label": "项目名称", "status": "found", "value": "平谷区马昌营公共交通枢纽工程", "unit": ""},
+    {"id": "project_owner", "label": "项目单位", "status": "found", "value": "北京市平谷区交通局", "unit": ""},
+    {"id": "location", "label": "建设地点所处乡镇", "status": "found", "value": "平谷区马昌营镇、峪口镇、大兴庄镇三镇交界处", "unit": ""},
+    {"id": "total_land_area", "label": "用地总面积", "status": "found", "value": "73431.105", "unit": "㎡"},
+    {"id": "construction_land_area", "label": "建设用地面积", "status": "found", "value": "54088.771", "unit": "㎡"},
+    {"id": "green_expropriated_area", "label": "代征绿地面积", "status": "found", "value": "3105.104", "unit": "㎡"},
+    {"id": "road_expropriated_area", "label": "代征道路面积", "status": "found", "value": "16237.23", "unit": "㎡"},
+    {"id": "total_building_area", "label": "总建筑面积", "status": "found", "value": "17268.25", "unit": "㎡"},
+    {"id": "aboveground_building_area", "label": "地上建筑面积", "status": "found", "value": "15756.25", "unit": "㎡"},
+    {"id": "underground_building_area", "label": "地下建筑面积", "status": "found", "value": "1512", "unit": "㎡"},
+    {"id": "floor_area_ratio", "label": "容积率", "status": "found", "value": "0.291", "unit": ""},
+    {"id": "green_rate", "label": "绿地率", "status": "found", "value": "20", "unit": "%"},
+    {"id": "building_density", "label": "建筑密度", "status": "found", "value": "16.65", "unit": "%"},
+    {"id": "car_parking_spaces", "label": "机动车位停车位", "status": "found", "value": "149", "unit": "辆"},
+    {"id": "underground_car_parking_spaces", "label": "地下机动车位停车位", "status": "missing", "value": null, "unit": "辆"},
+    {"id": "construction_duration", "label": "施工周期", "status": "found", "value": "12", "unit": "个月"},
+    {"id": "planned_start_month", "label": "计划开工月份", "status": "found", "value": "2025-12", "unit": ""},
+    {"id": "planned_completion_month", "label": "计划完工月份", "status": "found", "value": "2026-11", "unit": ""},
+    {"id": "total_investment", "label": "总投资估算", "status": "found", "value": "31255.57", "unit": "万元"},
+    {"id": "engineering_cost", "label": "工程费", "status": "found", "value": "22122.45", "unit": "万元"},
+    {"id": "other_construction_cost", "label": "工程建设其他费", "status": "found", "value": "2701.55", "unit": "万元"},
+    {"id": "contingency_cost", "label": "预备费", "status": "found", "value": "1241.20", "unit": "万元"},
+    {"id": "land_acquisition_cost", "label": "征地拆迁费", "status": "found", "value": "5190.37", "unit": "万元"},
+    {"id": "profitability_analysis", "label": "盈利能力分析适用性", "status": "not_applicable", "value": null, "unit": ""},
+    {"id": "annual_ticket_revenue", "label": "年度票务收入", "status": "unknown", "value": null, "unit": ""}
+  ]
+}

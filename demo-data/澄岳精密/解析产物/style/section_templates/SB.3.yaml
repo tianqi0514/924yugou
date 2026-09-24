@@ -1,0 +1,20 @@
+section_id: SB.3
+title: B.3 [资料03] 设备与系统询价摘要
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0165
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0165
+- chunk_id: C0166
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0166
+- chunk_id: C0167
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0167
+tables: []
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

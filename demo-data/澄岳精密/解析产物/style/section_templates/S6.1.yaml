@@ -1,0 +1,50 @@
+section_id: S6.1
+title: 6.1 计划进度
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0067
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0067
+- chunk_id: C0068
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0068
+- chunk_id: C0069
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0069
+- chunk_id: C0070
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0070
+- chunk_id: C0071
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0071
+tables:
+- table_id: T06
+  caption: 表6-1 项目实施计划
+  columns:
+  - 阶段
+  - 月份安排
+  - 时长
+  - 主要交付物
+  chunk_id: C0070
+argument_patterns:
+- claim_id: L018
+  pattern: 阶段月数相加，未含赶工和额外停等。
+  strength: conditional
+  requires_support:
+  - N058
+  - N063
+  - N065
+- claim_id: L019
+  pattern: 更新投产日后，不能默认客户预测可等量平移。
+  strength: conditional
+  requires_support:
+  - N063
+  - N066
+  - N070
+  - N071
+  - N198
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

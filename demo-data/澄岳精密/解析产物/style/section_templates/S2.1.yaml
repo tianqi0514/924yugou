@@ -1,0 +1,44 @@
+section_id: S2.1
+title: 2.1 需求来源与历史业务
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0026
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0026
+- chunk_id: C0027
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0027
+- chunk_id: C0028
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0028
+- chunk_id: C0029
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0029
+- chunk_id: C0030
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0030
+- chunk_id: C0031
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0031
+tables:
+- table_id: T02
+  caption: 表2-1 分客户销售需求预测
+  columns:
+  - 客户
+  - 首个运营年度（套）
+  - 正常运营年（套）
+  - 商务状态
+  chunk_id: C0029
+argument_patterns:
+- claim_id: L002
+  pattern: 客户预测不能改写为已签订单或最低采购承诺。
+  strength: conditional
+  requires_support:
+  - N012
+  - N018
+  - N017
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

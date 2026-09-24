@@ -1,0 +1,33 @@
+{
+  "note": "人工在本轮模型调用前建立的最小核对点；未列入的额外候选需逐条人工查源，不自动判错。页码为 PDF 物理页。",
+  "source_file": "04_jinjiang_accident.pdf",
+  "fact_checkpoints": [
+    {"id": "date", "expected": "2025-08-02", "refs": ["p3-s1", "p8-s1"]},
+    {"id": "accident_time", "expected": "06:59", "refs": ["p3-s1", "p8-s1"]},
+    {"id": "location", "expected": "晋江市英林镇", "refs": ["p3-s1"]},
+    {"id": "project_capacity", "expected": "900 kW", "refs": ["p3-s1"]},
+    {"id": "death_count", "expected": "1 人", "refs": ["p3-s1", "p9-s1"]},
+    {"id": "direct_loss", "expected": "77.0239 万元", "refs": ["p3-s1", "p9-s2"]},
+    {"id": "work_start_time", "expected": "06:30", "refs": ["p8-s1"]},
+    {"id": "emergency_call_received", "expected": "07:04", "refs": ["p8-s2"]},
+    {"id": "medics_arrived", "expected": "07:15", "refs": ["p8-s2"]},
+    {"id": "ppe_missing", "expected": "未按规定佩戴、使用劳动防护用品", "refs": ["p9-s3"]},
+    {"id": "warning_missing", "expected": "未设置安全警示标志", "refs": ["p9-s3", "p10-s1", "p10-s2"]},
+    {"id": "panel_stepped", "expected": "踩踏屋面采光板", "refs": ["p9-s3"]},
+    {"id": "panel_broke", "expected": "采光板断开", "refs": ["p9-s3"]},
+    {"id": "fall", "expected": "从屋面掉落至地面", "refs": ["p9-s3"]},
+    {"id": "contractor_unqualified", "expected": "承包方不具备相应资质", "refs": ["p9-s4", "p9-s5", "p10-s2"]},
+    {"id": "training_absent", "expected": "未依规开展安全教育培训", "refs": ["p10-s1", "p10-s2"]},
+    {"id": "town_oversight", "expected": "英林镇人民政府监督检查不到位", "refs": ["p10-s3"]}
+  ],
+  "relation_checkpoints": [
+    {"id": "step_break", "from": "踩踏采光板", "to": "采光板断开", "relation": "导致", "refs": ["p9-s3"]},
+    {"id": "break_fall", "from": "采光板断开", "to": "从屋面掉落", "relation": "导致", "refs": ["p9-s3"]},
+    {"id": "fall_death", "from": "从屋面掉落", "to": "死亡", "relation": "导致", "refs": ["p9-s3"]},
+    {"id": "no_ppe_direct", "from": "未按规定使用劳动防护用品", "to": "事故直接原因", "relation": "被调查报告认定为", "refs": ["p9-s3"]},
+    {"id": "no_warning_direct", "from": "未设置安全警示标志", "to": "事故直接原因", "relation": "被调查报告认定为", "refs": ["p9-s3"]},
+    {"id": "unqualified_indirect", "from": "违规发包给无资质单位", "to": "事故间接原因", "relation": "被调查报告认定为", "refs": ["p9-s4"]},
+    {"id": "training_indirect", "from": "未开展安全教育培训", "to": "事故间接原因", "relation": "被调查报告认定为", "refs": ["p9-s5", "p10-s1", "p10-s2"]},
+    {"id": "oversight_indirect", "from": "监督检查不到位", "to": "事故间接原因", "relation": "被调查报告认定为", "refs": ["p10-s3"]}
+  ]
+}

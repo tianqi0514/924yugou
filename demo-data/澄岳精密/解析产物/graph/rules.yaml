@@ -1,0 +1,5796 @@
+- id: R001
+  target: N017
+  kind: compute
+  expr: N013+N014
+  readable_expr: demand_a_first+demand_b_first
+  deps:
+  - N013
+  - N014
+  dep_keys:
+  - demand_a_first
+  - demand_b_first
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-01
+  source_locations:
+  - block_id: B0161
+    chunk_id: C0161
+    page: 17
+    span:
+    - 14911
+    - 15075
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 176
+      body_index: 194
+      xpath: /w:document/w:body/w:p[177]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0029
+    chunk_id: C0029
+    page: 4
+    span:
+    - 2179
+    - 2186
+    source_locator:
+      part: word/document.xml
+      table_index: 2
+      row_index: 3
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[3]/w:tr[4]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0047
+    chunk_id: C0047
+    page: 6
+    span:
+    - 4030
+    - 4037
+    source_locator:
+      part: word/document.xml
+      table_index: 4
+      row_index: 8
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[5]/w:tr[9]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0052
+    chunk_id: C0052
+    page: 6
+    span:
+    - 4387
+    - 4394
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 56
+      body_index: 61
+      xpath: /w:document/w:body/w:p[57]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0102
+    chunk_id: C0102
+    page: 11
+    span:
+    - 8764
+    - 8771
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 111
+      body_index: 122
+      xpath: /w:document/w:body/w:p[112]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 首年合计需求 = 甲客户首年需求+乙客户首年需求。任一依赖缺失时不可评估。
+  unit: 套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R002
+  target: N018
+  kind: compute
+  expr: N015+N016
+  readable_expr: demand_a_normal+demand_b_normal
+  deps:
+  - N015
+  - N016
+  dep_keys:
+  - demand_a_normal
+  - demand_b_normal
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-01
+  source_locations:
+  - block_id: B0161
+    chunk_id: C0161
+    page: 17
+    span:
+    - 14911
+    - 15075
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 176
+      body_index: 194
+      xpath: /w:document/w:body/w:p[177]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0029
+    chunk_id: C0029
+    page: 4
+    span:
+    - 2189
+    - 2196
+    source_locator:
+      part: word/document.xml
+      table_index: 2
+      row_index: 3
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[3]/w:tr[4]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3380
+    - 3382
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 4
+      cell_index: 0
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[5]/w:tc[1]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0047
+    chunk_id: C0047
+    page: 6
+    span:
+    - 4001
+    - 4008
+    source_locator:
+      part: word/document.xml
+      table_index: 4
+      row_index: 7
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[5]/w:tr[8]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0137
+    chunk_id: C0137
+    page: 14
+    span:
+    - 11815
+    - 11817
+    source_locator:
+      part: word/document.xml
+      table_index: 14
+      row_index: 1
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[15]/w:tr[2]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0141
+    chunk_id: C0141
+    page: 14
+    span:
+    - 12388
+    - 12395
+    source_locator:
+      part: word/document.xml
+      table_index: 15
+      row_index: 1
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[16]/w:tr[2]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0021
+    chunk_id: C0021
+    page: 3
+    span:
+    - 1073
+    - 1078
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 22
+      body_index: 23
+      xpath: /w:document/w:body/w:p[23]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0030
+    chunk_id: C0030
+    page: 4
+    span:
+    - 2320
+    - 2325
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 32
+      body_index: 35
+      xpath: /w:document/w:body/w:p[33]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0102
+    chunk_id: C0102
+    page: 11
+    span:
+    - 8735
+    - 8742
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 111
+      body_index: 122
+      xpath: /w:document/w:body/w:p[112]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0145
+    chunk_id: C0145
+    page: 15
+    span:
+    - 12818
+    - 12823
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 158
+      body_index: 174
+      xpath: /w:document/w:body/w:p[159]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年合计需求 = 甲客户正常年需求+乙客户正常年需求。任一依赖缺失时不可评估。
+  unit: 套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R003
+  target: N032
+  kind: compute
+  expr: N025*N026*N027*N028
+  readable_expr: line_count*work_days*shifts*hours
+  deps:
+  - N025
+  - N026
+  - N027
+  - N028
+  dep_keys:
+  - line_count
+  - work_days
+  - shifts
+  - hours
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-02
+  source_locations:
+  - block_id: B0049
+    chunk_id: C0049
+    page: 6
+    span:
+    - 4143
+    - 4205
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 53
+      body_index: 58
+      xpath: /w:document/w:body/w:p[54]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4259
+    - 4379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4266
+    - 4271
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 两线年计划线时 = 新增并行线数*年工作日*每日班次*每班时长。任一依赖缺失时不可评估。
+  unit: 线小时/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R004
+  target: N033
+  kind: compute
+  expr: N032*N029*N030
+  readable_expr: planned_hours*rate*uptime
+  deps:
+  - N032
+  - N029
+  - N030
+  dep_keys:
+  - planned_hours
+  - rate
+  - uptime
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-02
+  source_locations:
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4259
+    - 4379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4291
+    - 4298
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 年毛产出 = 两线年计划线时*单线毛产出速率*有效开动率。任一依赖缺失时不可评估。
+  unit: 套/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R005
+  target: N034
+  kind: compute
+  expr: floor(N033*N031)
+  readable_expr: floor(gross_output*yield)
+  deps:
+  - N033
+  - N031
+  dep_keys:
+  - gross_output
+  - yield
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-02
+  source_locations:
+  - block_id: B0048
+    chunk_id: C0048
+    page: 6
+    span:
+    - 4051
+    - 4141
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 52
+      body_index: 57
+      xpath: /w:document/w:body/w:p[53]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0049
+    chunk_id: C0049
+    page: 6
+    span:
+    - 4143
+    - 4205
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 53
+      body_index: 58
+      xpath: /w:document/w:body/w:p[54]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0050
+    chunk_id: C0050
+    page: 6
+    span:
+    - 4207
+    - 4257
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 54
+      body_index: 59
+      xpath: /w:document/w:body/w:p[55]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4259
+    - 4379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1335
+    - 1342
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 3
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[4]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3281
+    - 3288
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 1
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[2]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0141
+    chunk_id: C0141
+    page: 14
+    span:
+    - 12378
+    - 12385
+    source_locator:
+      part: word/document.xml
+      table_index: 15
+      row_index: 1
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[16]/w:tr[2]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0021
+    chunk_id: C0021
+    page: 3
+    span:
+    - 1085
+    - 1092
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 22
+      body_index: 23
+      xpath: /w:document/w:body/w:p[23]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0050
+    chunk_id: C0050
+    page: 6
+    span:
+    - 4249
+    - 4256
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 54
+      body_index: 59
+      xpath: /w:document/w:body/w:p[55]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4307
+    - 4314
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4317
+    - 4324
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0102
+    chunk_id: C0102
+    page: 11
+    span:
+    - 8748
+    - 8755
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 111
+      body_index: 122
+      xpath: /w:document/w:body/w:p[112]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0145
+    chunk_id: C0145
+    page: 15
+    span:
+    - 12837
+    - 12844
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 158
+      body_index: 174
+      xpath: /w:document/w:body/w:p[159]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年合格产能 = floor(年毛产出*最终合格率)。任一依赖缺失时不可评估。
+  unit: 套/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R006
+  target: N035
+  kind: compute
+  expr: min(N017,N034)
+  readable_expr: min(demand_first,capacity)
+  deps:
+  - N017
+  - N034
+  dep_keys:
+  - demand_first
+  - capacity
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-01
+  - EV-02
+  source_locations:
+  - block_id: B0033
+    chunk_id: C0033
+    page: 4
+    span:
+    - 2504
+    - 2627
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 35
+      body_index: 38
+      xpath: /w:document/w:body/w:p[36]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0052
+    chunk_id: C0052
+    page: 6
+    span:
+    - 4381
+    - 4487
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 56
+      body_index: 61
+      xpath: /w:document/w:body/w:p[57]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0102
+    chunk_id: C0102
+    page: 11
+    span:
+    - 8722
+    - 8853
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 111
+      body_index: 122
+      xpath: /w:document/w:body/w:p[112]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 10961
+    - 10968
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 2
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[3]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0052
+    chunk_id: C0052
+    page: 6
+    span:
+    - 4414
+    - 4421
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 56
+      body_index: 61
+      xpath: /w:document/w:body/w:p[57]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0076
+    chunk_id: C0076
+    page: 8
+    span:
+    - 6581
+    - 6588
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 82
+      body_index: 90
+      xpath: /w:document/w:body/w:p[83]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 首年计划销售量 = min(首年合计需求,正常年合格产能)。任一依赖缺失时不可评估。
+  unit: 套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R007
+  target: N036
+  kind: compute
+  expr: min(N018,N034)
+  readable_expr: min(demand_normal,capacity)
+  deps:
+  - N018
+  - N034
+  dep_keys:
+  - demand_normal
+  - capacity
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-01
+  - EV-02
+  source_locations:
+  - block_id: B0033
+    chunk_id: C0033
+    page: 4
+    span:
+    - 2504
+    - 2627
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 35
+      body_index: 38
+      xpath: /w:document/w:body/w:p[36]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4259
+    - 4379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0102
+    chunk_id: C0102
+    page: 11
+    span:
+    - 8722
+    - 8853
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 111
+      body_index: 122
+      xpath: /w:document/w:body/w:p[112]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 10971
+    - 10978
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 2
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[3]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1379
+    - 1386
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 4
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[5]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4334
+    - 4341
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年计划销售量 = min(正常年合计需求,正常年合格产能)。任一依赖缺失时不可评估。
+  unit: 套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R008
+  target: N037
+  kind: compute
+  expr: N034-N018
+  readable_expr: capacity-demand_normal
+  deps:
+  - N034
+  - N018
+  dep_keys:
+  - capacity
+  - demand_normal
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-02
+  source_locations:
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4259
+    - 4379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4347
+    - 4353
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年能力余量 = 正常年合格产能-正常年合计需求。任一依赖缺失时不可评估。
+  unit: 套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R009
+  target: N038
+  kind: compute
+  expr: max(N018-N034,0)
+  readable_expr: max(demand_normal-capacity,0)
+  deps:
+  - N018
+  - N034
+  dep_keys:
+  - demand_normal
+  - capacity
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit_rule_no_reported_result
+  source: []
+  source_locations:
+  - block_id: B0033
+    chunk_id: C0033
+    page: 4
+    span:
+    - 2504
+    - 2627
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 35
+      body_index: 38
+      xpath: /w:document/w:body/w:p[36]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0054
+    chunk_id: C0054
+    page: 6
+    span:
+    - 4507
+    - 4636
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 58
+      body_index: 63
+      xpath: /w:document/w:body/w:p[59]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年交付缺口 = max(正常年合计需求-正常年合格产能,0)。任一依赖缺失时不可评估。
+  unit: 套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R010
+  target: N039
+  kind: compute
+  expr: max(N017-N034,0)
+  readable_expr: max(demand_first-capacity,0)
+  deps:
+  - N017
+  - N034
+  dep_keys:
+  - demand_first
+  - capacity
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit_rule_no_reported_result
+  source: []
+  source_locations:
+  - block_id: B0033
+    chunk_id: C0033
+    page: 4
+    span:
+    - 2504
+    - 2627
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 35
+      body_index: 38
+      xpath: /w:document/w:body/w:p[36]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0052
+    chunk_id: C0052
+    page: 6
+    span:
+    - 4381
+    - 4487
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 56
+      body_index: 61
+      xpath: /w:document/w:body/w:p[57]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 首年交付缺口 = max(首年合计需求-正常年合格产能,0)。任一依赖缺失时不可评估。
+  unit: 套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R011
+  target: N040
+  kind: compute
+  expr: N036/N034
+  readable_expr: sales_normal/capacity
+  deps:
+  - N036
+  - N034
+  dep_keys:
+  - sales_normal
+  - capacity
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: N034 > 0
+    additional_source: capacity > 0
+  origin: source_explicit
+  source: []
+  source_locations:
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4259
+    - 4379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4363
+    - 4369
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0055
+    chunk_id: C0055
+    page: 6
+    span:
+    - 4665
+    - 4671
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 59
+      body_index: 64
+      xpath: /w:document/w:body/w:p[60]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年计划产能占用率 = 正常年计划销售量/正常年合格产能。任一依赖缺失时不可评估。仅在“正常年合格产能 > 0”成立时执行。
+  unit: 比例
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R012
+  target: N048
+  kind: compute
+  expr: N041-N042
+  readable_expr: factory_area-area
+  deps:
+  - N041
+  - N042
+  dep_keys:
+  - factory_area
+  - area
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-04
+  source_locations:
+  - block_id: B0058
+    chunk_id: C0058
+    page: 7
+    span:
+    - 4786
+    - 4907
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 63
+      body_index: 68
+      xpath: /w:document/w:body/w:p[64]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0169
+    chunk_id: C0169
+    page: 17
+    span:
+    - 15668
+    - 15813
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 184
+      body_index: 202
+      xpath: /w:document/w:body/w:p[185]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0058
+    chunk_id: C0058
+    page: 7
+    span:
+    - 4834
+    - 4839
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 63
+      body_index: 68
+      xpath: /w:document/w:body/w:p[64]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0169
+    chunk_id: C0169
+    page: 17
+    span:
+    - 15739
+    - 15744
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 184
+      body_index: 202
+      xpath: /w:document/w:body/w:p[185]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 旧业务保留仓储面积 = 厂房总建筑面积-本项目改造计费面积。任一依赖缺失时不可评估。
+  unit: 平方米
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R013
+  target: N054
+  kind: compute
+  expr: N050-N053
+  readable_expr: power_a-power_required
+  deps:
+  - N050
+  - N053
+  dep_keys:
+  - power_a
+  - power_required
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source: []
+  source_locations:
+  - block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5396
+    - 5531
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5426
+    - 5428
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 按资料06A条件余量 = 资料06A记载可用有功余量-新增最大有功需量。任一依赖缺失时不可评估。
+  unit: kW
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R014
+  target: N055
+  kind: compute
+  expr: max(N053-N051,0)
+  readable_expr: max(power_required-power_b,0)
+  deps:
+  - N053
+  - N051
+  dep_keys:
+  - power_required
+  - power_b
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source: []
+  source_locations:
+  - block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5396
+    - 5531
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5442
+    - 5444
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 按资料06B条件缺口 = max(新增最大有功需量-资料06B记载可用有功余量,0)。任一依赖缺失时不可评估。
+  unit: kW
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R015
+  target: N063
+  kind: compute
+  expr: N059+N060+N061+N062
+  readable_expr: months_design+months_make+months_install+months_trial
+  deps:
+  - N059
+  - N060
+  - N061
+  - N062
+  dep_keys:
+  - months_design
+  - months_make
+  - months_install
+  - months_trial
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-10
+  source_locations:
+  - block_id: B0068
+    chunk_id: C0068
+    page: 8
+    span:
+    - 5689
+    - 5806
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 74
+      body_index: 80
+      xpath: /w:document/w:body/w:p[75]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0191
+    chunk_id: C0191
+    page: 19
+    span:
+    - 17409
+    - 17536
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 208
+      body_index: 226
+      xpath: /w:document/w:body/w:p[209]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0070
+    chunk_id: C0070
+    page: 8
+    span:
+    - 6100
+    - 6104
+    source_locator:
+      part: word/document.xml
+      table_index: 6
+      row_index: 5
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[7]/w:tr[6]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3366
+    - 3368
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 3
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[4]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0070
+    chunk_id: C0070
+    page: 8
+    span:
+    - 6100
+    - 6102
+    source_locator:
+      part: word/document.xml
+      table_index: 6
+      row_index: 5
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[7]/w:tr[6]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0141
+    chunk_id: C0141
+    page: 14
+    span:
+    - 12540
+    - 12542
+    source_locator:
+      part: word/document.xml
+      table_index: 15
+      row_index: 4
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[16]/w:tr[5]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0068
+    chunk_id: C0068
+    page: 8
+    span:
+    - 5730
+    - 5732
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 74
+      body_index: 80
+      xpath: /w:document/w:body/w:p[75]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 实施期限 = 详细设计与条件确认月数+设备制造与厂房改造月数+安装与联调月数+试生产与验收月数。任一依赖缺失时不可评估。
+  unit: 月
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R016
+  target: N064
+  kind: compute
+  expr: N063/12
+  readable_expr: months_total/12
+  deps:
+  - N063
+  dep_keys:
+  - months_total
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source: []
+  source_locations:
+  - block_id: B0129
+    chunk_id: C0129
+    page: 13
+    span:
+    - 11288
+    - 11418
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 140
+      body_index: 154
+      xpath: /w:document/w:body/w:p[141]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0129
+    chunk_id: C0129
+    page: 13
+    span:
+    - 11292
+    - 11293
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 140
+      body_index: 154
+      xpath: /w:document/w:body/w:p[141]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0131
+    chunk_id: C0131
+    page: 13
+    span:
+    - 11470
+    - 11471
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 142
+      body_index: 156
+      xpath: /w:document/w:body/w:p[143]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 建设期年数 = 实施期限/12。任一依赖缺失时不可评估。
+  unit: 年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R017
+  target: N075
+  kind: compute
+  expr: N025*N027*N073
+  readable_expr: line_count*shifts*direct_per_shift
+  deps:
+  - N025
+  - N027
+  - N073
+  dep_keys:
+  - line_count
+  - shifts
+  - direct_per_shift
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-10
+  source_locations:
+  - block_id: B0073
+    chunk_id: C0073
+    page: 8
+    span:
+    - 6258
+    - 6359
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 79
+      body_index: 86
+      xpath: /w:document/w:body/w:p[80]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0075
+    chunk_id: C0075
+    page: 8
+    span:
+    - 6447
+    - 6449
+    source_locator:
+      part: word/document.xml
+      table_index: 7
+      row_index: 1
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[8]/w:tr[2]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0073
+    chunk_id: C0073
+    page: 8
+    span:
+    - 6294
+    - 6296
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 79
+      body_index: 86
+      xpath: /w:document/w:body/w:p[80]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 直接操作人员 = 新增并行线数*每日班次*每线每班直接操作人数。任一依赖缺失时不可评估。
+  unit: 人
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R018
+  target: N076
+  kind: compute
+  expr: N075+N074
+  readable_expr: direct_staff+support_staff
+  deps:
+  - N075
+  - N074
+  dep_keys:
+  - direct_staff
+  - support_staff
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-10
+  source_locations:
+  - block_id: B0073
+    chunk_id: C0073
+    page: 8
+    span:
+    - 6258
+    - 6359
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 79
+      body_index: 86
+      xpath: /w:document/w:body/w:p[80]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0075
+    chunk_id: C0075
+    page: 8
+    span:
+    - 6497
+    - 6499
+    source_locator:
+      part: word/document.xml
+      table_index: 7
+      row_index: 3
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[8]/w:tr[4]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0073
+    chunk_id: C0073
+    page: 8
+    span:
+    - 6334
+    - 6336
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 79
+      body_index: 86
+      xpath: /w:document/w:body/w:p[80]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0145
+    chunk_id: C0145
+    page: 15
+    span:
+    - 12869
+    - 12871
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 158
+      body_index: 174
+      xpath: /w:document/w:body/w:p[159]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 项目新增定员 = 直接操作人员+共享支持岗位总人数。任一依赖缺失时不可评估。
+  unit: 人
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R019
+  target: N078
+  kind: compute
+  expr: N076*N077
+  readable_expr: total_staff*labor_unit
+  deps:
+  - N076
+  - N077
+  dep_keys:
+  - total_staff
+  - labor_unit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  - EV-10
+  source_locations:
+  - block_id: B0076
+    chunk_id: C0076
+    page: 8
+    span:
+    - 6503
+    - 6615
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 82
+      body_index: 90
+      xpath: /w:document/w:body/w:p[83]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0109
+    chunk_id: C0109
+    page: 11
+    span:
+    - 9475
+    - 9615
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 118
+      body_index: 130
+      xpath: /w:document/w:body/w:p[119]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0076
+    chunk_id: C0076
+    page: 8
+    span:
+    - 6553
+    - 6561
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 82
+      body_index: 90
+      xpath: /w:document/w:body/w:p[83]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0109
+    chunk_id: C0109
+    page: 11
+    span:
+    - 9486
+    - 9494
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 118
+      body_index: 130
+      xpath: /w:document/w:body/w:p[119]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 年度人工费用 = 项目新增定员*人均年度综合付现成本。任一依赖缺失时不可评估。
+  unit: 万元/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R020
+  target: N081
+  kind: compute
+  expr: N079*N080
+  readable_expr: weld_qty*weld_price
+  deps:
+  - N079
+  - N080
+  dep_keys:
+  - weld_qty
+  - weld_price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-03
+  source_locations:
+  - block_id: B0082
+    chunk_id: C0082
+    page: 9
+    span:
+    - 6965
+    - 6973
+    source_locator:
+      part: word/document.xml
+      table_index: 8
+      row_index: 1
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[9]/w:tr[2]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 自动焊接线购置小计 = 自动焊接线购置数量*自动焊接线购置单价。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R021
+  target: N084
+  kind: compute
+  expr: N082*N083
+  readable_expr: mach_qty*mach_price
+  deps:
+  - N082
+  - N083
+  dep_keys:
+  - mach_qty
+  - mach_price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-03
+  source_locations:
+  - block_id: B0082
+    chunk_id: C0082
+    page: 9
+    span:
+    - 7000
+    - 7006
+    source_locator:
+      part: word/document.xml
+      table_index: 8
+      row_index: 2
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[9]/w:tr[3]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 精加工单元购置小计 = 精加工单元购置数量*精加工单元购置单价。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R022
+  target: N087
+  kind: compute
+  expr: N085*N086
+  readable_expr: leak_qty*leak_price
+  deps:
+  - N085
+  - N086
+  dep_keys:
+  - leak_qty
+  - leak_price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-03
+  source_locations:
+  - block_id: B0082
+    chunk_id: C0082
+    page: 9
+    span:
+    - 7043
+    - 7049
+    source_locator:
+      part: word/document.xml
+      table_index: 8
+      row_index: 3
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[9]/w:tr[4]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 气密检测单元购置小计 = 气密检测单元购置数量*气密检测单元购置单价。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R023
+  target: N090
+  kind: compute
+  expr: N088*N089
+  readable_expr: inspect_qty*inspect_price
+  deps:
+  - N088
+  - N089
+  dep_keys:
+  - inspect_qty
+  - inspect_price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-03
+  source_locations:
+  - block_id: B0082
+    chunk_id: C0082
+    page: 9
+    span:
+    - 7080
+    - 7086
+    source_locator:
+      part: word/document.xml
+      table_index: 8
+      row_index: 4
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[9]/w:tr[5]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 在线尺寸与终检单元购置小计 = 在线尺寸与终检单元购置数量*在线尺寸与终检单元购置单价。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R024
+  target: N093
+  kind: compute
+  expr: N091*N092
+  readable_expr: logistic_qty*logistic_price
+  deps:
+  - N091
+  - N092
+  dep_keys:
+  - logistic_qty
+  - logistic_price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-03
+  source_locations:
+  - block_id: B0082
+    chunk_id: C0082
+    page: 9
+    span:
+    - 7116
+    - 7122
+    source_locator:
+      part: word/document.xml
+      table_index: 8
+      row_index: 5
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[9]/w:tr[6]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 厂内物流及工装包购置小计 = 厂内物流及工装包购置数量*厂内物流及工装包购置单价。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R025
+  target: N096
+  kind: compute
+  expr: N094*N095
+  readable_expr: mes_qty*mes_price
+  deps:
+  - N094
+  - N095
+  dep_keys:
+  - mes_qty
+  - mes_price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-03
+  source_locations:
+  - block_id: B0082
+    chunk_id: C0082
+    page: 9
+    span:
+    - 7152
+    - 7157
+    source_locator:
+      part: word/document.xml
+      table_index: 8
+      row_index: 6
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[9]/w:tr[7]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 制造追溯与接口系统购置小计 = 制造追溯与接口系统购置数量*制造追溯与接口系统购置单价。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R026
+  target: N100
+  kind: compute
+  expr: N081+N084+N087+N090+N093+N096
+  readable_expr: weld_subtotal+mach_subtotal+leak_subtotal+inspect_subtotal+logistic_subtotal+mes_subtotal
+  deps:
+  - N081
+  - N084
+  - N087
+  - N090
+  - N093
+  - N096
+  dep_keys:
+  - weld_subtotal
+  - mach_subtotal
+  - leak_subtotal
+  - inspect_subtotal
+  - logistic_subtotal
+  - mes_subtotal
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-03
+  source_locations:
+  - block_id: B0082
+    chunk_id: C0082
+    page: 9
+    span:
+    - 7183
+    - 7191
+    source_locator:
+      part: word/document.xml
+      table_index: 8
+      row_index: 7
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[9]/w:tr[8]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0095
+    chunk_id: C0095
+    page: 10
+    span:
+    - 8124
+    - 8132
+    source_locator:
+      part: word/document.xml
+      table_index: 10
+      row_index: 2
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[11]/w:tr[3]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0091
+    chunk_id: C0091
+    page: 10
+    span:
+    - 7874
+    - 7882
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 99
+      body_index: 109
+      xpath: /w:document/w:body/w:p[100]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0092
+    chunk_id: C0092
+    page: 10
+    span:
+    - 7926
+    - 7934
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 100
+      body_index: 110
+      xpath: /w:document/w:body/w:p[101]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 设备与系统购置费 = 自动焊接线购置小计+精加工单元购置小计+气密检测单元购置小计+在线尺寸与终检单元购置小计+厂内物流及工装包购置小计+制造追溯与接口系统购置小计。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R027
+  target: N101
+  kind: compute
+  expr: N042*N047/10000
+  readable_expr: area*site_unit/10000
+  deps:
+  - N042
+  - N047
+  dep_keys:
+  - area
+  - site_unit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-04
+  source_locations:
+  - block_id: B0061
+    chunk_id: C0061
+    page: 7
+    span:
+    - 5123
+    - 5248
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 66
+      body_index: 72
+      xpath: /w:document/w:body/w:p[67]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0086
+    chunk_id: C0086
+    page: 9
+    span:
+    - 7457
+    - 7463
+    source_locator:
+      part: word/document.xml
+      table_index: 9
+      row_index: 1
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[10]/w:tr[2]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0061
+    chunk_id: C0061
+    page: 7
+    span:
+    - 5145
+    - 5151
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 66
+      body_index: 72
+      xpath: /w:document/w:body/w:p[67]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 场地综合改造费用 = 本项目改造计费面积*场地综合改造单价/10000。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R028
+  target: N104
+  kind: compute
+  expr: N101+N102+N103
+  readable_expr: site_cost+utilities+ehs_capex
+  deps:
+  - N101
+  - N102
+  - N103
+  dep_keys:
+  - site_cost
+  - utilities
+  - ehs_capex
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-04
+  source_locations:
+  - block_id: B0086
+    chunk_id: C0086
+    page: 9
+    span:
+    - 7559
+    - 7565
+    source_locator:
+      part: word/document.xml
+      table_index: 9
+      row_index: 4
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[10]/w:tr[5]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0095
+    chunk_id: C0095
+    page: 10
+    span:
+    - 8091
+    - 8097
+    source_locator:
+      part: word/document.xml
+      table_index: 10
+      row_index: 1
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[11]/w:tr[2]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0092
+    chunk_id: C0092
+    page: 10
+    span:
+    - 7912
+    - 7918
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 100
+      body_index: 110
+      xpath: /w:document/w:body/w:p[101]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 建筑与公辅工程费用 = 场地综合改造费用+公辅改造预算+环保与安全设施预算。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R029
+  target: N108
+  kind: compute
+  expr: N105+N106+N107
+  readable_expr: design_cost+prep_cost+training_cost
+  deps:
+  - N105
+  - N106
+  - N107
+  dep_keys:
+  - design_cost
+  - prep_cost
+  - training_cost
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-04
+  source_locations:
+  - block_id: B0087
+    chunk_id: C0087
+    page: 9
+    span:
+    - 7569
+    - 7729
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 94
+      body_index: 104
+      xpath: /w:document/w:body/w:p[95]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0095
+    chunk_id: C0095
+    page: 10
+    span:
+    - 8231
+    - 8237
+    source_locator:
+      part: word/document.xml
+      table_index: 10
+      row_index: 5
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[11]/w:tr[6]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0087
+    chunk_id: C0087
+    page: 9
+    span:
+    - 7579
+    - 7585
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 94
+      body_index: 104
+      xpath: /w:document/w:body/w:p[95]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0093
+    chunk_id: C0093
+    page: 10
+    span:
+    - 7981
+    - 7987
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 101
+      body_index: 111
+      xpath: /w:document/w:body/w:p[102]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 工程建设其他费用 = 设计与项目管理费用+前期检测及准备费用+培训与首批专用备件费用。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R030
+  target: N111
+  kind: compute
+  expr: N100*N109
+  readable_expr: equipment*install_rate
+  deps:
+  - N100
+  - N109
+  dep_keys:
+  - equipment
+  - install_rate
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0091
+    chunk_id: C0091
+    page: 10
+    span:
+    - 7866
+    - 7898
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 99
+      body_index: 109
+      xpath: /w:document/w:body/w:p[100]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0095
+    chunk_id: C0095
+    page: 10
+    span:
+    - 8156
+    - 8162
+    source_locator:
+      part: word/document.xml
+      table_index: 10
+      row_index: 3
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[11]/w:tr[4]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0091
+    chunk_id: C0091
+    page: 10
+    span:
+    - 7890
+    - 7896
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 99
+      body_index: 109
+      xpath: /w:document/w:body/w:p[100]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0092
+    chunk_id: C0092
+    page: 10
+    span:
+    - 7941
+    - 7947
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 100
+      body_index: 110
+      xpath: /w:document/w:body/w:p[101]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 安装集成费 = 设备与系统购置费*安装集成费率。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R031
+  target: N112
+  kind: compute
+  expr: N104+N100+N111
+  readable_expr: building_util+equipment+installation
+  deps:
+  - N104
+  - N100
+  - N111
+  dep_keys:
+  - building_util
+  - equipment
+  - installation
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-04
+  - EV-05
+  source_locations:
+  - block_id: B0092
+    chunk_id: C0092
+    page: 10
+    span:
+    - 7900
+    - 7960
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 100
+      body_index: 110
+      xpath: /w:document/w:body/w:p[101]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0095
+    chunk_id: C0095
+    page: 10
+    span:
+    - 8191
+    - 8199
+    source_locator:
+      part: word/document.xml
+      table_index: 10
+      row_index: 4
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[11]/w:tr[5]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0092
+    chunk_id: C0092
+    page: 10
+    span:
+    - 7950
+    - 7958
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 100
+      body_index: 110
+      xpath: /w:document/w:body/w:p[101]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0093
+    chunk_id: C0093
+    page: 10
+    span:
+    - 7970
+    - 7978
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 101
+      body_index: 111
+      xpath: /w:document/w:body/w:p[102]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 工程费用 = 建筑与公辅工程费用+设备与系统购置费+安装集成费。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R032
+  target: N113
+  kind: compute
+  expr: (N112+N108)*N110
+  readable_expr: (engineering+other_capex)*reserve_rate
+  deps:
+  - N112
+  - N108
+  - N110
+  dep_keys:
+  - engineering
+  - other_capex
+  - reserve_rate
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0093
+    chunk_id: C0093
+    page: 10
+    span:
+    - 7962
+    - 8004
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 101
+      body_index: 111
+      xpath: /w:document/w:body/w:p[102]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0095
+    chunk_id: C0095
+    page: 10
+    span:
+    - 8271
+    - 8277
+    source_locator:
+      part: word/document.xml
+      table_index: 10
+      row_index: 6
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[11]/w:tr[7]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0093
+    chunk_id: C0093
+    page: 10
+    span:
+    - 7995
+    - 8002
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 101
+      body_index: 111
+      xpath: /w:document/w:body/w:p[102]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0098
+    chunk_id: C0098
+    page: 10
+    span:
+    - 8485
+    - 8491
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 106
+      body_index: 117
+      xpath: /w:document/w:body/w:p[107]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 基本预备费 = (工程费用+工程建设其他费用)*基本预备费率。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R033
+  target: N114
+  kind: compute
+  expr: N112+N108+N113
+  readable_expr: engineering+other_capex+reserve
+  deps:
+  - N112
+  - N108
+  - N113
+  dep_keys:
+  - engineering
+  - other_capex
+  - reserve
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-04
+  - EV-05
+  source_locations:
+  - block_id: B0117
+    chunk_id: C0117
+    page: 12
+    span:
+    - 10250
+    - 10311
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 127
+      body_index: 140
+      xpath: /w:document/w:body/w:p[128]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0095
+    chunk_id: C0095
+    page: 10
+    span:
+    - 8309
+    - 8317
+    source_locator:
+      part: word/document.xml
+      table_index: 10
+      row_index: 7
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[11]/w:tr[8]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1449
+    - 1457
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 6
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[7]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0096
+    chunk_id: C0096
+    page: 10
+    span:
+    - 8337
+    - 8345
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 104
+      body_index: 115
+      xpath: /w:document/w:body/w:p[105]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0117
+    chunk_id: C0117
+    page: 12
+    span:
+    - 10277
+    - 10286
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 127
+      body_index: 140
+      xpath: /w:document/w:body/w:p[128]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12945
+    - 12953
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 建设投资 = 工程费用+工程建设其他费用+基本预备费。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R034
+  target: N122
+  kind: compute
+  expr: N120*N121
+  readable_expr: energy_unit*energy_price
+  deps:
+  - N120
+  - N121
+  dep_keys:
+  - energy_unit
+  - energy_price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0106
+    chunk_id: C0106
+    page: 11
+    span:
+    - 9196
+    - 9200
+    source_locator:
+      part: word/document.xml
+      table_index: 11
+      row_index: 4
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[12]/w:tr[5]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 单套生产电费 = 单位合格销售套生产用电*生产电价。任一依赖缺失时不可评估。
+  unit: 元/套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R035
+  target: N123
+  kind: compute
+  expr: N116+N117+N118+N122+N119
+  readable_expr: material+consumables+outsource+energy_unit_cost+pack
+  deps:
+  - N116
+  - N117
+  - N118
+  - N122
+  - N119
+  dep_keys:
+  - material
+  - consumables
+  - outsource
+  - energy_unit_cost
+  - pack
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0106
+    chunk_id: C0106
+    page: 11
+    span:
+    - 9281
+    - 9289
+    source_locator:
+      part: word/document.xml
+      table_index: 11
+      row_index: 6
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[12]/w:tr[7]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11131
+    - 11139
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 单套变动成本 = 单套主要材料成本+单套焊接加工耗材+单套外协表面处理费+单套生产电费+单套包装及物流费。任一依赖缺失时不可评估。
+  unit: 元/套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R036
+  target: N124
+  kind: compute
+  expr: N036*N115/10000
+  readable_expr: sales_normal*price/10000
+  deps:
+  - N036
+  - N115
+  dep_keys:
+  - sales_normal
+  - price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  - EV-01
+  source_locations:
+  - block_id: B0103
+    chunk_id: C0103
+    page: 11
+    span:
+    - 8855
+    - 8895
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 112
+      body_index: 123
+      xpath: /w:document/w:body/w:p[113]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0104
+    chunk_id: C0104
+    page: 11
+    span:
+    - 8897
+    - 8985
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 113
+      body_index: 124
+      xpath: /w:document/w:body/w:p[114]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1416
+    - 1425
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 5
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[6]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0116
+    chunk_id: C0116
+    page: 12
+    span:
+    - 10051
+    - 10060
+    source_locator:
+      part: word/document.xml
+      table_index: 12
+      row_index: 1
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[13]/w:tr[2]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 11002
+    - 11011
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 3
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[4]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0104
+    chunk_id: C0104
+    page: 11
+    span:
+    - 8904
+    - 8913
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 113
+      body_index: 124
+      xpath: /w:document/w:body/w:p[114]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11168
+    - 11177
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0147
+    chunk_id: C0147
+    page: 15
+    span:
+    - 13077
+    - 13086
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 160
+      body_index: 176
+      xpath: /w:document/w:body/w:p[161]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年营业收入 = 正常年计划销售量*不含税产品销售单价/10000。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R037
+  target: N125
+  kind: compute
+  expr: N035*N115/10000
+  readable_expr: sales_first*price/10000
+  deps:
+  - N035
+  - N115
+  dep_keys:
+  - sales_first
+  - price
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  - EV-01
+  source_locations:
+  - block_id: B0103
+    chunk_id: C0103
+    page: 11
+    span:
+    - 8855
+    - 8895
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 112
+      body_index: 123
+      xpath: /w:document/w:body/w:p[113]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0104
+    chunk_id: C0104
+    page: 11
+    span:
+    - 8897
+    - 8985
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 113
+      body_index: 124
+      xpath: /w:document/w:body/w:p[114]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 10990
+    - 10999
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 3
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[4]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0104
+    chunk_id: C0104
+    page: 11
+    span:
+    - 8922
+    - 8931
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 113
+      body_index: 124
+      xpath: /w:document/w:body/w:p[114]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 首年营业收入 = 首年计划销售量*不含税产品销售单价/10000。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R038
+  target: N126
+  kind: compute
+  expr: N036*N116/10000
+  readable_expr: sales_normal*material/10000
+  deps:
+  - N036
+  - N116
+  dep_keys:
+  - sales_normal
+  - material
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0106
+    chunk_id: C0106
+    page: 11
+    span:
+    - 9082
+    - 9091
+    source_locator:
+      part: word/document.xml
+      table_index: 11
+      row_index: 1
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[12]/w:tr[2]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0116
+    chunk_id: C0116
+    page: 12
+    span:
+    - 10172
+    - 10181
+    source_locator:
+      part: word/document.xml
+      table_index: 12
+      row_index: 4
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[13]/w:tr[5]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年材料成本 = 正常年计划销售量*单套主要材料成本/10000。任一依赖缺失时不可评估。
+  unit: 万元/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R039
+  target: N127
+  kind: compute
+  expr: N036*N117/10000
+  readable_expr: sales_normal*consumables/10000
+  deps:
+  - N036
+  - N117
+  dep_keys:
+  - sales_normal
+  - consumables
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0106
+    chunk_id: C0106
+    page: 11
+    span:
+    - 9132
+    - 9138
+    source_locator:
+      part: word/document.xml
+      table_index: 11
+      row_index: 2
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[12]/w:tr[3]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年耗材成本 = 正常年计划销售量*单套焊接加工耗材/10000。任一依赖缺失时不可评估。
+  unit: 万元/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R040
+  target: N128
+  kind: compute
+  expr: N036*N118/10000
+  readable_expr: sales_normal*outsource/10000
+  deps:
+  - N036
+  - N118
+  dep_keys:
+  - sales_normal
+  - outsource
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0106
+    chunk_id: C0106
+    page: 11
+    span:
+    - 9167
+    - 9173
+    source_locator:
+      part: word/document.xml
+      table_index: 11
+      row_index: 3
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[12]/w:tr[4]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年外协处理成本 = 正常年计划销售量*单套外协表面处理费/10000。任一依赖缺失时不可评估。
+  unit: 万元/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R041
+  target: N129
+  kind: compute
+  expr: N036*N122/10000
+  readable_expr: sales_normal*energy_unit_cost/10000
+  deps:
+  - N036
+  - N122
+  dep_keys:
+  - sales_normal
+  - energy_unit_cost
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0106
+    chunk_id: C0106
+    page: 11
+    span:
+    - 9203
+    - 9209
+    source_locator:
+      part: word/document.xml
+      table_index: 11
+      row_index: 4
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[12]/w:tr[5]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年生产电费成本 = 正常年计划销售量*单套生产电费/10000。任一依赖缺失时不可评估。
+  unit: 万元/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R042
+  target: N130
+  kind: compute
+  expr: N036*N119/10000
+  readable_expr: sales_normal*pack/10000
+  deps:
+  - N036
+  - N119
+  dep_keys:
+  - sales_normal
+  - pack
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0106
+    chunk_id: C0106
+    page: 11
+    span:
+    - 9253
+    - 9259
+    source_locator:
+      part: word/document.xml
+      table_index: 11
+      row_index: 5
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[12]/w:tr[6]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年包装物流成本 = 正常年计划销售量*单套包装及物流费/10000。任一依赖缺失时不可评估。
+  unit: 万元/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R043
+  target: N131
+  kind: compute
+  expr: N036*N120
+  readable_expr: sales_normal*energy_unit
+  deps:
+  - N036
+  - N120
+  dep_keys:
+  - sales_normal
+  - energy_unit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0065
+    chunk_id: C0065
+    page: 7
+    span:
+    - 5533
+    - 5659
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 70
+      body_index: 76
+      xpath: /w:document/w:body/w:p[71]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0065
+    chunk_id: C0065
+    page: 7
+    span:
+    - 5581
+    - 5587
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 70
+      body_index: 76
+      xpath: /w:document/w:body/w:p[71]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年生产用电量 = 正常年计划销售量*单位合格销售套生产用电。任一依赖缺失时不可评估。
+  unit: 千瓦时/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R044
+  target: N132
+  kind: compute
+  expr: N036*N123/10000
+  readable_expr: sales_normal*variable_unit/10000
+  deps:
+  - N036
+  - N123
+  dep_keys:
+  - sales_normal
+  - variable_unit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0107
+    chunk_id: C0107
+    page: 11
+    span:
+    - 9322
+    - 9458
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 116
+      body_index: 128
+      xpath: /w:document/w:body/w:p[117]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0106
+    chunk_id: C0106
+    page: 11
+    span:
+    - 9292
+    - 9301
+    source_locator:
+      part: word/document.xml
+      table_index: 11
+      row_index: 6
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[12]/w:tr[7]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0116
+    chunk_id: C0116
+    page: 12
+    span:
+    - 10096
+    - 10105
+    source_locator:
+      part: word/document.xml
+      table_index: 12
+      row_index: 2
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[13]/w:tr[3]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 11035
+    - 11044
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 4
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[5]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0107
+    chunk_id: C0107
+    page: 11
+    span:
+    - 9357
+    - 9366
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 116
+      body_index: 128
+      xpath: /w:document/w:body/w:p[117]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年变动成本 = 正常年计划销售量*单套变动成本/10000。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R045
+  target: N133
+  kind: compute
+  expr: N035*N123/10000
+  readable_expr: sales_first*variable_unit/10000
+  deps:
+  - N035
+  - N123
+  dep_keys:
+  - sales_first
+  - variable_unit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0107
+    chunk_id: C0107
+    page: 11
+    span:
+    - 9322
+    - 9458
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 116
+      body_index: 128
+      xpath: /w:document/w:body/w:p[117]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 11023
+    - 11032
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 4
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[5]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0107
+    chunk_id: C0107
+    page: 11
+    span:
+    - 9375
+    - 9384
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 116
+      body_index: 128
+      xpath: /w:document/w:body/w:p[117]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 首年变动成本 = 首年计划销售量*单套变动成本/10000。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R046
+  target: N137
+  kind: compute
+  expr: N078+N134+N135+N136
+  readable_expr: labor_cost+maintenance+management+other_fixed
+  deps:
+  - N078
+  - N134
+  - N135
+  - N136
+  dep_keys:
+  - labor_cost
+  - maintenance
+  - management
+  - other_fixed
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0109
+    chunk_id: C0109
+    page: 11
+    span:
+    - 9475
+    - 9615
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 118
+      body_index: 130
+      xpath: /w:document/w:body/w:p[119]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 11058
+    - 11066
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 5
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[6]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 11069
+    - 11077
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 5
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[6]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0109
+    chunk_id: C0109
+    page: 11
+    span:
+    - 9553
+    - 9561
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 118
+      body_index: 130
+      xpath: /w:document/w:body/w:p[119]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0124
+    chunk_id: C0124
+    page: 13
+    span:
+    - 10821
+    - 10829
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 135
+      body_index: 148
+      xpath: /w:document/w:body/w:p[136]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 年度固定付现成本 = 年度人工费用+年度设备维护费+年度管理与技术支持费+年度其他固定付现成本。任一依赖缺失时不可评估。
+  unit: 万元/年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R047
+  target: N143
+  kind: compute
+  expr: N124/N138*N139
+  readable_expr: revenue_normal/turnover_days*receivable_days
+  deps:
+  - N124
+  - N138
+  - N139
+  dep_keys:
+  - revenue_normal
+  - turnover_days
+  - receivable_days
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: N138 > 0
+    additional_source: turnover_days > 0
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0116
+    chunk_id: C0116
+    page: 12
+    span:
+    - 10074
+    - 10082
+    source_locator:
+      part: word/document.xml
+      table_index: 12
+      row_index: 1
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[13]/w:tr[2]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年应收账款 = 正常年营业收入/周转年基数*应收账款周转天数。任一依赖缺失时不可评估。仅在“周转年基数 > 0”成立时执行。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R048
+  target: N144
+  kind: compute
+  expr: N132/N138*N140
+  readable_expr: variable_normal/turnover_days*inventory_days
+  deps:
+  - N132
+  - N138
+  - N140
+  dep_keys:
+  - variable_normal
+  - turnover_days
+  - inventory_days
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: N138 > 0
+    additional_source: turnover_days > 0
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0116
+    chunk_id: C0116
+    page: 12
+    span:
+    - 10119
+    - 10127
+    source_locator:
+      part: word/document.xml
+      table_index: 12
+      row_index: 2
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[13]/w:tr[3]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年综合存货资金占用 = 正常年变动成本/周转年基数*综合存货周转天数。任一依赖缺失时不可评估。仅在“周转年基数 > 0”成立时执行。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R049
+  target: N145
+  kind: compute
+  expr: N126/N138*N141
+  readable_expr: material_annual/turnover_days*payable_days
+  deps:
+  - N126
+  - N138
+  - N141
+  dep_keys:
+  - material_annual
+  - turnover_days
+  - payable_days
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: N138 > 0
+    additional_source: turnover_days > 0
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0116
+    chunk_id: C0116
+    page: 12
+    span:
+    - 10195
+    - 10203
+    source_locator:
+      part: word/document.xml
+      table_index: 12
+      row_index: 4
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[13]/w:tr[5]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年材料应付账款 = 正常年材料成本/周转年基数*材料应付周转天数。任一依赖缺失时不可评估。仅在“周转年基数 > 0”成立时执行。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R050
+  target: N146
+  kind: compute
+  expr: max(N143+N144+N142-N145,0)
+  readable_expr: max(receivable+inventory+minimum_cash-payable,0)
+  deps:
+  - N143
+  - N144
+  - N142
+  - N145
+  dep_keys:
+  - receivable
+  - inventory
+  - minimum_cash
+  - payable
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0176
+    chunk_id: C0176
+    page: 18
+    span:
+    - 16293
+    - 16400
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 192
+      body_index: 210
+      xpath: /w:document/w:body/w:p[193]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0116
+    chunk_id: C0116
+    page: 12
+    span:
+    - 10238
+    - 10246
+    source_locator:
+      part: word/document.xml
+      table_index: 12
+      row_index: 5
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[13]/w:tr[6]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1486
+    - 1494
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 7
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[8]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0117
+    chunk_id: C0117
+    page: 12
+    span:
+    - 10289
+    - 10297
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 127
+      body_index: 140
+      xpath: /w:document/w:body/w:p[128]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12961
+    - 12969
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 净营运资金需求 = max(正常年应收账款+正常年综合存货资金占用+最低现金余额-正常年材料应付账款,0)。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R051
+  target: N147
+  kind: compute
+  expr: N114+N146
+  readable_expr: construction+working_capital
+  deps:
+  - N114
+  - N146
+  dep_keys:
+  - construction
+  - working_capital
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0117
+    chunk_id: C0117
+    page: 12
+    span:
+    - 10250
+    - 10311
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 127
+      body_index: 140
+      xpath: /w:document/w:body/w:p[128]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1524
+    - 1532
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 8
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[9]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3326
+    - 3334
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 2
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[3]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0141
+    chunk_id: C0141
+    page: 14
+    span:
+    - 12429
+    - 12437
+    source_locator:
+      part: word/document.xml
+      table_index: 15
+      row_index: 2
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[16]/w:tr[3]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0021
+    chunk_id: C0021
+    page: 3
+    span:
+    - 1135
+    - 1143
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 22
+      body_index: 23
+      xpath: /w:document/w:body/w:p[23]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0117
+    chunk_id: C0117
+    page: 12
+    span:
+    - 10300
+    - 10309
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 127
+      body_index: 140
+      xpath: /w:document/w:body/w:p[128]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0131
+    chunk_id: C0131
+    page: 13
+    span:
+    - 11478
+    - 11487
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 142
+      body_index: 156
+      xpath: /w:document/w:body/w:p[143]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12928
+    - 12936
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 融资前项目资金需求 = 建设投资+净营运资金需求。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R052
+  target: N151
+  kind: compute
+  expr: N148+N149
+  readable_expr: equity+loan_cap
+  deps:
+  - N148
+  - N149
+  dep_keys:
+  - equity
+  - loan_cap
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0119
+    chunk_id: C0119
+    page: 12
+    span:
+    - 10331
+    - 10453
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 129
+      body_index: 142
+      xpath: /w:document/w:body/w:p[130]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0119
+    chunk_id: C0119
+    page: 12
+    span:
+    - 10371
+    - 10379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 129
+      body_index: 142
+      xpath: /w:document/w:body/w:p[130]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 意向资金来源合计上限 = 股东拟投入+银行意向融资上限。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R053
+  target: N152
+  kind: compute
+  expr: max(N147-N148,0)
+  readable_expr: max(funding-equity,0)
+  deps:
+  - N147
+  - N148
+  dep_keys:
+  - funding
+  - equity
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10455
+    - 10577
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1577
+    - 1585
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 9
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[10]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0141
+    chunk_id: C0141
+    page: 14
+    span:
+    - 12485
+    - 12493
+    source_locator:
+      part: word/document.xml
+      table_index: 15
+      row_index: 3
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[16]/w:tr[4]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10487
+    - 10495
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12994
+    - 13002
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 拟需借款 = max(融资前项目资金需求-股东拟投入,0)。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R054
+  target: N153
+  kind: compute
+  expr: N150-N147
+  readable_expr: investment_cap-funding
+  deps:
+  - N150
+  - N147
+  dep_keys:
+  - investment_cap
+  - funding
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0021
+    chunk_id: C0021
+    page: 3
+    span:
+    - 1061
+    - 1193
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 22
+      body_index: 23
+      xpath: /w:document/w:body/w:p[23]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12919
+    - 13068
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0141
+    chunk_id: C0141
+    page: 14
+    span:
+    - 12458
+    - 12464
+    source_locator:
+      part: word/document.xml
+      table_index: 15
+      row_index: 2
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[16]/w:tr[3]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0021
+    chunk_id: C0021
+    page: 3
+    span:
+    - 1163
+    - 1169
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 22
+      body_index: 23
+      xpath: /w:document/w:body/w:p[23]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 13029
+    - 13035
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 投资控制余量 = 融资前投资控制上限-融资前项目资金需求。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R055
+  target: N154
+  kind: compute
+  expr: N149-N152
+  readable_expr: loan_cap-loan_need
+  deps:
+  - N149
+  - N152
+  dep_keys:
+  - loan_cap
+  - loan_need
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10455
+    - 10577
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12919
+    - 13068
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10509
+    - 10515
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 意向融资额度余量 = 银行意向融资上限-拟需借款。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R056
+  target: N155
+  kind: compute
+  expr: max(N152-N149,0)
+  readable_expr: max(loan_need-loan_cap,0)
+  deps:
+  - N152
+  - N149
+  dep_keys:
+  - loan_need
+  - loan_cap
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10455
+    - 10577
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10531
+    - 10535
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0121
+    chunk_id: C0121
+    page: 12
+    span:
+    - 10650
+    - 10654
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 131
+      body_index: 144
+      xpath: /w:document/w:body/w:p[132]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 融资前安排缺口 = max(拟需借款-银行意向融资上限,0)。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R057
+  target: N165
+  kind: compute
+  expr: N125-N133-N137
+  readable_expr: revenue_first-variable_first-fixed
+  deps:
+  - N125
+  - N133
+  - N137
+  dep_keys:
+  - revenue_first
+  - variable_first
+  - fixed
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0124
+    chunk_id: C0124
+    page: 13
+    span:
+    - 10728
+    - 10834
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 135
+      body_index: 148
+      xpath: /w:document/w:body/w:p[136]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0177
+    chunk_id: C0177
+    page: 18
+    span:
+    - 16402
+    - 16533
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 193
+      body_index: 211
+      xpath: /w:document/w:body/w:p[194]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 11091
+    - 11099
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 6
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[7]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0129
+    chunk_id: C0129
+    page: 13
+    span:
+    - 11326
+    - 11334
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 140
+      body_index: 154
+      xpath: /w:document/w:body/w:p[141]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0131
+    chunk_id: C0131
+    page: 13
+    span:
+    - 11488
+    - 11496
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 142
+      body_index: 156
+      xpath: /w:document/w:body/w:p[143]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 首年经营现金盈余 = 首年营业收入-首年变动成本-年度固定付现成本。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R058
+  target: N166
+  kind: compute
+  expr: N124-N132-N137
+  readable_expr: revenue_normal-variable_normal-fixed
+  deps:
+  - N124
+  - N132
+  - N137
+  dep_keys:
+  - revenue_normal
+  - variable_normal
+  - fixed
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0124
+    chunk_id: C0124
+    page: 13
+    span:
+    - 10728
+    - 10834
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 135
+      body_index: 148
+      xpath: /w:document/w:body/w:p[136]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0177
+    chunk_id: C0177
+    page: 18
+    span:
+    - 16402
+    - 16533
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 193
+      body_index: 211
+      xpath: /w:document/w:body/w:p[194]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0126
+    chunk_id: C0126
+    page: 13
+    span:
+    - 11102
+    - 11110
+    source_locator:
+      part: word/document.xml
+      table_index: 13
+      row_index: 6
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[14]/w:tr[7]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1620
+    - 1628
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 10
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[11]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11159
+    - 11167
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0129
+    chunk_id: C0129
+    page: 13
+    span:
+    - 11352
+    - 11360
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 140
+      body_index: 154
+      xpath: /w:document/w:body/w:p[141]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0131
+    chunk_id: C0131
+    page: 13
+    span:
+    - 11499
+    - 11507
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 142
+      body_index: 156
+      xpath: /w:document/w:body/w:p[143]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0147
+    chunk_id: C0147
+    page: 15
+    span:
+    - 13095
+    - 13103
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 160
+      body_index: 176
+      xpath: /w:document/w:body/w:p[161]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年经营现金盈余 = 正常年营业收入-正常年变动成本-年度固定付现成本。任一依赖缺失时不可评估。
+  unit: 万元
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R059
+  target: N167
+  kind: compute
+  expr: N115-N123
+  readable_expr: price-variable_unit
+  deps:
+  - N115
+  - N123
+  dep_keys:
+  - price
+  - variable_unit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11114
+    - 11268
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11140
+    - 11146
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 单套贡献 = 不含税产品销售单价-单套变动成本。任一依赖缺失时不可评估。
+  unit: 元/套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R060
+  target: N168
+  kind: compute
+  expr: N166/N124
+  readable_expr: surplus_normal/revenue_normal
+  deps:
+  - N166
+  - N124
+  dep_keys:
+  - surplus_normal
+  - revenue_normal
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: N124 > 0
+    additional_source: revenue_normal > 0
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11114
+    - 11268
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11178
+    - 11184
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 正常年经营现金盈余率 = 正常年经营现金盈余/正常年营业收入。任一依赖缺失时不可评估。仅在“正常年营业收入 > 0”成立时执行。
+  unit: 比例
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R061
+  target: N169
+  kind: compute
+  expr: ceil(N137*10000/N167)
+  readable_expr: ceil(fixed*10000/contribution)
+  deps:
+  - N137
+  - N167
+  dep_keys:
+  - fixed
+  - contribution
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: N167 > 0
+    additional_source: contribution > 0
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11114
+    - 11268
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11217
+    - 11223
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 经营付现收支平衡销量 = ceil(年度固定付现成本*10000/单套贡献)。任一依赖缺失时不可评估。仅在“单套贡献 > 0”成立时执行。
+  unit: 套
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  unit_conversion: 10000为元与万元的明示換算，非新增业务系数
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R062
+  target: N170
+  kind: compute
+  expr: N064+1+(N147-N165)/N166
+  readable_expr: years_build+1+(funding-surplus_first)/surplus_normal
+  deps:
+  - N064
+  - N147
+  - N165
+  - N166
+  dep_keys:
+  - years_build
+  - funding
+  - surplus_first
+  - surplus_normal
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: N147 > N165 and N166 > 0
+    additional_source: funding > surplus_first and surplus_normal > 0
+  origin: source_explicit
+  source:
+  - EV-05
+  source_locations:
+  - block_id: B0129
+    chunk_id: C0129
+    page: 13
+    span:
+    - 11288
+    - 11418
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 140
+      body_index: 154
+      xpath: /w:document/w:body/w:p[141]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0130
+    chunk_id: C0130
+    page: 13
+    span:
+    - 11420
+    - 11466
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 141
+      body_index: 155
+      xpath: /w:document/w:body/w:p[142]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0131
+    chunk_id: C0131
+    page: 13
+    span:
+    - 11468
+    - 11515
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 142
+      body_index: 156
+      xpath: /w:document/w:body/w:p[143]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0132
+    chunk_id: C0132
+    page: 13
+    span:
+    - 11517
+    - 11637
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 143
+      body_index: 157
+      xpath: /w:document/w:body/w:p[144]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0023
+    chunk_id: C0023
+    page: 3
+    span:
+    - 1659
+    - 1663
+    source_locator:
+      part: word/document.xml
+      table_index: 1
+      row_index: 11
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[2]/w:tr[12]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0141
+    chunk_id: C0141
+    page: 14
+    span:
+    - 12581
+    - 12585
+    source_locator:
+      part: word/document.xml
+      table_index: 15
+      row_index: 5
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[16]/w:tr[6]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0131
+    chunk_id: C0131
+    page: 13
+    span:
+    - 11510
+    - 11514
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 142
+      body_index: 156
+      xpath: /w:document/w:body/w:p[143]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0132
+    chunk_id: C0132
+    page: 13
+    span:
+    - 11579
+    - 11583
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 143
+      body_index: 157
+      xpath: /w:document/w:body/w:p[144]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0147
+    chunk_id: C0147
+    page: 15
+    span:
+    - 13113
+    - 13117
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 160
+      body_index: 176
+      xpath: /w:document/w:body/w:p[161]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: recompute
+  enabled: true
+  narrative_zh: 简化静态资金回收期 = 建设期年数+1+(融资前项目资金需求-首年经营现金盈余)/正常年经营现金盈余。任一依赖缺失时不可评估。仅在“融资前项目资金需求 > 首年经营现金盈余 and 正常年经营现金盈余 > 0”成立时执行。
+  unit: 年
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R063
+  target: N179
+  kind: select
+  expr: N034>=N018
+  readable_expr: capacity>=demand_normal
+  deps:
+  - N034
+  - N018
+  dep_keys:
+  - capacity
+  - demand_normal
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0051
+    chunk_id: C0051
+    page: 6
+    span:
+    - 4259
+    - 4379
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 55
+      body_index: 60
+      xpath: /w:document/w:body/w:p[56]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0054
+    chunk_id: C0054
+    page: 6
+    span:
+    - 4507
+    - 4636
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 58
+      body_index: 63
+      xpath: /w:document/w:body/w:p[59]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3393
+    - 3394
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 4
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[5]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: 基准年度需求覆盖 = 正常年合格产能>=正常年合计需求。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R064
+  target: N180
+  kind: select
+  expr: N147<=N150
+  readable_expr: funding<=investment_cap
+  deps:
+  - N147
+  - N150
+  dep_keys:
+  - funding
+  - investment_cap
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12919
+    - 13068
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3420
+    - 3421
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 5
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[6]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: 融资前投资控制满足 = 融资前项目资金需求<=融资前投资控制上限。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R065
+  target: N181
+  kind: select
+  expr: N152<=N149
+  readable_expr: loan_need<=loan_cap
+  deps:
+  - N152
+  - N149
+  dep_keys:
+  - loan_need
+  - loan_cap
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10455
+    - 10577
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: 意向融资上限满足 = 拟需借款<=银行意向融资上限。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R066
+  target: N182
+  kind: select
+  expr: N063<=N172
+  readable_expr: months_total<=months_limit
+  deps:
+  - N063
+  - N172
+  dep_keys:
+  - months_total
+  - months_limit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0068
+    chunk_id: C0068
+    page: 8
+    span:
+    - 5689
+    - 5806
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 74
+      body_index: 80
+      xpath: /w:document/w:body/w:p[75]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3447
+    - 3448
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 6
+      cell_index: 2
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[7]/w:tc[3]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: 实施计划期限满足 = 实施期限<=实施期限上限。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R067
+  target: N183
+  kind: select
+  expr: N170<=N171
+  readable_expr: payback<=payback_limit
+  deps:
+  - N170
+  - N171
+  dep_keys:
+  - payback
+  - payback_limit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0132
+    chunk_id: C0132
+    page: 13
+    span:
+    - 11517
+    - 11637
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 143
+      body_index: 157
+      xpath: /w:document/w:body/w:p[144]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: 简化回收期初筛满足 = 简化静态资金回收期<=静态回收期初筛上限。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R068
+  target: N184
+  kind: select
+  expr: N131<=N057
+  readable_expr: energy_annual<=annual_energy_budget
+  deps:
+  - N131
+  - N057
+  dep_keys:
+  - energy_annual
+  - annual_energy_budget
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0065
+    chunk_id: C0065
+    page: 7
+    span:
+    - 5533
+    - 5659
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 70
+      body_index: 76
+      xpath: /w:document/w:body/w:p[71]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: 年度内部用电预算满足 = 正常年生产用电量<=年度内部用电预算。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R069
+  target: N185
+  kind: select
+  expr: N173>=N018
+  readable_expr: a_capacity>=demand_normal
+  deps:
+  - N173
+  - N018
+  dep_keys:
+  - a_capacity
+  - demand_normal
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3389
+    - 3390
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 4
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[5]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: A方案需求覆盖 = A方案合格能力>=正常年合计需求。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R070
+  target: N186
+  kind: select
+  expr: N174<=N150
+  readable_expr: a_funding<=investment_cap
+  deps:
+  - N174
+  - N150
+  dep_keys:
+  - a_funding
+  - investment_cap
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3416
+    - 3417
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 5
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[6]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: A方案资金控制满足 = A方案融资前资金需求<=融资前投资控制上限。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R071
+  target: N187
+  kind: select
+  expr: N175<=N172
+  readable_expr: a_months<=months_limit
+  deps:
+  - N175
+  - N172
+  dep_keys:
+  - a_months
+  - months_limit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3443
+    - 3444
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 6
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[7]/w:tc[2]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: A方案期限满足 = A方案实施期<=实施期限上限。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R072
+  target: N188
+  kind: select
+  expr: N176>=N018
+  readable_expr: c_capacity>=demand_normal
+  deps:
+  - N176
+  - N018
+  dep_keys:
+  - c_capacity
+  - demand_normal
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3397
+    - 3398
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 4
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[5]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: C方案需求覆盖 = C方案合格能力>=正常年合计需求。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R073
+  target: N189
+  kind: select
+  expr: N177<=N150
+  readable_expr: c_funding<=investment_cap
+  deps:
+  - N177
+  - N150
+  dep_keys:
+  - c_funding
+  - investment_cap
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3424
+    - 3425
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 5
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[6]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: C方案资金控制满足 = C方案融资前资金需求<=融资前投资控制上限。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。
+- id: R074
+  target: N190
+  kind: select
+  expr: N178<=N172
+  readable_expr: c_months<=months_limit
+  deps:
+  - N178
+  - N172
+  dep_keys:
+  - c_months
+  - months_limit
+  guard:
+    missing_any_dep: UNDEFINED
+    additional_expr: null
+    additional_source: null
+  origin: source_explicit
+  source:
+  - EV-08
+  source_locations:
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  - block_id: B0042
+    chunk_id: C0042
+    page: 5
+    span:
+    - 3451
+    - 3452
+    source_locator:
+      part: word/document.xml
+      table_index: 3
+      row_index: 6
+      cell_index: 3
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[4]/w:tr[7]/w:tc[4]
+    span_convention: unicode_codepoint_0_based_end_exclusive
+  on_dep_change: rejudge
+  enabled: true
+  narrative_zh: C方案期限满足 = C方案实施期<=实施期限上限。任一依赖缺失时不可评估。
+  unit: null
+  execution:
+    language: restricted_decimal_expression
+    precision: 50
+    rounding: display_only_HALF_UP
+    allowed_functions:
+    - min
+    - max
+    - floor
+    - ceil
+    no_python_eval: true
+  narrative_origin: 原文公式的确定性标签展开；不是新增论证或未披露计算规则。

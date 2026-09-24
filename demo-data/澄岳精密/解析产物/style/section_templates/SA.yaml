@@ -1,0 +1,47 @@
+section_id: SA
+title: 附录A  内部资料目录
+level: 1
+reusable: false
+paragraph_order:
+- chunk_id: C0152
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0152
+- chunk_id: C0153
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0153
+- chunk_id: C0154
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0154
+- chunk_id: C0155
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0155
+- chunk_id: C0156
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0156
+- chunk_id: C0157
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0157
+- chunk_id: C0158
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0158
+tables:
+- table_id: T17
+  caption: 表A-1 资料登记表
+  columns:
+  - 编号
+  - 名称 / 文号
+  - 形成日期
+  - 采用内容与状态
+  chunk_id: C0155
+argument_patterns:
+- claim_id: L046
+  pattern: 预测、询价和内部参数不能证明合同、验收或银行承诺。
+  strength: boundary
+  requires_support:
+  - N012
+  - N194
+  - N195
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

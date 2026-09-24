@@ -1,0 +1,38 @@
+section_id: READ.H1
+title: 报告使用说明
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0012
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0012
+- chunk_id: C0013
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0013
+- chunk_id: C0014
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0014
+- chunk_id: C0015
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0015
+- chunk_id: C0016
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0016
+- chunk_id: C0017
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0017
+- chunk_id: C0018
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0018
+tables:
+- table_id: T00
+  caption: 目录
+  columns:
+  - 章节
+  - 内容
+  chunk_id: C0017
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

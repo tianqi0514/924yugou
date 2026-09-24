@@ -1,0 +1,157 @@
+section_id: S11
+title: 十一、风险、约束与结论
+level: 1
+reusable: true
+paragraph_order:
+- chunk_id: C0134
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0134
+- chunk_id: C0135
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0135
+- chunk_id: C0136
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0136
+- chunk_id: C0137
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0137
+- chunk_id: C0138
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0138
+- chunk_id: C0139
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0139
+- chunk_id: C0140
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0140
+- chunk_id: C0141
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0141
+- chunk_id: C0142
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0142
+- chunk_id: C0143
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0143
+- chunk_id: C0144
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0144
+- chunk_id: C0145
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0145
+- chunk_id: C0146
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0146
+- chunk_id: C0147
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0147
+- chunk_id: C0148
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0148
+- chunk_id: C0149
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0149
+- chunk_id: C0150
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0150
+- chunk_id: C0151
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0151
+tables:
+- table_id: T14
+  caption: 表11-1 关键风险与待核事项
+  columns:
+  - 事项
+  - 当前信息
+  - 影响及处理
+  chunk_id: C0137
+- table_id: T15
+  caption: 表11-2 基准情景约束检查
+  columns:
+  - 约束
+  - 结果
+  - 判断边界
+  chunk_id: C0141
+- table_id: T16
+  caption: 表11-3 下一阶段提资及责任分工
+  columns:
+  - 需补充资料
+  - 责任部门
+  - 期望形成的结果
+  chunk_id: C0150
+argument_patterns:
+- claim_id: L039
+  pattern: 可继续条件下计算，不能凭余量推定增容费用工期。
+  strength: conditional
+  requires_support:
+  - N056
+  - N100
+  - N034
+  - N163
+  - N164
+  - N099
+- claim_id: L040
+  pattern: 数值约束与证据型条件分开判断。
+  strength: boundary
+  requires_support:
+  - N179
+  - N180
+  - N181
+  - N182
+  - N183
+  - N193
+- claim_id: L041
+  pattern: 名义能力覆盖本项目预测，排除历史旧线交付。
+  strength: conditional
+  requires_support:
+  - N034
+  - N018
+  - N042
+  - N076
+  - N020
+  - N199
+- claim_id: L042
+  pattern: 两个余量相同仅为当前情景；不再相同时应拆句。
+  strength: conditional
+  requires_support:
+  - N147
+  - N114
+  - N146
+  - N148
+  - N152
+  - N153
+  - N154
+- claim_id: L043
+  pattern: 满足本轮初筛，不保证税后盈利、需求实现或资金到位。
+  strength: conditional
+  requires_support:
+  - N124
+  - N166
+  - N170
+  - N183
+- claim_id: L044
+  pattern: 保留配电待复测、融资待测，不出无条件开工结论。
+  strength: conditional
+  requires_support:
+  - N191
+  - N192
+  - N056
+  - N193
+  - N195
+  - N179
+  - N180
+  - N181
+  - N182
+  - N183
+- claim_id: L045
+  pattern: 新版本保留历史实绩与原依据，补资料须说明替代关系。
+  strength: boundary
+  requires_support:
+  - N199
+  - N020
+  - N019
+  - N021
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

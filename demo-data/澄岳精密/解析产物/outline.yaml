@@ -1,0 +1,2856 @@
+sections:
+- id: FRONT
+  title: 封面
+  level: 0
+  children: []
+  synthetic_container: true
+  chunks:
+  - C0001
+  - C0002
+  - C0003
+  - C0004
+  - C0005
+  - C0006
+  - C0007
+  - C0008
+  - C0009
+  - C0010
+  pages:
+  - 1
+  source_spans:
+  - - 0
+    - 21
+  - - 23
+    - 39
+  - - 41
+    - 58
+  - - 60
+    - 77
+  - - 79
+    - 100
+  - - 102
+    - 122
+  - - 124
+    - 134
+  - - 136
+    - 153
+  - - 155
+    - 182
+  - - 184
+    - 252
+  source_char_count: 234
+  nodes:
+  - N002
+  - N004
+  - N005
+  - N006
+  - N003
+  - N001
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: READ
+  title: 阅读说明与目录
+  level: 1
+  paragraphs:
+  - 11
+  pages:
+  - 2
+  children:
+  - READ.H1
+  chunks:
+  - C0011
+  - C0012
+  - C0013
+  - C0014
+  - C0015
+  - C0016
+  - C0017
+  - C0018
+  source_spans:
+  - - 254
+    - 263
+  - - 265
+    - 274
+  - - 276
+    - 378
+  - - 380
+    - 497
+  - - 499
+    - 613
+  - - 615
+    - 617
+  - - 619
+    - 868
+  - - 870
+    - 938
+  source_char_count: 670
+  nodes:
+  - N006
+  - N209
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: READ.H1
+  title: 报告使用说明
+  level: 2
+  parent: READ
+  paragraphs:
+  - 12
+  pages:
+  - 2
+  chunks:
+  - C0012
+  - C0013
+  - C0014
+  - C0015
+  - C0016
+  - C0017
+  - C0018
+  source_spans:
+  - - 265
+    - 274
+  - - 276
+    - 378
+  - - 380
+    - 497
+  - - 499
+    - 613
+  - - 615
+    - 617
+  - - 619
+    - 868
+  - - 870
+    - 938
+  source_char_count: 661
+  nodes:
+  - N006
+  - N209
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S1
+  title: 一、项目概要与预审意见
+  level: 1
+  paragraphs:
+  - 20
+  pages:
+  - 3
+  children: []
+  chunks:
+  - C0019
+  - C0020
+  - C0021
+  - C0022
+  - C0023
+  - C0024
+  source_spans:
+  - - 940
+    - 953
+  - - 955
+    - 1059
+  - - 1061
+    - 1193
+  - - 1195
+    - 1208
+  - - 1210
+    - 1722
+  - - 1724
+    - 1851
+  source_char_count: 901
+  nodes:
+  - N042
+  - N025
+  - N034
+  - N036
+  - N124
+  - N114
+  - N146
+  - N147
+  - N166
+  - N170
+  - N030
+  - N031
+  - N148
+  - N152
+  - N192
+  - N018
+  - N150
+  - N153
+  - N050
+  - N051
+  - N053
+  - N007
+  - N242
+  - N243
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S2
+  title: 二、业务需求、产品与项目边界
+  level: 1
+  paragraphs:
+  - 27
+  pages:
+  - 4
+  children:
+  - S2.1
+  - S2.2
+  chunks:
+  - C0025
+  - C0026
+  - C0027
+  - C0028
+  - C0029
+  - C0030
+  - C0031
+  - C0032
+  - C0033
+  - C0034
+  - C0035
+  source_spans:
+  - - 1853
+    - 1869
+  - - 1871
+    - 1887
+  - - 1889
+    - 2004
+  - - 2006
+    - 2020
+  - - 2022
+    - 2211
+  - - 2213
+    - 2343
+  - - 2345
+    - 2486
+  - - 2488
+    - 2502
+  - - 2504
+    - 2627
+  - - 2629
+    - 2737
+  - - 2739
+    - 2805
+  source_char_count: 932
+  nodes:
+  - N013
+  - N015
+  - N014
+  - N016
+  - N017
+  - N018
+  - N072
+  - N023
+  - N019
+  - N020
+  - N021
+  - N025
+  - N008
+  - N066
+  - N067
+  - N068
+  - N069
+  - N024
+  - N209
+  - N236
+  - N211
+  - N244
+  - N245
+  - N246
+  - N247
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S2.1
+  title: 2.1 需求来源与历史业务
+  level: 2
+  parent: S2
+  paragraphs:
+  - 28
+  pages:
+  - 4
+  chunks:
+  - C0026
+  - C0027
+  - C0028
+  - C0029
+  - C0030
+  - C0031
+  source_spans:
+  - - 1871
+    - 1887
+  - - 1889
+    - 2004
+  - - 2006
+    - 2020
+  - - 2022
+    - 2211
+  - - 2213
+    - 2343
+  - - 2345
+    - 2486
+  source_char_count: 605
+  nodes:
+  - N013
+  - N015
+  - N014
+  - N016
+  - N017
+  - N018
+  - N072
+  - N023
+  - N019
+  - N020
+  - N021
+  - N008
+  - N066
+  - N067
+  - N068
+  - N069
+  - N209
+  - N236
+  - N211
+  - N244
+  - N245
+  - N246
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S2.2
+  title: 2.2 边界与产销口径
+  level: 2
+  parent: S2
+  paragraphs:
+  - 34
+  pages:
+  - 4
+  chunks:
+  - C0032
+  - C0033
+  - C0034
+  - C0035
+  source_spans:
+  - - 2488
+    - 2502
+  - - 2504
+    - 2627
+  - - 2629
+    - 2737
+  - - 2739
+    - 2805
+  source_char_count: 311
+  nodes:
+  - N025
+  - N024
+  - N247
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S3
+  title: 三、工艺路径与备选方案
+  level: 1
+  paragraphs:
+  - 39
+  pages:
+  - 5
+  children:
+  - S3.1
+  chunks:
+  - C0036
+  - C0037
+  - C0038
+  - C0039
+  - C0040
+  - C0041
+  - C0042
+  - C0043
+  - C0044
+  source_spans:
+  - - 2807
+    - 2820
+  - - 2822
+    - 2839
+  - - 2841
+    - 2946
+  - - 2948
+    - 3076
+  - - 3078
+    - 3180
+  - - 3182
+    - 3194
+  - - 3196
+    - 3498
+  - - 3500
+    - 3607
+  - - 3609
+    - 3726
+  source_char_count: 903
+  nodes:
+  - N173
+  - N034
+  - N176
+  - N174
+  - N147
+  - N177
+  - N175
+  - N063
+  - N178
+  - N018
+  - N150
+  - N172
+  - N185
+  - N179
+  - N188
+  - N186
+  - N180
+  - N189
+  - N187
+  - N182
+  - N190
+  - N029
+  - N025
+  - N011
+  - N212
+  - N215
+  - N233
+  - N248
+  - N249
+  - N250
+  - N251
+  - N252
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S3.1
+  title: 3.1 拟采用工艺与验收边界
+  level: 2
+  parent: S3
+  paragraphs:
+  - 40
+  pages:
+  - 5
+  chunks:
+  - C0037
+  - C0038
+  - C0039
+  - C0040
+  - C0041
+  - C0042
+  - C0043
+  - C0044
+  source_spans:
+  - - 2822
+    - 2839
+  - - 2841
+    - 2946
+  - - 2948
+    - 3076
+  - - 3078
+    - 3180
+  - - 3182
+    - 3194
+  - - 3196
+    - 3498
+  - - 3500
+    - 3607
+  - - 3609
+    - 3726
+  source_char_count: 890
+  nodes:
+  - N173
+  - N034
+  - N176
+  - N174
+  - N147
+  - N177
+  - N175
+  - N063
+  - N178
+  - N018
+  - N150
+  - N172
+  - N185
+  - N179
+  - N188
+  - N186
+  - N180
+  - N189
+  - N187
+  - N182
+  - N190
+  - N029
+  - N025
+  - N011
+  - N212
+  - N215
+  - N233
+  - N248
+  - N249
+  - N250
+  - N251
+  - N252
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S4
+  title: 四、产能测算与交付匹配
+  level: 1
+  paragraphs:
+  - 49
+  pages:
+  - 6
+  children:
+  - S4.1
+  chunks:
+  - C0045
+  - C0046
+  - C0047
+  - C0048
+  - C0049
+  - C0050
+  - C0051
+  - C0052
+  - C0053
+  - C0054
+  - C0055
+  source_spans:
+  - - 3728
+    - 3741
+  - - 3743
+    - 3754
+  - - 3756
+    - 4049
+  - - 4051
+    - 4141
+  - - 4143
+    - 4205
+  - - 4207
+    - 4257
+  - - 4259
+    - 4379
+  - - 4381
+    - 4487
+  - - 4489
+    - 4505
+  - - 4507
+    - 4636
+  - - 4638
+    - 4751
+  source_char_count: 1003
+  nodes:
+  - N025
+  - N026
+  - N029
+  - N030
+  - N031
+  - N018
+  - N017
+  - N027
+  - N028
+  - N034
+  - N032
+  - N033
+  - N036
+  - N037
+  - N040
+  - N035
+  - N212
+  - N253
+  - N254
+  - N255
+  - N256
+  - N257
+  - N258
+  - N259
+  - N260
+  - N261
+  - N262
+  - N263
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S4.1
+  title: 4.1 交付结论与复议条件
+  level: 2
+  parent: S4
+  paragraphs:
+  - 57
+  pages:
+  - 6
+  chunks:
+  - C0053
+  - C0054
+  - C0055
+  source_spans:
+  - - 4489
+    - 4505
+  - - 4507
+    - 4636
+  - - 4638
+    - 4751
+  source_char_count: 258
+  nodes:
+  - N029
+  - N030
+  - N031
+  - N040
+  - N259
+  - N260
+  - N261
+  - N262
+  - N263
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S5
+  title: 五、厂房改造与公辅条件
+  level: 1
+  paragraphs:
+  - 61
+  pages:
+  - 7
+  children:
+  - S5.1
+  - S5.2
+  chunks:
+  - C0056
+  - C0057
+  - C0058
+  - C0059
+  - C0060
+  - C0061
+  - C0062
+  - C0063
+  - C0064
+  - C0065
+  source_spans:
+  - - 4753
+    - 4766
+  - - 4768
+    - 4784
+  - - 4786
+    - 4907
+  - - 4909
+    - 4923
+  - - 4925
+    - 5121
+  - - 5123
+    - 5248
+  - - 5250
+    - 5268
+  - - 5270
+    - 5394
+  - - 5396
+    - 5531
+  - - 5533
+    - 5659
+  source_char_count: 888
+  nodes:
+  - N043
+  - N044
+  - N045
+  - N046
+  - N042
+  - N041
+  - N048
+  - N047
+  - N101
+  - N102
+  - N103
+  - N050
+  - N051
+  - N053
+  - N054
+  - N055
+  - N120
+  - N131
+  - N057
+  - N049
+  - N056
+  - N224
+  - N227
+  - N264
+  - N265
+  - N266
+  - N267
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S5.1
+  title: 5.1 厂房面积与改造范围
+  level: 2
+  parent: S5
+  paragraphs:
+  - 62
+  pages:
+  - 7
+  chunks:
+  - C0057
+  - C0058
+  - C0059
+  - C0060
+  - C0061
+  source_spans:
+  - - 4768
+    - 4784
+  - - 4786
+    - 4907
+  - - 4909
+    - 4923
+  - - 4925
+    - 5121
+  - - 5123
+    - 5248
+  source_char_count: 472
+  nodes:
+  - N043
+  - N044
+  - N045
+  - N046
+  - N042
+  - N041
+  - N048
+  - N047
+  - N101
+  - N102
+  - N103
+  - N264
+  - N265
+  - N266
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S5.2
+  title: 5.2 配电资料分歧与用能预算
+  level: 2
+  parent: S5
+  paragraphs:
+  - 67
+  pages:
+  - 7
+  chunks:
+  - C0062
+  - C0063
+  - C0064
+  - C0065
+  source_spans:
+  - - 5250
+    - 5268
+  - - 5270
+    - 5394
+  - - 5396
+    - 5531
+  - - 5533
+    - 5659
+  source_char_count: 403
+  nodes:
+  - N050
+  - N051
+  - N053
+  - N054
+  - N055
+  - N102
+  - N120
+  - N131
+  - N057
+  - N049
+  - N056
+  - N224
+  - N227
+  - N267
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S6
+  title: 六、实施进度与人员配置
+  level: 1
+  paragraphs:
+  - 72
+  pages:
+  - 8
+  children:
+  - S6.1
+  - S6.2
+  chunks:
+  - C0066
+  - C0067
+  - C0068
+  - C0069
+  - C0070
+  - C0071
+  - C0072
+  - C0073
+  - C0074
+  - C0075
+  - C0076
+  - C0077
+  source_spans:
+  - - 5661
+    - 5674
+  - - 5676
+    - 5687
+  - - 5689
+    - 5806
+  - - 5808
+    - 5819
+  - - 5821
+    - 6126
+  - - 6128
+    - 6242
+  - - 6244
+    - 6256
+  - - 6258
+    - 6359
+  - - 6361
+    - 6377
+  - - 6379
+    - 6501
+  - - 6503
+    - 6615
+  - - 6617
+    - 6718
+  source_char_count: 1035
+  nodes:
+  - N059
+  - N060
+  - N061
+  - N062
+  - N063
+  - N066
+  - N025
+  - N027
+  - N073
+  - N075
+  - N074
+  - N076
+  - N077
+  - N078
+  - N035
+  - N058
+  - N065
+  - N204
+  - N205
+  - N206
+  - N207
+  - N208
+  - N268
+  - N269
+  - N270
+  - N271
+  - N272
+  - N273
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S6.1
+  title: 6.1 计划进度
+  level: 2
+  parent: S6
+  paragraphs:
+  - 73
+  pages:
+  - 8
+  chunks:
+  - C0067
+  - C0068
+  - C0069
+  - C0070
+  - C0071
+  source_spans:
+  - - 5676
+    - 5687
+  - - 5689
+    - 5806
+  - - 5808
+    - 5819
+  - - 5821
+    - 6126
+  - - 6128
+    - 6242
+  source_char_count: 558
+  nodes:
+  - N059
+  - N060
+  - N061
+  - N062
+  - N063
+  - N066
+  - N058
+  - N065
+  - N204
+  - N205
+  - N206
+  - N207
+  - N208
+  - N268
+  - N269
+  - N270
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S6.2
+  title: 6.2 定员与组织
+  level: 2
+  parent: S6
+  paragraphs:
+  - 78
+  pages:
+  - 8
+  chunks:
+  - C0072
+  - C0073
+  - C0074
+  - C0075
+  - C0076
+  - C0077
+  source_spans:
+  - - 6244
+    - 6256
+  - - 6258
+    - 6359
+  - - 6361
+    - 6377
+  - - 6379
+    - 6501
+  - - 6503
+    - 6615
+  - - 6617
+    - 6718
+  source_char_count: 464
+  nodes:
+  - N025
+  - N027
+  - N073
+  - N075
+  - N074
+  - N076
+  - N077
+  - N078
+  - N035
+  - N271
+  - N272
+  - N273
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S7
+  title: 七、建设投资估算
+  level: 1
+  paragraphs:
+  - 85
+  - 96
+  pages:
+  - 9
+  - 10
+  children:
+  - S7.1
+  - S7.2
+  - S7.3
+  - S7.4
+  chunks:
+  - C0078
+  - C0079
+  - C0080
+  - C0081
+  - C0082
+  - C0083
+  - C0084
+  - C0085
+  - C0086
+  - C0087
+  - C0088
+  - C0089
+  - C0090
+  - C0091
+  - C0092
+  - C0093
+  - C0094
+  - C0095
+  - C0096
+  - C0097
+  - C0098
+  - C0099
+  source_spans:
+  - - 6720
+    - 6730
+  - - 6732
+    - 6747
+  - - 6749
+    - 6853
+  - - 6855
+    - 6873
+  - - 6875
+    - 7193
+  - - 7195
+    - 7334
+  - - 7336
+    - 7353
+  - - 7355
+    - 7369
+  - - 7371
+    - 7567
+  - - 7569
+    - 7729
+  - - 7731
+    - 7744
+  - - 7746
+    - 7760
+  - - 7762
+    - 7864
+  - - 7866
+    - 7898
+  - - 7900
+    - 7960
+  - - 7962
+    - 8004
+  - - 8006
+    - 8019
+  - - 8021
+    - 8331
+  - - 8333
+    - 8428
+  - - 8430
+    - 8444
+  - - 8446
+    - 8563
+  - - 8565
+    - 8689
+  source_char_count: 1927
+  nodes:
+  - N079
+  - N080
+  - N081
+  - N082
+  - N083
+  - N084
+  - N085
+  - N086
+  - N087
+  - N088
+  - N089
+  - N090
+  - N091
+  - N092
+  - N093
+  - N094
+  - N095
+  - N096
+  - N097
+  - N098
+  - N100
+  - N042
+  - N047
+  - N101
+  - N102
+  - N103
+  - N104
+  - N111
+  - N112
+  - N108
+  - N113
+  - N114
+  - N109
+  - N105
+  - N106
+  - N107
+  - N110
+  - N099
+  - N202
+  - N215
+  - N218
+  - N274
+  - N275
+  - N276
+  - N277
+  - N278
+  - N279
+  - N280
+  - N281
+  - N282
+  - N283
+  - N284
+  - N285
+  - N286
+  - N287
+  - N288
+  - N289
+  - N290
+  - N291
+  - N292
+  - N293
+  - N294
+  - N295
+  - N296
+  - N297
+  - N298
+  - N299
+  - N300
+  - N301
+  - N302
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S7.1
+  title: 7.1 编制范围及购置费
+  level: 2
+  parent: S7
+  paragraphs:
+  - 86
+  pages:
+  - 9
+  chunks:
+  - C0079
+  - C0080
+  - C0081
+  - C0082
+  - C0083
+  source_spans:
+  - - 6732
+    - 6747
+  - - 6749
+    - 6853
+  - - 6855
+    - 6873
+  - - 6875
+    - 7193
+  - - 7195
+    - 7334
+  source_char_count: 594
+  nodes:
+  - N079
+  - N080
+  - N081
+  - N082
+  - N083
+  - N084
+  - N085
+  - N086
+  - N087
+  - N088
+  - N089
+  - N090
+  - N091
+  - N092
+  - N093
+  - N094
+  - N095
+  - N096
+  - N097
+  - N098
+  - N100
+  - N215
+  - N218
+  - N274
+  - N275
+  - N276
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S7.2
+  title: 7.2 建筑、公辅及其他费用
+  level: 2
+  parent: S7
+  paragraphs:
+  - 91
+  pages:
+  - 9
+  chunks:
+  - C0084
+  - C0085
+  - C0086
+  - C0087
+  source_spans:
+  - - 7336
+    - 7353
+  - - 7355
+    - 7369
+  - - 7371
+    - 7567
+  - - 7569
+    - 7729
+  source_char_count: 387
+  nodes:
+  - N042
+  - N047
+  - N101
+  - N102
+  - N103
+  - N104
+  - N108
+  - N105
+  - N106
+  - N107
+  - N202
+  - N277
+  - N278
+  - N279
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S7.3
+  title: 7.3 汇总方法与金额
+  level: 2
+  parent: S7
+  paragraphs:
+  - 97
+  pages:
+  - 10
+  chunks:
+  - C0089
+  - C0090
+  - C0091
+  - C0092
+  - C0093
+  - C0094
+  - C0095
+  - C0096
+  source_spans:
+  - - 7746
+    - 7760
+  - - 7762
+    - 7864
+  - - 7866
+    - 7898
+  - - 7900
+    - 7960
+  - - 7962
+    - 8004
+  - - 8006
+    - 8019
+  - - 8021
+    - 8331
+  - - 8333
+    - 8428
+  source_char_count: 668
+  nodes:
+  - N104
+  - N100
+  - N111
+  - N112
+  - N108
+  - N113
+  - N114
+  - N109
+  - N105
+  - N106
+  - N107
+  - N110
+  - N280
+  - N281
+  - N282
+  - N283
+  - N284
+  - N285
+  - N286
+  - N287
+  - N288
+  - N289
+  - N290
+  - N291
+  - N292
+  - N293
+  - N294
+  - N295
+  - N296
+  - N297
+  - N298
+  - N299
+  - N300
+  - N301
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S7.4
+  title: 7.4 精度与变更原则
+  level: 2
+  parent: S7
+  paragraphs:
+  - 105
+  pages:
+  - 10
+  chunks:
+  - C0097
+  - C0098
+  - C0099
+  source_spans:
+  - - 8430
+    - 8444
+  - - 8446
+    - 8563
+  - - 8565
+    - 8689
+  source_char_count: 255
+  nodes:
+  - N113
+  - N042
+  - N099
+  - N302
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S8
+  title: 八、营业收入与经营成本
+  level: 1
+  paragraphs:
+  - 109
+  pages:
+  - 11
+  children:
+  - S8.1
+  - S8.2
+  chunks:
+  - C0100
+  - C0101
+  - C0102
+  - C0103
+  - C0104
+  - C0105
+  - C0106
+  - C0107
+  - C0108
+  - C0109
+  - C0110
+  source_spans:
+  - - 8691
+    - 8704
+  - - 8706
+    - 8720
+  - - 8722
+    - 8853
+  - - 8855
+    - 8895
+  - - 8897
+    - 8985
+  - - 8987
+    - 9000
+  - - 9002
+    - 9320
+  - - 9322
+    - 9458
+  - - 9460
+    - 9473
+  - - 9475
+    - 9615
+  - - 9617
+    - 9722
+  source_char_count: 1011
+  nodes:
+  - N116
+  - N117
+  - N118
+  - N122
+  - N119
+  - N123
+  - N126
+  - N127
+  - N128
+  - N129
+  - N130
+  - N132
+  - N120
+  - N121
+  - N018
+  - N034
+  - N017
+  - N115
+  - N124
+  - N125
+  - N133
+  - N031
+  - N078
+  - N134
+  - N135
+  - N136
+  - N137
+  - N202
+  - N303
+  - N304
+  - N305
+  - N306
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S8.1
+  title: 8.1 收入及成本口径
+  level: 2
+  parent: S8
+  paragraphs:
+  - 110
+  pages:
+  - 11
+  chunks:
+  - C0101
+  - C0102
+  - C0103
+  - C0104
+  - C0105
+  - C0106
+  - C0107
+  source_spans:
+  - - 8706
+    - 8720
+  - - 8722
+    - 8853
+  - - 8855
+    - 8895
+  - - 8897
+    - 8985
+  - - 8987
+    - 9000
+  - - 9002
+    - 9320
+  - - 9322
+    - 9458
+  source_char_count: 740
+  nodes:
+  - N116
+  - N117
+  - N118
+  - N122
+  - N119
+  - N123
+  - N126
+  - N127
+  - N128
+  - N129
+  - N130
+  - N132
+  - N120
+  - N121
+  - N018
+  - N034
+  - N017
+  - N115
+  - N124
+  - N125
+  - N133
+  - N031
+  - N202
+  - N303
+  - N304
+  - N305
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S8.2
+  title: 8.2 固定付现成本
+  level: 2
+  parent: S8
+  paragraphs:
+  - 117
+  pages:
+  - 11
+  chunks:
+  - C0108
+  - C0109
+  - C0110
+  source_spans:
+  - - 9460
+    - 9473
+  - - 9475
+    - 9615
+  - - 9617
+    - 9722
+  source_char_count: 258
+  nodes:
+  - N078
+  - N134
+  - N135
+  - N136
+  - N137
+  - N306
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S9
+  title: 九、营运资金与融资安排
+  level: 1
+  paragraphs:
+  - 121
+  pages:
+  - 12
+  children:
+  - S9.1
+  - S9.2
+  chunks:
+  - C0111
+  - C0112
+  - C0113
+  - C0114
+  - C0115
+  - C0116
+  - C0117
+  - C0118
+  - C0119
+  - C0120
+  - C0121
+  source_spans:
+  - - 9724
+    - 9737
+  - - 9739
+    - 9753
+  - - 9755
+    - 9881
+  - - 9883
+    - 9980
+  - - 9982
+    - 9997
+  - - 9999
+    - 10248
+  - - 10250
+    - 10311
+  - - 10313
+    - 10329
+  - - 10331
+    - 10453
+  - - 10455
+    - 10577
+  - - 10579
+    - 10693
+  source_char_count: 949
+  nodes:
+  - N143
+  - N144
+  - N142
+  - N145
+  - N146
+  - N124
+  - N138
+  - N139
+  - N132
+  - N140
+  - N126
+  - N141
+  - N114
+  - N147
+  - N148
+  - N149
+  - N151
+  - N152
+  - N154
+  - N155
+  - N201
+  - N221
+  - N307
+  - N308
+  - N309
+  - N310
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S9.1
+  title: 9.1 净营运资金估算
+  level: 2
+  parent: S9
+  paragraphs:
+  - 122
+  pages:
+  - 12
+  chunks:
+  - C0112
+  - C0113
+  - C0114
+  - C0115
+  - C0116
+  - C0117
+  source_spans:
+  - - 9739
+    - 9753
+  - - 9755
+    - 9881
+  - - 9883
+    - 9980
+  - - 9982
+    - 9997
+  - - 9999
+    - 10248
+  - - 10250
+    - 10311
+  source_char_count: 562
+  nodes:
+  - N143
+  - N144
+  - N142
+  - N145
+  - N146
+  - N124
+  - N138
+  - N139
+  - N132
+  - N140
+  - N126
+  - N141
+  - N114
+  - N147
+  - N221
+  - N307
+  - N308
+  - N309
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S9.2
+  title: 9.2 资金来源与控制边界
+  level: 2
+  parent: S9
+  paragraphs:
+  - 128
+  pages:
+  - 12
+  chunks:
+  - C0118
+  - C0119
+  - C0120
+  - C0121
+  source_spans:
+  - - 10313
+    - 10329
+  - - 10331
+    - 10453
+  - - 10455
+    - 10577
+  - - 10579
+    - 10693
+  source_char_count: 374
+  nodes:
+  - N148
+  - N149
+  - N151
+  - N152
+  - N154
+  - N155
+  - N201
+  - N310
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S10
+  title: 十、经营现金盈余与回收测算
+  level: 1
+  paragraphs:
+  - 133
+  pages:
+  - 13
+  children:
+  - S10.1
+  - S10.2
+  chunks:
+  - C0122
+  - C0123
+  - C0124
+  - C0125
+  - C0126
+  - C0127
+  - C0128
+  - C0129
+  - C0130
+  - C0131
+  - C0132
+  - C0133
+  source_spans:
+  - - 10695
+    - 10710
+  - - 10712
+    - 10726
+  - - 10728
+    - 10834
+  - - 10836
+    - 10859
+  - - 10861
+    - 11112
+  - - 11114
+    - 11268
+  - - 11270
+    - 11286
+  - - 11288
+    - 11418
+  - - 11420
+    - 11466
+  - - 11468
+    - 11515
+  - - 11517
+    - 11637
+  - - 11639
+    - 11710
+  source_char_count: 993
+  nodes:
+  - N035
+  - N036
+  - N125
+  - N124
+  - N133
+  - N132
+  - N137
+  - N165
+  - N166
+  - N070
+  - N071
+  - N115
+  - N123
+  - N167
+  - N168
+  - N169
+  - N064
+  - N147
+  - N170
+  - N171
+  - N203
+  - N311
+  - N312
+  - N313
+  - N314
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S10.1
+  title: 10.1 经营现金盈余
+  level: 2
+  parent: S10
+  paragraphs:
+  - 134
+  pages:
+  - 13
+  chunks:
+  - C0123
+  - C0124
+  - C0125
+  - C0126
+  - C0127
+  source_spans:
+  - - 10712
+    - 10726
+  - - 10728
+    - 10834
+  - - 10836
+    - 10859
+  - - 10861
+    - 11112
+  - - 11114
+    - 11268
+  source_char_count: 548
+  nodes:
+  - N035
+  - N036
+  - N125
+  - N124
+  - N133
+  - N132
+  - N137
+  - N165
+  - N166
+  - N070
+  - N071
+  - N115
+  - N123
+  - N167
+  - N168
+  - N169
+  - N311
+  - N312
+  - N313
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S10.2
+  title: 10.2 简化静态资金回收
+  level: 2
+  parent: S10
+  paragraphs:
+  - 139
+  pages:
+  - 13
+  chunks:
+  - C0128
+  - C0129
+  - C0130
+  - C0131
+  - C0132
+  - C0133
+  source_spans:
+  - - 11270
+    - 11286
+  - - 11288
+    - 11418
+  - - 11420
+    - 11466
+  - - 11468
+    - 11515
+  - - 11517
+    - 11637
+  - - 11639
+    - 11710
+  source_char_count: 430
+  nodes:
+  - N064
+  - N165
+  - N166
+  - N147
+  - N170
+  - N171
+  - N203
+  - N314
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S11
+  title: 十一、风险、约束与结论
+  level: 1
+  paragraphs:
+  - 146
+  - 156
+  pages:
+  - 14
+  - 15
+  children:
+  - S11.1
+  - S11.2
+  - S11.3
+  chunks:
+  - C0134
+  - C0135
+  - C0136
+  - C0137
+  - C0138
+  - C0139
+  - C0140
+  - C0141
+  - C0142
+  - C0143
+  - C0144
+  - C0145
+  - C0146
+  - C0147
+  - C0148
+  - C0149
+  - C0150
+  - C0151
+  source_spans:
+  - - 11712
+    - 11725
+  - - 11727
+    - 11742
+  - - 11744
+    - 11759
+  - - 11761
+    - 12179
+  - - 12181
+    - 12288
+  - - 12290
+    - 12304
+  - - 12306
+    - 12320
+  - - 12322
+    - 12636
+  - - 12638
+    - 12741
+  - - 12743
+    - 12759
+  - - 12761
+    - 12778
+  - - 12780
+    - 12917
+  - - 12919
+    - 13068
+  - - 13070
+    - 13178
+  - - 13180
+    - 13298
+  - - 13300
+    - 13317
+  - - 13319
+    - 13639
+  - - 13641
+    - 13721
+  source_char_count: 1975
+  nodes:
+  - N018
+  - N115
+  - N029
+  - N030
+  - N031
+  - N050
+  - N051
+  - N053
+  - N139
+  - N141
+  - N034
+  - N147
+  - N150
+  - N153
+  - N152
+  - N149
+  - N172
+  - N063
+  - N171
+  - N170
+  - N099
+  - N042
+  - N076
+  - N023
+  - N020
+  - N114
+  - N146
+  - N148
+  - N124
+  - N166
+  - N025
+  - N056
+  - N315
+  - N316
+  - N317
+  - N318
+  - N319
+  - N320
+  - N321
+  - N322
+  - N323
+  - N324
+  - N325
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S11.1
+  title: 11.1 主要风险及处置
+  level: 2
+  parent: S11
+  paragraphs:
+  - 147
+  pages:
+  - 14
+  chunks:
+  - C0135
+  - C0136
+  - C0137
+  - C0138
+  source_spans:
+  - - 11727
+    - 11742
+  - - 11744
+    - 11759
+  - - 11761
+    - 12179
+  - - 12181
+    - 12288
+  source_char_count: 555
+  nodes:
+  - N018
+  - N115
+  - N029
+  - N030
+  - N031
+  - N050
+  - N051
+  - N053
+  - N139
+  - N141
+  - N099
+  - N315
+  - N316
+  - N317
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S11.2
+  title: 11.2 内部预审判断
+  level: 2
+  parent: S11
+  paragraphs:
+  - 151
+  pages:
+  - 14
+  chunks:
+  - C0139
+  - C0140
+  - C0141
+  - C0142
+  source_spans:
+  - - 12290
+    - 12304
+  - - 12306
+    - 12320
+  - - 12322
+    - 12636
+  - - 12638
+    - 12741
+  source_char_count: 445
+  nodes:
+  - N034
+  - N018
+  - N147
+  - N150
+  - N153
+  - N152
+  - N149
+  - N172
+  - N063
+  - N171
+  - N170
+  - N318
+  - N319
+  - N320
+  - N321
+  - N322
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: S11.3
+  title: 11.3 结论与下一阶段工作
+  level: 2
+  parent: S11
+  paragraphs:
+  - 157
+  pages:
+  - 15
+  chunks:
+  - C0144
+  - C0145
+  - C0146
+  - C0147
+  - C0148
+  - C0149
+  - C0150
+  - C0151
+  source_spans:
+  - - 12761
+    - 12778
+  - - 12780
+    - 12917
+  - - 12919
+    - 13068
+  - - 13070
+    - 13178
+  - - 13180
+    - 13298
+  - - 13300
+    - 13317
+  - - 13319
+    - 13639
+  - - 13641
+    - 13721
+  source_char_count: 946
+  nodes:
+  - N050
+  - N051
+  - N018
+  - N034
+  - N042
+  - N076
+  - N023
+  - N020
+  - N147
+  - N114
+  - N146
+  - N148
+  - N152
+  - N124
+  - N166
+  - N170
+  - N153
+  - N025
+  - N056
+  - N323
+  - N324
+  - N325
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SA
+  title: 附录A  内部资料目录
+  level: 1
+  paragraphs:
+  - 166
+  pages:
+  - 16
+  children:
+  - SA.H1
+  chunks:
+  - C0152
+  - C0153
+  - C0154
+  - C0155
+  - C0156
+  - C0157
+  - C0158
+  source_spans:
+  - - 13723
+    - 13736
+  - - 13738
+    - 13816
+  - - 13818
+    - 13828
+  - - 13830
+    - 14683
+  - - 14685
+    - 14692
+  - - 14694
+    - 14777
+  - - 14779
+    - 14866
+  source_char_count: 1131
+  nodes:
+  - N050
+  - N051
+  - N008
+  - N210
+  - N211
+  - N209
+  - N213
+  - N214
+  - N212
+  - N216
+  - N217
+  - N215
+  - N219
+  - N220
+  - N218
+  - N222
+  - N223
+  - N221
+  - N225
+  - N226
+  - N224
+  - N228
+  - N229
+  - N227
+  - N231
+  - N232
+  - N230
+  - N234
+  - N235
+  - N233
+  - N237
+  - N238
+  - N236
+  - N240
+  - N241
+  - N239
+  - N099
+  - N023
+  - N326
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SA.H1
+  title: 证据边界
+  level: 2
+  parent: SA
+  paragraphs:
+  - 170
+  pages:
+  - 16
+  chunks:
+  - C0156
+  - C0157
+  - C0158
+  source_spans:
+  - - 14685
+    - 14692
+  - - 14694
+    - 14777
+  - - 14779
+    - 14866
+  source_char_count: 177
+  nodes:
+  - N224
+  - N227
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB
+  title: 附录B  关键资料摘录（1）
+  level: 1
+  paragraphs:
+  - 174
+  - 187
+  - 199
+  pages:
+  - 17
+  - 18
+  - 19
+  children:
+  - SB.1
+  - SB.2
+  - SB.3
+  - SB.4
+  - SB.5
+  - SB.6
+  - SB.7
+  - SB.8
+  - SB.9
+  - SB.10
+  - SB.H11
+  chunks:
+  - C0159
+  - C0160
+  - C0161
+  - C0162
+  - C0163
+  - C0164
+  - C0165
+  - C0166
+  - C0167
+  - C0168
+  - C0169
+  - C0170
+  - C0171
+  - C0172
+  - C0173
+  - C0174
+  - C0175
+  - C0176
+  - C0177
+  - C0178
+  - C0179
+  - C0180
+  - C0181
+  - C0182
+  - C0183
+  - C0184
+  - C0185
+  - C0186
+  - C0187
+  - C0188
+  - C0189
+  - C0190
+  - C0191
+  - C0192
+  - C0193
+  - C0194
+  source_spans:
+  - - 14868
+    - 14884
+  - - 14886
+    - 14909
+  - - 14911
+    - 15075
+  - - 15077
+    - 15103
+  - - 15105
+    - 15231
+  - - 15233
+    - 15386
+  - - 15388
+    - 15411
+  - - 15413
+    - 15520
+  - - 15522
+    - 15643
+  - - 15645
+    - 15666
+  - - 15668
+    - 15813
+  - - 15815
+    - 15916
+  - - 15918
+    - 15934
+  - - 15936
+    - 15959
+  - - 15961
+    - 16094
+  - - 16096
+    - 16200
+  - - 16202
+    - 16291
+  - - 16293
+    - 16400
+  - - 16402
+    - 16533
+  - - 16535
+    - 16562
+  - - 16564
+    - 16636
+  - - 16638
+    - 16713
+  - - 16715
+    - 16805
+  - - 16807
+    - 16823
+  - - 16825
+    - 16847
+  - - 16849
+    - 16949
+  - - 16951
+    - 16973
+  - - 16975
+    - 17118
+  - - 17120
+    - 17238
+  - - 17240
+    - 17266
+  - - 17268
+    - 17381
+  - - 17383
+    - 17407
+  - - 17409
+    - 17536
+  - - 17538
+    - 17622
+  - - 17624
+    - 17635
+  - - 17637
+    - 17731
+  source_char_count: 2793
+  nodes:
+  - N013
+  - N014
+  - N015
+  - N016
+  - N115
+  - N025
+  - N026
+  - N027
+  - N028
+  - N029
+  - N030
+  - N031
+  - N173
+  - N174
+  - N175
+  - N176
+  - N177
+  - N178
+  - N080
+  - N079
+  - N082
+  - N083
+  - N085
+  - N086
+  - N088
+  - N089
+  - N091
+  - N092
+  - N094
+  - N095
+  - N041
+  - N042
+  - N043
+  - N044
+  - N045
+  - N046
+  - N048
+  - N047
+  - N102
+  - N103
+  - N105
+  - N106
+  - N107
+  - N116
+  - N117
+  - N118
+  - N119
+  - N120
+  - N121
+  - N077
+  - N134
+  - N135
+  - N136
+  - N109
+  - N110
+  - N138
+  - N139
+  - N140
+  - N141
+  - N142
+  - N050
+  - N051
+  - N053
+  - N057
+  - N150
+  - N172
+  - N171
+  - N148
+  - N149
+  - N023
+  - N019
+  - N020
+  - N021
+  - N022
+  - N059
+  - N060
+  - N061
+  - N062
+  - N073
+  - N074
+  - N007
+  - N008
+  - N097
+  - N099
+  - N049
+  - N058
+  - N065
+  - N066
+  - N067
+  - N068
+  - N069
+  - N209
+  - N212
+  - N215
+  - N218
+  - N221
+  - N224
+  - N227
+  - N230
+  - N233
+  - N236
+  - N239
+  - N226
+  - N229
+  - N327
+  - N328
+  - N329
+  - N330
+  - N331
+  - N332
+  - N333
+  - N334
+  - N335
+  - N336
+  - N337
+  - N338
+  - N339
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.1
+  title: B.1 [资料01] 销售需求预测备忘录
+  level: 2
+  parent: SB
+  paragraphs:
+  - 175
+  pages:
+  - 17
+  chunks:
+  - C0160
+  - C0161
+  source_spans:
+  - - 14886
+    - 14909
+  - - 14911
+    - 15075
+  source_char_count: 187
+  nodes:
+  - N013
+  - N014
+  - N015
+  - N016
+  - N115
+  - N007
+  - N066
+  - N067
+  - N068
+  - N069
+  - N209
+  - N328
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.2
+  title: B.2 [资料02] 装备方案预比较与能力说明
+  level: 2
+  parent: SB
+  paragraphs:
+  - 177
+  pages:
+  - 17
+  chunks:
+  - C0162
+  - C0163
+  - C0164
+  source_spans:
+  - - 15077
+    - 15103
+  - - 15105
+    - 15231
+  - - 15233
+    - 15386
+  source_char_count: 305
+  nodes:
+  - N025
+  - N026
+  - N027
+  - N028
+  - N029
+  - N030
+  - N031
+  - N173
+  - N174
+  - N175
+  - N176
+  - N177
+  - N178
+  - N212
+  - N329
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.3
+  title: B.3 [资料03] 设备与系统询价摘要
+  level: 2
+  parent: SB
+  paragraphs:
+  - 180
+  pages:
+  - 17
+  chunks:
+  - C0165
+  - C0166
+  - C0167
+  source_spans:
+  - - 15388
+    - 15411
+  - - 15413
+    - 15520
+  - - 15522
+    - 15643
+  source_char_count: 251
+  nodes:
+  - N080
+  - N079
+  - N082
+  - N083
+  - N085
+  - N086
+  - N088
+  - N089
+  - N091
+  - N092
+  - N094
+  - N095
+  - N097
+  - N099
+  - N215
+  - N330
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.4
+  title: B.4 [资料04] 场地与工程初估
+  level: 2
+  parent: SB
+  paragraphs:
+  - 183
+  pages:
+  - 17
+  chunks:
+  - C0168
+  - C0169
+  - C0170
+  source_spans:
+  - - 15645
+    - 15666
+  - - 15668
+    - 15813
+  - - 15815
+    - 15916
+  source_char_count: 267
+  nodes:
+  - N041
+  - N042
+  - N043
+  - N044
+  - N045
+  - N046
+  - N048
+  - N047
+  - N102
+  - N103
+  - N105
+  - N106
+  - N107
+  - N218
+  - N331
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.5
+  title: B.5 [资料05] 财务测算参数确认单
+  level: 2
+  parent: SB
+  paragraphs:
+  - 188
+  pages:
+  - 18
+  chunks:
+  - C0172
+  - C0173
+  - C0174
+  - C0175
+  - C0176
+  - C0177
+  source_spans:
+  - - 15936
+    - 15959
+  - - 15961
+    - 16094
+  - - 16096
+    - 16200
+  - - 16202
+    - 16291
+  - - 16293
+    - 16400
+  - - 16402
+    - 16533
+  source_char_count: 587
+  nodes:
+  - N115
+  - N116
+  - N117
+  - N118
+  - N119
+  - N120
+  - N121
+  - N031
+  - N077
+  - N134
+  - N135
+  - N136
+  - N109
+  - N110
+  - N138
+  - N139
+  - N140
+  - N141
+  - N142
+  - N007
+  - N221
+  - N333
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.6
+  title: B.6 [资料06A]、[资料06B] 配电资料
+  level: 2
+  parent: SB
+  paragraphs:
+  - 194
+  pages:
+  - 18
+  chunks:
+  - C0178
+  - C0179
+  - C0180
+  - C0181
+  source_spans:
+  - - 16535
+    - 16562
+  - - 16564
+    - 16636
+  - - 16638
+    - 16713
+  - - 16715
+    - 16805
+  source_char_count: 264
+  nodes:
+  - N050
+  - N051
+  - N053
+  - N057
+  - N049
+  - N224
+  - N227
+  - N226
+  - N229
+  - N334
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.7
+  title: B.7 [资料07] 现场踏勘问题清单
+  level: 2
+  parent: SB
+  paragraphs:
+  - 200
+  pages:
+  - 19
+  chunks:
+  - C0183
+  - C0184
+  source_spans:
+  - - 16825
+    - 16847
+  - - 16849
+    - 16949
+  source_char_count: 122
+  nodes:
+  - N103
+  - N230
+  - N336
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.8
+  title: B.8 [资料08] 项目预审会议纪要
+  level: 2
+  parent: SB
+  paragraphs:
+  - 202
+  pages:
+  - 19
+  chunks:
+  - C0185
+  - C0186
+  - C0187
+  source_spans:
+  - - 16951
+    - 16973
+  - - 16975
+    - 17118
+  - - 17120
+    - 17238
+  source_char_count: 283
+  nodes:
+  - N150
+  - N172
+  - N171
+  - N148
+  - N149
+  - N233
+  - N337
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.9
+  title: B.9 [资料09] 2025年旧业务经营摘要
+  level: 2
+  parent: SB
+  paragraphs:
+  - 205
+  pages:
+  - 19
+  chunks:
+  - C0188
+  - C0189
+  source_spans:
+  - - 17240
+    - 17266
+  - - 17268
+    - 17381
+  source_char_count: 139
+  nodes:
+  - N023
+  - N019
+  - N020
+  - N021
+  - N022
+  - N007
+  - N008
+  - N236
+  - N338
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.10
+  title: B.10 [资料10] 实施排期与定员记录
+  level: 2
+  parent: SB
+  paragraphs:
+  - 207
+  pages:
+  - 19
+  chunks:
+  - C0190
+  - C0191
+  - C0192
+  source_spans:
+  - - 17383
+    - 17407
+  - - 17409
+    - 17536
+  - - 17538
+    - 17622
+  source_char_count: 235
+  nodes:
+  - N059
+  - N060
+  - N061
+  - N062
+  - N073
+  - N025
+  - N027
+  - N074
+  - N058
+  - N065
+  - N066
+  - N239
+  - N339
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+- id: SB.H11
+  title: 资料使用终止说明
+  level: 2
+  parent: SB
+  paragraphs:
+  - 210
+  pages:
+  - 19
+  chunks:
+  - C0193
+  - C0194
+  source_spans:
+  - - 17624
+    - 17635
+  - - 17637
+    - 17731
+  source_char_count: 105
+  nodes: []
+  word_budget: null
+  legal_ref: null
+  must_cover: []
+  coverage_note: 沿用原文标题与覆盖内容；未提供法定大纲或字数预算，不自行编造。
+counts:
+  business_chapters: 11
+  logical_sections_including_cover_and_appendix: 49
+coverage:
+  legal_outline_provided: false
+  invented_legal_requirements: false
+  word_budgets_provided: false
+  toc_preserved_in_chunk: C0017

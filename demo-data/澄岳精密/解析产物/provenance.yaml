@@ -1,0 +1,968 @@
+source_filename: 澄岳精密_电池托盘焊接与检测技改项目_业务原文.docx
+source_sha256: 5c8c9902dc687ff42bc4333166ced872fe9aad40e474f9340a9db58ab53cf9d7
+source_byte_size: 64213
+source_compile_date: '2026-09-18'
+docx_core_properties:
+  title: 电池托盘焊接与检测技改项目可行性研究报告
+  subject: 虚构业务样本；仅用于文档抽取与受控推演测试
+  author: ''
+  created: '2013-12-23T23:15:00+00:00'
+  modified: '2013-12-23T23:15:00+00:00'
+extraction_started_at: '2026-09-23T03:08:46.059557+00:00'
+extraction_finished_at: '2026-09-23T03:08:46.249230+00:00'
+operator: assistant
+extractor: source-grounded annotation + python-docx XML normalization + restricted Decimal replay
+extractor_version: '1.0'
+schema_notes: 规范仅给部分字段样例；本包为保持可解析和可回放而增加明确字段，不声称官方完备schema。
+inputs_used:
+- type: business_source
+  filename: 澄岳精密_电池托盘焊接与检测技改项目_业务原文.docx
+  sha256: 5c8c9902dc687ff42bc4333166ced872fe9aad40e474f9340a9db58ab53cf9d7
+- type: structure_spec
+  filename: 语义图谱产物存储调用与双向Diff规范(1).md
+  version: '2.0'
+excluded_inputs:
+- filename: 仅供人工核对_抽取与数值推演测试说明.docx
+  used: false
+  reason: 避免答案泄漏
+human_review:
+  performed: false
+  reviewer: null
+external_research:
+  performed: false
+embedding_model: null
+events:
+- 原件XML解析及正文归一化
+- 段落/表格及位置映射
+- 关键节点/规则/论断/证据结构化
+- 基线规则回放与原文逐处渲染核验
+- 冲突、缺口、索引和JSON交换快照生成
+source_not_modified: true
+native_format_export:
+  performed_at: '2026-09-23T03:29:31.608133+00:00'
+  operator: assistant
+  version: v2
+  supersedes: v1
+  source_archive_filename: 澄岳精密_30项结构化抽取_JSON.zip
+  source_archive_sha256: 4c741344c98cf8a40850d5116ca94aa8355c3f03c9c2598e7189345421c42bf0
+  business_reextraction_performed: false
+  business_values_changed: false
+  source_word_byte_identical: true
+  source_text_and_offsets_preserved: true
+  source_record_schema: cy-corpus-json/1.0
+  native_envelope_schema: cy-corpus-native/1.0
+  source_spec_version: '2.0'
+  changes:
+  - 恢复原清单的文件后缀和目录结构
+  - 移除JSON交换封装，保留业务记录及辅助契约
+  - 拆分CSV表格、Markdown摘录和分节YAML模板
+  - 更新文件引用路径、文件校验和及合并图版本
+  - 写入零行Parquet表，向量状态仍为not_generated
+  business_external_sources_used: false
+  format_implementation_reference: https://github.com/apache/parquet-format/blob/master/src/main/thrift/parquet.thrift
+  format_reference_scope: 仅核对Parquet二进制SchemaElement/FileMetaData；不用于业务抽取或填补业务内容
+artifact_metadata:
+  style/section_templates/: {}
+  chunks/skeletons.jsonl:
+    render_contract:
+      placeholder: '{{node:Nxxx}}'
+      formatter: 每个node_slots记录发生位置和format；不能对所有节点统一两位小数
+      original_values_included: false
+      missing_value: 按UNDEFINED指令显式提示，不按0渲染
+      original_corpus_immutable: true
+      scope: 从本项目事实查询填槽；不可从原语料值直接继承
+      archive_policy: 附录原证据保留原貌；修改项目事实时重验引用，而非改写证据。
+    validation:
+      literal_numeric_residual_chunks: []
+      baseline_roundtrip_mismatches: []
+  chunks/chunks.jsonl:
+    chunking:
+      boundary: one nonempty paragraph/heading/caption or whole table
+      reason: 保留表格独立块与精确回链；为本轮单文档测试采用细粒度，可另行聚合检索窗口。
+      raw_values_included: true
+      writing_agent_access: false
+  index/node_index.json:
+    mention_count: 630
+    coordinate_convention: source/offset_map.json
+    index_note: 节点到原文全部已绑定位置的倒排；source_span_only表示语义源位置已定位但未改成逐词占位符。
+  source/assets/:
+    image_assets: []
+    image_asset_status: 原件无word/media图片资源；不生成虚构图片。
+    table_count: 18
+    items:
+    - id: T00
+      type: table
+      original_asset_name: T00.csv
+      caption: 目录
+      row_count: 13
+      column_count: 2
+      csv_encoding: UTF-8
+      csv_sha256: cfc75351155e4d44e463e53a7dd37af7a9a604f857316d2d06638cc04e1990e3
+      source_locator:
+        part: word/document.xml
+        table_index: 0
+        body_index: 17
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[1]
+      chunk_id: C0017
+      span:
+      - 619
+      - 868
+      page: 2
+      path: source/assets/T00.csv
+    - id: T01
+      type: table
+      original_asset_name: T01.csv
+      caption: 表1-1 主要技术经济指标
+      row_count: 13
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: ad909134331b84f1bc89280de39af19d3733b32819134a68fa94706d7d52c2c9
+      source_locator:
+        part: word/document.xml
+        table_index: 1
+        body_index: 25
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[2]
+      chunk_id: C0023
+      span:
+      - 1210
+      - 1722
+      page: 3
+      path: source/assets/T01.csv
+    - id: T02
+      type: table
+      original_asset_name: T02.csv
+      caption: 表2-1 分客户销售需求预测
+      row_count: 4
+      column_count: 4
+      csv_encoding: UTF-8
+      csv_sha256: 00a2b06b2b73a6009ba9a03887589df99927def1a8b88086f9dec6adada79507
+      source_locator:
+        part: word/document.xml
+        table_index: 2
+        body_index: 33
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[3]
+      chunk_id: C0029
+      span:
+      - 2022
+      - 2211
+      page: 4
+      path: source/assets/T02.csv
+    - id: T03
+      type: table
+      original_asset_name: T03.csv
+      caption: 表3-1 备选方案预比较
+      row_count: 8
+      column_count: 4
+      csv_encoding: UTF-8
+      csv_sha256: 3f5d72c4de80cafc164dbd8ad378fefb5225f8e133ede324e8196589d3f29df0
+      source_locator:
+        part: word/document.xml
+        table_index: 3
+        body_index: 48
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[4]
+      chunk_id: C0042
+      span:
+      - 3196
+      - 3498
+      page: 5
+      path: source/assets/T03.csv
+    - id: T04
+      type: table
+      original_asset_name: T04.csv
+      caption: 表4-1 产能测算输入
+      row_count: 9
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: ee040404a39d0716783cb323051cc090601bfd86c9cec90ce56b76855f9590a7
+      source_locator:
+        part: word/document.xml
+        table_index: 4
+        body_index: 55
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[5]
+      chunk_id: C0047
+      span:
+      - 3756
+      - 4049
+      page: 6
+      path: source/assets/T04.csv
+    - id: T05
+      type: table
+      original_asset_name: T05.csv
+      caption: 表5-1 本项目使用面积分配
+      row_count: 6
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: 814111fbd5a26897df9f77b63a1cad4719861c2ef8207e34da609719a3bdd7e7
+      source_locator:
+        part: word/document.xml
+        table_index: 5
+        body_index: 70
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[6]
+      chunk_id: C0060
+      span:
+      - 4925
+      - 5121
+      page: 7
+      path: source/assets/T05.csv
+    - id: T06
+      type: table
+      original_asset_name: T06.csv
+      caption: 表6-1 项目实施计划
+      row_count: 6
+      column_count: 4
+      csv_encoding: UTF-8
+      csv_sha256: ec3b5fef1ecd6e44bc84648369b1ab64c7619cca5542df80e31bc1c00de4e6c0
+      source_locator:
+        part: word/document.xml
+        table_index: 6
+        body_index: 82
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[7]
+      chunk_id: C0070
+      span:
+      - 5821
+      - 6126
+      page: 8
+      path: source/assets/T06.csv
+    - id: T07
+      type: table
+      original_asset_name: T07.csv
+      caption: 表6-2 新增定员及年度人工费用
+      row_count: 4
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: 4c071b01621295cdd83a2cdd766757faebe5afe4977d18f5b3b6988815b2935a
+      source_locator:
+        part: word/document.xml
+        table_index: 7
+        body_index: 88
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[8]
+      chunk_id: C0075
+      span:
+      - 6379
+      - 6501
+      page: 8
+      path: source/assets/T07.csv
+    - id: T08
+      type: table
+      original_asset_name: T08.csv
+      caption: 表7-1 设备与系统购置费（不含税）
+      row_count: 8
+      column_count: 4
+      csv_encoding: UTF-8
+      csv_sha256: fbf27e418aed7be8c39b81183d3cc257698edcbb352eb5b27f860f3be9c1b4d5
+      source_locator:
+        part: word/document.xml
+        table_index: 8
+        body_index: 97
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[9]
+      chunk_id: C0082
+      span:
+      - 6875
+      - 7193
+      page: 9
+      path: source/assets/T08.csv
+    - id: T09
+      type: table
+      original_asset_name: T09.csv
+      caption: 表7-2 建筑与公辅工程费用
+      row_count: 5
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: 7fb5f2b953662e48bbcc9f646971b5211e54a92fa649dbe77d4c6fa31a680176
+      source_locator:
+        part: word/document.xml
+        table_index: 9
+        body_index: 102
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[10]
+      chunk_id: C0086
+      span:
+      - 7371
+      - 7567
+      page: 9
+      path: source/assets/T09.csv
+    - id: T10
+      type: table
+      original_asset_name: T10.csv
+      caption: 表7-3 建设投资估算汇总
+      row_count: 8
+      column_count: 4
+      csv_encoding: UTF-8
+      csv_sha256: 774c276ceec646b120fadd548d50986951739ba82e935c996af5a4843cf7455a
+      source_locator:
+        part: word/document.xml
+        table_index: 10
+        body_index: 113
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[11]
+      chunk_id: C0095
+      span:
+      - 8021
+      - 8331
+      page: 10
+      path: source/assets/T10.csv
+    - id: T11
+      type: table
+      original_asset_name: T11.csv
+      caption: 表8-1 单套变动成本测算
+      row_count: 7
+      column_count: 4
+      csv_encoding: UTF-8
+      csv_sha256: 0cce90558ce9910629931c4df863a253f55515c65074d73a743e307187fe7739
+      source_locator:
+        part: word/document.xml
+        table_index: 11
+        body_index: 126
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[12]
+      chunk_id: C0106
+      span:
+      - 9002
+      - 9320
+      page: 11
+      path: source/assets/T11.csv
+    - id: T12
+      type: table
+      original_asset_name: T12.csv
+      caption: 表9-1 正常年净营运资金估算
+      row_count: 6
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: deb518092aafda8a714630bb720801ca601643655a5afbf7004377cf3e160e83
+      source_locator:
+        part: word/document.xml
+        table_index: 12
+        body_index: 138
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[13]
+      chunk_id: C0116
+      span:
+      - 9999
+      - 10248
+      page: 12
+      path: source/assets/T12.csv
+    - id: T13
+      type: table
+      original_asset_name: T13.csv
+      caption: 表10-1 两期经营测算对照（金额单位：万元）
+      row_count: 7
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: 45086d5386ba81d5c1e55c1c758173528c40865da050900ba45a521250adec95
+      source_locator:
+        part: word/document.xml
+        table_index: 13
+        body_index: 150
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[14]
+      chunk_id: C0126
+      span:
+      - 10861
+      - 11112
+      page: 13
+      path: source/assets/T13.csv
+    - id: T14
+      type: table
+      original_asset_name: T14.csv
+      caption: 表11-1 关键风险与待核事项
+      row_count: 8
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: a664a8c7ada1684b37108074d23c05b62c675ac22122cdfa14144d950d29dc87
+      source_locator:
+        part: word/document.xml
+        table_index: 14
+        body_index: 163
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[15]
+      chunk_id: C0137
+      span:
+      - 11761
+      - 12179
+      page: 14
+      path: source/assets/T14.csv
+    - id: T15
+      type: table
+      original_asset_name: T15.csv
+      caption: 表11-2 基准情景约束检查
+      row_count: 7
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: fcc1d2ca6eea9f8c34e93949964e391f8a666e30a502273ba27c947d2b980f14
+      source_locator:
+        part: word/document.xml
+        table_index: 15
+        body_index: 168
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[16]
+      chunk_id: C0141
+      span:
+      - 12322
+      - 12636
+      page: 14
+      path: source/assets/T15.csv
+    - id: T16
+      type: table
+      original_asset_name: T16.csv
+      caption: 表11-3 下一阶段提资及责任分工
+      row_count: 7
+      column_count: 3
+      csv_encoding: UTF-8
+      csv_sha256: 8517f17865aef0f30258c5707ba35ab7217f9a91a68417b09d7875a2673a4bae
+      source_locator:
+        part: word/document.xml
+        table_index: 16
+        body_index: 179
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[17]
+      chunk_id: C0150
+      span:
+      - 13319
+      - 13639
+      page: 15
+      path: source/assets/T16.csv
+    - id: T17
+      type: table
+      original_asset_name: T17.csv
+      caption: 表A-1 资料登记表
+      row_count: 12
+      column_count: 4
+      csv_encoding: UTF-8
+      csv_sha256: 582e5856cd6b8f12fd9e8ed7baa47c3e2550fdc2465985b7ac1a982f4436d76c
+      source_locator:
+        part: word/document.xml
+        table_index: 17
+        body_index: 186
+        index_base: 0
+        xpath: /w:document/w:body/w:tbl[18]
+      chunk_id: C0155
+      span:
+      - 13830
+      - 14683
+      page: 16
+      path: source/assets/T17.csv
+  graph/nodes.yaml:
+    counts:
+      sections: 49
+      business_chapters: 11
+      chunks: 194
+      tables: 18
+      nodes: 339
+      substantive_nodes: 201
+      structural_token_nodes: 98
+      other_metadata_or_format_nodes: 40
+      rules: 74
+      compute_rules: 62
+      select_rules: 12
+      relations: 1666
+      claims: 48
+      evidence: 12
+      embedded_internal_sources: 11
+      excerpts: 20
+      invariants: 18
+      conflicts: 1
+      gaps: 11
+      mentions: 630
+      undefined_nodes: 10
+      normalized_unicode_characters: 17733
+    contract:
+      kind:
+      - quantity
+      - judgment
+      - text
+      numeric_authority: decimal_value用于完整精度；value为便捷JSON数值；reported_value保留原文展示/记载值，不互相覆盖
+      confidence: null表示未校准；不编造概率
+      editable: 输入候选可用于情景改值；历史、观察、公式输出、元数据不得直接覆写
+      unknown: value=null/status=UNDEFINED
+      scope: corpus:cy_tray_20260918
+      frozen_snapshot: true
+  graph/graph.yaml:
+    snapshot_note: 与分项JSON内容一致的合并快照；不是第二个可写事实源；不向写作Agent整包注入。
+  graph/claims.yaml:
+    contract:
+      source_text: 每条保留原文段落及原文位置
+      pattern: 原文含义的结构化摘要；不是新证据或独立核准结论
+      evaluation: 数值支持项变化后复核条件/强度，不以数字为正自动推出风险可控
+  graph/invariants.yaml:
+    scope: source-consistency, applicability and extraction integrity; not legal or investment approval
+  graph/rules.yaml:
+    execution_contract:
+      language: restricted_decimal_expression
+      precision: 50
+      evaluation_order: topological
+      full_precision_between_steps: true
+      display_rounding: HALF_UP, per mention format
+      missing_any_dep: UNDEFINED
+      division_by_zero: UNDEFINED
+      date_replanning: 本包只登记人工复核依赖，未生成未明确的日历执行算法
+      deterministic_rule_count: 74
+  graph/relations.yaml:
+    relation_types:
+      DERIVES_FROM: recompute
+      DEPENDS_ON: rejudge
+      SUPPORTS: restate_claim
+      CAUSES: rewrite_argument
+      CONTRADICTS: block
+      ASSUMES: revalidate
+      RESTATES: sync_text
+      COMPARES_WITH: recheck_choice
+      REFERENCES: recheck_validity
+      CONTEXT_OF: none
+    edge_contract:
+      from_to: from_id为变更/证据触发端，to_id为受影响对象，除标明bidirectional的矛盾边
+      orientation_note: 保留规范的十种关系名，显式注明传播方向，避免DERIVES_FROM自然语言读向导致遍历歧义。
+      numeric_DAG: 只由带rule的DERIVES_FROM和DEPENDS_ON定义；其余是审阅/语义动作，不当作算式
+      cycle_handling: 行动图遍历用visited集合；CONTRADICTS双向；不得把整张语义图要求为DAG
+      source_archive_policy: archive_immutable_revalidate_reference_only边禁止自动改写历史原文
+  quality/gaps.yaml:
+    scope: 仅登记源文件明确缺失或需复核的条件；不使用外部知识补完。
+  quality/conflicts.yaml:
+    scope: 已在原文明确的同口径数值冲突，保留双方证据与未决状态。
+  reasoning/derivation.yaml:
+    replay_basis: 原文明确公式、汇总关系与适用条件；不由结果反算未给出的输入。
+  reasoning/decisions.yaml:
+    authority: 记录原文选择和本轮规则回放，不生成新的批准、签字或实际业务决策。
+  reasoning/trace.jsonl:
+    trace_kind: deterministic execution audit
+    note: 真实执行的数值回放、展示核验、闸门结果；不虚构Agent/MCP调用，不包含私有思考过程。
+  evidence/excerpts/:
+    offset_source: source/normalized.md
+    archive_immutable: true
+  evidence/evidence.yaml:
+    boundary: EV-REPORT为业务原文；其余11项仅是原文登记/摘录的虚构内部资料，不意味着完整原件已提供。
+  source/original.docx:
+    filename: 澄岳精密_电池托盘焊接与检测技改项目_业务原文.docx
+    mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    byte_size: 64213
+    sha256: 5c8c9902dc687ff42bc4333166ced872fe9aad40e474f9340a9db58ab53cf9d7
+    agent_writing_access: false
+  source/normalized.md:
+    format: Markdown
+    encoding: UTF-8
+    unicode_length: 17733
+    sha256_utf8: d3c1b4c0204aa34e7ea0cb573d2912cab0a85ffb4fe34afc30658a46ce406763
+    block_order:
+    - B0001
+    - B0002
+    - B0003
+    - B0004
+    - B0005
+    - B0006
+    - B0007
+    - B0008
+    - B0009
+    - B0010
+    - B0011
+    - B0012
+    - B0013
+    - B0014
+    - B0015
+    - B0016
+    - B0017
+    - B0018
+    - B0019
+    - B0020
+    - B0021
+    - B0022
+    - B0023
+    - B0024
+    - B0025
+    - B0026
+    - B0027
+    - B0028
+    - B0029
+    - B0030
+    - B0031
+    - B0032
+    - B0033
+    - B0034
+    - B0035
+    - B0036
+    - B0037
+    - B0038
+    - B0039
+    - B0040
+    - B0041
+    - B0042
+    - B0043
+    - B0044
+    - B0045
+    - B0046
+    - B0047
+    - B0048
+    - B0049
+    - B0050
+    - B0051
+    - B0052
+    - B0053
+    - B0054
+    - B0055
+    - B0056
+    - B0057
+    - B0058
+    - B0059
+    - B0060
+    - B0061
+    - B0062
+    - B0063
+    - B0064
+    - B0065
+    - B0066
+    - B0067
+    - B0068
+    - B0069
+    - B0070
+    - B0071
+    - B0072
+    - B0073
+    - B0074
+    - B0075
+    - B0076
+    - B0077
+    - B0078
+    - B0079
+    - B0080
+    - B0081
+    - B0082
+    - B0083
+    - B0084
+    - B0085
+    - B0086
+    - B0087
+    - B0088
+    - B0089
+    - B0090
+    - B0091
+    - B0092
+    - B0093
+    - B0094
+    - B0095
+    - B0096
+    - B0097
+    - B0098
+    - B0099
+    - B0100
+    - B0101
+    - B0102
+    - B0103
+    - B0104
+    - B0105
+    - B0106
+    - B0107
+    - B0108
+    - B0109
+    - B0110
+    - B0111
+    - B0112
+    - B0113
+    - B0114
+    - B0115
+    - B0116
+    - B0117
+    - B0118
+    - B0119
+    - B0120
+    - B0121
+    - B0122
+    - B0123
+    - B0124
+    - B0125
+    - B0126
+    - B0127
+    - B0128
+    - B0129
+    - B0130
+    - B0131
+    - B0132
+    - B0133
+    - B0134
+    - B0135
+    - B0136
+    - B0137
+    - B0138
+    - B0139
+    - B0140
+    - B0141
+    - B0142
+    - B0143
+    - B0144
+    - B0145
+    - B0146
+    - B0147
+    - B0148
+    - B0149
+    - B0150
+    - B0151
+    - B0152
+    - B0153
+    - B0154
+    - B0155
+    - B0156
+    - B0157
+    - B0158
+    - B0159
+    - B0160
+    - B0161
+    - B0162
+    - B0163
+    - B0164
+    - B0165
+    - B0166
+    - B0167
+    - B0168
+    - B0169
+    - B0170
+    - B0171
+    - B0172
+    - B0173
+    - B0174
+    - B0175
+    - B0176
+    - B0177
+    - B0178
+    - B0179
+    - B0180
+    - B0181
+    - B0182
+    - B0183
+    - B0184
+    - B0185
+    - B0186
+    - B0187
+    - B0188
+    - B0189
+    - B0190
+    - B0191
+    - B0192
+    - B0193
+    - B0194
+    join_separator: |2+
+
+
+    trailing_separator: true
+    transforms:
+    - 不纳入页眉页脚
+    - 保留非空正文段落与原顺序
+    - 标题增加Markdown井号
+    - 表格转Markdown并保留原始矩阵
+    - 单元格换行转<br>、竖线转义
+    - 正文中的文字算式原样保留，不伪造OMML或LaTeX公式
+    removed_content_policy: 只去重复页眉页脚及空白分页承载段；原件字节仍完整保存在source/original.docx。
+  chunks/embeddings.parquet:
+    status: not_generated
+    model: null
+    dimension: null
+    vectors: []
+    chunk_ids:
+    - C0001
+    - C0002
+    - C0003
+    - C0004
+    - C0005
+    - C0006
+    - C0007
+    - C0008
+    - C0009
+    - C0010
+    - C0011
+    - C0012
+    - C0013
+    - C0014
+    - C0015
+    - C0016
+    - C0017
+    - C0018
+    - C0019
+    - C0020
+    - C0021
+    - C0022
+    - C0023
+    - C0024
+    - C0025
+    - C0026
+    - C0027
+    - C0028
+    - C0029
+    - C0030
+    - C0031
+    - C0032
+    - C0033
+    - C0034
+    - C0035
+    - C0036
+    - C0037
+    - C0038
+    - C0039
+    - C0040
+    - C0041
+    - C0042
+    - C0043
+    - C0044
+    - C0045
+    - C0046
+    - C0047
+    - C0048
+    - C0049
+    - C0050
+    - C0051
+    - C0052
+    - C0053
+    - C0054
+    - C0055
+    - C0056
+    - C0057
+    - C0058
+    - C0059
+    - C0060
+    - C0061
+    - C0062
+    - C0063
+    - C0064
+    - C0065
+    - C0066
+    - C0067
+    - C0068
+    - C0069
+    - C0070
+    - C0071
+    - C0072
+    - C0073
+    - C0074
+    - C0075
+    - C0076
+    - C0077
+    - C0078
+    - C0079
+    - C0080
+    - C0081
+    - C0082
+    - C0083
+    - C0084
+    - C0085
+    - C0086
+    - C0087
+    - C0088
+    - C0089
+    - C0090
+    - C0091
+    - C0092
+    - C0093
+    - C0094
+    - C0095
+    - C0096
+    - C0097
+    - C0098
+    - C0099
+    - C0100
+    - C0101
+    - C0102
+    - C0103
+    - C0104
+    - C0105
+    - C0106
+    - C0107
+    - C0108
+    - C0109
+    - C0110
+    - C0111
+    - C0112
+    - C0113
+    - C0114
+    - C0115
+    - C0116
+    - C0117
+    - C0118
+    - C0119
+    - C0120
+    - C0121
+    - C0122
+    - C0123
+    - C0124
+    - C0125
+    - C0126
+    - C0127
+    - C0128
+    - C0129
+    - C0130
+    - C0131
+    - C0132
+    - C0133
+    - C0134
+    - C0135
+    - C0136
+    - C0137
+    - C0138
+    - C0139
+    - C0140
+    - C0141
+    - C0142
+    - C0143
+    - C0144
+    - C0145
+    - C0146
+    - C0147
+    - C0148
+    - C0149
+    - C0150
+    - C0151
+    - C0152
+    - C0153
+    - C0154
+    - C0155
+    - C0156
+    - C0157
+    - C0158
+    - C0159
+    - C0160
+    - C0161
+    - C0162
+    - C0163
+    - C0164
+    - C0165
+    - C0166
+    - C0167
+    - C0168
+    - C0169
+    - C0170
+    - C0171
+    - C0172
+    - C0173
+    - C0174
+    - C0175
+    - C0176
+    - C0177
+    - C0178
+    - C0179
+    - C0180
+    - C0181
+    - C0182
+    - C0183
+    - C0184
+    - C0185
+    - C0186
+    - C0187
+    - C0188
+    - C0189
+    - C0190
+    - C0191
+    - C0192
+    - C0193
+    - C0194
+    reason: 未调用embedding服务或本地语义向量模型；不以随机、零向量或哈希数组冒充真实语义向量。
+    required_before_vector_search:
+    - 选定并实际调用向量模型
+    - 记录模型、版本和维度
+    - 对同一归一化切块计算并存储向量
+    - 在索引服务落实租户、作用域与权限过滤
+    not_needed_for_baseline_replay: true
+    file_representation: schema_only_parquet
+    row_count: 0

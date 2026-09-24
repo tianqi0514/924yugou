@@ -1,0 +1,170 @@
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f7f9fc;
+}
+
+.sidebar {
+  width: 214px;
+  flex-basis: 214px;
+  border-right-color: #e8edf4;
+}
+
+.brand {
+  height: 62px;
+  padding: 0 17px;
+  gap: 10px;
+}
+
+.brand strong {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.workspace-picker {
+  margin: 13px 11px 15px;
+  padding: 10px;
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.workspace-picker label {
+  display: block;
+  margin-bottom: 3px;
+  color: #8391a4;
+  font-size: 11px;
+}
+
+.workspace-picker button {
+  margin-top: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.sidebar nav {
+  padding: 0 8px;
+}
+
+.sidebar nav button {
+  min-height: 40px;
+  margin-bottom: 2px;
+  padding: 9px 12px;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.sidebar nav button.selected {
+  color: #245cd6;
+  background: #ecf3ff;
+}
+
+.sidebar-secondary {
+  margin-top: auto;
+  margin-bottom: 12px;
+  padding-top: 10px !important;
+  border-top: 1px solid #eef1f5;
+}
+
+.app-error {
+  margin: 16px 24px 0;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-loading {
+  padding: 56px 0;
+  color: #8694a8;
+  font-size: 13px;
+}
+
+button:focus-visible,
+select:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #4b7ee8;
+  outline-offset: 2px;
+}
+
+@media (max-width: 780px) {
+  .sidebar {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 145px minmax(0, 1fr);
+    border-right: 0;
+    border-bottom: 1px solid #e8edf4;
+  }
+
+  .brand {
+    height: auto;
+    min-height: 57px;
+    border: 0;
+  }
+
+  .workspace-picker {
+    margin: 7px 10px 7px 0;
+    padding: 5px 8px;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .workspace-picker label {
+    display: none;
+  }
+
+  .workspace-picker .picker-row {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .workspace-picker button {
+    flex: 0 0 auto;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .sidebar nav {
+    grid-column: 1 / -1;
+    min-width: 0;
+    padding: 0 8px 5px;
+  }
+
+  .sidebar nav button {
+    min-height: 37px;
+    padding: 7px 11px;
+  }
+
+  .sidebar-secondary {
+    margin: 0;
+    padding: 4px 8px 7px !important;
+    border-top: 1px solid #f0f3f7;
+  }
+
+  .page {
+    padding-top: 18px;
+  }
+}
+
+@media (max-width: 500px) {
+  .sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .brand {
+    min-height: 52px;
+  }
+
+  .workspace-picker {
+    margin: 0 10px 8px;
+  }
+}

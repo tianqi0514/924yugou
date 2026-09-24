@@ -1,0 +1,166 @@
+{
+  "file": "03_taizhou_audit.pdf",
+  "source_sha256": "9e56c7676016096282283718ffccd358f0b4bfde461ad17f77c9259a2c1688a8",
+  "physical_page": 3,
+  "captured_at_utc": "2026-09-24T03:05:49.783197+00:00",
+  "segments": [
+    {
+      "ref": "p3-ocr1",
+      "page": 3,
+      "kind": "ocr",
+      "review_status": "PENDING_REVIEW",
+      "locator": "PDF 物理第 3 页 · OCR 待校对",
+      "text": "18. $11\\%$ ，兴化市占 $14.45\\%$ ，医药高新区(高港区)占 $13.07\\%$ 海陵区占 $11.54\\%$ ，姜堰区占 $22.36\\%$ 。全市重点扶持“专精特新”企业288户、“科技小巨人”企业41户、“绿色环保”企业23户、“科技型中小企业”2503户和“高新技术企业”1601户。\n\n（二）金融机构扶持基本情况。2023年6月末，泰州市小微企业贷款余额4131.41亿元，当年小微企业法人首贷户数为1760户。其中：小微企业信用贷款余额369.04亿元、中长期贷款余额1909.44亿元、普惠型小微企业贷款余额1674.78亿元。普惠型小微企业贷款规模与2022年12月末相比扩大了261.53亿元，贷款户数增加了4580户，贷款年化利率比上年降低0.46。10家政府性融资担保机构为5172户小微企业提供192.21亿元融资担保，平均担保费率为 $0.55\\%$ 。紫金保险泰州中心支公司为4208户小微企业提供保费1364.91万元保险，平均保险费率 $0.04\\%$\n\n（三）金融服务平台基本情况。截至2023年6月末，泰州市产融综合服务平台自建设以来共入驻企业96205户，合作金融机构69家，发布金融产品595个，利用平台投放小微企业贷款1429.64亿元，其中小微企业信用贷款269.63亿元。市本级地方自建金融服务平台1个，为泰州金控中小企业金融服务平台，主要功能是线上对接有融资需求的企业，通过线下办理融资业务。2022年6月交付使用，截至2023年6月共为企业办理融资业务2笔，涉及贷款金额20万元。"
+    }
+  ],
+  "model_call": {
+    "model_id": "dd06373f-4046-4b4f-bb3b-4a297f436e9a",
+    "model": "deepseek-v4-flash-0731",
+    "model_version": "deepseek-v4-flash-0731",
+    "source": "saved",
+    "protocol": "chat",
+    "temperature": 0,
+    "max_tokens": 3000,
+    "response_id": "chatcmpl-b1d13f7b1384f065"
+  },
+  "candidates": [
+    {
+      "label": "兴化市占比",
+      "value_text": "14.45",
+      "unit": "%",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "医药高新区占比",
+      "value_text": "13.07",
+      "unit": "%",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "海陵区占比",
+      "value_text": "11.54",
+      "unit": "%",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "姜堰区占比",
+      "value_text": "22.36",
+      "unit": "%",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "专精特新企业数",
+      "value_text": "288",
+      "unit": "户",
+      "data_type": "integer",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "科技小巨人企业数",
+      "value_text": "41",
+      "unit": "户",
+      "data_type": "integer",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "绿色环保企业数",
+      "value_text": "23",
+      "unit": "户",
+      "data_type": "integer",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "科技型中小企业数",
+      "value_text": "2503",
+      "unit": "户",
+      "data_type": "integer",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "高新技术企业数",
+      "value_text": "1601",
+      "unit": "户",
+      "data_type": "integer",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "小微企业贷款余额",
+      "value_text": "4131.41",
+      "unit": "亿元",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "小微企业法人首贷户数",
+      "value_text": "1760",
+      "unit": "户",
+      "data_type": "integer",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "小微企业信用贷款余额",
+      "value_text": "369.04",
+      "unit": "亿元",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "小微企业中长期贷款余额",
+      "value_text": "1909.44",
+      "unit": "亿元",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "普惠型小微企业贷款余额",
+      "value_text": "1674.78",
+      "unit": "亿元",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "普惠型小微企业贷款规模扩大",
+      "value_text": "261.53",
+      "unit": "亿元",
+      "data_type": "decimal",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    },
+    {
+      "label": "普惠型小微企业贷款户数增加",
+      "value_text": "4580",
+      "unit": "户",
+      "data_type": "integer",
+      "source_ref": "p3-ocr1",
+      "source_valid": true
+    }
+  ],
+  "parse_status": "OCR_REQUIRED",
+  "ocr": {
+    "provider": "mineru",
+    "model": "OpenDataLab/MinerU2.5-2509-1.2B",
+    "metadata": {
+      "model_id": "5cfad6e1-3a8a-4dd1-a1af-bd2594e50b08",
+      "page": 3
+    }
+  },
+  "preregistered_gold_sha256": "e87495704d157cf383dd98af12420e7df57a8c766d1f24b5e0f1a68ff27811cf"
+}

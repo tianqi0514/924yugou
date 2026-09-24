@@ -1,0 +1,130 @@
+{
+  "facts": [
+    {
+      "label": "事故时间",
+      "value": "2025-08-02 06:59",
+      "unit": null,
+      "kind": "time",
+      "source_refs": ["p3-s1"]
+    },
+    {
+      "label": "事故地点",
+      "value": "晋江市英林镇福建省立乔建设发展有限公司（晋江市华斯达服饰有限公司）屋顶900KW分布式光伏发电项目施工过程中",
+      "unit": null,
+      "kind": "overview",
+      "source_refs": ["p3-s1"]
+    },
+    {
+      "label": "事故类型",
+      "value": "高坠事故",
+      "unit": null,
+      "kind": "overview",
+      "source_refs": ["p3-s1"]
+    },
+    {
+      "label": "死亡人数",
+      "value": 1,
+      "unit": "人",
+      "kind": "harm",
+      "source_refs": ["p3-s1", "p9-s1"]
+    },
+    {
+      "label": "直接经济损失",
+      "value": 77.0239,
+      "unit": "万元",
+      "kind": "loss",
+      "source_refs": ["p3-s1", "p9-s2"]
+    },
+    {
+      "label": "死者姓名",
+      "value": "黄*华",
+      "unit": null,
+      "kind": "harm",
+      "source_refs": ["p9-s1"]
+    },
+    {
+      "label": "死者性别",
+      "value": "男",
+      "unit": null,
+      "kind": "harm",
+      "source_refs": ["p9-s1"]
+    },
+    {
+      "label": "死者出生日期",
+      "value": "1972-09-23",
+      "unit": null,
+      "kind": "harm",
+      "source_refs": ["p9-s1"]
+    },
+    {
+      "label": "死者籍贯",
+      "value": "漳州市芗城区人",
+      "unit": null,
+      "kind": "harm",
+      "source_refs": ["p9-s1"]
+    },
+    {
+      "label": "作业开始时间",
+      "value": "2025-08-02 06:30",
+      "unit": null,
+      "kind": "time",
+      "source_refs": ["p8-s1"]
+    },
+    {
+      "label": "坠落发生时间",
+      "value": "2025-08-02 06:59",
+      "unit": null,
+      "kind": "time",
+      "source_refs": ["p8-s1"]
+    },
+    {
+      "label": "120接警时间",
+      "value": "2025-08-02 07:04",
+      "unit": null,
+      "kind": "time",
+      "source_refs": ["p8-s2"]
+    },
+    {
+      "label": "医护人员抵达时间",
+      "value": "2025-08-02 07:15",
+      "unit": null,
+      "kind": "time",
+      "source_refs": ["p8-s2"]
+    },
+    {
+      "label": "直接原因",
+      "value": "黄*华安全意识薄弱，未按规定佩戴、使用劳动防护用品，在未设置安全警示标志及未满足安全要求的屋面搬运光伏板，不慎踩踏到屋面采光板，致使采光板断开，导致其从屋面掉落至地面死亡。",
+      "unit": null,
+      "kind": "direct_cause",
+      "source_refs": ["p9-s3"]
+    },
+    {
+      "label": "间接原因-立乔公司",
+      "value": "福建省立乔建设发展有限公司将光伏发电项目发包给不具备相应资质的漳州市宇飞新能源科技有限公司，履行安全生产统一协调、管理不力，未能有效制止施工现场违法违规行为。",
+      "unit": null,
+      "kind": "indirect_cause",
+      "source_refs": ["p9-s4"]
+    },
+    {
+      "label": "间接原因-宇飞公司",
+      "value": "漳州市宇飞新能源科技有限公司不具备相应资质违规承揽项目，并转包给不具备资质的顺航公司，未建立安全生产规章制度和操作规程，未依规开展安全教育培训，对作业现场疏于管理，未落实安全防护措施和警示标志，未持证人员从事高处作业，现场人员未按规定佩戴使用防护用品。",
+      "unit": null,
+      "kind": "indirect_cause",
+      "source_refs": ["p9-s5", "p10-s1"]
+    },
+    {
+      "label": "间接原因-顺航公司",
+      "value": "漳州芗城区顺航建筑劳务有限公司不具备相应资质违规承揽项目，未建立安全生产规章制度和操作规程，未依规开展安全教育培训，未设置临时走道板和安全警示标志，未配备劳动防护用品，对事故隐患排查督促检查不力。",
+      "unit": null,
+      "kind": "indirect_cause",
+      "source_refs": ["p10-s2"]
+    },
+    {
+      "label": "间接原因-英林镇政府",
+      "value": "英林镇人民政府对辖区内生产经营单位安全生产状况监督检查不到位。",
+      "unit": null,
+      "kind": "indirect_cause",
+      "source_refs": ["p10-s3"]
+    }
+  ]
+}

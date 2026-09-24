@@ -1,0 +1,153 @@
+section_id: S7
+title: 七、建设投资估算
+level: 1
+reusable: true
+paragraph_order:
+- chunk_id: C0078
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0078
+- chunk_id: C0079
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0079
+- chunk_id: C0080
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0080
+- chunk_id: C0081
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0081
+- chunk_id: C0082
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0082
+- chunk_id: C0083
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0083
+- chunk_id: C0084
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0084
+- chunk_id: C0085
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0085
+- chunk_id: C0086
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0086
+- chunk_id: C0087
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0087
+- chunk_id: C0088
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0088
+- chunk_id: C0089
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0089
+- chunk_id: C0090
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0090
+- chunk_id: C0091
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0091
+- chunk_id: C0092
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0092
+- chunk_id: C0093
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0093
+- chunk_id: C0094
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0094
+- chunk_id: C0095
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0095
+- chunk_id: C0096
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0096
+- chunk_id: C0097
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0097
+- chunk_id: C0098
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0098
+- chunk_id: C0099
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0099
+tables:
+- table_id: T08
+  caption: 表7-1 设备与系统购置费（不含税）
+  columns:
+  - 项目
+  - 数量
+  - 单价（万元）
+  - 小计（万元）
+  chunk_id: C0082
+- table_id: T09
+  caption: 表7-2 建筑与公辅工程费用
+  columns:
+  - 费用项
+  - 测算依据
+  - 金额（万元）
+  chunk_id: C0086
+- table_id: T10
+  caption: 表7-3 建设投资估算汇总
+  columns:
+  - 序号
+  - 费用项目
+  - 金额（万元）
+  - 说明
+  chunk_id: C0095
+argument_patterns:
+- claim_id: L022
+  pattern: 购置报价不含另列安装，不得重复计价。
+  strength: boundary
+  requires_support:
+  - N100
+  - N111
+  - N101
+- claim_id: L023
+  pattern: 不因设备价格改变自动按比例变化。
+  strength: boundary
+  requires_support:
+  - N105
+  - N106
+  - N107
+  - N108
+- claim_id: L024
+  pattern: 安装与预备费按各自明示基数计取。
+  strength: boundary
+  requires_support:
+  - N100
+  - N109
+  - N112
+  - N108
+  - N110
+- claim_id: L025
+  pattern: 不得把建设投资改称含融资成本总资金。
+  strength: limited
+  requires_support:
+  - N114
+  - N146
+  - N161
+  - N163
+- claim_id: L026
+  pattern: 完整精度计算，仅展示时四舍五入。
+  strength: boundary
+  requires_support:
+  - N113
+  - N114
+  - N042
+- claim_id: L027
+  pattern: 纯报价变化不自动改变产能或经营单耗；超期需重询。
+  strength: boundary
+  requires_support:
+  - N080
+  - N100
+  - N111
+  - N113
+  - N114
+  - N147
+  - N029
+  - N115
+  - N116
+  - N099
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

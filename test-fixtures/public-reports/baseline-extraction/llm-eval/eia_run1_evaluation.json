@@ -1,0 +1,237 @@
+{
+  "model": "deepseek-v4-flash-0731",
+  "source_sha256": "2649027d0995f4de3ca8dd8f822ba3e9535322abfb46589fce371da161fa8846",
+  "prompt_sha256": "a4ad48c09380e2c821c2f28460c8925f0013c131358c01144c75887dc073e902",
+  "source_records": 14,
+  "elapsed_seconds": 3.45,
+  "usage": {
+    "prompt_tokens": 1498,
+    "total_tokens": 2205,
+    "completion_tokens": 707,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "created_cache_tokens": 1280,
+      "multimodal_tokens": null
+    }
+  },
+  "scoring_version": 3,
+  "fields": 14,
+  "passed": 13,
+  "status_correct": 14,
+  "value_correct": 13,
+  "unit_correct": 13,
+  "source_valid": 14,
+  "unexpected_ids": [],
+  "checks": [
+    {
+      "id": "project_name",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "project_name",
+        "status": "found",
+        "value": "广东旗山再生资源有限公司金属废料分选与筛分30000 吨建设项目",
+        "unit": null,
+        "source_ref": "p5-t1-r0"
+      }
+    },
+    {
+      "id": "project_code",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "project_code",
+        "status": "found",
+        "value": "2509-440783-04-01-133743",
+        "unit": null,
+        "source_ref": "p5-t1-r1"
+      }
+    },
+    {
+      "id": "location",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "location",
+        "status": "found",
+        "value": "开平市水口镇东乐路387 号",
+        "unit": null,
+        "source_ref": "p5-t1-r3"
+      }
+    },
+    {
+      "id": "construction_nature",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "construction_nature",
+        "status": "found",
+        "value": "新建（迁建）",
+        "unit": null,
+        "source_ref": "p5-t1-r6"
+      }
+    },
+    {
+      "id": "application_kind",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "application_kind",
+        "status": "found",
+        "value": "首次申报项目",
+        "unit": null,
+        "source_ref": "p5-t1-r6"
+      }
+    },
+    {
+      "id": "total_investment",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "total_investment",
+        "status": "found",
+        "value": 500,
+        "unit": "万元",
+        "source_ref": "p5-t1-r8"
+      }
+    },
+    {
+      "id": "environmental_investment",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "environmental_investment",
+        "status": "found",
+        "value": 17,
+        "unit": "万元",
+        "source_ref": "p5-t1-r8"
+      }
+    },
+    {
+      "id": "environmental_investment_ratio",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "environmental_investment_ratio",
+        "status": "found",
+        "value": 3.4,
+        "unit": "%",
+        "source_ref": "p5-t1-r9"
+      }
+    },
+    {
+      "id": "construction_duration",
+      "status_ok": true,
+      "value_ok": false,
+      "unit_ok": false,
+      "source_ok": true,
+      "passed": false,
+      "actual": {
+        "id": "construction_duration",
+        "status": "found",
+        "value": "6 个月",
+        "unit": "月",
+        "source_ref": "p5-t1-r9"
+      }
+    },
+    {
+      "id": "land_area",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "land_area",
+        "status": "found",
+        "value": 8606.63,
+        "unit": "㎡",
+        "source_ref": "p5-t1-r10"
+      }
+    },
+    {
+      "id": "has_started",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "has_started",
+        "status": "found",
+        "value": "否",
+        "unit": null,
+        "source_ref": "p5-t1-r10"
+      }
+    },
+    {
+      "id": "special_assessment",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "special_assessment",
+        "status": "found",
+        "value": "无",
+        "unit": null,
+        "source_ref": "p5-t1-r11"
+      }
+    },
+    {
+      "id": "planning_status",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "planning_status",
+        "status": "found",
+        "value": "无",
+        "unit": null,
+        "source_ref": "p5-t1-r12"
+      }
+    },
+    {
+      "id": "annual_emission",
+      "status_ok": true,
+      "value_ok": true,
+      "unit_ok": true,
+      "source_ok": true,
+      "passed": true,
+      "actual": {
+        "id": "annual_emission",
+        "status": "unknown",
+        "value": null,
+        "unit": null,
+        "source_ref": null
+      }
+    }
+  ]
+}

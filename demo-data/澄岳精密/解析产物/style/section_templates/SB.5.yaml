@@ -1,0 +1,29 @@
+section_id: SB.5
+title: B.5 [资料05] 财务测算参数确认单
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0172
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0172
+- chunk_id: C0173
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0173
+- chunk_id: C0174
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0174
+- chunk_id: C0175
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0175
+- chunk_id: C0176
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0176
+- chunk_id: C0177
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0177
+tables: []
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

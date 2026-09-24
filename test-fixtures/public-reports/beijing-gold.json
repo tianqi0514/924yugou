@@ -1,0 +1,22 @@
+{
+  "source_file": "01_beijing_feasibility.pdf",
+  "sha256": "4406b7c6b40fade73a785342962d2cd47f87f67e04e4e7a5c905cbb0089a551c",
+  "note": "人工核对 PDF 实体页 6、7、8、16、177、191；只评价文档定位和原始表格行，不评价事实归一化、规则或写作。",
+  "text_anchors": [
+    {"id": "project_name", "pdf_page": 6, "text": "平谷区马昌营公共交通枢纽工程"},
+    {"id": "construction_period", "pdf_page": 8, "text": "本项目施工周期预计为12个月"},
+    {"id": "total_investment_narrative", "pdf_page": 8, "text": "本项目总投资估算为31255.57万元"}
+  ],
+  "heading_anchors": [
+    {"id": "chapter_1", "pdf_page": 6, "text": "第一章 概述"},
+    {"id": "chapter_2", "pdf_page": 16, "text": "第二章 项目建设背景及必要性"},
+    {"id": "chapter_10", "pdf_page": 191, "text": "第十章 研究结论与建议"}
+  ],
+  "table_anchors": [
+    {"id": "technical_land_area", "pdf_page": 7, "caption": "表1-1 技术经济指标表", "label": "用地总面积", "value": "73431.105", "unit": "㎡"},
+    {"id": "technical_building_area", "pdf_page": 7, "caption": "表1-1 技术经济指标表", "label": "总建筑面积", "value": "17268.25", "unit": "㎡"},
+    {"id": "technical_parking", "pdf_page": 7, "caption": "表1-1 技术经济指标表", "label": "机动车位停车位", "value": "149", "unit": "辆"},
+    {"id": "investment_engineering", "pdf_page": 177, "caption": "表7-1 项目总投资汇总表", "label": "工程费", "value": "22122.45", "unit": "万元"},
+    {"id": "investment_total", "pdf_page": 177, "caption": "表7-1 项目总投资汇总表", "label": "总投资", "value": "31255.57", "unit": "万元"}
+  ]
+}

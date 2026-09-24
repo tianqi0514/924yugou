@@ -1,0 +1,38 @@
+section_id: S7.2
+title: 7.2 建筑、公辅及其他费用
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0084
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0084
+- chunk_id: C0085
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0085
+- chunk_id: C0086
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0086
+- chunk_id: C0087
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0087
+tables:
+- table_id: T09
+  caption: 表7-2 建筑与公辅工程费用
+  columns:
+  - 费用项
+  - 测算依据
+  - 金额（万元）
+  chunk_id: C0086
+argument_patterns:
+- claim_id: L023
+  pattern: 不因设备价格改变自动按比例变化。
+  strength: boundary
+  requires_support:
+  - N105
+  - N106
+  - N107
+  - N108
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

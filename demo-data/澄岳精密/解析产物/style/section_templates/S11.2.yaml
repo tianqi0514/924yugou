@@ -1,0 +1,40 @@
+section_id: S11.2
+title: 11.2 内部预审判断
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0139
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0139
+- chunk_id: C0140
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0140
+- chunk_id: C0141
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0141
+- chunk_id: C0142
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0142
+tables:
+- table_id: T15
+  caption: 表11-2 基准情景约束检查
+  columns:
+  - 约束
+  - 结果
+  - 判断边界
+  chunk_id: C0141
+argument_patterns:
+- claim_id: L040
+  pattern: 数值约束与证据型条件分开判断。
+  strength: boundary
+  requires_support:
+  - N179
+  - N180
+  - N181
+  - N182
+  - N183
+  - N193
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

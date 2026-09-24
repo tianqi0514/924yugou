@@ -1,0 +1,133 @@
+section_id: SB
+title: 附录B  关键资料摘录（1）
+level: 1
+reusable: false
+paragraph_order:
+- chunk_id: C0159
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0159
+- chunk_id: C0160
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0160
+- chunk_id: C0161
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0161
+- chunk_id: C0162
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0162
+- chunk_id: C0163
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0163
+- chunk_id: C0164
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0164
+- chunk_id: C0165
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0165
+- chunk_id: C0166
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0166
+- chunk_id: C0167
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0167
+- chunk_id: C0168
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0168
+- chunk_id: C0169
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0169
+- chunk_id: C0170
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0170
+- chunk_id: C0171
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0171
+- chunk_id: C0172
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0172
+- chunk_id: C0173
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0173
+- chunk_id: C0174
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0174
+- chunk_id: C0175
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0175
+- chunk_id: C0176
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0176
+- chunk_id: C0177
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0177
+- chunk_id: C0178
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0178
+- chunk_id: C0179
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0179
+- chunk_id: C0180
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0180
+- chunk_id: C0181
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0181
+- chunk_id: C0182
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0182
+- chunk_id: C0183
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0183
+- chunk_id: C0184
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0184
+- chunk_id: C0185
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0185
+- chunk_id: C0186
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0186
+- chunk_id: C0187
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0187
+- chunk_id: C0188
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0188
+- chunk_id: C0189
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0189
+- chunk_id: C0190
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0190
+- chunk_id: C0191
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0191
+- chunk_id: C0192
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0192
+- chunk_id: C0193
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0193
+- chunk_id: C0194
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0194
+tables: []
+argument_patterns:
+- claim_id: L047
+  pattern: 仅踏勘，未形成全部专项最终结论。
+  strength: limited
+  requires_support:
+  - N193
+  - N103
+- claim_id: L048
+  pattern: 未提供的签字合同、授信、试车记录与专项文件不得视为已有。
+  strength: limited
+  requires_support:
+  - N194
+  - N195
+  - N193
+  - N012
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

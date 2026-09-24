@@ -1,0 +1,52 @@
+industry: 制造业/新能源汽车零部件
+project_type: 现有厂房技术改造
+product: 电池托盘
+process_keywords:
+- 机器人焊接
+- 精加工
+- 气密检测
+- 尺寸复核
+- 质量追溯
+source_date: '2026-09-18'
+scale_node_refs:
+- N025
+- N042
+- N034
+- N114
+- N147
+section_titles:
+- 一、项目概要与预审意见
+- 二、业务需求、产品与项目边界
+- 三、工艺路径与备选方案
+- 四、产能测算与交付匹配
+- 五、厂房改造与公辅条件
+- 六、实施进度与人员配置
+- 七、建设投资估算
+- 八、营业收入与经营成本
+- 九、营运资金与融资安排
+- 十、经营现金盈余与回收测算
+- 十一、风险、约束与结论
+rule_features:
+  compute: 62
+  select: 12
+relation_features:
+  DERIVES_FROM: 152
+  DEPENDS_ON: 48
+  REFERENCES: 359
+  RESTATES: 679
+  SUPPORTS: 198
+  CONTEXT_OF: 194
+  CONTRADICTS: 1
+  ASSUMES: 21
+  COMPARES_WITH: 9
+  CAUSES: 5
+evidence_features:
+  internal_sources: 11
+  fictional: true
+  power_conflict: true
+  financing_gaps: true
+vector: null
+embedding_model: null
+weighted_matching_weights: null
+status: structured_features_only
+feature_origin: 原文内容与本次实际抽取计数；未训练或调用匹配模型。

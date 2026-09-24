@@ -1,0 +1,462 @@
+- id: G001
+  what: 融资条款不完整
+  nodes:
+  - N156
+  - N157
+  - N158
+  - N159
+  - N160
+  - N161
+  - N162
+  owner: 财务管理部
+  source_locations:
+  - block_id: B0121
+    chunk_id: C0121
+    page: 12
+    span:
+    - 10579
+    - 10693
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 131
+      body_index: 144
+      xpath: /w:document/w:body/w:p[132]
+      index_base: 0
+  - block_id: B0187
+    chunk_id: C0187
+    page: 19
+    span:
+    - 17120
+    - 17238
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 204
+      body_index: 222
+      xpath: /w:document/w:body/w:p[205]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 阻断含融资成本总资金、利息及偿债评价；不阻断明示口径的融资前回放
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 融资条款不完整
+- id: G002
+  what: 增容费用与追加工期未知
+  nodes:
+  - N163
+  - N164
+  - N052
+  owner: 安环部 / 项目工程部 / 设备能源室
+  source_locations:
+  - block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5396
+    - 5531
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+  - block_id: B0138
+    chunk_id: C0138
+    page: 14
+    span:
+    - 12181
+    - 12288
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 150
+      body_index: 165
+      xpath: /w:document/w:body/w:p[151]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 不能认为现有预算或期限已覆盖增容
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 增容费用与追加工期未知
+- id: G003
+  what: 客户采购承诺、售价与账期待确认
+  nodes:
+  - N012
+  - N018
+  - N017
+  - N115
+  - N139
+  owner: 销售管理部
+  source_locations:
+  - block_id: B0027
+    chunk_id: C0027
+    page: 4
+    span:
+    - 1889
+    - 2004
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 29
+      body_index: 31
+      xpath: /w:document/w:body/w:p[30]
+      index_base: 0
+  - block_id: B0102
+    chunk_id: C0102
+    page: 11
+    span:
+    - 8722
+    - 8853
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 111
+      body_index: 122
+      xpath: /w:document/w:body/w:p[112]
+      index_base: 0
+  - block_id: B0114
+    chunk_id: C0114
+    page: 12
+    span:
+    - 9883
+    - 9980
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 124
+      body_index: 136
+      xpath: /w:document/w:body/w:p[125]
+      index_base: 0
+  - block_id: B0161
+    chunk_id: C0161
+    page: 17
+    span:
+    - 14911
+    - 15075
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 176
+      body_index: 194
+      xpath: /w:document/w:body/w:p[177]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 只能以预测和假设测算，不能声明订单或回款已落实
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 客户采购承诺、售价与账期待确认
+- id: G004
+  what: 连续节拍与质量验证资料未提供
+  nodes:
+  - N029
+  - N030
+  - N031
+  - N194
+  owner: 工程技术部
+  source_locations:
+  - block_id: B0040
+    chunk_id: C0040
+    page: 5
+    span:
+    - 3078
+    - 3180
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 43
+      body_index: 46
+      xpath: /w:document/w:body/w:p[44]
+      index_base: 0
+  - block_id: B0163
+    chunk_id: C0163
+    page: 17
+    span:
+    - 15105
+    - 15231
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 178
+      body_index: 196
+      xpath: /w:document/w:body/w:p[179]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 不能把规划取值声明为已达产实绩
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 连续节拍与质量验证资料未提供
+- id: G005
+  what: 专项适配设计未闭合
+  nodes:
+  - N193
+  - N103
+  owner: 安环部 / 项目工程部
+  source_locations:
+  - block_id: B0184
+    chunk_id: C0184
+    page: 19
+    span:
+    - 16849
+    - 16949
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 201
+      body_index: 219
+      xpath: /w:document/w:body/w:p[202]
+      index_base: 0
+  - block_id: B0077
+    chunk_id: C0077
+    page: 8
+    span:
+    - 6617
+    - 6718
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 83
+      body_index: 91
+      xpath: /w:document/w:body/w:p[84]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 阻断无条件现场施工和设备正式采购建议
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 专项适配设计未闭合
+- id: G006
+  what: A、C方案分项测算缺失
+  nodes:
+  - N173
+  - N174
+  - N176
+  - N177
+  owner: 工程技术部
+  source_locations:
+  - block_id: B0043
+    chunk_id: C0043
+    page: 5
+    span:
+    - 3500
+    - 3607
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 46
+      body_index: 50
+      xpath: /w:document/w:body/w:p[47]
+      index_base: 0
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 不能生成其设备清单、取费与推导底稿
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: A、C方案分项测算缺失
+- id: G007
+  what: 周度峰值、换型顺序与物流窗口未建模
+  nodes:
+  - N034
+  - N040
+  owner: 工程技术部 / 销售管理部
+  source_locations:
+  - block_id: B0054
+    chunk_id: C0054
+    page: 6
+    span:
+    - 4507
+    - 4636
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 58
+      body_index: 63
+      xpath: /w:document/w:body/w:p[59]
+      index_base: 0
+  - block_id: B0055
+    chunk_id: C0055
+    page: 6
+    span:
+    - 4638
+    - 4751
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 59
+      body_index: 64
+      xpath: /w:document/w:body/w:p[60]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 不能由年度能力余量推导低风险或加急可行
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 周度峰值、换型顺序与物流窗口未建模
+- id: G008
+  what: 税款收付、长期更新与末期回收未建模
+  nodes:
+  - N200
+  - N166
+  - N170
+  owner: 财务管理部
+  source_locations:
+  - block_id: B0014
+    chunk_id: C0014
+    page: 2
+    span:
+    - 380
+    - 497
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 14
+      body_index: 14
+      xpath: /w:document/w:body/w:p[15]
+      index_base: 0
+  - block_id: B0133
+    chunk_id: C0133
+    page: 13
+    span:
+    - 11639
+    - 11710
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 144
+      body_index: 158
+      xpath: /w:document/w:body/w:p[145]
+      index_base: 0
+  - block_id: B0177
+    chunk_id: C0177
+    page: 18
+    span:
+    - 16402
+    - 16533
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 193
+      body_index: 211
+      xpath: /w:document/w:body/w:p[194]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 不得补写NPV、IRR、税后回收或偿债覆盖指标
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 税款收付、长期更新与末期回收未建模
+- id: G009
+  what: 正式报价及配置边界仍需确认
+  nodes:
+  - N100
+  - N080
+  - N099
+  owner: 采购管理部
+  source_locations:
+  - block_id: B0083
+    chunk_id: C0083
+    page: 9
+    span:
+    - 7195
+    - 7334
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 90
+      body_index: 99
+      xpath: /w:document/w:body/w:p[91]
+      index_base: 0
+  - block_id: B0099
+    chunk_id: C0099
+    page: 10
+    span:
+    - 8565
+    - 8689
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 107
+      body_index: 118
+      xpath: /w:document/w:body/w:p[108]
+      index_base: 0
+  - block_id: B0166
+    chunk_id: C0166
+    page: 17
+    span:
+    - 15413
+    - 15520
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 181
+      body_index: 199
+      xpath: /w:document/w:body/w:p[182]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 超出有效期或范围变更后须重询，未知新价保持待补
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 正式报价及配置边界仍需确认
+- id: G010
+  what: 材料付款期尚无承诺
+  nodes:
+  - N141
+  - N145
+  - N146
+  owner: 采购管理部 / 财务管理部
+  source_locations:
+  - block_id: B0114
+    chunk_id: C0114
+    page: 12
+    span:
+    - 9883
+    - 9980
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 124
+      body_index: 136
+      xpath: /w:document/w:body/w:p[125]
+      index_base: 0
+  - block_id: B0176
+    chunk_id: C0176
+    page: 18
+    span:
+    - 16293
+    - 16400
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 192
+      body_index: 210
+      xpath: /w:document/w:body/w:p[193]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 账期变化重算，不得转述为供应商已承诺
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 材料付款期尚无承诺
+- id: G011
+  what: 实施日期变化后的客户期间适用性
+  nodes:
+  - N058
+  - N063
+  - N070
+  - N071
+  owner: 项目工程部 / 销售管理部
+  source_locations:
+  - block_id: B0071
+    chunk_id: C0071
+    page: 8
+    span:
+    - 6128
+    - 6242
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 77
+      body_index: 84
+      xpath: /w:document/w:body/w:p[78]
+      index_base: 0
+  - block_id: B0191
+    chunk_id: C0191
+    page: 19
+    span:
+    - 17409
+    - 17536
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 208
+      body_index: 226
+      xpath: /w:document/w:body/w:p[209]
+      index_base: 0
+  status: open
+  blocking: false
+  blocking_scope: 排期变化需重新确认预测，不能只平移期间标签
+  blocking_note: blocking=false仅表示可生成披露缺口的原口径测试快照，不表示工程/融资审批通过
+  need_from_client: 实施日期变化后的客户期间适用性

@@ -1,0 +1,265 @@
+measurement_origin: 直接统计规范化原文
+avg_sentence_len: 32.38
+sentence_count: 316
+paragraph_count: 104
+paragraph_character_range:
+- 10
+- 164
+person: 公司内部项目评审的第三人称与无主语陈述
+tone: 克制、条件化，区分测算、计划、意向、实绩与确认结论
+number_format:
+  currency: 人民币
+  default_amount_unit: 万元
+  display_amount_decimals: 2
+  intermediate_rounding: false
+  rounding: ROUND_HALF_UP
+  thousands_separator: true
+  percentage_display_decimals: 2
+  capacity_rounding: 向下取整至套
+  breakeven_rounding: 向上取整至套
+  occurrence_exceptions: 产能可显示25.4016万套，公式展示保留完整精度；按node_slots的format渲染
+terminology:
+- canonical: 融资前项目资金需求
+  observed_aliases:
+  - 融资前资金需求
+  - 融资前需求
+  node_ids:
+  - N147
+  disambiguation: 不得与建设投资或含融资成本总资金需求混同
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 建设投资
+  observed_aliases:
+  - 建设投资合计
+  node_ids:
+  - N114
+  disambiguation: 不包括净营运资金、融资费用及待确认增容工程
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 净营运资金需求
+  observed_aliases:
+  - 净营运资金
+  node_ids:
+  - N146
+  disambiguation: 采用正常年周转假设；不可当年经营成本再扣一次
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled:
+  - 净营运资金占用
+- canonical: 正常年合格产能
+  observed_aliases:
+  - 合格年产能
+  - 合格产能
+  - 年合格产能
+  node_ids:
+  - N034
+  disambiguation: 与年毛产出、客户需求、销量区分
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 正常年计划销售量
+  observed_aliases:
+  - 正常年计划销售
+  node_ids:
+  - N036
+  disambiguation: 取需求与合格产能较小值
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled:
+  - 正常年销量
+- canonical: 首个运营年度
+  observed_aliases:
+  - 首年
+  node_ids:
+  - N070
+  disambiguation: 运营期间，不等于2027日历年度
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 正常运营年
+  observed_aliases:
+  - 正常年
+  node_ids:
+  - N071
+  disambiguation: 2028年10月至2029年9月的完整12个月
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 有效开动率
+  observed_aliases: []
+  node_ids:
+  - N030
+  disambiguation: 仅折减时间，不含质量损失
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 最终合格率
+  observed_aliases: []
+  node_ids:
+  - N031
+  disambiguation: 包含允许返修的最终结果，不等于首检合格率
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 改造面积
+  observed_aliases:
+  - 使用面积
+  - 改造计费面积
+  node_ids:
+  - N042
+  disambiguation: 不等于厂房总建筑面积
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 厂房总建筑面积
+  observed_aliases:
+  - 总建筑面积
+  node_ids:
+  - N041
+  disambiguation: 包括改造与旧业务仓储
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 安装集成费
+  observed_aliases:
+  - 安装集成
+  node_ids:
+  - N111
+  disambiguation: 统一按购置费计列
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 基本预备费
+  observed_aliases: []
+  node_ids:
+  - N113
+  disambiguation: 不对营运资金或融资费用计取
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 经营现金盈余
+  observed_aliases: []
+  node_ids:
+  - N165
+  - N166
+  disambiguation: 需按期间消歧；不等于净利润或完整项目现金流
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 固定付现成本
+  observed_aliases:
+  - 年度固定付现成本
+  node_ids:
+  - N137
+  disambiguation: 首年全员到岗；不随销量同比缩减
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 拟需借款
+  observed_aliases: []
+  node_ids:
+  - N152
+  disambiguation: 非已审批授信、非可提款额度
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled:
+  - 测算借款需求
+- canonical: 材料应付账款
+  observed_aliases:
+  - 材料应付
+  node_ids:
+  - N145
+  disambiguation: 与同值应收账款是不同业务量
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 可用有功余量
+  observed_aliases:
+  - 配电可用余量
+  node_ids:
+  - N050
+  - N051
+  - N052
+  disambiguation: 冲突观察值不能自动归并成一个已采用数值
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 静态资金回收期
+  observed_aliases:
+  - 简化静态回收期
+  - 回收期
+  node_ids:
+  - N170
+  disambiguation: 融资前税前简化指标；不是税后或折现回收期
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+- canonical: 外协表面处理
+  observed_aliases: []
+  node_ids:
+  - N118
+  disambiguation: 本项目产品的服务成本，非旧业务外协交付数量
+  origin: source_grounded_terminology
+  unobserved_aliases_not_enabled: []
+unsupported_claims_to_avoid:
+- 年度实物净变化为零，不代表营运资金无库存占用。
+- 最终合格率含允许返修后的结果，不再乘首检合格率。
+- 仅有方案级估值，不反推设备与费用分项。
+- 独立约束不可相互抵销。
+- 原文未设额外占用率淘汰阈值，也未证明低风险。
+- 爬坡已反映在客户导入量，设备时长变化另算。
+- 改造计费面积不等于厂房总面积，不含旧仓储。
+- 同口径分歧未解释，较新或较大不能自动胜出。
+- 两条条件分支不能替代唯一适配结论。
+- 年度内部电量预算达标不证明瞬时负荷可接入。
+- 首年全员到岗费用不随首年销量比例缩减。
+- 购置报价不含另列安装，不得重复计价。
+- 不因设备价格改变自动按比例变化。
+- 安装与预备费按各自明示基数计取。
+- 不得把建设投资改称含融资成本总资金。
+- 完整精度计算，仅展示时四舍五入。
+- 纯报价变化不自动改变产能或经营单耗；超期需重询。
+- 维护费独立固定；线数班次变化需重算人员。
+- 数值相同的规模上限与资金来源上限是独立约束。
+- 未扣所得税、利息、还本等，不是完整项目现金流。
+- 数值约束与证据型条件分开判断。
+- 新版本保留历史实绩与原依据，补资料须说明替代关系。
+- 预测、询价和内部参数不能证明合同、验收或银行承诺。
+- 仅踏勘，未形成全部专项最终结论。
+- 未提供的签字合同、授信、试车记录与专项文件不得视为已有。
+forbidden_words: []
+forbidden_words_note: 原文未提供普适禁用词表；仅保留具体不应作出的业务断言。
+citation_style: '[资料01]等内部资料标识；附录A登记、附录B给出摘录。'
+table_caption: 表{章号}-{序号} {标题}；附录资料表采用表A-1
+source_locations:
+- block_id: B0013
+  chunk_id: C0013
+  page: 2
+  span:
+  - 276
+  - 378
+  source_locator:
+    part: word/document.xml
+    paragraph_index: 13
+    body_index: 13
+    xpath: /w:document/w:body/w:p[14]
+    index_base: 0
+- block_id: B0014
+  chunk_id: C0014
+  page: 2
+  span:
+  - 380
+  - 497
+  source_locator:
+    part: word/document.xml
+    paragraph_index: 14
+    body_index: 14
+    xpath: /w:document/w:body/w:p[15]
+    index_base: 0
+- block_id: B0015
+  chunk_id: C0015
+  page: 2
+  span:
+  - 499
+  - 613
+  source_locator:
+    part: word/document.xml
+    paragraph_index: 15
+    body_index: 15
+    xpath: /w:document/w:body/w:p[16]
+    index_base: 0
+- block_id: B0098
+  chunk_id: C0098
+  page: 10
+  span:
+  - 8446
+  - 8563
+  source_locator:
+    part: word/document.xml
+    paragraph_index: 106
+    body_index: 117
+    xpath: /w:document/w:body/w:p[107]
+    index_base: 0

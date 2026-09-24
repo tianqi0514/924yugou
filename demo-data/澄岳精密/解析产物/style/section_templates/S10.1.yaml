@@ -1,0 +1,47 @@
+section_id: S10.1
+title: 10.1 经营现金盈余
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0123
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0123
+- chunk_id: C0124
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0124
+- chunk_id: C0125
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0125
+- chunk_id: C0126
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0126
+- chunk_id: C0127
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0127
+tables:
+- table_id: T13
+  caption: 表10-1 两期经营测算对照（金额单位：万元）
+  columns:
+  - 项目
+  - 首个运营年度
+  - 正常运营年
+  chunk_id: C0126
+argument_patterns:
+- claim_id: L035
+  pattern: 未扣所得税、利息、还本等，不是完整项目现金流。
+  strength: boundary
+  requires_support:
+  - N166
+  - N165
+  - N137
+- claim_id: L036
+  pattern: 贡献不大于零时原公式不适用，不称完整财务盈亏平衡点。
+  strength: conditional
+  requires_support:
+  - N167
+  - N169
+  - N168
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

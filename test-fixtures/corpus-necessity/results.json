@@ -1,0 +1,243 @@
+{
+  "method": "One-category-at-a-time masking of parsed, in-memory source data",
+  "scope": [
+    "writing.source_cases + writing.render_cases",
+    "CorpusRepository.graph in bootstrap mode"
+  ],
+  "database_access": "disabled by invalid localhost URL; no database methods called",
+  "archive": {
+    "corpus_id": "cy_tray_20260918",
+    "version": "v2",
+    "manifest_sha256": "4c216ae676d2039593b38239e0fa4546dd3b37595509d42ab8982d70ff0555a7",
+    "categories": 30,
+    "artifacts": 114,
+    "auxiliary_files": 3,
+    "checksum_entries": 116,
+    "checksum_mismatches": []
+  },
+  "baseline": {
+    "chapter_validation": {
+      "source_cases": 2,
+      "blocks": 2,
+      "blocked": false
+    },
+    "graph_builder": {
+      "nodes": 728,
+      "edges": 2232,
+      "raw_edges": 1666,
+      "derived_edges": 566
+    }
+  },
+  "categories": [
+    {
+      "number": 1,
+      "path": "manifest.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 2,
+      "path": "meta.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 3,
+      "path": "provenance.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 4,
+      "path": "outline.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": false
+    },
+    {
+      "number": 5,
+      "path": "source/original.docx",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 6,
+      "path": "source/normalized.md",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 7,
+      "path": "source/offset_map.json",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 8,
+      "path": "source/assets/*",
+      "physical_file_count": 18,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 9,
+      "path": "chunks/chunks.jsonl",
+      "physical_file_count": 1,
+      "chapter_validation_available": false,
+      "graph_builder_available": false
+    },
+    {
+      "number": 10,
+      "path": "chunks/skeletons.jsonl",
+      "physical_file_count": 1,
+      "chapter_validation_available": false,
+      "graph_builder_available": true
+    },
+    {
+      "number": 11,
+      "path": "chunks/embeddings.parquet",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 12,
+      "path": "graph/nodes.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": false
+    },
+    {
+      "number": 13,
+      "path": "graph/rules.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": false
+    },
+    {
+      "number": 14,
+      "path": "graph/relations.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": false
+    },
+    {
+      "number": 15,
+      "path": "graph/claims.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": false
+    },
+    {
+      "number": 16,
+      "path": "graph/invariants.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 17,
+      "path": "graph/graph.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 18,
+      "path": "evidence/evidence.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": false
+    },
+    {
+      "number": 19,
+      "path": "evidence/excerpts/*.md",
+      "physical_file_count": 20,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 20,
+      "path": "reasoning/derivation.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 21,
+      "path": "reasoning/decisions.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 22,
+      "path": "reasoning/trace.jsonl",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 23,
+      "path": "quality/conflicts.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": false
+    },
+    {
+      "number": 24,
+      "path": "quality/gaps.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": false
+    },
+    {
+      "number": 25,
+      "path": "quality/gate_report.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 26,
+      "path": "style/style_profile.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 27,
+      "path": "style/section_templates/*.yaml",
+      "physical_file_count": 49,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 28,
+      "path": "index/node_index.json",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 29,
+      "path": "index/term_index.json",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    },
+    {
+      "number": 30,
+      "path": "index/signature.yaml",
+      "physical_file_count": 1,
+      "chapter_validation_available": true,
+      "graph_builder_available": true
+    }
+  ]
+}

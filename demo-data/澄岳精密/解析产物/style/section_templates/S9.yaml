@@ -1,0 +1,83 @@
+section_id: S9
+title: 九、营运资金与融资安排
+level: 1
+reusable: true
+paragraph_order:
+- chunk_id: C0111
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0111
+- chunk_id: C0112
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0112
+- chunk_id: C0113
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0113
+- chunk_id: C0114
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0114
+- chunk_id: C0115
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0115
+- chunk_id: C0116
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0116
+- chunk_id: C0117
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0117
+- chunk_id: C0118
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0118
+- chunk_id: C0119
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0119
+- chunk_id: C0120
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0120
+- chunk_id: C0121
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0121
+tables:
+- table_id: T12
+  caption: 表9-1 正常年净营运资金估算
+  columns:
+  - 项目
+  - 计算依据
+  - 金额（万元）
+  chunk_id: C0116
+argument_patterns:
+- claim_id: L031
+  pattern: 账期属假设，资金变化需重算。
+  strength: conditional
+  requires_support:
+  - N139
+  - N141
+  - N140
+  - N146
+- claim_id: L032
+  pattern: 数值相同的规模上限与资金来源上限是独立约束。
+  strength: boundary
+  requires_support:
+  - N151
+  - N150
+  - N148
+  - N149
+- claim_id: L033
+  pattern: 超过意向上限部分列待补资金，不自动增加资金。
+  strength: conditional
+  requires_support:
+  - N152
+  - N149
+  - N155
+  - N148
+- claim_id: L034
+  pattern: 融资前缺口零不证明融资落实。
+  strength: undefined
+  requires_support:
+  - N195
+  - N161
+  - N162
+  - N155
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

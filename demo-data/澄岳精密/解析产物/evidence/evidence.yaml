@@ -1,0 +1,984 @@
+- id: EV-REPORT
+  title: 电池托盘焊接与检测技改项目可行性研究报告·内部评审稿
+  version: V1.0
+  formed_at: '2026-09-18'
+  source_type: uploaded_document
+  original_document_available: true
+  fictional: true
+  source_document: source/original.docx
+  valid_until: null
+  credibility: 用户提供的虚构业务原文；仅验证文内一致性
+  limitations:
+  - 非真实投资项目
+  - 非签章合同或审批依据
+  - 未读取人工核对答案
+  excerpts: []
+- id: EV-01
+  title: 销售需求预测备忘录
+  document_number: CY-XS-2026-0912
+  version: null
+  formed_at: '2026-09-12'
+  valid_until: null
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 13899
+    - 13927
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 1
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[2]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0161
+    chunk_id: C0161
+    page: 17
+    span:
+    - 14911
+    - 15075
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 176
+      body_index: 194
+      xpath: /w:document/w:body/w:p[177]
+      index_base: 0
+  excerpt_ids:
+  - EX-01-01
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 两期需求；意向预测，非订单
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-01-01
+    evidence_id: EV-01
+    span:
+    - 14911
+    - 15075
+    page: 17
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 176
+      body_index: 194
+      xpath: /w:document/w:body/w:p[177]
+      index_base: 0
+    source_text_sha256: 11570abd81183300bcb9c6432dffb12f8b82c932e52664e748f30cc6db4fec0f
+    path: evidence/excerpts/EX-01-01.md
+- id: EV-02
+  title: 装备方案预比较与能力说明
+  document_number: CY-GC-2026-0915
+  version: null
+  formed_at: '2026-09-15'
+  valid_until: null
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 13968
+    - 13999
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 2
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[3]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0163
+    chunk_id: C0163
+    page: 17
+    span:
+    - 15105
+    - 15231
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 178
+      body_index: 196
+      xpath: /w:document/w:body/w:p[179]
+      index_base: 0
+  - block_id: B0164
+    chunk_id: C0164
+    page: 17
+    span:
+    - 15233
+    - 15386
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+  excerpt_ids:
+  - EX-02-01
+  - EX-02-02
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 能力参数、备选方案；待验证
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-02-01
+    evidence_id: EV-02
+    span:
+    - 15105
+    - 15231
+    page: 17
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 178
+      body_index: 196
+      xpath: /w:document/w:body/w:p[179]
+      index_base: 0
+    source_text_sha256: 22327a971cc78685db6db5419ca252fccb3cf29eebb90a6119c9d8fd9e7fe540
+    path: evidence/excerpts/EX-02-01.md
+  - id: EX-02-02
+    evidence_id: EV-02
+    span:
+    - 15233
+    - 15386
+    page: 17
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 179
+      body_index: 197
+      xpath: /w:document/w:body/w:p[180]
+      index_base: 0
+    source_text_sha256: 89a3073d099730d82a2560c9bb76e155cb07406686dc2f99230a870437901de5
+    path: evidence/excerpts/EX-02-02.md
+- id: EV-03
+  title: 禾进装备及配套采购询价摘要
+  document_number: Q-2026-0910-R2
+  version: R2
+  formed_at: '2026-09-10'
+  valid_until: '2026-10-10'
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14040
+    - 14071
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 3
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[4]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0166
+    chunk_id: C0166
+    page: 17
+    span:
+    - 15413
+    - 15520
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 181
+      body_index: 199
+      xpath: /w:document/w:body/w:p[182]
+      index_base: 0
+  - block_id: B0167
+    chunk_id: C0167
+    page: 17
+    span:
+    - 15522
+    - 15643
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 182
+      body_index: 200
+      xpath: /w:document/w:body/w:p[183]
+      index_base: 0
+  excerpt_ids:
+  - EX-03-01
+  - EX-03-02
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 设备及系统报价；有效至10.10
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: within_stated_validity
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-03-01
+    evidence_id: EV-03
+    span:
+    - 15413
+    - 15520
+    page: 17
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 181
+      body_index: 199
+      xpath: /w:document/w:body/w:p[182]
+      index_base: 0
+    source_text_sha256: 9895878ff482ba898b308674ccd59cd3e7d154d45f80c05650fde83557629ec6
+    path: evidence/excerpts/EX-03-01.md
+  - id: EX-03-02
+    evidence_id: EV-03
+    span:
+    - 15522
+    - 15643
+    page: 17
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 182
+      body_index: 200
+      xpath: /w:document/w:body/w:p[183]
+      index_base: 0
+    source_text_sha256: b45ba12f971a0bc4d9e5e44b3e45ddf42a9bf65569bf38f7686a02d8ce2fd6ef
+    path: evidence/excerpts/EX-03-02.md
+- id: EV-04
+  title: 二号厂房改造初估及面积登记
+  document_number: CY-JS-2026-0913
+  version: null
+  formed_at: '2026-09-13'
+  valid_until: null
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14115
+    - 14147
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 4
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[5]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0169
+    chunk_id: C0169
+    page: 17
+    span:
+    - 15668
+    - 15813
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 184
+      body_index: 202
+      xpath: /w:document/w:body/w:p[185]
+      index_base: 0
+  - block_id: B0170
+    chunk_id: C0170
+    page: 17
+    span:
+    - 15815
+    - 15916
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 185
+      body_index: 203
+      xpath: /w:document/w:body/w:p[186]
+      index_base: 0
+  excerpt_ids:
+  - EX-04-01
+  - EX-04-02
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 面积、建筑公辅预算和其他费用
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-04-01
+    evidence_id: EV-04
+    span:
+    - 15668
+    - 15813
+    page: 17
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 184
+      body_index: 202
+      xpath: /w:document/w:body/w:p[185]
+      index_base: 0
+    source_text_sha256: a0869dfc7230b8e96c35b54d0f55074f52692e5b53aefdc58b64900d72854cd9
+    path: evidence/excerpts/EX-04-01.md
+  - id: EX-04-02
+    evidence_id: EV-04
+    span:
+    - 15815
+    - 15916
+    page: 17
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 185
+      body_index: 203
+      xpath: /w:document/w:body/w:p[186]
+      index_base: 0
+    source_text_sha256: 408f15d988b63b7eb460d3f229ee4fffda3f91fdd897d9859b6c64a4422fef47
+    path: evidence/excerpts/EX-04-02.md
+- id: EV-05
+  title: 财务测算参数确认单
+  document_number: CY-CW-2026-0916
+  version: null
+  formed_at: '2026-09-16'
+  valid_until: null
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14189
+    - 14217
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 5
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[6]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0173
+    chunk_id: C0173
+    page: 18
+    span:
+    - 15961
+    - 16094
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 189
+      body_index: 207
+      xpath: /w:document/w:body/w:p[190]
+      index_base: 0
+  - block_id: B0174
+    chunk_id: C0174
+    page: 18
+    span:
+    - 16096
+    - 16200
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 190
+      body_index: 208
+      xpath: /w:document/w:body/w:p[191]
+      index_base: 0
+  - block_id: B0175
+    chunk_id: C0175
+    page: 18
+    span:
+    - 16202
+    - 16291
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 191
+      body_index: 209
+      xpath: /w:document/w:body/w:p[192]
+      index_base: 0
+  - block_id: B0176
+    chunk_id: C0176
+    page: 18
+    span:
+    - 16293
+    - 16400
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 192
+      body_index: 210
+      xpath: /w:document/w:body/w:p[193]
+      index_base: 0
+  - block_id: B0177
+    chunk_id: C0177
+    page: 18
+    span:
+    - 16402
+    - 16533
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 193
+      body_index: 211
+      xpath: /w:document/w:body/w:p[194]
+      index_base: 0
+  excerpt_ids:
+  - EX-05-01
+  - EX-05-02
+  - EX-05-03
+  - EX-05-04
+  - EX-05-05
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 价格、成本、周转、人员费用及公式
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-05-01
+    evidence_id: EV-05
+    span:
+    - 15961
+    - 16094
+    page: 18
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 189
+      body_index: 207
+      xpath: /w:document/w:body/w:p[190]
+      index_base: 0
+    source_text_sha256: f45b2f7bf3a2eacb3effe4626d7a6a1e4390b2a31f25da0f7941a7bc68acd16a
+    path: evidence/excerpts/EX-05-01.md
+  - id: EX-05-02
+    evidence_id: EV-05
+    span:
+    - 16096
+    - 16200
+    page: 18
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 190
+      body_index: 208
+      xpath: /w:document/w:body/w:p[191]
+      index_base: 0
+    source_text_sha256: 53bd4a1128b7d26101f2a35da86aaf17f41054814d4bb47d833f0015fb41a7fd
+    path: evidence/excerpts/EX-05-02.md
+  - id: EX-05-03
+    evidence_id: EV-05
+    span:
+    - 16202
+    - 16291
+    page: 18
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 191
+      body_index: 209
+      xpath: /w:document/w:body/w:p[192]
+      index_base: 0
+    source_text_sha256: 7662d47898e9f5b51507e02b85af5af73d1a73fef586d4333504c273f8b495b2
+    path: evidence/excerpts/EX-05-03.md
+  - id: EX-05-04
+    evidence_id: EV-05
+    span:
+    - 16293
+    - 16400
+    page: 18
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 192
+      body_index: 210
+      xpath: /w:document/w:body/w:p[193]
+      index_base: 0
+    source_text_sha256: cf80303dc1a260bb445ff7cbe07aa8fcfa98b3529a1eca8d2a4e097e3e77dfba
+    path: evidence/excerpts/EX-05-04.md
+  - id: EX-05-05
+    evidence_id: EV-05
+    span:
+    - 16402
+    - 16533
+    page: 18
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 193
+      body_index: 211
+      xpath: /w:document/w:body/w:p[194]
+      index_base: 0
+    source_text_sha256: a9fa77ba8f66a984dfe61ffba7ebb2357b3093e1908e371da9168d1fd693950b
+    path: evidence/excerpts/EX-05-05.md
+- id: EV-06A
+  title: 接入点配电可用余量初查表
+  document_number: CY-DL-2026-0908
+  version: null
+  formed_at: '2026-09-08'
+  valid_until: null
+  as_of: '2026-09-01'
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14262
+    - 14293
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 6
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[7]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0179
+    chunk_id: C0179
+    page: 18
+    span:
+    - 16564
+    - 16636
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 195
+      body_index: 213
+      xpath: /w:document/w:body/w:p[196]
+      index_base: 0
+  excerpt_ids:
+  - EX-06A-01
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 800kW；与06B存在差异
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: 设备能源室
+  excerpts:
+  - id: EX-06A-01
+    evidence_id: EV-06A
+    span:
+    - 16564
+    - 16636
+    page: 18
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 195
+      body_index: 213
+      xpath: /w:document/w:body/w:p[196]
+      index_base: 0
+    source_text_sha256: e74c17c42e276ff7587f7f0e9a5c36d6d0f4a14837189dff1b44ae285cdbb9ef
+    path: evidence/excerpts/EX-06A-01.md
+- id: EV-06B
+  title: 接入点负荷复核记录
+  document_number: CY-FH-2026-0916
+  version: null
+  formed_at: '2026-09-16'
+  valid_until: null
+  as_of: '2026-09-01'
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14336
+    - 14364
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 7
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[8]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0180
+    chunk_id: C0180
+    page: 18
+    span:
+    - 16638
+    - 16713
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 196
+      body_index: 214
+      xpath: /w:document/w:body/w:p[197]
+      index_base: 0
+  excerpt_ids:
+  - EX-06B-01
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 650kW；未说明对06A的替代关系
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: 运营部
+  excerpts:
+  - id: EX-06B-01
+    evidence_id: EV-06B
+    span:
+    - 16638
+    - 16713
+    page: 18
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 196
+      body_index: 214
+      xpath: /w:document/w:body/w:p[197]
+      index_base: 0
+    source_text_sha256: c1184aa505eb555895b4898164f6584ab6026d156f994c0d1aa6989af1f03d8c
+    path: evidence/excerpts/EX-06B-01.md
+- id: EV-07
+  title: 现场踏勘问题清单
+  document_number: CY-AH-2026-0914
+  version: null
+  formed_at: '2026-09-14'
+  valid_until: null
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14410
+    - 14437
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 8
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[9]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0184
+    chunk_id: C0184
+    page: 19
+    span:
+    - 16849
+    - 16949
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 201
+      body_index: 219
+      xpath: /w:document/w:body/w:p[202]
+      index_base: 0
+  excerpt_ids:
+  - EX-07-01
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 专项条件待确认，不是验收结论
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-07-01
+    evidence_id: EV-07
+    span:
+    - 16849
+    - 16949
+    page: 19
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 201
+      body_index: 219
+      xpath: /w:document/w:body/w:p[202]
+      index_base: 0
+    source_text_sha256: a1c4e1011cb9f03d054120be32fdf24d015ec60c60d059f7728cb7de26e1b051
+    path: evidence/excerpts/EX-07-01.md
+- id: EV-08
+  title: 项目预审会议纪要
+  document_number: CY-XM-2026-0917
+  version: null
+  formed_at: '2026-09-17'
+  valid_until: null
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14479
+    - 14506
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 9
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[10]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0186
+    chunk_id: C0186
+    page: 19
+    span:
+    - 16975
+    - 17118
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 203
+      body_index: 221
+      xpath: /w:document/w:body/w:p[204]
+      index_base: 0
+  - block_id: B0187
+    chunk_id: C0187
+    page: 19
+    span:
+    - 17120
+    - 17238
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 204
+      body_index: 222
+      xpath: /w:document/w:body/w:p[205]
+      index_base: 0
+  excerpt_ids:
+  - EX-08-01
+  - EX-08-02
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 约束、意向资金和阶段推进要求
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-08-01
+    evidence_id: EV-08
+    span:
+    - 16975
+    - 17118
+    page: 19
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 203
+      body_index: 221
+      xpath: /w:document/w:body/w:p[204]
+      index_base: 0
+    source_text_sha256: 2abe94e3eeac7b79fc3f0bd65d8da7060c0416160f6eab7e5b022bfb860c8cbb
+    path: evidence/excerpts/EX-08-01.md
+  - id: EX-08-02
+    evidence_id: EV-08
+    span:
+    - 17120
+    - 17238
+    page: 19
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 204
+      body_index: 222
+      xpath: /w:document/w:body/w:p[205]
+      index_base: 0
+    source_text_sha256: 09e03c1c905860c8c8ac2a7c01bdbb81941cfc9d74dd01de52a88d50707c7fe9
+    path: evidence/excerpts/EX-08-02.md
+- id: EV-09
+  title: 2025年旧业务经营摘要
+  document_number: CY-YY-2025-12
+  version: null
+  formed_at: '2026-01-12'
+  valid_until: null
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14548
+    - 14577
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 10
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[11]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0189
+    chunk_id: C0189
+    page: 19
+    span:
+    - 17268
+    - 17381
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 206
+      body_index: 224
+      xpath: /w:document/w:body/w:p[207]
+      index_base: 0
+  excerpt_ids:
+  - EX-09-01
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: T-200历史业务；非本项目预测
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-09-01
+    evidence_id: EV-09
+    span:
+    - 17268
+    - 17381
+    page: 19
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 206
+      body_index: 224
+      xpath: /w:document/w:body/w:p[207]
+      index_base: 0
+    source_text_sha256: 9ffd8fe8b439550a0216a8318db62dec12aede83557227e69caf03a575a32830
+    path: evidence/excerpts/EX-09-01.md
+- id: EV-10
+  title: 实施排期与定员测算记录
+  document_number: CY-JH-2026-0916
+  version: null
+  formed_at: '2026-09-16'
+  valid_until: null
+  as_of: null
+  source_type: embedded_internal_excerpt
+  fictional: true
+  original_document_available: false
+  source_document: source/original.docx
+  register_location:
+    block_id: B0155
+    chunk_id: C0155
+    page: 16
+    span:
+    - 14621
+    - 14651
+    source_locator:
+      part: word/document.xml
+      table_index: 17
+      row_index: 11
+      cell_index: 1
+      index_base: 0
+      xpath: /w:document/w:body/w:tbl[18]/w:tr[12]/w:tc[2]
+  excerpt_locations:
+  - block_id: B0191
+    chunk_id: C0191
+    page: 19
+    span:
+    - 17409
+    - 17536
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 208
+      body_index: 226
+      xpath: /w:document/w:body/w:p[209]
+      index_base: 0
+  - block_id: B0192
+    chunk_id: C0192
+    page: 19
+    span:
+    - 17538
+    - 17622
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 209
+      body_index: 227
+      xpath: /w:document/w:body/w:p[210]
+      index_base: 0
+  excerpt_ids:
+  - EX-10-01
+  - EX-10-02
+  credibility: 本报告内嵌的虚构资料摘录；未独立核验，不代表实际合同或承诺
+  adopted_for: 阶段月数、岗位配置及起止计划
+  limitations:
+  - 只有目录和摘录，未获得完整原始文件
+  - 不得推断未展示资料内容
+  validity_evaluation:
+    as_of: '2026-09-18'
+    status: not_stated
+    rule: 缺失有效期不得解释成永不过期
+  issuer: null
+  owner: null
+  excerpts:
+  - id: EX-10-01
+    evidence_id: EV-10
+    span:
+    - 17409
+    - 17536
+    page: 19
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 208
+      body_index: 226
+      xpath: /w:document/w:body/w:p[209]
+      index_base: 0
+    source_text_sha256: e30da4f04fc75dba215a3dfb39f56bba6cbb6f14f46b2b07cb16afb93dcbdb2c
+    path: evidence/excerpts/EX-10-01.md
+  - id: EX-10-02
+    evidence_id: EV-10
+    span:
+    - 17538
+    - 17622
+    page: 19
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 209
+      body_index: 227
+      xpath: /w:document/w:body/w:p[210]
+      index_base: 0
+    source_text_sha256: 1eaec9dd60ea8a9e88a6c3b12b84a1ec5df9b0eca08b33e11bd3c04897166e9a
+    path: evidence/excerpts/EX-10-02.md

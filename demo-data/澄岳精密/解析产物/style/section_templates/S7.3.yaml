@@ -1,0 +1,60 @@
+section_id: S7.3
+title: 7.3 汇总方法与金额
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0089
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0089
+- chunk_id: C0090
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0090
+- chunk_id: C0091
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0091
+- chunk_id: C0092
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0092
+- chunk_id: C0093
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0093
+- chunk_id: C0094
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0094
+- chunk_id: C0095
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0095
+- chunk_id: C0096
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0096
+tables:
+- table_id: T10
+  caption: 表7-3 建设投资估算汇总
+  columns:
+  - 序号
+  - 费用项目
+  - 金额（万元）
+  - 说明
+  chunk_id: C0095
+argument_patterns:
+- claim_id: L024
+  pattern: 安装与预备费按各自明示基数计取。
+  strength: boundary
+  requires_support:
+  - N100
+  - N109
+  - N112
+  - N108
+  - N110
+- claim_id: L025
+  pattern: 不得把建设投资改称含融资成本总资金。
+  strength: limited
+  requires_support:
+  - N114
+  - N146
+  - N161
+  - N163
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

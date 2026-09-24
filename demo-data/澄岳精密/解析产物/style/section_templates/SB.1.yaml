@@ -1,0 +1,17 @@
+section_id: SB.1
+title: B.1 [资料01] 销售需求预测备忘录
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0160
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0160
+- chunk_id: C0161
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0161
+tables: []
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

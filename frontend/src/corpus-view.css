@@ -1,0 +1,19 @@
+.corpus-header-status{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.corpus-metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}
+.corpus-metrics .metric{min-height:82px;padding:13px 16px}
+.corpus-metrics .metric strong{margin-top:5px}
+.catalog-group{margin:19px 0 24px}
+.catalog-card{min-height:124px;padding:12px 14px}
+.catalog-card-main>strong{margin-top:8px}
+.catalog-bottom{padding-top:8px}
+.corpus-files-toggle{margin-top:15px}
+.corpus-files-toggle>.subtle-button{font-size:12px}
+.corpus-files-toggle .artifact-section{margin-top:10px}
+.record-more{margin-top:10px;font-size:11px;color:#5372a5}
+.record-more summary{cursor:pointer;padding:5px 0}
+.record-more .detail-object{margin-top:8px}
+.record-group summary{cursor:pointer;color:#435874;font-size:12px;font-weight:650;padding:3px 0}
+.record-group summary span{font-size:11px;color:#92a0b2;font-weight:400;margin-left:4px}
+.record-group .detail-list,.record-group .detail-object{margin-top:9px}
+@media(max-width:950px){.corpus-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.corpus-header-status{justify-content:flex-start}.corpus-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.corpus-metrics .metric{min-height:72px}.corpus-metrics .metric strong{font-size:19px}.corpus-metrics .metric strong.metric-word{font-size:16px}}

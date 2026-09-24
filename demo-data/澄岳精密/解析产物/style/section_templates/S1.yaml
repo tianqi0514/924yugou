@@ -1,0 +1,36 @@
+section_id: S1
+title: 一、项目概要与预审意见
+level: 1
+reusable: true
+paragraph_order:
+- chunk_id: C0019
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0019
+- chunk_id: C0020
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0020
+- chunk_id: C0021
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0021
+- chunk_id: C0022
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0022
+- chunk_id: C0023
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0023
+- chunk_id: C0024
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0024
+tables:
+- table_id: T01
+  caption: 表1-1 主要技术经济指标
+  columns:
+  - 指标
+  - 基准值
+  - 口径与状态
+  chunk_id: C0023
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

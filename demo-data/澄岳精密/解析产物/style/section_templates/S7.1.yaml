@@ -1,0 +1,41 @@
+section_id: S7.1
+title: 7.1 编制范围及购置费
+level: 2
+reusable: true
+paragraph_order:
+- chunk_id: C0079
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0079
+- chunk_id: C0080
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0080
+- chunk_id: C0081
+  type: caption
+  skeleton_ref: chunks/skeletons.jsonl#C0081
+- chunk_id: C0082
+  type: table
+  skeleton_ref: chunks/skeletons.jsonl#C0082
+- chunk_id: C0083
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0083
+tables:
+- table_id: T08
+  caption: 表7-1 设备与系统购置费（不含税）
+  columns:
+  - 项目
+  - 数量
+  - 单价（万元）
+  - 小计（万元）
+  chunk_id: C0082
+argument_patterns:
+- claim_id: L022
+  pattern: 购置报价不含另列安装，不得重复计价。
+  strength: boundary
+  requires_support:
+  - N100
+  - N111
+  - N101
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

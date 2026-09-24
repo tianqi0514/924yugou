@@ -1,0 +1,139 @@
+{
+  "schema_version": "writing-support-preregistration/1.0",
+  "frozen_on": "2026-09-24",
+  "status": "preregistered_not_executed",
+  "corpus": {
+    "corpus_id": "cy_tray_20260918",
+    "version": "v2",
+    "manifest_sha256": "4c216ae676d2039593b38239e0fa4546dd3b37595509d42ab8982d70ff0555a7",
+    "review_status": "not_independently_human_reviewed",
+    "use": "read_only_reference"
+  },
+  "project_setup": {
+    "name_prefix": "QA-写作支撑验证",
+    "initial_project_facts": [],
+    "allow_historical_fact_value_copy": false,
+    "test_database_only": true,
+    "test_database_only_scope": "自动化与破坏性实验；不得针对应用数据库重建表",
+    "demo_project": "在已备份的应用数据库中另建名称明确标为 QA 演示的可打开项目；该项目不是测试数据库"
+  },
+  "cases": [
+    {
+      "id": "WS-C0052-BASE",
+      "kind": "positive_calculation",
+      "target_section": "S4",
+      "historical_refs": ["C0052", "N017", "N034", "N035", "R006"],
+      "project_facts": [
+        {"key": "first_year_demand", "value": "300000", "unit": "套", "status": "PROVIDED", "source": "QA合成输入"},
+        {"key": "qualified_capacity", "value": "254016", "unit": "套", "status": "PROVIDED", "source": "QA合成输入"}
+      ],
+      "confirmed_project_rule": {"target_key": "planned_sales", "expression": "min(first_year_demand, qualified_capacity)", "unit": "套"},
+      "expected": [
+        "计划销售量的 Decimal 值为 254016 套，并能回查两个项目事实版本与已确认规则版本",
+        "候选正文区分需求、能力和销售量，条件句与 300000 大于 254016 的情景一致",
+        "候选先供人工核对；未经确认不自动写入 Plate 正式报告"
+      ],
+      "forbidden": ["需求低于能力", "历史需求 180000 套被当成新项目事实", "自动继承历史爬坡和设备时长判断"],
+      "failure_if": ["数值不等于 254016", "历史条件句仍保留", "缺少项目事实或规则版本回链"],
+      "gate_expectation": "工作稿可保存；正式导出还须满足本项目证据和审核闸门"
+    },
+    {
+      "id": "WS-C0052-ZERO",
+      "kind": "zero_is_defined",
+      "target_section": "S4",
+      "historical_refs": ["C0052", "N017", "N034", "N035", "R006"],
+      "project_facts": [
+        {"key": "first_year_demand", "value": "0", "unit": "套", "status": "PROVIDED", "source": "QA合成输入"},
+        {"key": "qualified_capacity", "value": "254016", "unit": "套", "status": "PROVIDED", "source": "QA合成输入"}
+      ],
+      "confirmed_project_rule": {"target_key": "planned_sales", "expression": "min(first_year_demand, qualified_capacity)", "unit": "套"},
+      "expected": ["计划销售量为有效计算值 0 套", "0 的来源与 PROVIDED 状态可见"],
+      "forbidden": ["0 被当成未定义", "候选声称需求大于能力", "历史销售量 180000 套被复制"],
+      "failure_if": ["结果不是数值 0", "值状态为 UNDEFINED 或 UNEVALUABLE"],
+      "gate_expectation": "0 本身不阻断，其他证据/审核条件另行判定"
+    },
+    {
+      "id": "WS-C0052-MISSING",
+      "kind": "missing_dependency",
+      "target_section": "S4",
+      "historical_refs": ["C0052", "N017", "N034", "N035", "R006"],
+      "project_facts": [
+        {"key": "first_year_demand", "value": null, "unit": "套", "status": "UNDEFINED", "source": "尚未提供"},
+        {"key": "qualified_capacity", "value": "254016", "unit": "套", "status": "PROVIDED", "source": "QA合成输入"}
+      ],
+      "confirmed_project_rule": {"target_key": "planned_sales", "expression": "min(first_year_demand, qualified_capacity)", "unit": "套"},
+      "expected": ["计划销售量状态为 UNEVALUABLE，值为空", "页面与工作包列出缺失依赖及受影响正文"],
+      "forbidden": ["把空值当成 0", "给出确定性的销售量", "复制历史 180000 套"],
+      "failure_if": ["输出数值销售结论", "未列出缺失依赖", "可作为已核对正式结论导出"],
+      "gate_expectation": "阻断包含确定性销售结论的正式导出；允许明确标缺口的工作稿"
+    },
+    {
+      "id": "WS-C0083-IDENTITY",
+      "kind": "new_identity_and_quote_scope",
+      "target_section": "S7.1",
+      "historical_refs": ["C0083", "N080", "S7.1"],
+      "project_facts": [
+        {"key": "supplier_name", "value": "新拓设备", "unit": "", "status": "PROVIDED", "source": "QA合成输入；未附报价原件"},
+        {"key": "equipment_unit_price", "value": "1234.50", "unit": "万元/条", "status": "PROVIDED", "source": "QA合成输入；未附报价原件"}
+      ],
+      "expected": [
+        "候选仅在待核对状态表达新项目供应商和单价；元/条与万元/条的显示换算一致",
+        "未有本项目报价证据时，报价范围、有效期、设备配置及采购建议标为未核对"
+      ],
+      "forbidden": ["禾进装备", "1480.00 万元/条作为新价格", "14800000 元/条作为新价格", "自动继承机器人本体、夹具、控制系统的包含范围", "无条件采购建议"],
+      "failure_if": ["旧供应商或旧报价残留", "未有新证据却给出确定性报价范围或采购建议", "格式换算有误"],
+      "gate_expectation": "无本项目报价证据时不能作为已核对的正式采购结论"
+    },
+    {
+      "id": "WS-X001-CONFLICT",
+      "kind": "unresolved_conflict",
+      "target_section": "S5.2",
+      "historical_refs": ["X001", "N050", "N051", "N052", "EV-06A", "EV-06B", "C0063", "C0064"],
+      "project_facts": [],
+      "expected": [
+        "历史语料风险卡同时保留 800 kW 与 650 kW、两种来源、同口径冲突和 open 状态",
+        "新项目未录入对应事实和证据时，不把历史冲突转成新项目已确认配电参数",
+        "披露冲突的内部预审文字可作为候选，需显著标记为历史参考"
+      ],
+      "forbidden": ["自动选择 800 kW", "自动选择 650 kW", "自动取均值", "配电适配确定性通过", "无条件采购或开工建议"],
+      "failure_if": ["任一来源消失", "open 变成已解决", "凭历史值生成新项目确定性结论"],
+      "gate_expectation": "可形成披露冲突的预审稿；确定性配电结论和无条件采购/开工建议阻断"
+    },
+    {
+      "id": "WS-L002-CLAIM",
+      "kind": "claim_evidence_boundary",
+      "target_section": "S4",
+      "historical_refs": ["L002", "N012", "N018", "N017", "EV-01", "C0027"],
+      "project_facts": [
+        {"key": "first_year_demand", "value": "300000", "unit": "套", "status": "PROVIDED", "source": "QA合成输入；无客户订单原件"},
+        {"key": "qualified_capacity", "value": "254016", "unit": "套", "status": "PROVIDED", "source": "QA合成输入；无独立能力说明"}
+      ],
+      "expected": [
+        "历史论断“需求不是订单”可回查其支撑节点、EV-01 与 C0027 原文位置",
+        "EV-01 标为仅有嵌入摘录、完整原件不可得、未独立核实",
+        "新项目没有自己的客户承诺证据时，任何相关表达仍是待核对候选"
+      ],
+      "forbidden": ["把预测需求写成已签订单", "把 EV-01 当成完整合同", "把历史论断直接当成新项目事实"],
+      "failure_if": ["论断缺少来源回链", "缺少证据边界", "生成新项目确定性的签约结论"],
+      "gate_expectation": "需本项目证据与人工审核，历史证据不能单独支持新项目正式结论"
+    },
+    {
+      "id": "WS-NEG-ACCIDENT",
+      "kind": "cross_type_negative_control",
+      "target_report_type": "事故调查报告",
+      "held_out_document": {
+        "path": "test-fixtures/public-reports/04_jinjiang_accident.pdf",
+        "sha256": "eb6655da71f0d11b8a41c3bc5320a53fd4307fec370018150a037978927d69c4"
+      },
+      "historical_refs": [],
+      "project_facts": [],
+      "expected": [
+        "若没有经过审核的事故调查领域包和新项目输入，应拒绝澄岳可研写作包套用并显示不适用原因",
+        "仅允许通用原件定位、待审事实与 Plate 手工编辑，不自动套用制造业技改规则或模板"
+      ],
+      "forbidden": ["自动套用 S4 产能模板", "自动引入焊接线设备报价", "自动引入禾进装备", "自动引入 min(需求, 合格能力) 规则"],
+      "failure_if": ["澄岳专用结构、供应商或规则进入事故报告工作包或候选", "未审领域包却宣称跨类型适用"],
+      "gate_expectation": "不因跨类型报告可上传或可手工编辑就宣称历史语料支持其自动写作"
+    }
+  ]
+}

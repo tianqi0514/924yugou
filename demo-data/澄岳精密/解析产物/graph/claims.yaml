@@ -1,0 +1,1426 @@
+- id: L001
+  label: 项目范围隔离
+  pattern: 新增产线与旧业务分开核算，不自动外协补缺。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 本项目测算对象仅为新增两条线。旧线保留原有客户业务，人员、产量、收入及历史外协量均不并入。本报告未假设新项目接替旧项目，也未计入跨项目协同收益。新增销量以当期客户需求和本项目合格产能的较小值为上限，超过能力的部分列为交付缺口，不自动转为外协销售。
+  source_location:
+    block_id: B0033
+    chunk_id: C0033
+    page: 4
+    span:
+    - 2504
+    - 2627
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 35
+      body_index: 38
+      xpath: /w:document/w:body/w:p[36]
+      index_base: 0
+  strength: context
+  supports:
+  - N009
+  - N199
+  must_cite:
+  - EV-09
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L002
+  label: 需求不是订单
+  pattern: 客户预测不能改写为已签订单或最低采购承诺。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 销售管理部于2026年9月12日提交的需求备忘录[资料01]，将拟导入客户分为甲客户和乙客户。双方均处于平台导入及商务确认阶段，备忘录不是不可撤销订单，也未约定最低采购量。报告采用客户预测作为测算输入，未将意向需求表述为已签订单。
+  source_location:
+    block_id: B0027
+    chunk_id: C0027
+    page: 4
+    span:
+    - 1889
+    - 2004
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 29
+      body_index: 31
+      xpath: /w:document/w:body/w:p[30]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N012
+  - N018
+  - N017
+  must_cite:
+  - EV-01
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L003
+  label: 库存量和占用不同
+  pattern: 年度实物净变化为零，不代表营运资金无库存占用。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 公司采购主要材料并拥有在制品，不属于客户供料加工模式。销售收入为完整托盘产品收入。期初、期末实物库存的年度净变化在简化经营测算中取零，但营运资金仍按周转天数保留库存占用；“销售量等于合格产量”不等于“库存资金为零”。
+  source_location:
+    block_id: B0034
+    chunk_id: C0034
+    page: 4
+    span:
+    - 2629
+    - 2737
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 36
+      body_index: 39
+      xpath: /w:document/w:body/w:p[37]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N024
+  - N146
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L004
+  label: 需求和产品变化需复核
+  pattern: 需求或产品改变后，不自动认定新增收入。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 需求上调、产品图纸变更或产品组合改变后，应重新验证产线节拍、单套材料成本及报价边界；本报告没有足够依据把新增需求直接转换成确定收入。
+  source_location:
+    block_id: B0035
+    chunk_id: C0035
+    page: 4
+    span:
+    - 2739
+    - 2805
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 37
+      body_index: 40
+      xpath: /w:document/w:body/w:p[38]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N018
+  - N029
+  - N116
+  - N115
+  must_cite:
+  - EV-01
+  - EV-02
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L005
+  label: 质量扣减只计一次
+  pattern: 最终合格率含允许返修后的结果，不再乘首检合格率。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 拟采用“来料检验—组框及定位—机器人焊接—精加工—气密检测—尺寸复核—追溯入库”的工艺路径。气密检测不合格品进入隔离区，经授权返修后重新检测；本次最终合格率已经包含允许返修后的最终判定，不再另乘一次首检合格率。
+  source_location:
+    block_id: B0038
+    chunk_id: C0038
+    page: 5
+    span:
+    - 2841
+    - 2946
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 41
+      body_index: 44
+      xpath: /w:document/w:body/w:p[42]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N031
+  - N011
+  must_cite:
+  - EV-02
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L006
+  label: 配套瓶颈适用边界
+  pattern: 约定两线速率边界内不另作瓶颈；超边界重校。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 供应商方案[资料02、资料03]提出，每条线在约定产品与连续作业条件下设计毛产出速率为30套/小时。精加工、气密和终检单元按两线30套/小时的配套边界配置；该边界内暂不作为额外瓶颈，不再重复折减产能。超过该速率、增加线体或更换产品后，必须重新进行瓶颈校核。
+  source_location:
+    block_id: B0039
+    chunk_id: C0039
+    page: 5
+    span:
+    - 2948
+    - 3076
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 42
+      body_index: 45
+      xpath: /w:document/w:body/w:p[43]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N029
+  - N025
+  - N196
+  must_cite:
+  - EV-02
+  - EV-03
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L007
+  label: 验收尚未证明
+  pattern: 规划速率和合格率不是量产实测成绩。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 关键验收条件包括约定型号的连续节拍验证、最终合格率验证以及单套质量记录可追溯。节拍和合格率目前均为规划取值，不是量产实测成绩；采购技术协议应补充样件状态、持续运行时长和统计方式，不能只凭短时演示确认达产。
+  source_location:
+    block_id: B0040
+    chunk_id: C0040
+    page: 5
+    span:
+    - 3078
+    - 3180
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 43
+      body_index: 46
+      xpath: /w:document/w:body/w:p[44]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N194
+  - N029
+  - N031
+  must_cite:
+  - EV-02
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L008
+  label: A及C估值资料边界
+  pattern: 仅有方案级估值，不反推设备与费用分项。
+  pattern_origin: source_grounded_structured_summary
+  source_text: A、C的能力和费用为工程技术部整理的方案级估值，均按与B一致的融资前资金口径比较，但尚未取得分项测算表。本轮仅作方案级预比较，暂不对两方案的设备构成与取费明细作审定。B的能力和费用在第四章、第七章及第九章展开计算。
+  source_location:
+    block_id: B0043
+    chunk_id: C0043
+    page: 5
+    span:
+    - 3500
+    - 3607
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 46
+      body_index: 50
+      xpath: /w:document/w:body/w:p[47]
+      index_base: 0
+  strength: limited
+  supports:
+  - N173
+  - N174
+  - N176
+  - N177
+  must_cite:
+  - EV-02
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L009
+  label: 方案比较不加权
+  pattern: 独立约束不可相互抵销。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 依据预审纪要[资料08]，本轮不采用综合加权评分。需求覆盖、资金上限和实施期限均为独立约束；其中一项不满足，应重新组织方案讨论，不能因为另一项表现较好而直接抵销。配电及专项条件属于进一步推进的前置事项，表3-1并未判定这些条件已满足。
+  source_location:
+    block_id: B0044
+    chunk_id: C0044
+    page: 5
+    span:
+    - 3609
+    - 3726
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 47
+      body_index: 51
+      xpath: /w:document/w:body/w:p[48]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N179
+  - N180
+  - N182
+  - N191
+  must_cite:
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L010
+  label: 年能力与需求覆盖
+  pattern: 年度平均需求可覆盖依赖规划参数，不证明峰值插单可行。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 在现有参数下，基准需求可以覆盖；这一判断依赖30套/小时、90%和98%三个条件共同成立。当计算能力低于客户需求时，销售上限随能力下降，需求缺口单独列示，不能把未生产的部分继续计入收入。能力余量也不直接证明加急插单可行，周度峰值、换型顺序和物流窗口尚未建模。
+  source_location:
+    block_id: B0054
+    chunk_id: C0054
+    page: 6
+    span:
+    - 4507
+    - 4636
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 58
+      body_index: 63
+      xpath: /w:document/w:body/w:p[59]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N034
+  - N018
+  - N179
+  - N029
+  - N030
+  - N031
+  must_cite:
+  - EV-01
+  - EV-02
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L011
+  label: 产能占用率不等于低风险
+  pattern: 原文未设额外占用率淘汰阈值，也未证明低风险。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 本轮未设置“产能占用率不超过某百分比”的额外淘汰门槛。94.48%的占用率只能说明平均能力使用程度，不能自行推导为“交付风险低”。当速率、工作日、开动率或合格率变更时，表1-1、表3-1、销量、经营测算与相关结论均应重新核对。
+  source_location:
+    block_id: B0055
+    chunk_id: C0055
+    page: 6
+    span:
+    - 4638
+    - 4751
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 59
+      body_index: 64
+      xpath: /w:document/w:body/w:p[60]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N040
+  - N034
+  must_cite:
+  - EV-02
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L012
+  label: 首年不再叠乘爬坡率
+  pattern: 爬坡已反映在客户导入量，设备时长变化另算。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 首年客户需求180,000套低于同一规划能力，因此首年计划销售仍为180,000套。该年爬坡反映在客户导入量中，本次不再叠乘一个未定义的“爬坡率”。若首年设备可用时长另有变化，应单列期间参数重算，而非保留旧销量。
+  source_location:
+    block_id: B0052
+    chunk_id: C0052
+    page: 6
+    span:
+    - 4381
+    - 4487
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 56
+      body_index: 61
+      xpath: /w:document/w:body/w:p[57]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N035
+  - N017
+  - N034
+  must_cite:
+  - EV-01
+  - EV-02
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L013
+  label: 改造面积口径
+  pattern: 改造计费面积不等于厂房总面积，不含旧仓储。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 二号厂房现有总建筑面积6,000平方米，本项目使用其中4,800平方米，即0.48万平方米；剩余1,200平方米继续用于既有仓储，不纳入本次改造单价计费面积。项目不新增用地，不新建主体建筑；“使用既有厂房”不代表其改造手续和专项条件已经完成。
+  source_location:
+    block_id: B0058
+    chunk_id: C0058
+    page: 7
+    span:
+    - 4786
+    - 4907
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 63
+      body_index: 68
+      xpath: /w:document/w:body/w:p[64]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N041
+  - N042
+  - N048
+  must_cite:
+  - EV-04
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L014
+  label: 面积调整须复核分区
+  pattern: 费用更新不能替代面积分配一致性检查。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 场地综合改造采用900元/平方米，改造费用为432.00万元。该单价覆盖地坪、局部基础和隔断，不含另列的280.00万元公辅改造、110.00万元环保与安全设施以及设备安装集成费。若调整使用面积，分区面积合计也须复核，不能只改工程费而保留原面积分配。
+  source_location:
+    block_id: B0061
+    chunk_id: C0061
+    page: 7
+    span:
+    - 5123
+    - 5248
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 66
+      body_index: 72
+      xpath: /w:document/w:body/w:p[67]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N042
+  - N043
+  - N044
+  - N045
+  - N046
+  - N101
+  must_cite:
+  - EV-04
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L015
+  label: 配电记录不得自动择值
+  pattern: 同口径分歧未解释，较新或较大不能自动胜出。
+  pattern_origin: source_grounded_structured_summary
+  source_text: '[资料06A]和[资料06B]均以2026年9月1日为统计基准，描述二号厂房接入点扣除已投运及已批准项目后的可用有功余量，但分别给出800kW和650kW。后者形成时间较晚，尚不能解释差异，也未明确废止前一记录；本报告不自行选择其中较大或较新的值。'
+  source_location:
+    block_id: B0063
+    chunk_id: C0063
+    page: 7
+    span:
+    - 5270
+    - 5394
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 68
+      body_index: 74
+      xpath: /w:document/w:body/w:p[69]
+      index_base: 0
+  strength: conflicted
+  supports:
+  - N050
+  - N051
+  - N052
+  must_cite:
+  - EV-06A
+  - EV-06B
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L016
+  label: 配电适配待联合复测
+  pattern: 两条条件分支不能替代唯一适配结论。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 设备方案新增最大有功需量为720kW。采用800kW时余量为80kW；采用650kW时缺口为70kW。两种结果对应不同的适配判断，故当前结论为“待联合复测”，不得替换成确定满足或确定不满足。公辅改造280.00万元暂不含变压器增容及外线接入工程，是否追加投资尚无法定量。
+  source_location:
+    block_id: B0064
+    chunk_id: C0064
+    page: 7
+    span:
+    - 5396
+    - 5531
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 69
+      body_index: 75
+      xpath: /w:document/w:body/w:p[70]
+      index_base: 0
+  strength: conflicted
+  supports:
+  - N050
+  - N051
+  - N053
+  - N054
+  - N055
+  - N056
+  - N163
+  must_cite:
+  - EV-06A
+  - EV-06B
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L017
+  label: 年用电预算与瞬时接入分离
+  pattern: 年度内部电量预算达标不证明瞬时负荷可接入。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 正常年生产用电按8千瓦时/合格销售套估算，已经折入本方案平均损耗，不再除以合格率。正常年用电量为192.00万千瓦时，未超过公司为本项目暂定的200.00万千瓦时年度内部预算。该预算不是行政核定指标；年电量低于预算也不能证明720kW瞬时负荷可以接入。
+  source_location:
+    block_id: B0065
+    chunk_id: C0065
+    page: 7
+    span:
+    - 5533
+    - 5659
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 70
+      body_index: 76
+      xpath: /w:document/w:body/w:p[71]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N131
+  - N057
+  - N184
+  - N053
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L018
+  label: 进度为串行计划
+  pattern: 阶段月数相加，未含赶工和额外停等。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 项目计划于2026年10月1日启动，至2027年9月30日完成试生产及内部验收，按12个月建设期测算。各阶段按顺序衔接，实施期限取阶段月数之和；本轮未假设并行赶工，也未计入因审批或配电改造造成的额外停等。启动日期和阶段安排均属于计划。
+  source_location:
+    block_id: B0068
+    chunk_id: C0068
+    page: 8
+    span:
+    - 5689
+    - 5806
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 74
+      body_index: 80
+      xpath: /w:document/w:body/w:p[75]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N058
+  - N063
+  - N065
+  must_cite:
+  - EV-10
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L019
+  label: 工期变更需复核需求期间
+  pattern: 更新投产日后，不能默认客户预测可等量平移。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 建设期的简化现金安排为：建设投资在建设期内投入，全部净营运资金在投产前备齐；银行实际提款时点尚未确认。该简化安排仅用于融资前回收测算，不能替代逐月资金计划。实施延长时，应同步调整投产时点及运营期间标签，并核对客户预测是否仍适用。
+  source_location:
+    block_id: B0071
+    chunk_id: C0071
+    page: 8
+    span:
+    - 6128
+    - 6242
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 77
+      body_index: 84
+      xpath: /w:document/w:body/w:p[78]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N063
+  - N066
+  - N070
+  - N071
+  - N198
+  must_cite:
+  - EV-10
+  - EV-01
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L020
+  label: 定员口径及首年人工
+  pattern: 首年全员到岗费用不随首年销量比例缩减。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 年度人均综合付现成本采用18.00万元，包含本测算约定的薪酬、企业承担费用及福利预算，年度人工费用为1,188.00万元。首个运营年度即按全员到岗计费，不随180,000套首年销量同比例缩减。综合成本不对应任何法定缴费比例。
+  source_location:
+    block_id: B0076
+    chunk_id: C0076
+    page: 8
+    span:
+    - 6503
+    - 6615
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 82
+      body_index: 90
+      xpath: /w:document/w:body/w:p[83]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N076
+  - N077
+  - N078
+  - N035
+  must_cite:
+  - EV-05
+  - EV-10
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L021
+  label: 实施责任分工
+  pattern: 正式采购和现场施工前提交配电及专项复核。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 工程部对进度、设备接口和试车负责，销售部对需求与商务条件负责，财务部对资金和口径负责，安环部对专项条件闭合负责。正式设备采购与现场施工前，配电复测和专项适配事项必须提交复核，不得用本报告的财务测算替代。
+  source_location:
+    block_id: B0077
+    chunk_id: C0077
+    page: 8
+    span:
+    - 6617
+    - 6718
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 83
+      body_index: 91
+      xpath: /w:document/w:body/w:p[84]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N193
+  - N056
+  must_cite:
+  - EV-07
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L022
+  label: 报价与安装边界
+  pattern: 购置报价不含另列安装，不得重复计价。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 本次估算采用现阶段询价和工程初估，不是施工图预算。设备与软件系统均列入购置费；设备供应商报价不含安装集成，故按购置费统一计列安装集成费，不重复包含在建筑改造单价中。报价边界及价格时效见[资料03、资料04]。
+  source_location:
+    block_id: B0080
+    chunk_id: C0080
+    page: 9
+    span:
+    - 6749
+    - 6853
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 87
+      body_index: 95
+      xpath: /w:document/w:body/w:p[88]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N100
+  - N111
+  - N101
+  must_cite:
+  - EV-03
+  - EV-04
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L023
+  label: 其他工程费用固定金额
+  pattern: 不因设备价格改变自动按比例变化。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 工程建设其他费用合计331.00万元，其中设计与项目管理156.00万元，前期检测及准备65.00万元，培训与首批专用备件110.00万元。后三项按本轮范围采用独立金额，不因设备价格变化自动等比例调整；若采购或项目范围改变，应重新询价。环保安全设施与培训备件分别由工程、采购部门维护明细，不得跨项调剂后仍沿用原范围说明。
+  source_location:
+    block_id: B0087
+    chunk_id: C0087
+    page: 9
+    span:
+    - 7569
+    - 7729
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 94
+      body_index: 104
+      xpath: /w:document/w:body/w:p[95]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N105
+  - N106
+  - N107
+  - N108
+  must_cite:
+  - EV-04
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L024
+  label: 取费基数
+  pattern: 安装与预备费按各自明示基数计取。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 安装集成费按设备与系统购置费的6%计取。基本预备费按“工程费用与工程建设其他费用之和”的8%计取，不对净营运资金或融资费用计提。两项比例均是公司本次预审测算参数，不引用外部定额，也不表示已经取得合同承诺。
+  source_location:
+    block_id: B0090
+    chunk_id: C0090
+    page: 10
+    span:
+    - 7762
+    - 7864
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 98
+      body_index: 108
+      xpath: /w:document/w:body/w:p[99]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N100
+  - N109
+  - N112
+  - N108
+  - N110
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L025
+  label: 建设投资不是全部资金
+  pattern: 不得把建设投资改称含融资成本总资金。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 建设投资6,442.63万元不包括第九章的净营运资金，不包括建设期利息和其他融资费用，也未包括待确认的增容工程。故该数值不能单独称为项目全部资金需求，更不能据此判断现有股东资金足以覆盖项目。
+  source_location:
+    block_id: B0096
+    chunk_id: C0096
+    page: 10
+    span:
+    - 8333
+    - 8428
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 104
+      body_index: 115
+      xpath: /w:document/w:body/w:p[105]
+      index_base: 0
+  strength: limited
+  supports:
+  - N114
+  - N146
+  - N161
+  - N163
+  must_cite:
+  - EV-04
+  - EV-05
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L026
+  label: 中间精度不回写展示值
+  pattern: 完整精度计算，仅展示时四舍五入。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 各中间计算保留完整精度，金额在展示时四舍五入到小数点后两位；不把表中已经取整的477.23万元反向作为后续计算源值。正文“0.48万平方米”和“4,800平方米”等单位转换不改变事实。百分比展示保留两位，整套产品数量按第四章规则取整。
+  source_location:
+    block_id: B0098
+    chunk_id: C0098
+    page: 10
+    span:
+    - 8446
+    - 8563
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 106
+      body_index: 117
+      xpath: /w:document/w:body/w:p[107]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N113
+  - N114
+  - N042
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L027
+  label: 设备价格不等于技术参数
+  pattern: 纯报价变化不自动改变产能或经营单耗；超期需重询。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 设备单价变化将影响购置费、安装集成费、预备费、建设投资及融资前资金需求，但不直接改变产品售价、材料单耗或产能速率。只有供应商明确提出相应技术变化，才另行调整技术参数。询价超过2026年10月10日有效期仍未锁价时，费用结论需要复核，不视为自动延续。
+  source_location:
+    block_id: B0099
+    chunk_id: C0099
+    page: 10
+    span:
+    - 8565
+    - 8689
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 107
+      body_index: 118
+      xpath: /w:document/w:body/w:p[108]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N080
+  - N100
+  - N111
+  - N113
+  - N114
+  - N147
+  - N029
+  - N115
+  - N116
+  - N099
+  must_cite:
+  - EV-03
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L028
+  label: 销售收入条件
+  pattern: 目标售价未锁定，销量以需求和能力较小值计。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 正常年计划销售量取客户需求240,000套与合格产能254,016套的较小值；首年以180,000套需求按相同规则计算。不含税销售单价采用1,280元/套，系销售部与财务部用于方案测算的目标价格，并非已签合同价。两期暂采用同一单价，不计年度降价、汇率和涨价因素。
+  source_location:
+    block_id: B0102
+    chunk_id: C0102
+    page: 11
+    span:
+    - 8722
+    - 8853
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 111
+      body_index: 122
+      xpath: /w:document/w:body/w:p[112]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N036
+  - N035
+  - N115
+  - N012
+  must_cite:
+  - EV-01
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L029
+  label: 单位成本损耗假设
+  pattern: 不得重复除以合格率；质量变化需重验单耗。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 年变动成本等于当期计划销量乘以单套变动成本并换算为万元。正常年变动成本25,387.20万元，首年变动成本19,040.40万元。本表材料及耗材参数已折入规划损耗，不应再按98%合格率重复放大；若质量假设实质改变，需复核单位成本依据，不能声称单位成本已被自动证明仍然适用。
+  source_location:
+    block_id: B0107
+    chunk_id: C0107
+    page: 11
+    span:
+    - 9322
+    - 9458
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 116
+      body_index: 128
+      xpath: /w:document/w:body/w:p[117]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N123
+  - N031
+  - N197
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L030
+  label: 维护费不是设备原值比例
+  pattern: 维护费独立固定；线数班次变化需重算人员。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 报价变更不自动改变维护费120.00万元；该费用是财务部核定的固定年度预算，并非设备原值的某个比例。反之，若生产线数量、班次或直接岗位数变化，应按第六章重新计算定员和人工费用。其余固定项目仍需判断原预算适用性。
+  source_location:
+    block_id: B0110
+    chunk_id: C0110
+    page: 11
+    span:
+    - 9617
+    - 9722
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 119
+      body_index: 131
+      xpath: /w:document/w:body/w:p[120]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N134
+  - N080
+  - N025
+  - N027
+  - N078
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L031
+  label: 周转参数非已签账期
+  pattern: 账期属假设，资金变化需重算。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 综合存货占用采用全口径变动成本的简化周转估算，仅用于工程阶段资金安排，不等同于会计存货计价。45天收款期与60天材料付款期均为项目假设，尚未形成客户、供应商承诺；发生变化时，应重新评估资金峰值。
+  source_location:
+    block_id: B0114
+    chunk_id: C0114
+    page: 12
+    span:
+    - 9883
+    - 9980
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 124
+      body_index: 136
+      xpath: /w:document/w:body/w:p[125]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N139
+  - N141
+  - N140
+  - N146
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L032
+  label: 资金两类上限分离
+  pattern: 数值相同的规模上限与资金来源上限是独立约束。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 股东拟投入5,000.00万元，银行意向融资上限为4,000.00万元，两者之和9,000.00万元也恰为本轮融资前投资控制上限。两项上限虽然数值相同，仍属不同约束：一项控制项目规模，另一项取决于资金来源安排。银行意向额度不是已审批可提款额度。
+  source_location:
+    block_id: B0119
+    chunk_id: C0119
+    page: 12
+    span:
+    - 10331
+    - 10453
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 129
+      body_index: 142
+      xpath: /w:document/w:body/w:p[130]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N151
+  - N150
+  - N148
+  - N149
+  must_cite:
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L033
+  label: 资金缺口不得自动增资
+  pattern: 超过意向上限部分列待补资金，不自动增加资金。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 拟需借款按“融资前项目资金需求减股东资金，小于零时取零”计算，为3,858.23万元；与意向融资上限相比余量141.77万元，基准假设下融资前安排缺口为0.00万元。若所需借款超过上限，超出部分必须列为待补资金，不能自动调高银行额度或股东投入。
+  source_location:
+    block_id: B0120
+    chunk_id: C0120
+    page: 12
+    span:
+    - 10455
+    - 10577
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 130
+      body_index: 143
+      xpath: /w:document/w:body/w:p[131]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N152
+  - N149
+  - N155
+  - N148
+  must_cite:
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L034
+  label: 融资缺值不是零
+  pattern: 融资前缺口零不证明融资落实。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 银行尚未明确利率、期限、还本方式、建设期提款节奏及其他融资收费。因此建设期利息和项目含融资成本的总资金需求均为“待测”，不是0.00万元。本章0.00万元仅指已定义口径下的融资前安排缺口；不能据此得出“全项目融资已落实”的结论。
+  source_location:
+    block_id: B0121
+    chunk_id: C0121
+    page: 12
+    span:
+    - 10579
+    - 10693
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 131
+      body_index: 144
+      xpath: /w:document/w:body/w:p[132]
+      index_base: 0
+  strength: undefined
+  supports:
+  - N195
+  - N161
+  - N162
+  - N155
+  must_cite:
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L035
+  label: 现金盈余不是净利润
+  pattern: 未扣所得税、利息、还本等，不是完整项目现金流。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 本报告将“营业收入减变动成本减固定付现成本”定义为经营现金盈余。该指标尚未扣除所得税、利息、还本、后续更新支出及后续营运资金变化，不等于净利润，也不是完整项目现金流量。固定付现成本按每年1,644.00万元计列。
+  source_location:
+    block_id: B0124
+    chunk_id: C0124
+    page: 13
+    span:
+    - 10728
+    - 10834
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 135
+      body_index: 148
+      xpath: /w:document/w:body/w:p[136]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N166
+  - N165
+  - N137
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L036
+  label: 经营付现平衡适用条件
+  pattern: 贡献不大于零时原公式不适用，不称完整财务盈亏平衡点。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 正常年单套贡献为1,280.00－1,057.80＝222.20元，正常年经营现金盈余率为3,688.80÷30,720.00＝12.01%。经营付现收支平衡销量按固定付现成本除以单套贡献并向上取整，结果为73,988套；该值不含折旧和融资费用，不应改称完整财务盈亏平衡点。单套贡献不大于零时，该公式不适用。
+  source_location:
+    block_id: B0127
+    chunk_id: C0127
+    page: 13
+    span:
+    - 11114
+    - 11268
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 138
+      body_index: 152
+      xpath: /w:document/w:body/w:p[139]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N167
+  - N169
+  - N168
+  must_cite:
+  - EV-05
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L037
+  label: 回收简式适用条件
+  pattern: 首年未回收且正常年盈余大于零时才使用简式。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 上述简式只适用于首年结束尚未收回初始资金且正常年盈余大于零的情形；若前提改变，应按累计收支重新定位回收年度，不套用旧式。基准3.76年未超过公司本轮4.00年初筛线，但该结果依赖未锁定的售价、材料价格、需求与账期，不能据此保证实际回收年限。
+  source_location:
+    block_id: B0132
+    chunk_id: C0132
+    page: 13
+    span:
+    - 11517
+    - 11637
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 143
+      body_index: 157
+      xpath: /w:document/w:body/w:p[144]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N147
+  - N165
+  - N166
+  - N170
+  - N171
+  must_cite:
+  - EV-05
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L038
+  label: 未建模财务指标不补写
+  pattern: 不得生成缺乏税费融资及更新依据的NPV、IRR或偿债结论。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 建设期利息、税款收付和长期更新安排不完整，本报告不列内部收益率、净现值、税后回收期及偿债覆盖指标，也不以经营现金盈余直接证明能够按约还本付息。
+  source_location:
+    block_id: B0133
+    chunk_id: C0133
+    page: 13
+    span:
+    - 11639
+    - 11710
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 144
+      body_index: 158
+      xpath: /w:document/w:body/w:p[145]
+      index_base: 0
+  strength: undefined
+  supports:
+  - N200
+  - N161
+  - N195
+  must_cite:
+  - EV-05
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L039
+  label: 配电与报价不影响所有计算
+  pattern: 可继续条件下计算，不能凭余量推定增容费用工期。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 配电条件不明确不影响在现有假设下计算设备购置费和名义产能，但会影响工程实施建议；如果必须增容，费用和工期目前都缺乏依据，不能凭“仍有预算余量”推定能够覆盖。报价时效失效同样首先影响取值依据，不等于自动知道新的报价。
+  source_location:
+    block_id: B0138
+    chunk_id: C0138
+    page: 14
+    span:
+    - 12181
+    - 12288
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 150
+      body_index: 165
+      xpath: /w:document/w:body/w:p[151]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N056
+  - N100
+  - N034
+  - N163
+  - N164
+  - N099
+  must_cite:
+  - EV-03
+  - EV-06A
+  - EV-06B
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L040
+  label: 定量合格不等于风险可控
+  pattern: 数值约束与证据型条件分开判断。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 表11-2各项分别判断，不设置加权总分。对于明确的数值约束，可在参数变化后重算结果；对于客户是否稳定、工艺能否持续达产或专项条件是否充分，需要相应资料支持，不因某个财务指标仍为正值就自动改写为“风险可控”。
+  source_location:
+    block_id: B0142
+    chunk_id: C0142
+    page: 14
+    span:
+    - 12638
+    - 12741
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 154
+      body_index: 170
+      xpath: /w:document/w:body/w:p[155]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N179
+  - N180
+  - N181
+  - N182
+  - N183
+  - N193
+  must_cite:
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L041
+  label: 结论段能力及范围
+  pattern: 名义能力覆盖本项目预测，排除历史旧线交付。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 在本报告采用的技术参数、价格与周转假设下，新增两条焊接与检测线具有承接正常年24.00万套需求的名义能力，合格产能25.4016万套/年；场地改造面积4,800平方米，拟新增定员66人。该结论并未将旧线2025年180,000套交付计入新增能力，也未把客户预测当作已签订单。
+  source_location:
+    block_id: B0145
+    chunk_id: C0145
+    page: 15
+    span:
+    - 12780
+    - 12917
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 158
+      body_index: 174
+      xpath: /w:document/w:body/w:p[159]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N034
+  - N018
+  - N042
+  - N076
+  - N020
+  - N199
+  must_cite:
+  - EV-01
+  - EV-02
+  - EV-04
+  - EV-09
+  - EV-10
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L042
+  label: 结论段资金及余量
+  pattern: 两个余量相同仅为当前情景；不再相同时应拆句。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 融资前项目资金需求8,858.23万元，其中建设投资6,442.63万元、净营运资金2,415.60万元；按股东资金5,000.00万元安排，拟需借款3,858.23万元。基准资金需求及借款均在现有控制边界内，但各自仅有141.77万元余量，设备价格、账期或新增公辅工程的变化均应重新提交财务核对。
+  source_location:
+    block_id: B0146
+    chunk_id: C0146
+    page: 15
+    span:
+    - 12919
+    - 13068
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 159
+      body_index: 175
+      xpath: /w:document/w:body/w:p[160]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N147
+  - N114
+  - N146
+  - N148
+  - N152
+  - N153
+  - N154
+  must_cite:
+  - EV-05
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L043
+  label: 结论段经营与回收
+  pattern: 满足本轮初筛，不保证税后盈利、需求实现或资金到位。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 正常年营业收入30,720.00万元，经营现金盈余3,688.80万元，简化静态回收期3.76年，满足本轮初筛要求。当前资料不足以形成项目税后盈利、净现值或偿债能力结论，也不足以保证需求实现、量产稳定和资金按期到位。
+  source_location:
+    block_id: B0147
+    chunk_id: C0147
+    page: 15
+    span:
+    - 13070
+    - 13178
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 160
+      body_index: 176
+      xpath: /w:document/w:body/w:p[161]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N124
+  - N166
+  - N170
+  - N183
+  must_cite:
+  - EV-05
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L044
+  label: 阶段性深化而非开工批准
+  pattern: 保留配电待复测、融资待测，不出无条件开工结论。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 建议将B方案作为下一阶段深化对象，继续开展技术协议、商务确认和专项条件核对；这不构成批准全面开工或认定全部实施条件已经具备。配电数据未统一前，保留“待联合复测”的判断；融资条款未补齐前，保留建设期利息及含融资成本资金需求“待测”的状态。
+  source_location:
+    block_id: B0148
+    chunk_id: C0148
+    page: 15
+    span:
+    - 13180
+    - 13298
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 161
+      body_index: 177
+      xpath: /w:document/w:body/w:p[162]
+      index_base: 0
+  strength: conditional
+  supports:
+  - N191
+  - N192
+  - N056
+  - N193
+  - N195
+  - N179
+  - N180
+  - N181
+  - N182
+  - N183
+  must_cite:
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L045
+  label: 历史事实不可随方案回写
+  pattern: 新版本保留历史实绩与原依据，补资料须说明替代关系。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 下一次修订应保留本版使用的依据、期间及计算口径。已确认历史实绩不因新方案变化而回写；缺失资料补齐后，应明确替代或新增了哪项依据，而不是仅把结论句改成“已满足”。
+  source_location:
+    block_id: B0151
+    chunk_id: C0151
+    page: 15
+    span:
+    - 13641
+    - 13721
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 164
+      body_index: 181
+      xpath: /w:document/w:body/w:p[165]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N199
+  - N020
+  - N019
+  - N021
+  must_cite:
+  - EV-09
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L046
+  label: 证据能力边界
+  pattern: 预测、询价和内部参数不能证明合同、验收或银行承诺。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 销售预测可以支持本轮需求假设，不能证明未来收入必然实现；设备询价可以支持估算取值，不能证明技术验收已经通过；内部财务参数可以支持计算口径，不能替代银行承诺或法定要求。
+  source_location:
+    block_id: B0157
+    chunk_id: C0157
+    page: 16
+    span:
+    - 14694
+    - 14777
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 171
+      body_index: 189
+      xpath: /w:document/w:body/w:p[172]
+      index_base: 0
+  strength: boundary
+  supports:
+  - N012
+  - N194
+  - N195
+  must_cite:
+  - EV-01
+  - EV-02
+  - EV-05
+  - EV-08
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: revalidate
+  status: source_asserted_not_independently_verified
+- id: L047
+  label: 专项踏勘并非最终确认
+  pattern: 仅踏勘，未形成全部专项最终结论。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 摘录：本轮仅完成现有厂房现场踏勘。焊接烟尘治理布置、噪声控制、局部基础及安全设施适配方案尚需深化，未形成全部专项条件的最终确认。110.00万元为现阶段环保安全设施预算，不表示最终费用或措施已经锁定。
+  source_location:
+    block_id: B0184
+    chunk_id: C0184
+    page: 19
+    span:
+    - 16849
+    - 16949
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 201
+      body_index: 219
+      xpath: /w:document/w:body/w:p[202]
+      index_base: 0
+  strength: limited
+  supports:
+  - N193
+  - N103
+  must_cite:
+  - EV-07
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified
+- id: L048
+  label: 资料终止边界
+  pattern: 未提供的签字合同、授信、试车记录与专项文件不得视为已有。
+  pattern_origin: source_grounded_structured_summary
+  source_text: 本版报告至此。未附签字合同、正式授信、连续试车原始记录和专项确认文件；相应缺口不得以本版报告中的内部假设补作既成事实。后续取得补充资料时，应说明其适用对象、期间、版本和对本版采用值的影响。
+  source_location:
+    block_id: B0194
+    chunk_id: C0194
+    page: 19
+    span:
+    - 17637
+    - 17731
+    source_locator:
+      part: word/document.xml
+      paragraph_index: 211
+      body_index: 229
+      xpath: /w:document/w:body/w:p[212]
+      index_base: 0
+  strength: limited
+  supports:
+  - N194
+  - N195
+  - N193
+  - N012
+  must_cite:
+  - EV-REPORT
+  counterexample_check: 变更后复核原句的条件、否定、期间和口径；不得仅替换数字后保留已失效结论
+  on_dep_change: restate_claim
+  status: source_asserted_not_independently_verified

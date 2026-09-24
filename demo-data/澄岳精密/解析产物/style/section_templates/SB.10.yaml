@@ -1,0 +1,20 @@
+section_id: SB.10
+title: B.10 [资料10] 实施排期与定员记录
+level: 2
+reusable: false
+paragraph_order:
+- chunk_id: C0190
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0190
+- chunk_id: C0191
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0191
+- chunk_id: C0192
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0192
+tables: []
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

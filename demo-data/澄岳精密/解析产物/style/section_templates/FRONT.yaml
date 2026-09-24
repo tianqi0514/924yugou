@@ -1,0 +1,41 @@
+section_id: FRONT
+title: 封面
+level: 0
+reusable: false
+paragraph_order:
+- chunk_id: C0001
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0001
+- chunk_id: C0002
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0002
+- chunk_id: C0003
+  type: heading
+  skeleton_ref: chunks/skeletons.jsonl#C0003
+- chunk_id: C0004
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0004
+- chunk_id: C0005
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0005
+- chunk_id: C0006
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0006
+- chunk_id: C0007
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0007
+- chunk_id: C0008
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0008
+- chunk_id: C0009
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0009
+- chunk_id: C0010
+  type: paragraph
+  skeleton_ref: chunks/skeletons.jsonl#C0010
+tables: []
+argument_patterns: []
+must_cover: []
+legal_template: null
+word_budget: null
+note: 保留原文层次、段落顺序和表列，不把测算值带入新项目。主章节包含子节，装配时须去重。

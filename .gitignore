@@ -1,0 +1,37 @@
+# Local environments and build output
+.venv/
+venv/
+node_modules/
+dist/
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.tsbuildinfo
+.pytest_cache/
+.coverage
+htmlcov/
+test-results/
+playwright-report/
+.DS_Store
+
+# Credentials and machine-specific settings
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+
+# User originals, model settings, database dumps and runtime logs
+/storage/
+/backups/
+/tmp/
+/demo-output/
+/design/
+**/_test_storage/
+*.dump
+*.log
+*.pid
+
+# Keep demo-data and audited test fixtures: they are part of the source release.
