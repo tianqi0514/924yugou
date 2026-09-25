@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('model basis is reviewed, stale hash is rejected, and candidate stays cancelable until commit', async ({ page }) => {
+  test.setTimeout(90_000)
   const project = { id: 'model-project', name: '模型依据验收', version: 1, has_corpus: false, is_builtin: false }
   const corpus = { corpus_id: 'cy_tray_20260918', corpus_version: 'v2', source_project_id: 'historical-project' }
   const claimRef = { corpus_id: corpus.corpus_id, corpus_version: 'v2', category_id: 'CAT-15', artifact_id: 'claims', record_id: '15:000002', semantic_id: 'L002' }
@@ -39,6 +40,17 @@ test('model basis is reviewed, stale hash is rejected, and candidate stays cance
       { item_id: '15:000002', role: 'claim', source_ref: claimRef, review_status: 'selected_for_project_pattern', usage: '仅作预测与订单的边界提醒', content: { text: '预测需求不是已签订单。', must_cite: ['EV-01'] } },
     ], constraints: { historical_values: 'excluded', new_claims: 'forbidden', candidate_status: 'pending_review' },
   })
+  const materialResponse = () => ({
+      project_id: project.id, section_id: 'S4', config_version: configVersion,
+      groups: ['基础信息', '语义图谱'], slots: [], items: [
+        { category_id: 'CAT-03', number: 3, name: '来源过程', group: '基础信息', record_count: 1, artifact_count: 1,
+          configured_mode: provenanceMode, effective_role: 'review', purpose: '核对抽取过程', chapter_role: '核对来源', limitations: [], record_ids: ['03:000001'] },
+        { category_id: 'CAT-04', number: 4, name: '章节结构', group: '基础信息', record_count: 1, artifact_count: 1,
+          configured_mode: 'auto', effective_role: 'input', purpose: '确定章节顺序', chapter_role: '写作输入', limitations: [], record_ids: ['04:000004'] },
+        { category_id: 'CAT-15', number: 15, name: '论断', group: '语义图谱', record_count: 1, artifact_count: 1,
+          configured_mode: 'auto', effective_role: 'input', purpose: '控制论断边界', chapter_role: '写作输入', limitations: [], record_ids: ['15:000002'] },
+      ],
+  })
   await page.route('**/api/**', async (route) => {
     const request = route.request()
     const path = new URL(request.url()).pathname.replace(/^\/api/, '')
@@ -54,24 +66,14 @@ test('model basis is reviewed, stale hash is rejected, and candidate stays cance
     ] })
     if (path === '/projects/model-project/writing/packages/S4') return reply({ section: { id: 'S4', title: '需求与产能', level: 1 }, project_id: project.id, project_version: projectVersion,
       ...corpus, items, required_item_ids: ['15:000002'], slots: [], issues: [], facts: [] })
-    if (path === '/projects/model-project/writing/materials' && request.method() === 'GET') return reply({
-      project_id: project.id, section_id: 'S4', config_version: configVersion,
-      groups: ['基础信息', '语义图谱'], slots: [], items: [
-        { category_id: 'CAT-03', number: 3, name: '来源过程', group: '基础信息', record_count: 1, artifact_count: 1,
-          configured_mode: provenanceMode, effective_role: 'review', purpose: '核对抽取过程', chapter_role: '核对来源', limitations: [], record_ids: ['03:000001'] },
-        { category_id: 'CAT-04', number: 4, name: '章节结构', group: '基础信息', record_count: 1, artifact_count: 1,
-          configured_mode: 'auto', effective_role: 'input', purpose: '确定章节顺序', chapter_role: '写作输入', limitations: [], record_ids: ['04:000004'] },
-        { category_id: 'CAT-15', number: 15, name: '论断', group: '语义图谱', record_count: 1, artifact_count: 1,
-          configured_mode: 'auto', effective_role: 'input', purpose: '控制论断边界', chapter_role: '写作输入', limitations: [], record_ids: ['15:000002'] },
-      ],
-    })
+    if (path === '/projects/model-project/writing/materials' && request.method() === 'GET') return reply(materialResponse())
     if (path === '/projects/model-project/writing/materials/S4' && request.method() === 'PUT') {
       materialSaveCalls += 1
       const body = request.postDataJSON()
       expect(body.base_version).toBe(configVersion)
       expect(body.settings).toContainEqual({ category_id: 'CAT-03', mode: 'exclude' })
       configVersion += 1; provenanceMode = 'exclude'; projectVersion += 1; currentHash = 'c'.repeat(64)
-      return reply({ config_version: configVersion })
+      return reply(materialResponse())
     }
     if (path === '/projects/model-project/reports/r1/writing/model-input' && request.method() === 'POST') {
       modelInputCalls += 1
@@ -98,13 +100,18 @@ test('model basis is reviewed, stale hash is rejected, and candidate stays cance
       return reply(report)
     }
     if (path === '/projects/model-project/writing/sources/15/15%3A000002') return reply({ source_ref: claimRef,
-      location: { page: 4 }, summary: '预测需求不是订单', payload: { text: '预测需求不是已签订单。', must_cite: ['EV-01'] } })
+      location: { page: 4 }, summary: '预测需求不是订单', payload: { pattern: '客户预测不能改写为已签订单或最低采购承诺。', must_cite: ['EV-01'] } })
     if (path === '/projects/model-project/writing/impact') return reply({ impacts: [] })
     return reply({ detail: `未模拟的 API：${request.method()} ${path}` }, 501)
   })
 
   await page.goto('/')
   await page.getByRole('button', { name: '报告写作' }).click()
+  await page.setViewportSize({ width: 900, height: 700 })
+  const foldedHeights = await page.locator('.report-optional-draft, .report-history').evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height))
+  expect(foldedHeights).toHaveLength(2)
+  expect(foldedHeights.every((height) => height < 100)).toBe(true)
+  await page.setViewportSize({ width: 1280, height: 720 })
   await page.getByLabel('选择语料章节').selectOption('S4')
   await page.locator('.corpus-writing-item').filter({ hasText: 'S4' }).getByRole('checkbox').check()
   await page.locator('.corpus-writing-item').filter({ hasText: 'L002' }).getByRole('checkbox').check()
@@ -123,6 +130,7 @@ test('model basis is reviewed, stale hash is rejected, and candidate stays cance
   await expect(basis).toContainText('SK1')
   await basis.locator('.model-input-material').filter({ hasText: 'L002' }).getByRole('button', { name: '来源' }).click()
   await expect(page.locator('.drawer-content.corpus-writing-source').getByText('预测需求不是订单', { exact: true })).toBeVisible()
+  await expect(page.locator('.drawer-content.corpus-writing-source .corpus-source-text')).toContainText('客户预测不能改写为已签订单或最低采购承诺。')
   await page.getByRole('button', { name: '关闭来源' }).click()
   await page.getByRole('button', { name: '起草依据' }).click()
   expect(modelInputCalls).toBe(1)

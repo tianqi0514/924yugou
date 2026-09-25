@@ -254,6 +254,7 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
     setLinkError('')
   }
   const knownBlockIds = useRef(new Set((editor.children as Block[]).map((block) => block.id).filter((id): id is string => !!id)))
+  const initialBindings = useRef(new Map(initial.map((block) => [block.id, new Set(block.fact_keys || [])])))
   const previousBlocks = useRef(normalizedBlocks(initial))
   const repairingSplitIds = useRef(false)
   const clearedInheritedKeys = useRef(new Set<string>())
@@ -317,6 +318,16 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
       delete block.origin
       if (block.type !== 'table') delete block.project_rule_refs
     }
+    for (const block of next) {
+      if (!block.fact_keys?.length || block.type === 'table' || /\d/.test(blockText(block))) continue
+      const retained = block.fact_keys.filter((key) => {
+        const fact = facts.find((item) => item.key === key)
+        return hasFactToken(block, key) || !fact || !['integer', 'decimal'].includes(fact.data_type)
+          || initialBindings.current.get(block.id)?.has(key)
+      })
+      if (retained.length) block.fact_keys = retained
+      else delete block.fact_keys
+    }
     previousBlocks.current = next
     onChange(next)
   }
@@ -327,8 +338,22 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
       if (topIndex === undefined) return
       const block = editor.children[topIndex] as Block
       const keys = block.fact_keys || []
-      if (!keys.includes(fact.key)) editor.tf.setNodes({ fact_keys: [...keys, fact.key] }, { at: [topIndex] })
+      const addedKey = !keys.includes(fact.key)
+      const previouslyBound = new Set((editor.children as Block[])
+        .filter((candidate) => candidate.fact_keys?.includes(fact.key))
+        .map((candidate) => candidate.id))
+      if (addedKey) editor.tf.setNodes({ fact_keys: [...keys, fact.key] }, { at: [topIndex] })
       editor.tf.insertNodes({ type: 'fact_ref', fact_key: fact.key, display: `${fact.label} ${fact.value}${fact.unit}`, children: [{ text: '' }] })
+      // Plate may split the text block while inserting an inline void. In that
+      // case the new fact token lands in the second half, but the first half
+      // retains the temporary key assigned above. Keep the binding only where
+      // the token actually lives.
+      if (addedKey) (editor.children as Block[]).forEach((candidate, index) => {
+        if (!candidate.fact_keys?.includes(fact.key) || hasFactToken(candidate, fact.key)
+          || previouslyBound.has(candidate.id)) return
+        const remaining = candidate.fact_keys.filter((key) => key !== fact.key)
+        editor.tf.setNodes({ fact_keys: remaining.length ? remaining : undefined }, { at: [index] })
+      })
       editor.tf.focus()
     } }
     return () => { actionsRef.current = null }

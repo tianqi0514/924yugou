@@ -13,7 +13,7 @@
 .report-link-form input{width:min(310px,100%);border:1px solid #cbd8e9;border-radius:6px;background:#fff;padding:6px 9px;color:#263b59;font-size:12px}
 .report-link-form small{color:#b6403b;font-size:11px}
 @media(max-width:700px){.plate-content{overflow-x:auto}.plate-content .report-table{min-width:520px}}
-.corpus-writing-panel{min-height:0}
+.workspace-card.corpus-writing-panel{min-height:0}
 .corpus-writing-empty,.corpus-writing-reference,.corpus-writing-summary,.corpus-writing-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .corpus-writing-empty,.corpus-writing-reference{border:1px solid #e5eaf2;border-radius:8px;padding:12px 14px;margin-bottom:13px}
 .corpus-writing-empty>div{display:grid;gap:4px}.corpus-writing-empty .form-field{margin:0;min-width:175px}.corpus-writing-empty .form-field select{width:100%}.corpus-writing-empty strong,.corpus-writing-summary strong{font-size:13px;color:#2c3e59}.corpus-writing-empty small,.corpus-writing-reference span,.corpus-writing-summary span{font-size:11px;color:#8b9aae}
@@ -42,7 +42,7 @@
 .report-flow-nav button{flex:1;min-width:max-content;border:0;background:transparent;border-radius:6px;padding:9px 12px;text-align:center;color:#536781;font-size:12px;font-weight:650}
 .report-flow-nav button:hover,.report-flow-nav button:focus-visible{background:#edf3ff;color:#245dcc;outline:none}
 #report-drafting,#report-editor,#report-review{scroll-margin-top:65px}
-.report-optional-draft,.report-history{min-height:0}
+.workspace-card.report-optional-draft,.workspace-card.report-history{min-height:0}
 .report-optional-draft>summary,.report-history>summary,.report-issues>summary,.report-bound-facts>summary,.report-bind-menu>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;color:#334b6c;font-size:13px;font-weight:650}
 .report-optional-draft>summary::-webkit-details-marker,.report-history>summary::-webkit-details-marker,.report-issues>summary::-webkit-details-marker,.report-bound-facts>summary::-webkit-details-marker,.report-bind-menu>summary::-webkit-details-marker{display:none}
 .report-optional-draft>summary:after,.report-history>summary:after,.report-issues>summary:after,.report-bound-facts>summary:after,.report-bind-menu>summary:after{content:'⌄';color:#8b9bb0;font-size:16px;line-height:1}
@@ -65,7 +65,7 @@
 .report-impact-preview>div{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .report-impact-preview>div span{color:#a34b36;font-weight:650}
 .report-impact-preview>div .subtle-button{margin-left:auto}
-.corpus-writing-panel{min-height:0}
+.workspace-card.corpus-writing-panel{min-height:0}
 .corpus-writing-source .status{margin-bottom:6px}
 .corpus-writing-source .field-grid{margin-top:12px}
 @media(max-width:780px){.report-flow-nav{top:0}.report-flow-nav button{font-size:11px;padding:8px 10px}#report-drafting,#report-editor,#report-review{scroll-margin-top:50px}}

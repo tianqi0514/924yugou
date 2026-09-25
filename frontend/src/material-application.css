@@ -32,6 +32,7 @@
 .material-simulate{border-top:1px solid #ebeff4;padding:12px 16px 14px}
 .material-simulate-head{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin-bottom:10px}
 .material-simulate-head>strong{font-size:12px;color:#334761}
+.material-simulate-switches{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
 .material-simulate .segmented button{font-size:10px}
 .material-simulate>.primary-button{padding:7px 12px}
 .material-muted{font-size:11px;color:#8794a5}
@@ -65,6 +66,14 @@
 .material-experiment p{color:#7c8ca1;font-size:10px;line-height:1.5;margin:5px 0 0}
 .material-difference{display:grid;gap:5px;margin-top:7px;font-size:10px;color:#52657e;overflow-wrap:anywhere}
 .material-difference span:last-child{color:#ac6742}
+.material-contract{border-top:1px solid #edf1f5;margin-top:7px;padding-top:6px}
+.material-contract summary{cursor:pointer;font-size:10px;color:#5673a3;width:max-content}
+.material-contract summary:hover{color:#2863dd}
+.material-contract-body{max-height:220px;overflow:auto;margin-top:7px;border:1px solid #e8edf4;border-radius:6px}
+.material-contract-body>div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px;padding:6px 8px;border-bottom:1px solid #edf1f5;font-size:10px;line-height:1.55;overflow-wrap:anywhere}
+.material-contract-body>div:last-child{border-bottom:0}
+.material-contract-body span{color:#8a99ac}
+.material-contract-body strong{color:#445a76;font-weight:500}
 .material-facts>div,.material-trace>div{display:flex;align-items:center;gap:8px;border-top:1px solid #edf1f5;padding:7px 0;font-size:10px;color:#6b7b91}
 .material-facts b,.material-trace b{margin-left:auto;color:#344a66;text-align:right}
 .material-trace strong{color:#8795a9;font-weight:500}
@@ -76,5 +85,8 @@
 .material-purpose dl>div:last-child{border-bottom:0}
 .material-purpose dt{color:#8b99ab}
 .material-purpose dd{margin:0;color:#3f526c;white-space:pre-wrap;overflow-wrap:anywhere}
+.material-records{display:flex;flex-wrap:wrap;gap:5px;max-height:170px;overflow:auto}
+.material-records button,.material-records span{border:1px solid #e2e9f4;border-radius:5px;background:#f7faff;color:#45699f;font-size:10px;padding:3px 6px}
+.material-records button:hover{border-color:#9ebbef;color:#245fd1}
 @media(max-width:700px){.material-row{grid-template-columns:22px minmax(120px,1fr) 88px 36px;gap:6px}.material-role{display:none}.material-row select{font-size:10px}.material-row .text-button svg{display:none}.material-outcomes{grid-template-columns:1fr}.material-purpose dl>div{grid-template-columns:65px minmax(0,1fr)}}
 @media(max-width:420px){.material-row{grid-template-columns:20px minmax(95px,1fr) 82px 34px;padding:7px}.material-name{gap:4px}.material-name b{padding:2px 3px}.material-name strong{font-size:10px}.material-groups{padding-left:8px}.material-list{margin:0 8px}.material-example-fields label{width:100%;justify-content:space-between}.material-example-fields input{width:50%}}

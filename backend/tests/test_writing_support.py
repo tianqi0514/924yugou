@@ -73,15 +73,72 @@ def new_report(client, pid):
     return ok(client.post(f"/api/projects/{pid}/reports", json={"title": "写作支撑试验稿"}))["id"]
 
 
-def candidate(client, pid, rid, section):
+def candidate(client, pid, rid, section, replace_section=False):
     pack = ok(client.get(f"/api/projects/{pid}/writing/packages/{section}"))
     approved = [item["item_id"] for item in pack["items"] if item["decision"] == "selectable"]
     return client.post(f"/api/projects/{pid}/reports/{rid}/writing/preview", json={
-        "section_id": section, "approved_item_ids": approved, "mode": "guided"})
+        "section_id": section, "approved_item_ids": approved, "mode": "guided",
+        "replace_section": replace_section})
 
 
 def commit(client, pid, rid, value):
     return ok(client.post(f"/api/projects/{pid}/reports/{rid}/writing/commit", json=value))
+
+
+def test_section_replacement_is_explicit_atomic_and_keeps_other_sections_and_versions(client):
+    from app.db import ReportVersion, SessionLocal, WritingCommitEvent
+    from sqlalchemy import select
+
+    pid = make_project(client)
+    setup(client, pid)
+    rid = new_report(client, pid)
+    for key, value in (("first_year_demand", "300000"), ("qualified_capacity", "254016"),
+                       ("supplier_name", "新拓设备"), ("equipment_unit_price", "1234.50")):
+        set_fact(client, pid, key, value)
+    first = ok(candidate(client, pid, rid, "S4"))
+    commit(client, pid, rid, first)
+    commit(client, pid, rid, ok(candidate(client, pid, rid, "S7.1")))
+    before_manual = ok(client.get(f"/api/projects/{pid}/reports/{rid}"))
+    old_token = copy.deepcopy(next(child for block in before_manual["content"]
+                                   for child in block.get("children", [])
+                                   if child.get("type") == "fact_ref" and child.get("fact_key") == "first_year_demand"))
+    manual_content = [*before_manual["content"], {"type": "p", "children": [
+        {"text": "人工补充："}, old_token], "fact_keys": ["first_year_demand"]}]
+    manual_preview = ok(client.post(f"/api/projects/{pid}/reports/{rid}/preview", json={
+        "content": manual_content, "base_version": before_manual["version"]}))
+    ok(client.put(f"/api/projects/{pid}/reports/{rid}", json={
+        "content": manual_content, "base_version": before_manual["version"],
+        "preview_token": manual_preview["preview_token"]}))
+    before = ok(client.get(f"/api/projects/{pid}/reports/{rid}"))
+    old_blocks = [block for block in before["content"] if block.get("section_id") == "S4"]
+    other_blocks = [block for block in before["content"] if block.get("section_id") != "S4"]
+    set_fact(client, pid, "first_year_demand", "0")
+    preview = ok(candidate(client, pid, rid, "S4", replace_section=True))
+    assert preview["replaced_blocks"] == old_blocks
+    assert "计划销售量为" in json.dumps(preview["paragraphs"], ensure_ascii=False)
+    current = ok(client.get(f"/api/projects/{pid}/reports/{rid}"))
+    assert current["version"] == before["version"] and current["content"] == before["content"]
+    tampered = {**preview, "replace_section": False}
+    assert client.post(f"/api/projects/{pid}/reports/{rid}/writing/commit", json=tampered).status_code == 409
+    result = commit(client, pid, rid, preview)["report"]
+    assert result["version"] == before["version"] + 1
+    assert [block for block in result["content"] if block.get("section_id") != "S4"] == other_blocks
+    assert [block for block in result["content"] if block.get("section_id") == "S4"] == preview["paragraphs"]
+    assert result["bound_facts"]["first_year_demand"] == before["bound_facts"]["first_year_demand"]
+    assert len(result["fact_impacts"]) == 1
+    assert result["fact_impacts"][0]["fact_key"] == "first_year_demand"
+    assert result["fact_impacts"][0]["text"].startswith("人工补充：")
+    assert any(issue["code"] == "FACT_CHANGED" for issue in result["issues"])
+    assert not ({block["id"] for block in old_blocks} & {block.get("id") for block in result["content"]})
+    old_start = next(i for i, block in enumerate(before["content"]) if block.get("section_id") == "S4")
+    assert result["content"][old_start:old_start + len(preview["paragraphs"])] == preview["paragraphs"]
+    with SessionLocal() as session:
+        assert session.get(ReportVersion, (rid, before["version"])).content == before["content"]
+        event = session.scalar(select(WritingCommitEvent).where(
+            WritingCommitEvent.report_id == rid, WritingCommitEvent.report_version == result["version"]))
+        audit = next(issue for issue in event.issues if issue["code"] == "SECTION_REPLACED")
+        assert audit["replaced_block_ids"] == [block["id"] for block in old_blocks]
+    assert client.post(f"/api/projects/{pid}/reports/{rid}/writing/commit", json=preview).status_code == 409
 
 
 def test_reference_package_and_source_ids(client):

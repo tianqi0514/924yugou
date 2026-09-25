@@ -18,7 +18,7 @@ from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from .corpus import CATEGORY_NAMES, GROUPS
-from .corpus_storage import CorpusArtifact, CorpusCategoryRow
+from .corpus_storage import CorpusArtifact, CorpusCategoryRow, CorpusRecord
 from .db import Base, Project, ProjectFact, RuleRecord, SessionLocal, utcnow
 from .writing import SLOTS
 from .writing_support import GUIDED_SECTIONS, accepted_reference, build_candidate, package
@@ -59,6 +59,7 @@ class MaterialSimulate(BaseModel):
     selected_categories: list[str] = Field(default_factory=list, max_length=6)
     input_mode: Literal["project", "example"] = "project"
     slot_values: dict[str, Any] = Field(default_factory=dict)
+    experiment_mode: Literal["remove", "equivalent"] = "remove"
 
 
 def _project(session: Session, project_id: str, *, lock: bool = False) -> Project:
@@ -369,16 +370,32 @@ def simulate_materials(project_id: str, section_id: str, body: MaterialSimulate)
             unadapted = {"status": "unadapted", "text": "", "used_categories": [],
                          "used_records": [], "issues": [{"severity": "block", "message": "本章尚未适配写作模拟"}]}
             return {"baseline": unadapted, "configured": unadapted,
-                    "experiments": [{"category_id": category, "status": "not_consumed",
+                    "experiments": [{"category_id": category,
+                                     "status": "not_supported" if body.experiment_mode == "equivalent" else "not_consumed",
                                      "reason": "本章尚未适配写作模拟，不能判断此类的写作贡献",
                                      "before_text": "", "after_text": "", "used_records": []}
                                     for category in selected],
-                    "trace": [], "facts": [], "simulation_only": True}
+                    "trace": [], "facts": [], "simulation_only": True,
+                    "experiment_mode": body.experiment_mode}
         state, rules, bindings, trace = _simulation_inputs(session, project_id, body.input_mode, body.slot_values)
         baseline = _candidate_snapshot(session, raw, {}, state, rules, bindings)
         configured = _candidate_snapshot(session, raw, settings, state, rules, bindings)
         experiments = []
         for category in selected:
+            if body.experiment_mode == "equivalent":
+                from .writing_contract import compare_equivalent
+
+                number = int(category[4:])
+                record_ids = [record_id for record_id in configured["used_records"]
+                              if record_id.startswith(f"{number:02d}:")]
+                payloads = []
+                for record_id in record_ids:
+                    record = session.get(CorpusRecord, (raw["corpus_id"], number, record_id))
+                    if record is not None:
+                        payloads.append(record.payload)
+                experiments.append(compare_equivalent(section_id, number, configured,
+                                                      state, rules, bindings, record_ids, payloads))
+                continue
             without = dict(settings)
             without[category] = "exclude"
             after = _candidate_snapshot(session, raw, without, state, rules, bindings)
@@ -401,4 +418,5 @@ def simulate_materials(project_id: str, section_id: str, body: MaterialSimulate)
                                                  if item.startswith(f"{int(category[4:]):02d}:")]})
         return {"baseline": baseline, "configured": configured,
                 "experiments": experiments, "trace": trace,
-                "facts": _facts_for_display(raw, state, bindings), "simulation_only": True}
+                "facts": _facts_for_display(raw, state, bindings), "simulation_only": True,
+                "experiment_mode": body.experiment_mode}

@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
-from decimal import Decimal, DivisionByZero, InvalidOperation, ROUND_CEILING, ROUND_FLOOR, getcontext
+from decimal import Decimal, DecimalException, DivisionByZero, Inexact, InvalidOperation, Overflow, ROUND_CEILING, ROUND_FLOOR, Underflow, localcontext
 from typing import Any
 
-getcontext().prec = 50
+DECIMAL_PRECISION = 50
+MAX_DECIMAL_EXPONENT = 1000
 
 
 class RuleError(ValueError):
@@ -76,12 +77,37 @@ def _combine(left: tuple, right: tuple, sign: int) -> tuple:
     return tuple(sorted((key, power) for key, power in result.items() if power))
 
 
+def unit_signature(unit: str) -> tuple[tuple[str, int], ...]:
+    """Keep scale-bearing symbols when composing units; no implicit conversion."""
+    powers: dict[str, int] = {}
+    for index, part in enumerate(unit.replace("／", "/").split("/")):
+        for token in part.split("·"):
+            token = token.strip()
+            if token in {"", "无", "1", "比例"}:
+                continue
+            token = "元" if token == "人民币" else token
+            powers[token] = powers.get(token, 0) + (1 if index == 0 else -1)
+    return tuple(sorted((key, power) for key, power in powers.items() if power))
+
+
+def _combined_unit_tag(left: str, right: str, sign: int) -> str:
+    combined = _combine(unit_signature(left), unit_signature(right), sign)
+    numerator = [unit for unit, power in combined for _ in range(max(0, power))]
+    denominator = [unit for unit, power in combined for _ in range(max(0, -power))]
+    if denominator:
+        return ("·".join(numerator) or "1") + "/" + "·".join(denominator)
+    return "·".join(numerator)
+
+
 def _compatible(left: EvalValue, right: EvalValue) -> tuple:
     if isinstance(left.value, bool) != isinstance(right.value, bool):
         raise RuleError("布尔值与数值不能直接比较")
     if left.dimension == right.dimension:
-        if left.unit_tag and right.unit_tag and left.unit_tag != right.unit_tag:
-            raise RuleError("单位不一致；请在规则中显式换算")
+        if unit_signature(left.unit_tag) != unit_signature(right.unit_tag):
+            zero_guard = ((left.value == 0 and not left.unit_tag)
+                          or (right.value == 0 and not right.unit_tag))
+            if not zero_guard:
+                raise RuleError("单位不一致；请统一事实单位后计算")
         return left.dimension
     # 加减零是业务规则中的常见缺口守卫，例如 max(金额差, 0)。
     if left.value == 0 and not left.dimension:
@@ -141,7 +167,11 @@ def parse_expression(expression: str) -> tuple[ast.Expression, list[str]]:
 def _decimal_constant(node: ast.Constant, expression: str) -> Decimal:
     source = ast.get_source_segment(expression, node)
     try:
-        return Decimal(source if source is not None else str(node.value))
+        value = Decimal(source if source is not None else str(node.value))
+        if (not value.is_finite() or abs(value.as_tuple().exponent) > MAX_DECIMAL_EXPONENT
+                or abs(value.adjusted()) > MAX_DECIMAL_EXPONENT):
+            raise RuleError("规则数值超出可计算范围")
+        return value
     except InvalidOperation as exc:
         raise RuleError("数值常量无效") from exc
 
@@ -174,21 +204,28 @@ def evaluate(expression: str, values: dict[str, EvalValue]) -> EvalValue:
             item = walk(node.operand)
             if isinstance(item.value, bool):
                 raise RuleError("布尔值不能参与算术")
-            return EvalValue(-item.value if isinstance(node.op, ast.USub) else item.value, item.dimension, item.unit_tag)
+            return EvalValue(item.value.copy_negate() if isinstance(node.op, ast.USub) else item.value, item.dimension, item.unit_tag)
         if isinstance(node, ast.BinOp):
             left, right = walk(node.left), walk(node.right)
             if isinstance(left.value, bool) or isinstance(right.value, bool):
                 raise RuleError("布尔值不能参与算术")
             if isinstance(node.op, (ast.Add, ast.Sub)):
                 dim = _compatible(left, right)
-                result = left.value + right.value if isinstance(node.op, ast.Add) else left.value - right.value
+                with localcontext() as exact:
+                    exact.traps[Inexact] = True
+                    result = left.value + right.value if isinstance(node.op, ast.Add) else left.value - right.value
                 return EvalValue(result, dim, left.unit_tag or right.unit_tag)
             if isinstance(node.op, ast.Mult):
-                return EvalValue(left.value * right.value, _combine(left.dimension, right.dimension, 1))
+                with localcontext() as exact:
+                    exact.traps[Inexact] = True
+                    product = left.value * right.value
+                return EvalValue(product, _combine(left.dimension, right.dimension, 1),
+                                 _combined_unit_tag(left.unit_tag, right.unit_tag, 1))
             if right.value == 0:
                 raise RuleError("规则除零")
             try:
-                return EvalValue(left.value / right.value, _combine(left.dimension, right.dimension, -1))
+                return EvalValue(left.value / right.value, _combine(left.dimension, right.dimension, -1),
+                                 _combined_unit_tag(left.unit_tag, right.unit_tag, -1))
             except (DivisionByZero, InvalidOperation) as exc:
                 raise RuleError("规则除法无效") from exc
         if isinstance(node, ast.Compare):
@@ -214,16 +251,37 @@ def evaluate(expression: str, values: dict[str, EvalValue]) -> EvalValue:
                     raise RuleError("取整函数只接受一个数值")
                 rounding = ROUND_FLOOR if node.func.id == "floor" else ROUND_CEILING
                 return EvalValue(args[0].value.to_integral_value(rounding=rounding), args[0].dimension, args[0].unit_tag)
-            dim = args[0].dimension
+            representative = args[0]
             for item in args[1:]:
-                dim = _compatible(EvalValue(args[0].value, dim), item)
+                dim = _compatible(representative, item)
+                representative = EvalValue(representative.value, dim,
+                                           representative.unit_tag or item.unit_tag)
             if any(isinstance(item.value, bool) for item in args):
                 raise RuleError("min/max 只接受数值")
             result = min(x.value for x in args) if node.func.id == "min" else max(x.value for x in args)
-            return EvalValue(result, dim, next((item.unit_tag for item in args if item.unit_tag), ""))
+            return EvalValue(result, representative.dimension, representative.unit_tag)
         raise RuleError("规则包含不允许的语法")
 
-    return walk(tree)
+    # Decimal contexts are thread-local; setting the importing thread's context
+    # does not configure FastAPI worker threads.
+    with localcontext() as context:
+        context.prec = DECIMAL_PRECISION
+        context.Emax = MAX_DECIMAL_EXPONENT
+        context.Emin = -MAX_DECIMAL_EXPONENT
+        context.traps[Underflow] = True
+        try:
+            result = walk(tree)
+        except (Overflow, Underflow) as exc:
+            raise RuleError("规则数值超出可计算范围") from exc
+        except Inexact as exc:
+            raise RuleError("加减乘结果超出50位有效精度，不能无损计算") from exc
+        except DecimalException as exc:
+            raise RuleError("规则数值超出可计算范围") from exc
+        if isinstance(result.value, Decimal) and not result.value.is_finite():
+            raise RuleError("规则结果必须是有限值")
+        if isinstance(result.value, Decimal) and abs(result.value.adjusted()) > MAX_DECIMAL_EXPONENT:
+            raise RuleError("规则数值超出可计算范围")
+        return result
 
 
 def sort_rules(rules: list[Any], fact_keys: set[str]) -> list[Any]:

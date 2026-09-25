@@ -300,7 +300,7 @@ def _reference_display_numbers(node: dict, facts: dict, position: int) -> tuple[
 
 
 def report_fact_impacts(content: list[dict], bound_facts: dict, current_facts: dict) -> list[dict]:
-    """List exact saved paragraphs whose cited fact snapshot is no longer current."""
+    """Locate paragraphs that still need a visible fact-reference update."""
     impacts = []
     for position, node in enumerate(content, 1):
         for key in dict.fromkeys(node.get("fact_keys", [])):
@@ -308,6 +308,15 @@ def report_fact_impacts(content: list[dict], bound_facts: dict, current_facts: d
             old = bound_facts.get(key)
             new = {"value": fact.value_text, "revision": fact.revision} if fact else None
             if old != new:
+                # A newly inserted chapter can already show the current value
+                # while another paragraph still uses the older shared snapshot.
+                # Show the user the paragraph that actually needs editing.
+                if (old and new and old.get("value") != new.get("value")
+                        and new.get("value") is not None
+                        and contains_fact_value([node], key, new["value"])
+                        and (old.get("value") is None
+                             or not contains_fact_value([node], key, old["value"]))):
+                    continue
                 impacts.append({"position": position, "text": plain(node), "fact_key": key,
                                 "before": old, "after": new})
     return impacts

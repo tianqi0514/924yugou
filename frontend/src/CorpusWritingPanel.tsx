@@ -45,7 +45,7 @@ type Candidate = {
   section_id: string; paragraphs: CandidateParagraph[]; issues: PackageIssue[]; used_items: string[];
   rejected_items: { item_id: string; reason: string }[]; base_version: number; project_version: number;
   preview_token: string; expires_at: number; model_input?: ModelInput; input_sha256?: string;
-  model_call?: Record<string, unknown>; model_usage?: ModelUsage[]
+  model_call?: Record<string, unknown>; model_usage?: ModelUsage[]; replaced_blocks?: CandidateParagraph[]
 }
 type SourceDetail = { source_ref: CorpusSourceRef; payload: Record<string, unknown> | null; location: unknown; summary: string }
 type SourceImpact = { report_id: string; report_title: string; report_version: number; block_id: string;
@@ -104,7 +104,7 @@ function paragraphText(value: unknown): string {
 
 export function primarySourceText(payload: Record<string, unknown> | null): string | null {
   if (!payload) return null
-  for (const key of ['text', 'excerpt', 'content', 'body', 'quote', 'statement']) {
+  for (const key of ['text', 'excerpt', 'content', 'body', 'quote', 'statement', 'pattern']) {
     const value = payload[key]
     if (typeof value === 'string' && value.trim()) return value.trim()
   }
@@ -231,6 +231,8 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
   const modelInputRequest = useRef(0)
   const referenceRequest = useRef(0)
   const packageRequest = useRef(0)
+  const previewRequest = useRef(0)
+  const previewController = useRef<AbortController | null>(null)
   const [detail, setDetail] = useState<{ item: PackageItem; source: SourceDetail | null; impacts: SourceImpact[]; loadError?: string } | null>(null)
   const [mappingData, setMappingData] = useState<MappingData | null>(null)
   const [mappingDraft, setMappingDraft] = useState<Record<string, string>>({})
@@ -238,22 +240,34 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
   const [mappingBusy, setMappingBusy] = useState(false)
   const [mappingError, setMappingError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [previewBusy, setPreviewBusy] = useState(false)
   const [error, setError] = useState('')
-  useEffect(() => { modelInputRequest.current += 1; setModelInput(null); setModelInputOpen(false); setModelInputBusy(false); setCandidate(null) }, [project.id, reportId])
+  const invalidatePreview = useCallback(() => {
+    previewRequest.current += 1
+    previewController.current?.abort()
+    previewController.current = null
+    setPreviewBusy(false)
+  }, [])
+  useEffect(() => { invalidatePreview(); modelInputRequest.current += 1; setModelInput(null); setModelInputOpen(false); setModelInputBusy(false); setCandidate(null) }, [project.id, reportId, invalidatePreview])
   useEffect(() => {
     referenceRequest.current += 1; packageRequest.current += 1
     setReference(null); setSections([]); setSectionId(''); setWritingPackage(null); setApproved([])
     setPackageStale(false); setCandidate(null); setDetail(null); setError('')
   }, [project.id])
+  useEffect(() => { if (dirty) { invalidatePreview(); setCandidate(null) } }, [dirty, invalidatePreview])
 
   const refreshReference = useCallback(async () => {
     const requestId = ++referenceRequest.current
-    const result = await api<Reference>(`/projects/${project.id}/writing/reference`)
+    let result: Reference
+    try { result = await api<Reference>(`/projects/${project.id}/writing/reference`) }
+    catch (cause) { if (requestId === referenceRequest.current) throw cause; return }
     if (requestId !== referenceRequest.current) return
     setReference(result)
     if (result.target_report_type) setReportType(result.target_report_type)
     if (result.selected) {
-      const available = await api<{ sections: Section[] }>(`/projects/${project.id}/writing/sections`)
+      let available: { sections: Section[] }
+      try { available = await api<{ sections: Section[] }>(`/projects/${project.id}/writing/sections`) }
+      catch (cause) { if (requestId === referenceRequest.current) throw cause; return }
       if (requestId !== referenceRequest.current) return
       setSections(available.sections)
     } else {
@@ -264,8 +278,11 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
   const refreshPackage = useCallback(async () => {
     const requestId = ++packageRequest.current
     if (!sectionId || !reference?.selected) { setWritingPackage(null); return }
-    const result = await api<WritingPackage>(`/projects/${project.id}/writing/packages/${encodeURIComponent(sectionId)}`)
+    let result: WritingPackage
+    try { result = await api<WritingPackage>(`/projects/${project.id}/writing/packages/${encodeURIComponent(sectionId)}`) }
+    catch (cause) { if (requestId === packageRequest.current) throw cause; return }
     if (requestId !== packageRequest.current) return
+    invalidatePreview()
     setWritingPackage(result)
     setPackageStale(false)
     setApproved([])
@@ -276,8 +293,9 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
     setModelInputBusy(false)
     setItemFilter('selectable')
     setItemSearch('')
-  }, [project.id, reference?.selected, sectionId])
+  }, [project.id, reference?.selected, sectionId, invalidatePreview])
   const materialConfigurationChanged = useCallback(async () => {
+    invalidatePreview()
     modelInputRequest.current += 1
     setModelInput(null)
     setModelInputOpen(false)
@@ -289,7 +307,7 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
     setError('')
     try { await refreshPackage() }
     catch (cause) { setError((cause as Error).message); throw cause }
-  }, [refreshPackage])
+  }, [refreshPackage, invalidatePreview])
   useEffect(() => { void refreshPackage().catch((cause: Error) => setError(cause.message)) }, [refreshPackage])
   const shownSections = useMemo(() => sections.filter((section) => section.id === sectionId || `${section.id} ${section.title}`.toLowerCase().includes(sectionSearch.trim().toLowerCase())), [sections, sectionId, sectionSearch])
   const selectedSection = sections.find((section) => section.id === sectionId)
@@ -348,6 +366,14 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
       }
     } catch (cause) { setDetail((current) => current?.item.item_id === item.item_id ? { ...current, loadError: (cause as Error).message } : current) }
   }
+  const openMaterialRecord = (categoryId: string, recordId: string) => {
+    const existing = writingPackage?.items.find((item) => item.category_id === categoryId && item.record_id === recordId)
+    const categoryNumber = Number(categoryId.slice(4))
+    if (!existing && (!Number.isInteger(categoryNumber) || categoryNumber < 1 || categoryNumber > 30)) return
+    void openItem(existing || { item_id: `material-${categoryId}-${recordId}`, category_id: categoryId,
+      category_number: categoryNumber, artifact_id: '', record_id: recordId, semantic_id: null,
+      role: 'historical_text', decision: 'review_only', reason: '', location: null, summary: recordId })
+  }
   const openRelated = (id: string) => {
     const existing = writingPackage?.items.find((item) => item.semantic_id === id || item.record_id === id)
     if (existing) { void openItem(existing); return }
@@ -384,14 +410,21 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
     finally { if (requestId === modelInputRequest.current) setModelInputBusy(false) }
   }
   const preview = async () => {
-    if (!writingPackage || packageStale || !approved.length || dirty || !canDraft || (mode === 'model' && !modelInput)) return
-    setBusy(true); setError(''); setCandidate(null)
+    if (!writingPackage || packageStale || !approved.length || dirty || !canDraft || previewBusy || busy || (mode === 'model' && !modelInput)) return
+    const requestId = ++previewRequest.current
+    const controller = new AbortController()
+    previewController.current = controller
+    setPreviewBusy(true); setError(''); setCandidate(null)
     try {
-      setCandidate(await post<Candidate>(`/projects/${project.id}/reports/${reportId}/writing/preview`, {
-        section_id: writingPackage.section.id, approved_item_ids: approved, mode,
+      const result = await api<Candidate>(`/projects/${project.id}/reports/${reportId}/writing/preview`, {
+        method: 'POST', signal: controller.signal, body: JSON.stringify({
+        section_id: writingPackage.section.id, approved_item_ids: approved, mode, replace_section: true,
         ...(mode === 'model' ? { expected_input_sha256: modelInput?.input_sha256 } : {}),
-      }))
-    } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
+        }),
+      })
+      if (requestId === previewRequest.current) setCandidate(result)
+    } catch (cause) { if (requestId === previewRequest.current && (cause as Error).name !== 'AbortError') setError((cause as Error).message) }
+    finally { if (requestId === previewRequest.current) { setPreviewBusy(false); previewController.current = null } }
   }
   const commit = async () => {
     if (!candidate || dirty) return
@@ -406,6 +439,7 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
     } catch (cause) { setCandidate(null); setError(`${(cause as Error).message}；请重新预览`) } finally { setBusy(false) }
   }
   const toggle = (id: string) => {
+    invalidatePreview()
     setApproved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
     setCandidate(null)
     modelInputRequest.current += 1
@@ -417,26 +451,27 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
   return <section className="workspace-card corpus-writing-panel">
     <div className="workspace-toolbar"><h2>章节起草</h2></div>
     {error && <div className="notice error" role="alert">{error}</div>}
-    {!reference ? <div className="empty">正在读取参考语料…</div> : !reference.selected ? <div className="corpus-writing-empty"><strong>澄岳精密 · {versionLabel(reference.corpus_version)}</strong><label className="form-field"><span>本项目报告类型</span><select aria-label="本项目报告类型" value={reportType} onChange={(event) => setReportType(event.target.value as ReportType)}><option value="feasibility">项目可行性报告</option><option value="accident_investigation">事故调查报告</option><option value="other">其他专业报告</option></select></label><button type="button" className="primary-button" disabled={busy} onClick={() => void bindReference()}>选择为只读参考</button></div> : <>
+    {!reference ? <div className="empty">{error ? <button type="button" className="subtle-button" onClick={() => { setError(''); void refreshReference().catch((cause: Error) => setError(cause.message)) }}>重试读取参考语料</button> : '正在读取参考语料…'}</div> : !reference.selected ? <div className="corpus-writing-empty"><strong>澄岳精密 · {versionLabel(reference.corpus_version)}</strong><label className="form-field"><span>本项目报告类型</span><select aria-label="本项目报告类型" value={reportType} onChange={(event) => setReportType(event.target.value as ReportType)}><option value="feasibility">项目可行性报告</option><option value="accident_investigation">事故调查报告</option><option value="other">其他专业报告</option></select></label><button type="button" className="primary-button" disabled={busy} onClick={() => void bindReference()}>选择为只读参考</button></div> : <>
       <div className="corpus-writing-reference"><span>参考语料</span><strong>{reference.corpus_id.startsWith('cy_tray') ? '澄岳精密' : reference.corpus_id} · {versionLabel(reference.corpus_version)}</strong><span className="status status-neutral">只读</span></div>
-      <div className="corpus-writing-selector"><label className="form-field"><span>查找章节</span><input value={sectionSearch} onChange={(event) => setSectionSearch(event.target.value)} placeholder="章节编号或名称" /></label><label className="form-field"><span>目标章节</span><select aria-label="选择语料章节" value={sectionId} onChange={(event) => { packageRequest.current += 1; modelInputRequest.current += 1; setSectionId(event.target.value); setMode('guided'); setWritingPackage(null); setCandidate(null); setModelInput(null); setModelInputOpen(false); setModelInputBusy(false) }}><option value="">选择章节</option>{shownSections.map((section) => <option key={section.id} value={section.id}>{section.id} · {section.title}{!section.guided_available ? ' · 仅核对' : ''}</option>)}</select></label></div>
+      <div className="corpus-writing-selector"><label className="form-field"><span>查找章节</span><input value={sectionSearch} onChange={(event) => setSectionSearch(event.target.value)} placeholder="章节编号或名称" /></label><label className="form-field"><span>目标章节</span><select aria-label="选择语料章节" value={sectionId} onChange={(event) => { packageRequest.current += 1; modelInputRequest.current += 1; invalidatePreview(); setSectionId(event.target.value); setMode('guided'); setWritingPackage(null); setCandidate(null); setDetail(null); setError(''); setModelInput(null); setModelInputOpen(false); setModelInputBusy(false) }}><option value="">选择章节</option>{shownSections.map((section) => <option key={section.id} value={section.id}>{section.id} · {section.title}{!section.guided_available ? ' · 仅核对' : ''}</option>)}</select></label></div>
+      {sections.length === 0 && error && <button type="button" className="subtle-button corpus-writing-retry" onClick={() => { setError(''); void refreshReference().catch((cause: Error) => setError(cause.message)) }}>重试读取章节目录</button>}
       {sectionId && !writingPackage && <div className="empty">{error ? <button type="button" className="subtle-button" onClick={() => { setError(''); void refreshPackage().catch((cause: Error) => setError(cause.message)) }}>重试读取章节</button> : '正在整理章节写作包…'}</div>}
       {writingPackage && <>
         <div className="corpus-writing-summary"><strong>{writingPackage.section.id} · {writingPackage.section.title}</strong></div>
-        <div className="corpus-material-application"><MaterialApplicationPanel projectId={project.id} sectionId={writingPackage.section.id} onConfigurationChanged={materialConfigurationChanged} /></div>
+        <div className="corpus-material-application"><MaterialApplicationPanel projectId={project.id} sectionId={writingPackage.section.id} onConfigurationChanged={materialConfigurationChanged} onRecordClick={openMaterialRecord} /></div>
         {packageStale && <div className="notice warn">写作包需刷新 <button type="button" className="text-button" onClick={() => { setError(''); void refreshPackage().catch((cause: Error) => setError(cause.message)) }}>重试</button></div>}
         {!selectedSection?.guided_available && <div className="notice warn">{selectedSection?.availability_reason || '当前章节只能查看来源并人工核对。'}</div>}
         {writingPackage.slots.length > 0 && <div className="corpus-writing-slots"><div className="surface-heading"><strong>本项目事实</strong><div className="inline-actions"><button type="button" className="text-button" onClick={() => void openMapping()}>映射事实</button><button type="button" className="text-button" onClick={onEditFacts}>项目事实 <ArrowRight size={13} /></button></div></div><div>{writingPackage.slots.map((slot) => <span key={slot.slot_id} className={`corpus-writing-slot ${slot.value === null ? 'missing' : ''}`}><b>{slot.label}</b><small>{!slot.fact_key ? '未映射' : slot.value === null ? '未定义' : `${slot.value}${slot.unit || ''}`}</small></span>)}</div></div>}
         {writingPackage.issues.length > 0 && <div className="corpus-writing-issues">{writingPackage.issues.map((issue, index) => <div key={`${issue.code}-${index}`} className={`notice ${issue.severity === 'block' ? 'warn' : ''}`}><span>{issue.message}</span></div>)}</div>}
         <div className="corpus-writing-items"><div className="corpus-writing-list-toolbar"><strong>参考记录 · 已选 {approved.length}{requiredIds.length > 0 ? ` / 必选 ${requiredIds.length}` : ''}</strong><div className="segmented" role="group" aria-label="写作包筛选"><button type="button" className={itemFilter === 'selectable' ? 'active' : ''} onClick={() => setItemFilter('selectable')}>可选用 {selectable.length}</button><button type="button" className={itemFilter === 'review_only' ? 'active' : ''} onClick={() => setItemFilter('review_only')}>仅核对 {reviewOnly.length}</button><button type="button" className={itemFilter === 'excluded' ? 'active' : ''} onClick={() => setItemFilter('excluded')}>不适用 {excluded.length}</button></div><input aria-label="搜索写作包记录" value={itemSearch} onChange={(event) => setItemSearch(event.target.value)} placeholder="搜索 ID 或内容" /></div>{shownItems.length === 0 && <div className="empty">没有记录</div>}{shownItems.map((item) => <div className={`corpus-writing-item decision-${item.decision}`} key={item.item_id}><label><input type="checkbox" checked={approved.includes(item.item_id)} disabled={item.decision !== 'selectable' || busy || packageStale} onChange={() => toggle(item.item_id)} /><span><b>{roleLabels[item.role] || item.role} · {item.semantic_id || item.record_id}{requiredIds.includes(item.item_id) ? ' · 必选' : ''}</b><small>{item.summary}</small>{item.decision !== 'selectable' && item.reason && <em>{item.reason}</em>}</span></label><button type="button" className="text-button" onClick={() => void openItem(item)}>来源</button></div>)}</div>
-        <div className="corpus-writing-actions"><label className="form-field"><span>起草方式</span><select aria-label="起草方式" value={mode} onChange={(event) => { modelInputRequest.current += 1; setMode(event.target.value as 'guided' | 'model'); setCandidate(null); setModelInput(null); setModelInputOpen(false); setModelInputBusy(false) }}><option value="guided">按事实与规则组织</option><option value="model" disabled={!selectedSection?.model_available}>使用已配置写作模型</option></select></label><div className="inline-actions">{mode === 'model' && <button type="button" className="subtle-button" disabled={busy || modelInputBusy || dirty || packageStale || approved.length === 0 || missingRequired.length > 0 || !canDraft} onClick={() => modelInput ? setModelInputOpen(true) : void loadModelInput()}>{modelInputBusy ? '读取中…' : '起草依据'}</button>}<button type="button" className="primary-button" disabled={busy || modelInputBusy || dirty || packageStale || approved.length === 0 || missingRequired.length > 0 || !canDraft || (mode === 'model' && !modelInput)} onClick={() => void preview()}><Sparkles size={14} /> 预览章节候选</button></div></div>
+        <div className="corpus-writing-actions"><label className="form-field"><span>起草方式</span><select aria-label="起草方式" value={mode} onChange={(event) => { invalidatePreview(); modelInputRequest.current += 1; setMode(event.target.value as 'guided' | 'model'); setCandidate(null); setModelInput(null); setModelInputOpen(false); setModelInputBusy(false) }}><option value="guided">按事实与规则组织</option><option value="model" disabled={!selectedSection?.model_available}>使用已配置写作模型</option></select></label><div className="inline-actions">{mode === 'model' && <button type="button" className="subtle-button" disabled={busy || previewBusy || modelInputBusy || dirty || packageStale || approved.length === 0 || missingRequired.length > 0 || !canDraft} onClick={() => modelInput ? setModelInputOpen(true) : void loadModelInput()}>{modelInputBusy ? '读取中…' : '起草依据'}</button>}<button type="button" className="primary-button" disabled={busy || previewBusy || modelInputBusy || dirty || packageStale || approved.length === 0 || missingRequired.length > 0 || !canDraft || (mode === 'model' && !modelInput)} onClick={() => void preview()}><Sparkles size={14} /> {previewBusy ? '预览中…' : '预览章节候选'}</button></div></div>
         {missingRequired.length > 0 && <div className="notice">必选：{writingPackage.items.filter((item) => missingRequired.includes(item.item_id)).map((item) => item.semantic_id || item.record_id).join('、')}</div>}
         {dirty && <div className="notice warn">请先保存正文</div>}
-        {candidate && <div className="corpus-writing-candidate"><div className="surface-heading"><strong>章节候选 · {candidate.section_id}</strong><span>{candidate.paragraphs.length} 段</span></div>{candidate.model_input && <div className="candidate-model-summary"><span>输入材料 {candidate.model_input.materials.length} · 实际引用 {new Set((candidate.model_usage || []).flatMap((item) => item.source_item_ids)).size}</span><button type="button" className="text-button" onClick={() => setModelInputOpen(true)}>起草依据</button></div>}{candidate.paragraphs.map((paragraph, index) => { const usage = candidate.model_usage?.find((entry) => entry.paragraph_id === paragraph.id); return <div className="candidate-paragraph" key={paragraph.id || index}><small>第 {index + 1} 段</small><p>{paragraphText(paragraph)}</p>{candidate.model_input ? <small>实际引用 {usage?.source_item_ids.length ? usage.source_item_ids.map((id) => writingPackage.items.find((item) => item.item_id === id)?.semantic_id || id).join('、') : '无'}{usage?.fact_keys.length ? ` · 项目事实 ${usage.fact_keys.join('、')}` : ''}</small> : <small>{paragraph.fact_keys?.length ? `项目事实 ${paragraph.fact_keys.join('、')} · ` : ''}{paragraph.source_refs?.map((ref) => `${ref.category_id}/${ref.semantic_id || ref.record_id}`).join('、') || '无历史引用'}</small>}</div> })}{candidate.issues.length > 0 && <div className="corpus-writing-issues">{candidate.issues.map((issue, index) => <div className="notice warn" key={index}>{issue.message}</div>)}</div>}{candidate.rejected_items.length > 0 && <details className="candidate-rejections"><summary>未采用 {candidate.rejected_items.length} 项</summary>{candidate.rejected_items.map((item) => <div key={item.item_id}>{writingPackage.items.find((record) => record.item_id === item.item_id)?.semantic_id || item.item_id} · {item.reason}</div>)}</details>}{candidate.issues.some((issue) => issue.code === 'POWER_CONFLICT_UNRESOLVED') && <div className="notice warn">冲突未解决，仅可作为预审稿</div>}<div className="inline-actions"><button type="button" onClick={() => setCandidate(null)}>取消候选</button><button type="button" className="primary-button" disabled={busy || dirty || candidate.issues.some((issue) => issue.severity === 'block' && issue.code !== 'POWER_CONFLICT_UNRESOLVED')} onClick={() => void commit()}><Check size={14} /> 加入报告</button></div></div>}
+        {candidate && <div className="corpus-writing-candidate"><div className="surface-heading"><strong>章节候选 · {candidate.section_id}</strong><span>{candidate.paragraphs.length} 段</span></div>{candidate.model_input && <div className="candidate-model-summary"><span>输入材料 {candidate.model_input.materials.length} · 实际引用 {new Set((candidate.model_usage || []).flatMap((item) => item.source_item_ids)).size}</span><button type="button" className="text-button" onClick={() => setModelInputOpen(true)}>起草依据</button></div>}{candidate.paragraphs.map((paragraph, index) => { const usage = candidate.model_usage?.find((entry) => entry.paragraph_id === paragraph.id); return <div className="candidate-paragraph" key={paragraph.id || index}><small>第 {index + 1} 段</small><p>{paragraphText(paragraph)}</p>{candidate.model_input ? <small>实际引用 {usage?.source_item_ids.length ? usage.source_item_ids.map((id) => writingPackage.items.find((item) => item.item_id === id)?.semantic_id || id).join('、') : '无'}{usage?.fact_keys.length ? ` · 项目事实 ${usage.fact_keys.join('、')}` : ''}</small> : <small>{paragraph.fact_keys?.length ? `项目事实 ${paragraph.fact_keys.join('、')} · ` : ''}{paragraph.source_refs?.map((ref) => `${ref.category_id}/${ref.semantic_id || ref.record_id}`).join('、') || '无历史引用'}</small>}</div> })}{candidate.issues.length > 0 && <div className="corpus-writing-issues">{candidate.issues.map((issue, index) => <div className="notice warn" key={index}>{issue.message}</div>)}</div>}{!!candidate.replaced_blocks?.length && <details className="candidate-rejections"><summary>将替换 {candidate.replaced_blocks.length} 段</summary>{candidate.replaced_blocks.map((block, index) => <div key={block.id || index}>{index + 1}. {paragraphText(block) || "空白段落"}</div>)}</details>}{candidate.rejected_items.length > 0 && <details className="candidate-rejections"><summary>未采用 {candidate.rejected_items.length} 项</summary>{candidate.rejected_items.map((item) => <div key={item.item_id}>{writingPackage.items.find((record) => record.item_id === item.item_id)?.semantic_id || item.item_id} · {item.reason}</div>)}</details>}{candidate.issues.some((issue) => issue.code === 'POWER_CONFLICT_UNRESOLVED') && <div className="notice warn">冲突未解决，仅可作为预审稿</div>}<div className="inline-actions"><button type="button" onClick={() => setCandidate(null)}>取消候选</button><button type="button" className="primary-button" disabled={busy || dirty || candidate.issues.some((issue) => issue.severity === 'block' && issue.code !== 'POWER_CONFLICT_UNRESOLVED')} onClick={() => void commit()}><Check size={14} /> {candidate.replaced_blocks?.length ? "替换本章" : "加入报告"}</button></div></div>}
       </>}
     </>}
     {modelInputOpen && modelInput && <ModelInputDrawer snapshot={modelInput} items={writingPackage?.items || []} busy={modelInputBusy || busy || dirty} error={error} onClose={() => setModelInputOpen(false)} onRefresh={() => void loadModelInput()} onSource={openModelMaterialSource} onPreview={() => { setModelInputOpen(false); void preview() }} />}
-    {mappingOpen && <div className="drawer-backdrop" onClick={() => setMappingOpen(false)}><aside className="drawer" role="dialog" aria-modal="true" aria-label="映射项目事实" onClick={(event) => event.stopPropagation()}><div className="drawer-header"><h2>映射项目事实</h2><button type="button" className="icon-button" aria-label="关闭映射" onClick={() => setMappingOpen(false)}><X size={19} /></button></div><div className="drawer-content"><div className="mapping-rows">{activeMappingSlots.map((slot) => { const options = mappingData?.facts.filter((fact) => fact.unit === slot.unit && (slot.data_type === 'text' ? ['text', 'enum'].includes(fact.data_type) : ['integer', 'decimal'].includes(fact.data_type))) || []; return <label className="form-field" key={slot.id}><span>{slot.label} · {slot.id}</span><select aria-label={`映射 ${slot.label}`} value={mappingDraft[slot.id] || ''} onChange={(event) => setMappingDraft((old) => ({ ...old, [slot.id]: event.target.value }))}><option value="">暂不映射</option>{options.map((fact) => <option key={fact.key} value={fact.key}>{fact.label} · {fact.value ?? '未定义'}</option>)}</select></label> })}</div>{mappingBusy && !mappingData && <div className="empty">正在读取…</div>}{mappingError && <div className="notice error" role="alert">{mappingError}</div>}<div className="form-actions"><button type="button" onClick={() => setMappingOpen(false)}>取消</button><button type="button" className="primary-button" disabled={!mappingChanged || mappingBusy} onClick={() => void saveMapping()}>{mappingBusy ? '保存中…' : '保存映射'}</button></div></div></aside></div>}
+    {mappingOpen && <div className="drawer-backdrop" onClick={() => setMappingOpen(false)}><aside className="drawer" role="dialog" aria-modal="true" aria-label="映射项目事实" onClick={(event) => event.stopPropagation()}><div className="drawer-header"><h2>映射项目事实</h2><button type="button" className="icon-button" aria-label="关闭映射" onClick={() => setMappingOpen(false)}><X size={19} /></button></div><div className="drawer-content"><div className="mapping-rows">{activeMappingSlots.map((slot) => { const options = mappingData?.facts.filter((fact) => fact.unit === slot.unit && (slot.data_type === 'text' ? ['text', 'enum'].includes(fact.data_type) : ['integer', 'decimal'].includes(fact.data_type))) || []; return <label className="form-field" key={slot.id}><span>{slot.label} · {slot.id}</span><select aria-label={`映射 ${slot.label}`} value={mappingDraft[slot.id] || ''} onChange={(event) => setMappingDraft((old) => ({ ...old, [slot.id]: event.target.value }))}><option value="">暂不映射</option>{options.map((fact) => <option key={fact.key} value={fact.key}>{fact.label} · {fact.value ?? '未定义'}</option>)}</select></label> })}</div>{mappingBusy && !mappingData && <div className="empty">正在读取…</div>}{mappingError && <div className="notice error" role="alert">{mappingError}{!mappingData && <button type="button" className="text-button" disabled={mappingBusy} onClick={() => void openMapping()}>重试</button>}</div>}<div className="form-actions"><button type="button" onClick={() => setMappingOpen(false)}>取消</button><button type="button" className="primary-button" disabled={!mappingChanged || mappingBusy} onClick={() => void saveMapping()}>{mappingBusy ? '保存中…' : '保存映射'}</button></div></div></aside></div>}
     {detail && <div className="drawer-backdrop" onClick={() => setDetail(null)}>
       <aside className="drawer" onClick={(event) => event.stopPropagation()}>
         <div className="drawer-header"><h2>资料来源 · {detail.item.semantic_id || detail.item.record_id}</h2>
@@ -450,7 +485,7 @@ export default function CorpusWritingPanel({ project, reportId, dirty, onCommitt
             <div className="field"><span>用途</span><strong>{decisionLabels[detail.item.decision]}</strong></div>
           </div>
           {detail.item.reason && <div className="notice">{detail.item.reason}</div>}
-          {detail.loadError && <div className="notice error">{detail.loadError}</div>}
+          {detail.loadError && <div className="notice error">{detail.loadError}<button type="button" className="text-button" onClick={() => void openItem(detail.item)}>重试</button></div>}
           {detail.source ? <>
             {primarySourceText(detail.source.payload) && primarySourceText(detail.source.payload) !== detail.source.summary && <blockquote className="source-excerpt corpus-source-text">{primarySourceText(detail.source.payload)}</blockquote>}
             {detail.source.payload?.original_document_available === false && <div className="notice warn">完整原件缺失</div>}

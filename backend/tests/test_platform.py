@@ -182,6 +182,45 @@ def test_rule_validation_and_atomic_failures(client: TestClient):
     assert len(client.get(f"/api/projects/{project_id}/rules").json()["rules"]) == 1
 
 
+def test_invalid_units_and_oversized_values_leave_no_partial_changes(client: TestClient):
+    project_id = create_project(client)
+    for key, unit in (("yuan", "元"), ("wan_yuan", "万元"), ("result", "元"), ("ratio", "")):
+        add_fact(client, project_id, key, unit)
+    for key, value in (("yuan", "10"), ("wan_yuan", "2")):
+        change, result = preview(client, project_id, key, value)
+        commit(client, project_id, change, result)
+    before = client.get(f"/api/projects/{project_id}/facts").json()
+    revisions = client.get(f"/api/projects/{project_id}/revisions").json()
+    for expression, target in (("min(yuan,wan_yuan)", "result"),
+                               ("max(0,yuan,wan_yuan)", "result"),
+                               ("max(yuan,1e100000000)", "result"),
+                               ("yuan*1+wan_yuan", "result"), ("yuan/wan_yuan", "ratio")):
+        response = client.post(f"/api/projects/{project_id}/rules", json={
+            "name": "无效规则", "target_key": target, "expression": expression})
+        assert response.status_code == 400, response.text
+    for value in ("1e100000000", "1e-1001", "9" * 1001):
+        response = client.post(f"/api/projects/{project_id}/changes/preview", json={
+            "fact_key": "yuan", "value": value})
+        assert response.status_code == 400, response.text
+    assert client.get(f"/api/projects/{project_id}/facts").json() == before
+    assert client.get(f"/api/projects/{project_id}/revisions").json() == revisions
+    assert client.get(f"/api/projects/{project_id}/rules").json()["rules"] == []
+
+
+def test_blank_names_are_rejected_before_database_writes(client: TestClient):
+    initial = client.get("/api/projects").json()
+    assert client.post("/api/projects", json={"name": "   "}).status_code == 422
+    assert client.get("/api/projects").json() == initial
+    project_id = create_project(client)
+    response = client.post(f"/api/projects/{project_id}/facts", json={
+        "key": "amount", "label": " \n ", "data_type": "integer"})
+    assert response.status_code == 422
+    assert client.get(f"/api/projects/{project_id}/facts").json()["facts"] == []
+    response = client.post(f"/api/projects/{project_id}/reports", json={"title": "   "})
+    assert response.status_code == 422
+    assert client.get(f"/api/projects/{project_id}/reports").json() == []
+
+
 def test_stale_preview_cannot_commit(client: TestClient):
     project_id = create_project(client)
     add_fact(client, project_id, "amount")
@@ -481,6 +520,12 @@ def test_report_save_rebinds_only_current_visible_fact_revision(client: TestClie
     assert client.post(f"/api/projects/{project_id}/reports/{report_id}/review").status_code == 400
     bind_project_original(client, project_id, "test_qty", "12")
     assert client.post(f"/api/projects/{project_id}/reports/{report_id}/review").status_code == 200
+    without_reference = [current[0], {"type": "p", "children": [{"text": "本节待补充。"}]}]
+    removed = save(without_reference, 4)
+    assert removed["bound_facts"] == {}
+    assert removed["version"] == 5
+    assert next(row for row in client.get(f"/api/projects/{project_id}/facts").json()["facts"]
+                if row["key"] == "test_qty")["value"] == "12"
 
 
 def test_review_checks_each_cited_paragraph_and_uncited_numbers(client: TestClient):

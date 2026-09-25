@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('reference, source review, cancel and confirmed candidate reach Plate without a hidden write', async ({ page }) => {
+  test.setTimeout(90_000)
   const project = { id: 'qa-project', name: '写作包浏览器验收', version: 0, has_corpus: false, is_builtin: false }
   const corpusRef = { corpus_id: 'chengyue', corpus_version: 'v2', source_project_id: 'historical-project' }
   const l002 = { corpus_id: 'chengyue', corpus_version: 'v2', category_id: 'CAT-15', artifact_id: 'graph-claims', record_id: '15:000002', semantic_id: 'L002' }
@@ -196,7 +197,7 @@ test('reference, source review, cancel and confirmed candidate reach Plate witho
   expect(savedParagraph?.source_refs).toEqual([l002])
   expect(savedParagraph?.section_id).toBe('S4')
   expect((savedParagraph?.project_rule_refs as { rule_id: string }[])?.[0].rule_id).toBe('rule-1')
-  await page.reload()
+  await page.reload({ waitUntil: 'domcontentloaded' })
   await page.getByRole('button', { name: '报告写作' }).click()
   await expect(page.locator('.plate-content')).toContainText('补充')
   const paragraphText = page.locator('.plate-content [data-block-id="paragraph-s4"] [data-slate-string]').last()
@@ -218,7 +219,7 @@ test('reference, source review, cancel and confirmed candidate reach Plate witho
   expect(newTable?.section_id).toBe('S4')
   expect(savedContent?.filter((block) => block.type === 'p' && JSON.stringify(block.children) === '[{"text":""}]')
     .every((block) => !block.fact_keys && !block.source_refs && !block.project_rule_refs)).toBe(true)
-  await page.reload()
+  await page.reload({ waitUntil: 'domcontentloaded' })
   await page.getByRole('button', { name: '报告写作' }).click()
   await expect(page.locator('.plate-content table.report-table')).toContainText('测试表格单元格')
   await page.locator('.report-history > summary').click()

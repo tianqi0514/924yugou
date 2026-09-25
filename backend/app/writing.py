@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import ast
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP, localcontext
 from typing import Any
 
 
@@ -37,11 +37,30 @@ def source_cases(corpus: Any) -> list[dict]:
 
 def format_number(value: Decimal, specification: dict) -> str:
     """遵循原 mention 的倍率、千分位和小数位；仅负责显示。"""
-    scaled = value * Decimal(str(specification.get("multiplier", "1")))
+    multiplier = Decimal(str(specification.get("multiplier", "1")))
     decimals = int(specification.get("decimals", 0))
-    quantum = Decimal(1).scaleb(-decimals)
-    rounded = scaled.quantize(quantum, rounding=ROUND_HALF_UP)
+    with localcontext() as context:
+        context.prec = max(50, len(value.as_tuple().digits) + len(multiplier.as_tuple().digits)
+                           + max(value.adjusted(), 0) + abs(multiplier.adjusted()) + decimals + 4)
+        scaled = value * multiplier
+        quantum = Decimal(1).scaleb(-decimals)
+        rounded = scaled.quantize(quantum, rounding=ROUND_HALF_UP)
     return f"{rounded:,.{decimals}f}" if specification.get("thousands") else f"{rounded:.{decimals}f}"
+
+
+def fits_decimal_places(value: Decimal, places: int) -> bool:
+    """Check exact display precision without context-dependent rounding."""
+    if not value.is_finite():
+        return False
+    if value == 0:
+        return True
+    _, digits, exponent = value.as_tuple()
+    trailing_zeros = 0
+    for digit in reversed(digits):
+        if digit != 0:
+            break
+        trailing_zeros += 1
+    return exponent + trailing_zeros >= -places
 
 
 def _direct_min_rule(rules: list[Any], target: str, inputs: set[str]) -> bool:
@@ -119,7 +138,7 @@ def render_cases(state: dict[str, dict], rules: list[Any], bindings: dict[str, s
         mentions = [item for item in by_id["C0083"]["mentions"] if item["slot"] == "N080"]
         if not name:
             issue("C0083", "EMPTY_SUPPLIER", "本项目供应商名称不能为空", "block", "supplier_name")
-        elif amount != amount.quantize(Decimal("0.01")):
+        elif not fits_decimal_places(amount, 2):
             issue("C0083", "FORMAT_LOSS", "单价超过两位小数，按历史 mention 格式显示会丢失精度", "block", "N080")
         else:
             yuan = format_number(amount, mentions[0]["format"])

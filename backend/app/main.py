@@ -14,13 +14,13 @@ from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Annotated, Any
 from urllib.parse import quote
 from uuid import uuid4
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import delete, select
 
 from .corpus import CorpusRepository
@@ -28,7 +28,7 @@ from .db import ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRev
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
 from .report_pipeline import change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
-from .rules import EvalValue, RuleError, evaluate, parse_expression, sort_rules, unit_dimension
+from .rules import MAX_DECIMAL_EXPONENT, EvalValue, RuleError, evaluate, parse_expression, sort_rules, unit_dimension, unit_signature
 from .writing import SLOTS, SLOT_BY_ID, render_cases, source_cases
 from .writing_support import GUIDED_SECTIONS, accepted_reference, build_candidate, prepare_model_input, package as writing_package, sections as writing_sections
 from .writing_model import ModelInputChanged
@@ -100,13 +100,16 @@ def require_writable_project(project: Project) -> None:
         fail("内置语料项目为只读；请新建项目录入事实", 403)
 
 
+NonBlankLabel = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=160)]
+
+
 class ProjectCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=160)
+    name: NonBlankLabel
 
 
 class FactCreate(BaseModel):
     key: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_]{0,99}$")
-    label: str = Field(min_length=1, max_length=160)
+    label: NonBlankLabel
     data_type: str
     unit: str = ""
     caliber: str = ""
@@ -115,7 +118,7 @@ class FactCreate(BaseModel):
 
 
 class RuleCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=160)
+    name: NonBlankLabel
     target_key: str
     expression: str = Field(min_length=1, max_length=1000)
 
@@ -139,7 +142,7 @@ class BindingUpdate(BaseModel):
 
 
 class CandidateDecision(BaseModel):
-    label: str = Field(min_length=1, max_length=160)
+    label: NonBlankLabel
     value: str = Field(min_length=1)
     unit: str = Field(default="", max_length=80)
     data_type: str
@@ -150,7 +153,7 @@ class CandidateDecision(BaseModel):
 
 
 class ReportCreate(BaseModel):
-    title: str = Field(min_length=1, max_length=160)
+    title: NonBlankLabel
 
 
 class ReportSave(BaseModel):
@@ -160,7 +163,7 @@ class ReportSave(BaseModel):
 
 
 class SectionDraft(BaseModel):
-    title: str = Field(min_length=1, max_length=160)
+    title: NonBlankLabel
     fact_keys: list[str] = Field(min_length=1, max_length=12)
 
 
@@ -183,9 +186,11 @@ class WritingPackDraft(BaseModel):
     approved_item_ids: list[str] = Field(default_factory=list, max_length=80)
     mode: str = "guided"
     expected_input_sha256: str | None = None
+    replace_section: bool = False
 
 
 class WritingPackCommit(WritingPackDraft):
+    replaced_blocks: list[dict] = Field(default_factory=list)
     model_input: dict | None = None
     input_sha256: str | None = None
     model_call: dict = Field(default_factory=dict)
@@ -292,6 +297,10 @@ def canonical_value(value: Any, data_type: str) -> str | None:
             raise RuleError("请输入有效数值") from exc
         if not number.is_finite():
             raise RuleError("数值必须是有限值")
+        if (len(number.as_tuple().digits) > 1000
+                or abs(number.as_tuple().exponent) > MAX_DECIMAL_EXPONENT
+                or abs(number.adjusted()) > MAX_DECIMAL_EXPONENT):
+            raise RuleError("数值超出当前支持的长度或精度范围")
         if data_type == "integer" and number != number.to_integral_value():
             raise RuleError("该事实只能输入整数")
         return format(number, "f")
@@ -370,8 +379,9 @@ def simulate(facts: list[ProjectFact], rules: list[RuleRecord], change: FactChan
             expected = unit_dimension(target["unit"])
             if result.dimension != expected and not (result.value == 0 and not result.dimension):
                 raise RuleError(f"规则 {rule.name} 的结果单位与目标事实不匹配")
-            if result.unit_tag and target["unit"] and result.unit_tag != target["unit"]:
-                raise RuleError(f"规则 {rule.name} 的结果单位与目标事实不一致；请显式换算")
+            if unit_signature(result.unit_tag) != unit_signature(target["unit"]):
+                if not (result.value == 0 and not result.unit_tag):
+                    raise RuleError(f"规则 {rule.name} 的结果单位与目标事实不一致；请统一事实单位")
             value = canonical_value(result.value, target["data_type"])
         else:
             raise RuleError("规则目标只能是数值或布尔事实")
@@ -1234,7 +1244,7 @@ def report_save(project_id: str, report_id: str, body: ReportSave):
             fail("正文引用了当前项目不存在的事实")
         impacts = change_impact(item.content, body.content)
         refresh = _current_fact_snapshots_for_saved_content(session, item, body.content, facts)
-        bound = {**item.bound_facts, **refresh}
+        bound = {key: snapshot for key, snapshot in {**item.bound_facts, **refresh}.items() if key in used}
         if impacts or bound != item.bound_facts:
             item.bound_facts = bound
             item.content = body.content
@@ -1921,6 +1931,24 @@ def report_model_input(project_id: str, report_id: str, body: WritingPackDraft):
             fail(str(exc), 409)
 
 
+def _section_content(content: list[dict], section_id: str, paragraphs: list[dict],
+                     replace_section: bool) -> tuple[list[dict], list[dict]]:
+    """Compose a preview; only an explicit confirmation can persist it."""
+    replaced = [block for block in content if block.get("section_id") == section_id] if replace_section else []
+    if not replaced:
+        return [*content, *paragraphs], []
+    result: list[dict] = []
+    inserted = False
+    for block in content:
+        if block.get("section_id") == section_id:
+            if not inserted:
+                result.extend(paragraphs)
+                inserted = True
+        else:
+            result.append(block)
+    return result, replaced
+
+
 @app.post("/api/projects/{project_id}/reports/{report_id}/writing/preview")
 def report_writing_preview(project_id: str, report_id: str, body: WritingPackDraft):
     if body.mode not in {"guided", "model"}:
@@ -1938,13 +1966,16 @@ def report_writing_preview(project_id: str, report_id: str, body: WritingPackDra
                                        model_context={"project_version": project.version, "report_id": report.id,
                                                       "report_version": report.version},
                                        expected_input_sha256=body.expected_input_sha256)
-            validate_content([*report.content, *proposal["paragraphs"]])
+            proposed_content, replaced_blocks = _section_content(
+                report.content, body.section_id, proposal["paragraphs"], body.replace_section)
+            validate_content(proposed_content)
             _validate_writing_refs(session, project_id, proposal["paragraphs"])
         except ModelInputChanged as exc:
             fail(str(exc), 409)
         except (ValueError, RuleError) as exc:
             fail(str(exc), 503 if body.mode == "model" else 409)
         result = {"section_id": body.section_id, "approved_item_ids": body.approved_item_ids,
+                  "replace_section": body.replace_section, "replaced_blocks": replaced_blocks,
                   "expected_input_sha256": body.expected_input_sha256,
                   "model_input": proposal.get("model_input"), "input_sha256": proposal.get("input_sha256"),
                   "model_call": proposal.get("model_call", {}), "model_usage": proposal.get("model_usage", []),
@@ -1988,7 +2019,10 @@ def report_writing_commit(project_id: str, report_id: str, body: WritingPackComm
             fail("候选章节或段落身份不正确", 409)
         if len({paragraph["id"] for paragraph in body.paragraphs}) != len(body.paragraphs):
             fail("候选段落 ID 重复", 409)
-        content = [*report.content, *body.paragraphs]
+        content, replaced_blocks = _section_content(
+            report.content, body.section_id, body.paragraphs, body.replace_section)
+        if replaced_blocks != body.replaced_blocks:
+            fail("待替换章节已变化，请重新预览", 409)
         try:
             validate_content(content)
             _validate_writing_refs(session, project_id, content)
@@ -2000,8 +2034,18 @@ def report_writing_commit(project_id: str, report_id: str, body: WritingPackComm
                for key in used_facts):
             fail("候选项目事实已失效，请重新生成", 409)
         bound = dict(report.bound_facts)
+        # Replacing one chapter must not silently certify an older fact reference
+        # in another paragraph. A bound snapshot is shared by fact key, so keep
+        # its previous revision until every surviving older use is reviewed.
+        untouched_keys = {key for block in report.content
+                          if not (body.replace_section and block.get("section_id") == body.section_id)
+                          for key in block.get("fact_keys", [])}
         for key in used_facts:
-            bound[key] = {"value": facts[key].value_text, "revision": facts[key].revision}
+            current_snapshot = {"value": facts[key].value_text, "revision": facts[key].revision}
+            if key not in untouched_keys or key not in bound or bound[key] == current_snapshot:
+                bound[key] = current_snapshot
+        remaining_keys = {key for paragraph in content for key in paragraph.get("fact_keys", [])}
+        bound = {key: value for key, value in bound.items() if key in remaining_keys}
         report.content, report.bound_facts, report.reviewed_hash = content, bound, None
         report.version += 1
         session.add(ReportVersion(report_id=report.id, version=report.version, content=content, bound_facts=bound))
@@ -2013,7 +2057,12 @@ def report_writing_commit(project_id: str, report_id: str, body: WritingPackComm
                           "refs": paragraph.get("source_refs", []),
                           "project_rule_refs": paragraph.get("project_rule_refs", [])}
                          for paragraph in body.paragraphs],
-            issues=body.issues, approved_item_ids=body.approved_item_ids,
+            issues=[*body.issues, *([{"code": "SECTION_REPLACED", "severity": "info",
+                                     "message": "确认替换本章；旧正文保留在报告版本中",
+                                     "replaced_block_ids": [block.get("id") for block in replaced_blocks],
+                                     "previous_report_version": body.base_version}]
+                                   if replaced_blocks else [])],
+            approved_item_ids=body.approved_item_ids,
             model_audit={"schema_version": "writing-model-audit/v1", "model_input": body.model_input,
                          "input_sha256": body.input_sha256, "model_call": body.model_call,
                          "model_usage": body.model_usage} if body.mode == "model" else {},
