@@ -95,6 +95,21 @@ def test_zero_missing_supplier_clear_and_invalid_units(client):
         "scenario_revision": scenario["revision"]-1, "request_key": "old-version-0001"}).status_code == 409
 
 
+def test_zero_quote_remains_an_explicit_scenario_value(client):
+    base, scenario = create_history(client)
+    scenario = update(client, base, scenario, {"supplier": "新供应商甲", "supplier_quote": "0"})
+    chosen = run(client, base, scenario)
+    report = client.post(base + "/reports", json={"title": "报价边界"}).json()
+    report_id = report["id"]
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": chosen["id"], "base_version": 0}).status_code == 200
+    candidate = client.post(base + f"/analysis/reports/{report_id}/draft/preview", json={
+        "run_id": chosen["id"], "section_id": "S7.1", "mode": "computed"})
+    assert candidate.status_code == 200, candidate.text
+    text = " ".join(str(block.get("children", "")) for block in candidate.json()["content"])
+    assert "0元/条" in text and "报价待补" not in text
+
+
 def test_report_candidate_editor_review_and_export(client):
     base, scenario = create_history(client)
     scenario = update(client, base, scenario, {"N017": "300000"})
