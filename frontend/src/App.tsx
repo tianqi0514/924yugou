@@ -3,7 +3,7 @@ import { BookOpenCheck, ChevronDown, Database, FilePenLine, FileSearch, GitBranc
 import CorpusView from './CorpusView'
 import DocumentsView from './DocumentsView'
 import ProjectView from './ProjectView'
-import ReportsView from './ReportsView'
+import WritingWorkspaceGateway from './WritingWorkspaceGateway'
 import WritingView from './WritingView'
 import ModelSettingsView from './ModelSettingsView'
 import { api, post, type Project } from './api'
@@ -19,6 +19,7 @@ const projectNav: NavItem[] = [
 ]
 const projectSections: Section[] = ['documents', 'facts', 'rules', 'reports', 'writing']
 function savedSection(project: Project): Section {
+  if (new URLSearchParams(window.location.search).get('report')) return 'reports'
   const stored = window.localStorage.getItem(`report-platform-section:${project.id}`) as Section | null
   if (project.has_corpus) return stored === 'reports' ? 'reports' : 'corpus'
   return stored && projectSections.includes(stored) ? stored : 'facts'
@@ -43,7 +44,8 @@ export default function App() {
       const items = await api<Project[]>('/projects')
       setProjects(items)
       const previous = window.localStorage.getItem('report-platform-project')
-      const chosen = items.find((item) => item.id === previous) || items.find((item) => !item.has_corpus) || items[0]
+      const requested = new URLSearchParams(window.location.search).get('project')
+      const chosen = items.find((item) => item.id === requested) || items.find((item) => item.id === previous) || items.find((item) => !item.has_corpus) || items[0]
       if (chosen) {
         setProjectId(chosen.id)
         setSection(savedSection(chosen))
@@ -69,11 +71,21 @@ export default function App() {
     const project = projects.find((item) => item.id === id)
     if (!project) return
     setProjectId(id)
+    const url = new URL(window.location.href)
+    url.searchParams.set('project', id)
+    url.searchParams.delete('report')
+    url.searchParams.delete('workspace')
+    window.history.pushState({}, '', url)
     window.localStorage.setItem('report-platform-project', id)
     setSection(savedSection(project))
   }
   const navigate = (next: Section) => {
     setSection(next)
+    if (next !== 'reports') {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('report')
+      window.history.pushState({}, '', url)
+    }
     if (projectId && projectSections.includes(next)) window.localStorage.setItem(`report-platform-section:${projectId}`, next)
   }
   const onProjectChange = useCallback((project: Project) => setProjects((items) => items.map((item) => item.id === project.id ? project : item)), [])
@@ -86,6 +98,11 @@ export default function App() {
       const created = await post<Project>('/projects', { name: projectName.trim() })
       setProjects((items) => [created, ...items])
       setProjectId(created.id)
+      const url = new URL(window.location.href)
+      url.searchParams.set('project', created.id)
+      url.searchParams.delete('report')
+      url.searchParams.delete('workspace')
+      window.history.pushState({}, '', url)
       window.localStorage.setItem('report-platform-project', created.id)
       setProjectName('')
       setCreateOpen(false)
@@ -122,9 +139,9 @@ export default function App() {
       {loading ? <main className="page"><div className="app-loading" role="status">加载中…</div></main>
         : section === 'model' ? <ModelSettingsView />
           : selected?.has_corpus && section === 'corpus' ? <CorpusView key={selected.id} project={selected} />
-            : selected?.has_corpus && section === 'reports' ? <ReportsView key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('corpus')} onOpenDocuments={() => navigate('corpus')} onOpenProjectFacts={() => navigate('corpus')} />
+            : selected?.has_corpus && section === 'reports' ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('corpus')} onOpenDocuments={() => navigate('corpus')} onOpenProjectFacts={() => navigate('corpus')} onOpenCorpus={() => navigate('corpus')} />
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
-              : section === 'reports' && selected ? <ReportsView key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} />
+              : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('writing')} />
                 : section === 'writing' && selected ? <WritingView key={selected.id} project={selected} onProjectChange={onProjectChange} notify={setNotice} onChooseReference={() => navigate('reports')} />
                   : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenRules={() => navigate('rules')} />}
     </div>

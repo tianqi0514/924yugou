@@ -24,12 +24,13 @@ type Link = { type: 'a'; url: string; target?: '_blank'; children: TextLeaf[] }
 type Inline = TextLeaf | FactRef | Link
 type ProjectRuleRef = { rule_id: string; expression: string; target_key: string; deps: string[];
   input_fact_revisions: { fact_key: string; revision: number; value: string | null }[]; target_fact_revision: number }
-type TextBlock = { type: 'p' | 'h1' | 'h2' | 'h3' | 'blockquote'; children: Inline[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[]; project_rule_refs?: ProjectRuleRef[]; listStyleType?: 'disc' | 'decimal'; indent?: number; listStart?: number }
+export type AnalysisRef = { run_id: string; result_key: string; value: string; unit: string }
+type TextBlock = { type: 'p' | 'h1' | 'h2' | 'h3' | 'blockquote'; children: Inline[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[]; project_rule_refs?: ProjectRuleRef[]; analysis_refs?: AnalysisRef[]; listStyleType?: 'disc' | 'decimal'; indent?: number; listStart?: number }
 type TableCell = { type: 'td' | 'th'; children: TextBlock[]; id?: string }
 type TableRow = { type: 'tr'; children: TableCell[]; id?: string }
-type TableBlock = { type: 'table'; children: TableRow[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[] }
-type Block = TextBlock | TableBlock
-type EditorActions = { insertFact: (fact: Fact) => void }
+type TableBlock = { type: 'table'; children: TableRow[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[]; analysis_refs?: AnalysisRef[] }
+export type Block = TextBlock | TableBlock
+export type EditorActions = { insertFact: (fact: Fact) => void; insertResult: (result: { key: string; label: string; value: string; unit: string }, runId: string) => void }
 type Issue = { code: string; message: string; severity: string; fact_key?: string }
 type FactImpact = { position: number; text: string; fact_key: string; before: { value: string | null; revision: number } | null; after: { value: string | null; revision: number } | null }
 type FactSource = {
@@ -175,6 +176,7 @@ function normalizedTextBlock(block: TextBlock): TextBlock {
   return { type: block.type, children: normalizedInline(block.children), ...(block.id ? { id: block.id } : {}),
     ...(block.fact_keys?.length ? { fact_keys: block.fact_keys } : {}), ...(block.origin ? { origin: block.origin } : {}),
     ...(block.section_id ? { section_id: block.section_id } : {}), ...(block.source_refs?.length ? { source_refs: block.source_refs } : {}),
+    ...(block.analysis_refs?.length ? { analysis_refs: block.analysis_refs } : {}),
     ...(block.project_rule_refs?.length ? { project_rule_refs: block.project_rule_refs } : {}),
     ...(block.listStyleType ? { listStyleType: block.listStyleType } : {}), ...(block.indent ? { indent: block.indent } : {}),
     ...(block.listStart ? { listStart: block.listStart } : {}) }
@@ -185,6 +187,7 @@ function normalizedBlocks(value: Block[]): Block[] {
     type: 'table', ...(block.id ? { id: block.id } : {}), ...(block.fact_keys?.length ? { fact_keys: block.fact_keys } : {}),
     ...(block.origin ? { origin: block.origin } : {}), ...(block.section_id ? { section_id: block.section_id } : {}),
     ...(block.source_refs?.length ? { source_refs: block.source_refs } : {}),
+    ...(block.analysis_refs?.length ? { analysis_refs: block.analysis_refs } : {}),
     children: block.children.map((row) => ({ type: 'tr', ...(row.id ? { id: row.id } : {}), children: row.children.map((cell) => ({
       type: cell.type, ...(cell.id ? { id: cell.id } : {}), children: cell.children.map(normalizedTextBlock),
     })) })),
@@ -227,7 +230,7 @@ function SlashInputElement(props: PlateElementProps) {
   </PlateElement>
 }
 
-function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFact, staleFactKeys, facts }: {
+export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFact, staleFactKeys, facts }: {
   initial: Block[]; onChange: (value: Block[]) => void; onSelectPosition: (position: number) => void;
   actionsRef: { current: EditorActions | null }; onOpenFact: (key: string) => void; staleFactKeys: string[]; facts: Fact[]
 }) {
@@ -278,11 +281,12 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
       if (manuallyEditedModelBlocks.current.has(block.id) && block.origin === 'model') block.origin = 'manual'
       if (!knownBlockIds.current.has(block.id)) {
         // A split or pasted paragraph must not silently inherit its source or model review status.
-        if (block.source_refs?.length || (block.type !== 'table' && block.project_rule_refs?.length) || block.origin === 'model' || block.origin === 'guided') clearedInheritedSources.current.add(block.id)
+        if (block.source_refs?.length || block.analysis_refs?.length || (block.type !== 'table' && block.project_rule_refs?.length) || block.origin === 'model' || block.origin === 'guided') clearedInheritedSources.current.add(block.id)
         if (block.fact_keys?.length && !block.fact_keys.some((key) => hasFactToken(block, key))) clearedInheritedKeys.current.add(block.id)
       }
       if (clearedInheritedSources.current.has(block.id)) {
         delete block.source_refs
+        delete block.analysis_refs
         if (block.type !== 'table') delete block.project_rule_refs
         if (block.origin === 'model' || block.origin === 'guided') block.origin = 'manual'
       }
@@ -301,9 +305,9 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
       const newId = moved.id
       repairingSplitIds.current = true
       try {
-        editor.tf.setNodes({ id: newId, fact_keys: undefined, source_refs: undefined,
+        editor.tf.setNodes({ id: newId, fact_keys: undefined, source_refs: undefined, analysis_refs: undefined,
           project_rule_refs: undefined, origin: undefined }, { at: [emptyIndex] })
-        editor.tf.setNodes({ id: old.id, fact_keys: old.fact_keys, source_refs: old.source_refs,
+        editor.tf.setNodes({ id: old.id, fact_keys: old.fact_keys, source_refs: old.source_refs, analysis_refs: old.analysis_refs,
           project_rule_refs: old.type === 'table' ? undefined : old.project_rule_refs,
           origin: old.origin, section_id: old.section_id }, { at: [emptyIndex + 1] })
       } finally { repairingSplitIds.current = false }
@@ -311,6 +315,7 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
       moved.id = old.id
       if (old.fact_keys?.length) moved.fact_keys = [...old.fact_keys]
       if (old.source_refs?.length) moved.source_refs = [...old.source_refs]
+      if (old.analysis_refs?.length) moved.analysis_refs = [...old.analysis_refs]
       if (old.origin) moved.origin = old.origin
       if (old.section_id) moved.section_id = old.section_id
       if (old.type !== 'table' && moved.type !== 'table' && old.project_rule_refs?.length) moved.project_rule_refs = [...old.project_rule_refs]
@@ -321,6 +326,7 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
       if (blockText(block).trim()) continue
       delete block.fact_keys
       delete block.source_refs
+      delete block.analysis_refs
       delete block.origin
       if (block.type !== 'table') delete block.project_rule_refs
     }
@@ -360,6 +366,19 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
         const remaining = candidate.fact_keys.filter((key) => key !== fact.key)
         editor.tf.setNodes({ fact_keys: remaining.length ? remaining : undefined }, { at: [index] })
       })
+      editor.tf.focus()
+    }, insertResult: (result, runId) => {
+      if (!editor.selection) editor.tf.select(editor.api.end([editor.children.length - 1]))
+      const index = editor.selection?.anchor.path[0]
+      if (index === undefined) return
+      const block = editor.children[index] as Block
+      if (block.type === 'table') return
+      const reference: AnalysisRef = { run_id: runId, result_key: result.key, value: result.value, unit: result.unit }
+      const existing = block.analysis_refs || []
+      editor.tf.setNodes({ section_id: block.section_id || 'S4',
+        analysis_refs: existing.some((ref) => ref.run_id === runId && ref.result_key === result.key)
+          ? existing : [...existing, reference] }, { at: [index] })
+      editor.tf.insertText(`${result.label} ${result.value}${result.unit}`)
       editor.tf.focus()
     } }
     return () => { actionsRef.current = null }

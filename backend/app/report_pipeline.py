@@ -110,11 +110,22 @@ def _validate_metadata(node: dict) -> set[str]:
                        or not isinstance(row["value"], str) for row in rule["input_fact_revisions"])
                 or not isinstance(rule["target_fact_revision"], int)):
             raise ValueError("项目规则引用结构不正确")
+    analysis_refs = node.get("analysis_refs", [])
+    if not isinstance(analysis_refs, list) or len(analysis_refs) > 30:
+        raise ValueError("推演引用结构不正确")
+    for ref in analysis_refs:
+        if (not isinstance(ref, dict) or set(ref) != {"run_id", "result_key", "value", "unit"}
+                or any(not isinstance(ref[key], str) or not ref[key] or len(ref[key]) > 100
+                       for key in ("run_id", "result_key", "value"))
+                or not isinstance(ref["unit"], str) or len(ref["unit"]) > 80):
+            raise ValueError("推演引用结构不正确")
+    if analysis_refs and (section_id is None or node_id is None):
+        raise ValueError("推演引用必须属于稳定的章节和段落")
     return set(keys)
 
 
 def _validate_text_block(node: dict, *, cell: bool = False) -> set[str]:
-    allowed = {"type", "children", "id", "fact_keys", "origin", "section_id", "source_refs", "project_rule_refs"}
+    allowed = {"type", "children", "id", "fact_keys", "origin", "section_id", "source_refs", "project_rule_refs", "analysis_refs"}
     if node.get("type") == "p":
         allowed |= {"listStyleType", "indent", "listStart"}
         if node.get("listStyleType") not in (None, "disc", "decimal"):
@@ -135,7 +146,7 @@ def _validate_text_block(node: dict, *, cell: bool = False) -> set[str]:
 
 
 def _validate_table(node: dict) -> set[str]:
-    if set(node) - {"type", "children", "id", "fact_keys", "origin", "section_id", "source_refs", "project_rule_refs"}:
+    if set(node) - {"type", "children", "id", "fact_keys", "origin", "section_id", "source_refs", "project_rule_refs", "analysis_refs"}:
         raise ValueError("表格包含不支持的属性")
     keys = _validate_metadata(node)
     rows = node.get("children")
@@ -343,14 +354,15 @@ def change_impact(before: list[dict], after: list[dict]) -> list[dict]:
     return changes
 
 
-def gate(content: list[dict], reviewed_hash: str | None, bound_facts: dict, current_facts: dict) -> list[dict]:
+def gate(content: list[dict], reviewed_hash: str | None, bound_facts: dict, current_facts: dict,
+         source_numbers: dict[int, set[str]] | None = None) -> list[dict]:
     issues = []
     if not any(plain(node).strip() for node in content):
         issues.append({"code": "EMPTY", "message": "报告正文为空", "severity": "block"})
     if content_hash(content) != reviewed_hash:
         issues.append({"code": "UNREVIEWED", "message": "正文保存后尚未人工核对", "severity": "block"})
     used = {key for node in content for key in node.get("fact_keys", [])}
-    if not used:
+    if not used and not any(node.get("analysis_refs") or node.get("source_refs") for node in content):
         issues.append({"code": "NO_FACT_LINK", "message": "正文没有绑定项目事实；请插入已确认事实并核对", "severity": "block"})
     for key in sorted(used):
         fact = current_facts.get(key)
@@ -368,10 +380,11 @@ def gate(content: list[dict], reviewed_hash: str | None, bound_facts: dict, curr
                 issues.append({"code": "FACT_TEXT_STALE", "message": f"第 {position} 段未找到事实 {key} 的当前数值", "severity": "block", "fact_key": key, "position": position})
         if node.get("type") in ("p", "blockquote", "table"):
             visible_numbers = numeric_tokens(plain(node))
-            if visible_numbers and not node.get("fact_keys"):
+            provenance_numbers = (source_numbers or {}).get(position, set())
+            if visible_numbers and not node.get("fact_keys") and not provenance_numbers:
                 issues.append({"code": "UNCITED_NUMBER", "message": f"第 {position} 段含数字但未绑定项目事实", "severity": "block", "position": position})
             else:
-                allowed_numbers = displayed_numbers | set().union(*(numeric_tokens(current_facts[key].value_text)
+                allowed_numbers = displayed_numbers | provenance_numbers | set().union(*(numeric_tokens(current_facts[key].value_text)
                                                 for key in node.get("fact_keys", [])
                                                 if key in current_facts and current_facts[key].value_text))
                 extra = sorted(visible_numbers - allowed_numbers)
@@ -548,9 +561,10 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
             elif node.get("indent", 1) > 1:
                 paragraph.paragraph_format.left_indent = Cm(0.7 * node["indent"])
         _word_inline(paragraph, node)
-    word.add_heading("事实依据", level=2)
-    for fact in audit["facts"]:
-        word.add_paragraph(f"{fact.get('label') or fact['key']}：{fact['value']}{fact['unit']}。{_fact_basis(fact, audit)}")
+    if audit["facts"]:
+        word.add_heading("事实依据", level=2)
+        for fact in audit["facts"]:
+            word.add_paragraph(f"{fact.get('label') or fact['key']}：{fact['value']}{fact['unit']}。{_fact_basis(fact, audit)}")
     docx_buffer = io.BytesIO()
     word.save(docx_buffer)
 
@@ -607,10 +621,11 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
         else:
             list_number = 0
         story.append(Paragraph(markup or " ", styles[node["type"] if node["type"] in styles else "p"]))
-    story.extend([Spacer(1, 20), Paragraph("事实依据", styles["h2"])])
-    for fact in audit["facts"]:
-        citation = f"{fact.get('label') or fact['key']}：{fact['value']}{fact['unit']}。{_fact_basis(fact, audit)}"
-        story.append(Paragraph(escape(citation), styles["p"]))
+    if audit["facts"]:
+        story.extend([Spacer(1, 20), Paragraph("事实依据", styles["h2"])])
+        for fact in audit["facts"]:
+            citation = f"{fact.get('label') or fact['key']}：{fact['value']}{fact['unit']}。{_fact_basis(fact, audit)}"
+            story.append(Paragraph(escape(citation), styles["p"]))
     def footer(canvas, doc):
         canvas.saveState()
         canvas.setFont("STSong-Light", 9)

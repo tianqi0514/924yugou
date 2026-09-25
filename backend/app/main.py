@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import delete, select
 
 from .corpus import CorpusRepository
-from .db import ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectFact, ReportDraft, ReportVersion, RuleRecord, SessionLocal, SourceDocument, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
+from .db import AnalysisRun, AnalysisScenario, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectFact, ReportDraft, ReportVersion, RuleRecord, SessionLocal, SourceDocument, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
 from .report_pipeline import change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
@@ -35,6 +35,8 @@ from .writing_model import ModelInputChanged
 from .writing_materials import router as material_router
 from .corpus_storage import CorpusArchive, CorpusRecord
 from .corpus_article import ARTICLE_SECTIONS, candidate_from_model, number_tokens as article_number_tokens, pack_digest, source_pack
+from .analysis import router as analysis_router
+from .analysis_writing import router as analysis_writing_router
 
 
 @asynccontextmanager
@@ -57,6 +59,8 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title="通用专业报告平台", version="0.1.0", lifespan=lifespan)
 app.include_router(model_router)
 app.include_router(material_router)
+app.include_router(analysis_router)
+app.include_router(analysis_writing_router)
 corpus = CorpusRepository()
 preview_secret = secrets.token_bytes(32)
 BUILTIN_PROJECT_ID = "92b09c9d-801c-5fcb-90e6-67bbcd5179a6"
@@ -80,7 +84,8 @@ def ensure_report_snapshots() -> None:
         for item in session.scalars(select(ReportDraft)).all():
             if session.get(ReportVersion, (item.id, item.version)) is None:
                 session.add(ReportVersion(report_id=item.id, version=item.version, content=item.content,
-                                          bound_facts=item.bound_facts, reviewed_hash=item.reviewed_hash))
+                                          bound_facts=item.bound_facts, reviewed_hash=item.reviewed_hash,
+                                          analysis_run_id=item.analysis_run_id))
 
 
 def project_dict(project: Project) -> dict:
@@ -577,6 +582,33 @@ def corpus_category(project_id: str, number: int, page: int = Query(1, ge=1), si
         return {**corpus.category(number, page, size, search, node_group, status, owner, rule_id, date_from, date_to, blocking), "project_id": project_id}
     except ValueError as exc:
         fail(str(exc), 404)
+
+
+@app.get("/api/projects/{project_id}/corpus/records/{category_number}/{record_id}")
+def corpus_record_detail(project_id: str, category_number: int, record_id: str):
+    get_corpus_project(project_id)
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        row = session.get(CorpusRecord, (project.corpus.corpus_id, category_number, record_id))
+        archive = session.get(CorpusArchive, project.corpus.corpus_id)
+        if row is None or archive is None:
+            fail("语料记录不存在", 404)
+        payload = row.payload if isinstance(row.payload, dict) else {}
+        summary = (payload.get("text") or payload.get("pattern") or payload.get("title")
+                   or payload.get("label") or row.semantic_id or row.record_id)
+        impacts = [{"report_id": report.id, "report_title": report.title,
+                    "report_version": report.version, "block_id": block.get("id") or "",
+                    "section_id": block.get("section_id") or "", "position": position}
+                   for report in session.scalars(select(ReportDraft).where(ReportDraft.project_id == project_id)).all()
+                   for position, block in enumerate(report.content, 1)
+                   if any(ref.get("category_id") == f"CAT-{category_number:02d}" and
+                          ref.get("record_id") == record_id for ref in block.get("source_refs", []))]
+        return {"source_ref": {"corpus_id": archive.id, "corpus_version": archive.version,
+                               "category_id": f"CAT-{category_number:02d}",
+                               "artifact_id": row.artifact_id, "record_id": row.record_id,
+                               "semantic_id": row.semantic_id},
+                "summary": summary, "location": row.location, "payload": row.payload,
+                "source_project_id": project_id, "impacts": impacts}
 
 
 @app.get("/api/projects/{project_id}/corpus/artifacts/{artifact_id}")
@@ -1112,17 +1144,20 @@ def _validate_corpus_article_content(session, project_id: str, report_id: str, c
             continue
         numbers = article_number_tokens(plain(block))
         refs = block.get("source_refs", [])
-        if numbers and not refs:
+        analysis_numbers = set().union(*(article_number_tokens(ref["value"]) for ref in block.get("analysis_refs", [])))
+        if numbers and not refs and not analysis_numbers:
             fail(f"第 {position} 段含未标注历史来源的数字", 409)
         cited_text = []
         for ref in refs:
-            if ref.get("category_id") != "CAT-09":
-                fail("历史文章只支持原文切块作为段落来源", 409)
-            row = session.get(CorpusRecord, (archive_id, 9, ref["record_id"]))
+            category = ref.get("category_id")
+            if category != "CAT-09" and (block.get("origin") != "guided" or category not in {"CAT-15", "CAT-18"}):
+                fail("历史模型文章只支持原文切块作为段落来源", 409)
+            row = session.get(CorpusRecord, (archive_id, int(category[4:]), ref["record_id"]))
             if row is None:
-                fail("文章来源切块不存在", 409)
-            cited_text.append(str(row.payload.get("text") or ""))
-        extra = numbers - article_number_tokens(" ".join(cited_text))
+                fail("文章引用的资料记录不存在", 409)
+            if category == "CAT-09":
+                cited_text.append(str(row.payload.get("text") or ""))
+        extra = numbers - article_number_tokens(" ".join(cited_text)) - analysis_numbers
         if extra:
             fail(f"第 {position} 段出现来源以外的数字：{'、'.join(sorted(extra))}", 409)
     conflict_article = session.scalar(select(WritingCommitEvent).where(
@@ -1257,13 +1292,80 @@ def _project_evidence_issues(session, item: ReportDraft) -> list[dict]:
     return issues
 
 
+def _analysis_report_state(session, item: ReportDraft, content: list[dict] | None = None) -> tuple[list[dict], dict[int, set[str]]]:
+    """Validate immutable run links and collect exact numbers supported by run/source records."""
+    blocks = item.content if content is None else content
+    issues: list[dict] = []
+    allowed: dict[int, set[str]] = {}
+    run_cache: dict[str, AnalysisRun | None] = {}
+    legacy_blocks: set[str] = set()
+    if item.analysis_run_id:
+        legacy_events = session.scalars(select(WritingCommitEvent).where(
+            WritingCommitEvent.project_id == item.project_id,
+            WritingCommitEvent.report_id == item.id,
+            WritingCommitEvent.mode == "corpus_article",
+        )).all()
+        legacy_blocks = {block_id for event in legacy_events for block_id in event.block_ids}
+    for position, block in enumerate(blocks, 1):
+        refs = list(block.get("analysis_refs", []))
+        if block.get("type") == "table":
+            for row in block.get("children", []):
+                for cell in row.get("children", []):
+                    for paragraph in cell.get("children", []):
+                        refs.extend(paragraph.get("analysis_refs", []))
+        numbers: set[str] = set()
+        if block.get("id") in legacy_blocks:
+            issues.append({"code": "LEGACY_ARTICLE_STALE", "severity": "block", "position": position,
+                           "message": f"第 {position} 段仍是历史文章，尚未按当前推演重写"})
+        for ref in refs:
+            run_id = ref["run_id"]
+            if run_id not in run_cache:
+                run_cache[run_id] = session.scalar(select(AnalysisRun).where(
+                    AnalysisRun.id == run_id, AnalysisRun.project_id == item.project_id))
+            run = run_cache[run_id]
+            if run is None:
+                fail("正文推演引用不属于当前项目", 409)
+            result = run.snapshot["results"].get(ref["result_key"])
+            if (result is None or result["value"] != ref["value"] or result["unit"] != ref["unit"]):
+                fail("正文推演引用与保存的计算结果不一致", 409)
+            if run_id != item.analysis_run_id:
+                issues.append({"code": "ANALYSIS_RUN_STALE", "severity": "block", "position": position,
+                               "message": f"第 {position} 段仍引用旧方案结果，请核对并更新"})
+            numbers |= numeric_tokens(ref["value"])
+        if refs and not item.analysis_run_id:
+            issues.append({"code": "ANALYSIS_RUN_UNSELECTED", "severity": "block", "position": position,
+                           "message": "报告尚未选择推演结果"})
+        for ref in block.get("source_refs", []):
+            if ref.get("category_id") != "CAT-09":
+                continue
+            row = session.get(CorpusRecord, (ref["corpus_id"], 9, ref["record_id"]))
+            if row is not None:
+                numbers |= numeric_tokens(str(row.payload.get("text") or ""))
+        if numbers:
+            allowed[position] = numbers
+    if item.analysis_run_id:
+        selected = session.scalar(select(AnalysisRun).where(
+            AnalysisRun.id == item.analysis_run_id, AnalysisRun.project_id == item.project_id))
+        if selected is None:
+            fail("报告选择的推演记录不存在", 409)
+        if selected.status == "UNEVALUABLE":
+            issues.append({"code": "ANALYSIS_INCOMPLETE", "severity": "block",
+                           "message": "当前方案有不可评估的计算结果"})
+        if selected.snapshot.get("corpus_id"):
+            issues.append({"code": "SCENARIO_ASSUMPTIONS", "severity": "note",
+                           "message": "报告采用历史资料及方案假设；交付时须明确标注"})
+    return issues, allowed
+
+
 def _report_dict(item: ReportDraft, facts: dict[str, ProjectFact], session=None) -> dict:
     used = {key for node in item.content for key in node.get("fact_keys", [])}
     writing_issues = [*_writing_report_issues(session, item), *_project_evidence_issues(session, item)] if session is not None else []
+    analysis_issues, source_numbers = _analysis_report_state(session, item) if session is not None else ([], {})
     return {"id": item.id, "project_id": item.project_id, "title": item.title, "version": item.version,
-            "content": item.content, "bound_facts": item.bound_facts,
+            "content": item.content, "bound_facts": item.bound_facts, "analysis_run_id": item.analysis_run_id,
             "reviewed": item.reviewed_hash == content_hash(item.content),
-            "issues": [*gate(item.content, item.reviewed_hash, item.bound_facts, facts), *writing_issues],
+            "issues": [*gate(item.content, item.reviewed_hash, item.bound_facts, facts, source_numbers),
+                       *writing_issues, *analysis_issues],
             "fact_impacts": report_fact_impacts(item.content, item.bound_facts, facts),
             "facts": [fact_dict(facts[key]) for key in sorted(used) if key in facts],
             "updated_at": item.updated_at.isoformat()}
@@ -1275,14 +1377,14 @@ def reports_list(project_id: str):
         get_project(session, project_id)
         items = session.scalars(select(ReportDraft).where(ReportDraft.project_id == project_id).order_by(ReportDraft.updated_at.desc())).all()
         return [{"id": item.id, "title": item.title, "version": item.version,
+                 "analysis_run_id": item.analysis_run_id,
                  "updated_at": item.updated_at.isoformat()} for item in items]
 
 
 @app.post("/api/projects/{project_id}/reports", status_code=201)
 def report_create(project_id: str, body: ReportCreate):
     with SessionLocal.begin() as session:
-        project = get_project(session, project_id)
-        require_writable_project(project)
+        get_project(session, project_id)
         item = ReportDraft(project_id=project_id, title=body.title.strip(),
                            content=[{"type": "h1", "children": [{"text": body.title.strip()}]},
                                     {"type": "p", "children": [{"text": ""}]}], bound_facts={})
@@ -1305,6 +1407,7 @@ def report_versions(project_id: str, report_id: str):
         _report(session, project_id, report_id)
         versions = session.scalars(select(ReportVersion).where(ReportVersion.report_id == report_id).order_by(ReportVersion.version.desc())).all()
         return [{"version": version.version, "reviewed": version.reviewed_hash == content_hash(version.content),
+                 "analysis_run_id": version.analysis_run_id,
                  "created_at": version.created_at.isoformat()} for version in versions]
 
 
@@ -1333,6 +1436,7 @@ def report_preview(project_id: str, report_id: str, body: ReportSave):
         facts = _current_facts(session, project_id)
         _validate_writing_refs(session, project_id, body.content)
         _validate_corpus_article_content(session, project_id, report_id, body.content)
+        _analysis_report_state(session, item, body.content)
         used = {key for node in body.content for key in node.get("fact_keys", [])}
         if any(key not in facts for key in used):
             fail("正文引用了当前项目不存在的事实")
@@ -1411,6 +1515,7 @@ def report_save(project_id: str, report_id: str, body: ReportSave):
         facts = _current_facts(session, project_id)
         _validate_writing_refs(session, project_id, body.content)
         _validate_corpus_article_content(session, project_id, report_id, body.content)
+        _analysis_report_state(session, item, body.content)
         used = {key for node in body.content for key in node.get("fact_keys", [])}
         if any(key not in facts for key in used):
             fail("正文引用了当前项目不存在的事实")
@@ -1423,7 +1528,8 @@ def report_save(project_id: str, report_id: str, body: ReportSave):
             item.reviewed_hash = None
             item.version += 1
             session.add(ReportVersion(report_id=item.id, version=item.version, content=item.content,
-                                      bound_facts=item.bound_facts, reviewed_hash=None))
+                                      bound_facts=item.bound_facts, reviewed_hash=None,
+                                      analysis_run_id=item.analysis_run_id))
         return {"report": _report_dict(item, facts, session), "changes": impacts}
 
 
@@ -1512,7 +1618,8 @@ def report_generate_commit(project_id: str, report_id: str, body: SectionCommit)
             bound[key] = {"value": fact.value_text, "revision": fact.revision}
         item.content, item.bound_facts, item.reviewed_hash = content, bound, None
         item.version += 1
-        session.add(ReportVersion(report_id=item.id, version=item.version, content=content, bound_facts=bound))
+        session.add(ReportVersion(report_id=item.id, version=item.version, content=content,
+                                  bound_facts=bound, analysis_run_id=item.analysis_run_id))
         session.flush()
         return _report_dict(item, facts, session)
 
@@ -1521,7 +1628,10 @@ def report_generate_commit(project_id: str, report_id: str, body: SectionCommit)
 def report_review(project_id: str, report_id: str):
     with SessionLocal.begin() as session:
         project = get_project(session, project_id)
-        require_writable_project(project)
+        if project.corpus is not None and not session.scalar(select(AnalysisRun).where(
+                AnalysisRun.id == _report(session, project_id, report_id).analysis_run_id,
+                AnalysisRun.project_id == project_id)):
+            fail("历史文章需先选择推演结果才能核对", 409)
         item = _report(session, project_id, report_id, lock=True)
         facts = _current_facts(session, project_id)
         used = {key for node in item.content for key in node.get("fact_keys", [])}
@@ -1529,13 +1639,15 @@ def report_review(project_id: str, report_id: str):
             fact = facts.get(key)
             if fact is None or fact.value_text is None or fact.value_status not in ("PROVIDED", "COMPUTED"):
                 fail(f"事实 {key} 尚不可用于正式报告")
-        if not used or not any(plain(node).strip() for node in item.content):
+        if (not used and not any(block.get("analysis_refs") for block in item.content)) or not any(
+                plain(node).strip() for node in item.content):
             fail("报告缺少正文或事实引用")
         proposed = {key: {"value": facts[key].value_text, "revision": facts[key].revision} for key in used}
         _validate_writing_refs(session, project_id, item.content)
-        blockers = [issue for issue in [*gate(item.content, content_hash(item.content), proposed, facts),
+        analysis_issues, source_numbers = _analysis_report_state(session, item)
+        blockers = [issue for issue in [*gate(item.content, content_hash(item.content), proposed, facts, source_numbers),
                                        *_writing_report_issues(session, item),
-                                       *_project_evidence_issues(session, item)] if issue["severity"] == "block"]
+                                       *_project_evidence_issues(session, item), *analysis_issues] if issue["severity"] == "block"]
         if blockers:
             fail("请先修正正文：" + "；".join(issue["message"] for issue in blockers))
         item.bound_facts = proposed
@@ -1548,7 +1660,7 @@ def report_review(project_id: str, report_id: str):
 
 
 @app.get("/api/projects/{project_id}/reports/{report_id}/export")
-def report_export(project_id: str, report_id: str, level: str = Query("formal", pattern="^(formal|preview)$")):
+def report_export(project_id: str, report_id: str, level: str = Query("formal", pattern="^(formal|preview|scenario)$")):
     with SessionLocal() as session:
         item = _report(session, project_id, report_id)
         if level == "preview" and not any(block.get("type") not in {"h1", "h2", "h3"} and plain(block).strip()
@@ -1556,14 +1668,24 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
             fail("报告尚无可预览的正文", 409)
         facts = _current_facts(session, project_id)
         _validate_writing_refs(session, project_id, item.content)
-        issues = [*gate(item.content, item.reviewed_hash, item.bound_facts, facts),
-                  *_writing_report_issues(session, item), *_project_evidence_issues(session, item)]
+        _validate_corpus_article_content(session, project_id, report_id, item.content)
+        analysis_issues, source_numbers = _analysis_report_state(session, item)
+        issues = [*gate(item.content, item.reviewed_hash, item.bound_facts, facts, source_numbers),
+                  *_writing_report_issues(session, item), *_project_evidence_issues(session, item), *analysis_issues]
+        selected_run = session.get(AnalysisRun, item.analysis_run_id) if item.analysis_run_id else None
+        assumptions = bool(selected_run and any(x.get("origin") in {"historical_reference", "scenario_assumption"}
+                      for x in selected_run.snapshot["inputs"].values()))
+        if level == "formal" and assumptions:
+            fail("当前报告包含方案假设，请使用情景分析交付或补充本项目事实和证据", 409)
+        if level == "scenario" and (selected_run is None or item.reviewed_hash != content_hash(item.content)):
+            fail("请先选择推演结果并核对当前报告", 409)
         always_block = {"SOURCE_LINK_CHANGED", "SOURCE_LINK_UNCONFIRMED", "SOURCE_VERSION_CHANGED",
                         "PROJECT_RULE_CHANGED", "PROJECT_RULE_INPUT_CHANGED", "PROJECT_RULE_RESULT_CHANGED",
                         "FACT_REF_DISPLAY_MISMATCH", "UNSUPPORTED_NUMBER", "FACT_TEXT_STALE",
                         "FACT_CHANGED", "FACT_MISSING", "UNCITED_NUMBER", "EMPTY"}
         blockers = [issue for issue in issues if issue["severity"] == "block" and
-                    (level == "formal" or issue["code"] in always_block)]
+                    (level in {"formal", "scenario"} or issue["code"] in always_block
+                     or issue["code"].startswith("ANALYSIS_"))]
         if blockers:
             fail("导出受阻：" + "；".join(issue["message"] for issue in blockers), 409)
         used = {key for node in item.content for key in node.get("fact_keys", [])}
@@ -1620,9 +1742,15 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
                                    "input_fact_refs": input_fact_refs})
         audit = {"report_id": item.id, "project_id": project_id, "report_version": item.version,
                  "content_sha256": content_hash(item.content),
-                 "delivery_status": "preview_only" if level == "preview" else "source_locator_reviewed",
+                 "delivery_status": "preview_only" if level == "preview" else
+                                    "scenario_assumptions_reviewed" if level == "scenario" else "source_locator_reviewed",
                  "delivery_note": "预审稿；项目证据或冲突仍待核，不构成正式结论" if level == "preview" else
+                                  "情景分析；方案假设及历史资料未独立核实，不构成现实项目事实结论" if level == "scenario" else
                                   "项目原文位置由操作者核对；不代表原件真实性经独立认证",
+                 "analysis_run_id": item.analysis_run_id,
+                 "analysis_run": selected_run.snapshot if selected_run else None,
+                 "analysis_refs": [{"block_id": block.get("id"), "refs": block.get("analysis_refs", [])}
+                                   for block in item.content if block.get("analysis_refs")],
                  "source_refs": [{"block_id": block.get("id"), "section_id": block.get("section_id"),
                                   "refs": block.get("source_refs", []),
                                   "project_rule_refs": block.get("project_rule_refs", [])}
@@ -1633,9 +1761,10 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
                  "facts": [{"key": key, "label": facts[key].label, "value": facts[key].value_text, "unit": facts[key].unit,
                             "revision": facts[key].revision, "source": facts[key].source} for key in sorted(used)]}
         data = export_bundle(item.title, item.content, audit,
-                             preview_label="预审稿 · 来源待核 · 不构成正式结论" if level == "preview" else None)
+                             preview_label="预审稿 · 来源待核 · 不构成正式结论" if level == "preview" else
+                             "情景分析 · 假设待核 · 不构成现实项目事实结论" if level == "scenario" else None)
         return Response(content=data, media_type="application/zip",
-                        headers={"Content-Disposition": f'attachment; filename="report-{item.id[:8]}-v{item.version}{"-preview" if level == "preview" else ""}.zip"'})
+                        headers={"Content-Disposition": f'attachment; filename="report-{item.id[:8]}-v{item.version}{"-preview" if level == "preview" else "-scenario" if level == "scenario" else ""}.zip"'})
 
 
 @app.get("/api/projects/{project_id}/facts")
@@ -2220,7 +2349,8 @@ def report_writing_commit(project_id: str, report_id: str, body: WritingPackComm
         bound = {key: value for key, value in bound.items() if key in remaining_keys}
         report.content, report.bound_facts, report.reviewed_hash = content, bound, None
         report.version += 1
-        session.add(ReportVersion(report_id=report.id, version=report.version, content=content, bound_facts=bound))
+        session.add(ReportVersion(report_id=report.id, version=report.version, content=content,
+                                  bound_facts=bound, analysis_run_id=report.analysis_run_id))
         event = WritingCommitEvent(
             project_id=project_id, report_id=report_id, report_version=report.version,
             section_id=body.section_id, corpus_id=body.corpus_id, corpus_version=body.corpus_version,

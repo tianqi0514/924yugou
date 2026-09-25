@@ -115,6 +115,7 @@ class ReportDraft(Base):
     content: Mapped[list[dict]] = mapped_column(JSON, nullable=False, default=list)
     bound_facts: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     reviewed_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    analysis_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
     project: Mapped[Project] = relationship(back_populates="reports")
@@ -130,6 +131,7 @@ class ReportVersion(Base):
     content: Mapped[list[dict]] = mapped_column(JSON, nullable=False)
     bound_facts: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     reviewed_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    analysis_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     report: Mapped[ReportDraft] = relationship(back_populates="versions")
 
@@ -252,6 +254,55 @@ class FactRevision(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class AnalysisScenario(Base):
+    """A project-owned, editable input set. Corpus values are copied only by explicit action."""
+
+    __tablename__ = "analysis_scenarios"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    blueprint_version: Mapped[str] = mapped_column(String(80), nullable=False)
+    corpus_id: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    corpus_version: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    definitions: Mapped[list[dict]] = mapped_column(JSON, nullable=False)
+    rules: Mapped[list[dict]] = mapped_column(JSON, nullable=False)
+    inputs: Mapped[dict] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
+class AnalysisRun(Base):
+    """Immutable result and provenance for one scenario revision."""
+
+    __tablename__ = "analysis_runs"
+    __table_args__ = (UniqueConstraint("scenario_id", "request_key", name="uq_analysis_run_request"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    scenario_id: Mapped[str] = mapped_column(ForeignKey("analysis_scenarios.id", ondelete="CASCADE"), nullable=False, index=True)
+    scenario_revision: Mapped[int] = mapped_column(Integer, nullable=False)
+    request_key: Mapped[str] = mapped_column(String(80), nullable=False)
+    input_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    snapshot: Mapped[dict] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class AnalysisWritingEvent(Base):
+    """Accepted and declined analysis writing actions, separate from report versions."""
+
+    __tablename__ = "analysis_writing_events"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_id: Mapped[str] = mapped_column(ForeignKey("report_drafts.id", ondelete="CASCADE"), nullable=False, index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("analysis_runs.id", ondelete="CASCADE"), nullable=False)
+    report_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    action: Mapped[str] = mapped_column(String(30), nullable=False)
+    section_id: Mapped[str] = mapped_column(String(80), nullable=False, default="")
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 def init_db() -> None:
     """为首版新数据库创建数据表。
 
@@ -262,6 +313,9 @@ def init_db() -> None:
     # Existing local installations predate candidate-level provenance. Old candidates
     # remain explicitly unattributed; new candidates always link to their run.
     with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE report_drafts ADD COLUMN IF NOT EXISTS analysis_run_id varchar(36)"))
+        connection.execute(text("ALTER TABLE report_versions ADD COLUMN IF NOT EXISTS analysis_run_id varchar(36)"))
+        connection.execute(text("CREATE INDEX IF NOT EXISTS ix_report_drafts_analysis_run_id ON report_drafts (analysis_run_id)"))
         connection.execute(text("ALTER TABLE writing_commit_events ADD COLUMN IF NOT EXISTS model_audit JSON NOT NULL DEFAULT '{}'::json"))
         connection.execute(text("ALTER TABLE writing_references ADD COLUMN IF NOT EXISTS target_report_type varchar(60) NOT NULL DEFAULT 'feasibility'"))
         connection.execute(text("ALTER TABLE extraction_candidates ADD COLUMN IF NOT EXISTS extraction_run_id varchar(36) REFERENCES extraction_runs(id) ON DELETE SET NULL"))

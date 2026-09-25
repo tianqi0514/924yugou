@@ -28,6 +28,7 @@ playwright-report/
 /backups/
 /tmp/
 /demo-output/
+/deliverables/
 /design/
 **/_test_storage/
 *.dump
