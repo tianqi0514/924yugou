@@ -19,8 +19,8 @@ const projectNav: NavItem[] = [
 ]
 const projectSections: Section[] = ['documents', 'facts', 'rules', 'reports', 'writing']
 function savedSection(project: Project): Section {
-  if (project.has_corpus) return 'corpus'
   const stored = window.localStorage.getItem(`report-platform-section:${project.id}`) as Section | null
+  if (project.has_corpus) return stored === 'reports' ? 'reports' : 'corpus'
   return stored && projectSections.includes(stored) ? stored : 'facts'
 }
 
@@ -114,14 +114,15 @@ export default function App() {
         <div className="picker-row"><select id="project-picker" aria-label="切换项目" value={projectId} disabled={loading || !projects.length} onChange={(event) => selectProject(event.target.value)}><option value="" disabled>选择项目</option>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}{project.is_builtin ? '（内置）' : ''}</option>)}</select><ChevronDown size={15} aria-hidden="true" /></div>
         <button type="button" onClick={() => { setCreateOpen(true); setFormError('') }}><Plus size={15} aria-hidden="true" />新建项目</button>
       </div>
-      <nav aria-label="主导航">{selected?.has_corpus ? navButton({ id: 'corpus', label: '项目资料', icon: Layers3 }) : selected ? projectNav.map(navButton) : null}</nav>
+      <nav aria-label="主导航">{selected?.has_corpus ? <>{navButton({ id: 'corpus', label: '项目资料', icon: Layers3 })}{navButton({ id: 'reports', label: '文章写作', icon: FilePenLine })}</> : selected ? projectNav.map(navButton) : null}</nav>
       <nav className="sidebar-secondary" aria-label="其他功能">{selected && !selected.has_corpus && navButton({ id: 'writing', label: '案例验证', icon: FileSearch })}{navButton({ id: 'model', label: '模型配置', icon: Settings2 })}</nav>
     </aside>
     <div className="main-area">
       {loadError && <div className="app-error notice error" role="alert"><span>{loadError}</span><button className="text-button" type="button" onClick={() => void loadProjects()}>重试</button></div>}
       {loading ? <main className="page"><div className="app-loading" role="status">加载中…</div></main>
         : section === 'model' ? <ModelSettingsView />
-          : selected?.has_corpus ? <CorpusView key={selected.id} project={selected} />
+          : selected?.has_corpus && section === 'corpus' ? <CorpusView key={selected.id} project={selected} />
+            : selected?.has_corpus && section === 'reports' ? <ReportsView key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('corpus')} onOpenDocuments={() => navigate('corpus')} onOpenProjectFacts={() => navigate('corpus')} />
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
               : section === 'reports' && selected ? <ReportsView key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} />
                 : section === 'writing' && selected ? <WritingView key={selected.id} project={selected} onProjectChange={onProjectChange} notify={setNotice} onChooseReference={() => navigate('reports')} />

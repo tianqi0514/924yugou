@@ -14,6 +14,7 @@ import { Plate, PlateContent, PlateElement, createPlatePlugin, useEditorRef, use
 import { Check, Download, Plus, RefreshCw, Sparkles, X } from 'lucide-react'
 import { api, post, rawUrl, type Fact, type Project } from './api'
 import CorpusWritingPanel, { locationText, originalWordLocator, primarySourceText, sourceLocation, wordLocator, type CorpusSourceRef } from './CorpusWritingPanel'
+import CorpusArticleComposer from './CorpusArticleComposer'
 import { refreshedFactDisplay } from './fact-display'
 import './report-editor.css'
 
@@ -49,14 +50,14 @@ type CorpusSourceImpact = { report_id: string; report_title: string; report_vers
   section_id: string; position: number; text: string }
 type CorpusSourceView = CorpusSourceDetail & { source_project_id: string; impacts: CorpusSourceImpact[] }
 
-function CorpusSourceDrawer({ source, onClose, onJump }: { source: CorpusSourceView; onClose: () => void;
+function CorpusSourceDrawer({ source, onClose, onJump, historicalProject = false }: { source: CorpusSourceView; onClose: () => void; historicalProject?: boolean;
   onJump: (reportId: string, position: number) => void }) {
   const payload = source.payload
   const excerpt = Array.isArray(payload?.excerpt_locations) ? payload.excerpt_locations[0] : null
   const excerptWord = excerpt && typeof excerpt === 'object' ? wordLocator((excerpt as Record<string, unknown>).source_locator) : null
   return <div className="drawer-backdrop" onClick={onClose}><aside className="drawer" onClick={(event) => event.stopPropagation()}>
     <div className="drawer-header"><h2>历史参考 · {source.source_ref.semantic_id || source.source_ref.record_id}</h2><button className="icon-button" aria-label="关闭语料来源" onClick={onClose}><X size={20} /></button></div>
-    <div className="drawer-content corpus-writing-source"><span className="status status-neutral">待本项目核对</span>
+    <div className="drawer-content corpus-writing-source"><span className="status status-neutral">{historicalProject ? '历史来源 · 待人工核对' : '待本项目核对'}</span>
       <p>{source.summary}</p>{primarySourceText(payload) && primarySourceText(payload) !== source.summary && <blockquote className="source-excerpt corpus-source-text">{primarySourceText(payload)}</blockquote>}<div className="field-grid"><div className="field"><span>记录</span><strong>{source.source_ref.category_id} · {source.source_ref.record_id}</strong></div>
         <div className="field"><span>版本</span><strong>{source.source_ref.corpus_version}</strong></div>
         <div className="field"><span>原文位置</span><strong>{locationText(sourceLocation(source, null))}</strong></div></div>
@@ -259,17 +260,22 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
   const repairingSplitIds = useRef(false)
   const clearedInheritedKeys = useRef(new Set<string>())
   const clearedInheritedSources = useRef(new Set<string>())
+  const manuallyEditedModelBlocks = useRef(new Set<string>())
   const reportChange = (value: Value) => {
     if (repairingSplitIds.current || hasTransientSlash(value)) return
     const next = normalizedBlocks(value as Block[])
     const before = previousBlocks.current
     const beforeIds = new Set(before.map((block) => block.id).filter((id): id is string => !!id))
+    const beforeById = new Map(before.filter((block) => block.id).map((block) => [block.id, block]))
     let activeSection: string | undefined
     for (const block of next) {
       if (block.section_id) activeSection = block.section_id
       else if (['h1', 'h2', 'h3'].includes(block.type)) activeSection = undefined
       else if (activeSection) block.section_id = activeSection
       if (!block.id) continue
+      const former = beforeById.get(block.id)
+      if (former?.origin === 'model' && blockText(former) !== blockText(block)) manuallyEditedModelBlocks.current.add(block.id)
+      if (manuallyEditedModelBlocks.current.has(block.id) && block.origin === 'model') block.origin = 'manual'
       if (!knownBlockIds.current.has(block.id)) {
         // A split or pasted paragraph must not silently inherit its source or model review status.
         if (block.source_refs?.length || (block.type !== 'table' && block.project_rule_refs?.length) || block.origin === 'model' || block.origin === 'guided') clearedInheritedSources.current.add(block.id)
@@ -379,8 +385,8 @@ function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFac
       <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => insertTable(editor, { rowCount: 2, colCount: 2, header: true }, { select: true })}>表格</button>
       <TableTools />
       <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={openLink}>链接</button>
-      <div className="plate-fact-menu-wrap"><button type="button" aria-expanded={factMenuOpen} onMouseDown={(event) => event.preventDefault()} onClick={() => setFactMenuOpen((open) => !open)}>事实</button>
-        {factMenuOpen && <div className="plate-fact-menu" role="menu" aria-label="插入事实引用">{facts.length ? facts.map((fact) => <button type="button" role="menuitem" key={fact.key} onMouseDown={(event) => event.preventDefault()} onClick={() => { actionsRef.current?.insertFact(fact); setFactMenuOpen(false) }}>{fact.label} · {fact.value}{fact.unit}</button>) : <span>暂无可用事实</span>}</div>}</div><span />
+      {facts.length > 0 && <div className="plate-fact-menu-wrap"><button type="button" aria-expanded={factMenuOpen} onMouseDown={(event) => event.preventDefault()} onClick={() => setFactMenuOpen((open) => !open)}>事实</button>
+        {factMenuOpen && <div className="plate-fact-menu" role="menu" aria-label="插入事实引用">{facts.map((fact) => <button type="button" role="menuitem" key={fact.key} onMouseDown={(event) => event.preventDefault()} onClick={() => { actionsRef.current?.insertFact(fact); setFactMenuOpen(false) }}>{fact.label} · {fact.value}{fact.unit}</button>)}</div>}</div>}<span />
       <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => editor.tf.bold.toggle()}><b>B</b></button>
       <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => editor.tf.italic.toggle()}><i>I</i></button>
       <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => editor.tf.underline.toggle()}><u>U</u></button>
@@ -556,6 +562,12 @@ export default function ReportsView({ project, notify, onEditFacts, onOpenDocume
     catch (cause) { setError((cause as Error).message) }
   }
   const openCorpusSource = async (ref: CorpusSourceRef) => {
+    if (project.has_corpus) {
+      try {
+        setCorpusSource(await api<CorpusSourceView>(`/projects/${project.id}/corpus/articles/sources/${encodeURIComponent(ref.record_id)}`))
+      } catch (cause) { setError((cause as Error).message) }
+      return
+    }
     const categoryNumber = Number(ref.category_id.match(/\d+$/)?.[0])
     if (!categoryNumber) { setError('语料类别编号缺失，无法定位来源'); return }
     setError('')
@@ -602,16 +614,17 @@ export default function ReportsView({ project, notify, onEditFacts, onOpenDocume
   const blockingIssues = report?.issues.filter((issue) => issue.severity === 'block') || []
   const reviewIssues = report?.issues.filter((issue) => issue.severity !== 'block') || []
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  return <main className="page"><div className="breadcrumb">项目 / {project.name} / 报告写作</div><div className="page-header"><h1>报告写作</h1>{report && <span className="status status-neutral">v{report.version} · {dirty ? '未保存' : report.reviewed ? '已核对' : '待核对'}</span>}</div>
+  return <main className="page"><div className="breadcrumb">项目 / {project.name} / {project.has_corpus ? '文章写作' : '报告写作'}</div><div className="page-header"><h1>{project.has_corpus ? '文章写作' : '报告写作'}</h1>{report && <span className="status status-neutral">v{report.version} · {dirty ? '未保存' : report.reviewed ? '已核对' : '待核对'}</span>}</div>
     {error && <div className="notice error">{error}</div>}
-    <div className="reports-layout"><aside className="workspace-card report-list"><h2>本项目报告</h2>{reports.map((item) => <button className={item.id === reportId ? 'active' : ''} key={item.id} onClick={() => { if (dirty && !window.confirm('当前修改尚未保存，确定切换报告？')) return; candidateRequest.current += 1; setSectionPreview(null); setReportId(item.id); window.localStorage.setItem(`report-platform-report:${project.id}`, item.id) }}><strong>{item.title}</strong><small>v{item.version}</small></button>)}<label className="form-field"><span>新报告名称</span><input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="如：项目情况报告" /></label><button className="primary-button" disabled={!title.trim() || busy} onClick={() => void create()}><Plus size={14} /> 创建报告</button></aside>
+    {project.has_corpus && <CorpusArticleComposer project={project} onSaved={(id) => { void loadReports(); setReportId(id); window.localStorage.setItem(`report-platform-report:${project.id}`, id); notify('文章已保存，可在 Plate 继续编辑') }} />}
+    <div className="reports-layout"><aside className="workspace-card report-list"><h2>{project.has_corpus ? '已保存文章' : '本项目报告'}</h2>{reports.map((item) => <button className={item.id === reportId ? 'active' : ''} key={item.id} onClick={() => { if (dirty && !window.confirm('当前修改尚未保存，确定切换报告？')) return; candidateRequest.current += 1; setSectionPreview(null); setReportId(item.id); window.localStorage.setItem(`report-platform-report:${project.id}`, item.id) }}><strong>{item.title}</strong><small>v{item.version}</small></button>)}{!project.has_corpus && <><label className="form-field"><span>新报告名称</span><input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="如：项目情况报告" /></label><button className="primary-button" disabled={!title.trim() || busy} onClick={() => void create()}><Plus size={14} /> 创建报告</button></>}</aside>
       <div className="reports-main">{report ? <>
-        <nav className="report-flow-nav" aria-label="写作步骤">
+        {!project.has_corpus && <nav className="report-flow-nav" aria-label="写作步骤">
           <button type="button" onClick={() => scrollTo('report-drafting')}>章节起草</button>
           <button type="button" onClick={() => scrollTo('report-editor')}>编辑正文</button>
           <button type="button" onClick={() => scrollTo('report-review')}>核对导出</button>
-        </nav>
-        <div id="report-drafting">
+        </nav>}
+        {!project.has_corpus && <><div id="report-drafting">
           <CorpusWritingPanel project={project} reportId={report.id} dirty={dirty} onEditFacts={onEditFacts} onJumpToReport={jumpToReport} onCommitted={async () => { await loadReport(); await loadReports(); notify('章节已加入报告'); window.requestAnimationFrame(() => scrollTo('report-editor')) }} />
         </div>
         <details className="workspace-card report-optional-draft">
@@ -625,7 +638,7 @@ export default function ReportsView({ project, notify, onEditFacts, onOpenDocume
             {sectionPreview.paragraphs.map((paragraph, index) => <div key={index}><small>第 {index + 1} 段 · 关联 {paragraph.fact_keys?.join('、') || '无事实'}</small><p>{blockText(paragraph)}</p></div>)}
             <div className="inline-actions"><button type="button" onClick={() => setSectionPreview(null)}>取消候选</button><button type="button" className="primary-button" disabled={busy || dirty} onClick={() => void confirmGenerate()}><Check size={14} /> 加入报告</button></div>
           </div>}
-        </details>
+        </details></>}
         <div id="report-editor" className="workspace-card"><div className="workspace-toolbar"><h2>{report.title}</h2><button className="subtle-button" onClick={() => { if (dirty && !window.confirm('放弃未保存修改并重新加载？')) return; void loadReport() }}><RefreshCw size={14} /> 刷新</button></div>
           {report.fact_impacts.length > 0 && <div className="report-impact-preview"><strong>过时引用 · {report.fact_impacts.length} 处</strong>{report.fact_impacts.map((impact, index) => <div key={`${impact.position}-${impact.fact_key}-${index}`}><small>第 {impact.position} 段 · {facts.find((fact) => fact.key === impact.fact_key)?.label || impact.fact_key}</small><span>{impact.before?.value ?? '未定义'} → {impact.after?.value ?? '未定义'}</span>{impact.after?.value !== null && impact.after && content[impact.position - 1] && hasFactToken(content[impact.position - 1], impact.fact_key) && <button className="subtle-button" type="button" onClick={() => refreshFactToken(impact.position, impact.fact_key)}>更新文内引用</button>}</div>)}</div>}
           <EditorPane key={`${report.id}-${editorKey}`} initial={content} actionsRef={editorActions} facts={usable} onOpenFact={(key) => void openSource(key)} staleFactKeys={report.fact_impacts.map((impact) => impact.fact_key)} onSelectPosition={setSelectedPosition} onChange={(next) => { candidateRequest.current += 1; setContent(next); setPreview(null); setSectionPreview(null) }} />
@@ -633,20 +646,20 @@ export default function ReportsView({ project, notify, onEditFacts, onOpenDocume
             {(content[selectedPosition - 1].fact_keys || []).map((key) => <button type="button" className="source-button" key={key} onClick={() => void openSource(key)}>{facts.find((fact) => fact.key === key)?.label || key} · 来源</button>)}
             <RuleProvenance block={content[selectedPosition - 1]} />
             {(content[selectedPosition - 1].source_refs || []).length > 0 && <div className="report-corpus-refs"><small>历史参考 · 待核对</small>{(content[selectedPosition - 1].source_refs || []).map((ref, index) => <button type="button" className="source-button" key={`${ref.category_id}-${ref.record_id}-${index}`} onClick={() => void openCorpusSource(ref)}>{ref.category_id} · {ref.semantic_id || ref.record_id}</button>)}</div>}
-            <details className="report-bind-menu"><summary>绑定项目事实</summary><div className="binding-choices">{usable.map((fact) => <button type="button" key={fact.key} className={(content[selectedPosition - 1].fact_keys || []).includes(fact.key) ? 'bound' : ''} onClick={() => bindFact(selectedPosition, fact.key)}>{fact.label} · {fact.value}{fact.unit}</button>)}</div></details>
+            {!project.has_corpus && <details className="report-bind-menu"><summary>绑定项目事实</summary><div className="binding-choices">{usable.map((fact) => <button type="button" key={fact.key} className={(content[selectedPosition - 1].fact_keys || []).includes(fact.key) ? 'bound' : ''} onClick={() => bindFact(selectedPosition, fact.key)}>{fact.label} · {fact.value}{fact.unit}</button>)}</div></details>}
           </div>}
           <div className="report-save-line"><span>{dirty ? '有未保存修改' : '当前正文已保存'}</span><button className="primary-button" disabled={(!dirty && report.fact_impacts.length === 0) || busy} onClick={() => void previewSave()}>{dirty ? '预览改动' : '预览引用核对'}</button></div>
           {preview && <div className="report-preview"><strong>保存预览 · {preview.changes.length} 处变化</strong>{preview.changes.length === 0 && report.fact_impacts.length > 0 && <div className="notice">正文未变 · 核对当前引用</div>}{preview.changes.map((change) => <div key={change.position}><small>第 {change.position} 段</small>{!change.before && !change.after ? <p>空段落或来源调整</p> : <><p>原文：{change.before || '（空）'}</p><p>提议：{change.after || '（删除）'}{change.before === change.after ? '（格式或来源变化）' : ''}</p></>}</div>)}<div className="inline-actions"><button onClick={() => setPreview(null)}>取消</button><button className="primary-button" disabled={busy} onClick={() => void save()}><Check size={14} /> 确认保存</button></div></div>}
         </div>
         <details className="workspace-card report-history"><summary>版本差异</summary><div className="toolbar"><select aria-label="比较历史版本" value={compareBase} onChange={(event) => setCompareBase(Number(event.target.value))}>{versions.map((version) => <option key={version.version} value={version.version}>v{version.version}{version.reviewed ? ' · 已核对' : ''}</option>)}</select><button className="subtle-button" onClick={() => void compare()}>与当前版本比较</button></div>{comparison && <div className="report-preview"><strong>v{comparison.base_version} → v{comparison.current_version} · {comparison.changes.length} 处变化</strong>{comparison.changes.length ? comparison.changes.map((change) => <div key={change.position}><small>第 {change.position} 段</small><p>旧版：{change.before || '（空）'}</p><p>当前：{change.after || '（删除）'}</p></div>) : <p>正文无变化</p>}</div>}</details>
-        <div id="report-review" className="workspace-card"><div className="workspace-toolbar"><h2>核对与交付</h2></div>
+        {!project.has_corpus && <div id="report-review" className="workspace-card"><div className="workspace-toolbar"><h2>核对与交付</h2></div>
           <div className="report-check-summary"><span className={`status ${blockingIssues.length ? 'status-warn' : 'status-neutral'}`}>{blockingIssues.length ? `正式导出阻断 ${blockingIssues.length}` : report.reviewed ? '正式导出可用' : '待人工核对'}</span>{reviewIssues.length > 0 && <span className="status status-neutral">保留 {reviewIssues.length}</span>}{dirty && <span className="status status-neutral">未保存</span>}{report.fact_impacts.length > 0 && <button type="button" className="text-button" onClick={() => scrollTo('report-editor')}>修正过时引用</button>}</div>
           {report.issues.length > 0 && <details className="report-issues"><summary>查看问题 · {report.issues.length}</summary>{report.issues.map((issue, index) => <div key={index} className={`notice ${issue.severity === 'block' ? 'warn' : ''}`}>{issue.severity === 'block' ? '阻断' : '保留'} · {issue.message}</div>)}</details>}
           {report.facts.length > 0 && <details className="report-bound-facts"><summary>引用事实 · {report.facts.length}</summary>{report.facts.map((fact) => <div key={fact.key}><strong>{fact.label} · {fact.value}{fact.unit}</strong><button className="source-button" type="button" onClick={() => void openSource(fact.key)}>来源</button>{sourceLink(project.id, fact) && <a href={sourceLink(project.id, fact)!} target="_blank" rel="noreferrer">打开原件</a>}</div>)}</details>}
           <div className="report-save-line report-delivery"><div className="inline-actions"><button type="button" onClick={onOpenDocuments}>项目文件</button><button type="button" onClick={onOpenProjectFacts}>项目事实</button></div><div className="inline-actions">{report.reviewed ? <span className="status status-neutral">已人工核对</span> : <button className="subtle-button" disabled={dirty || busy || blockingIssues.some((issue) => issue.code !== 'UNREVIEWED')} onClick={() => void review()}><Check size={14} /> 我已核对</button>}<a className={`subtle-button ${dirty ? 'disabled-link' : ''}`} aria-disabled={dirty} href={dirty ? undefined : `/api/projects/${project.id}/reports/${report.id}/export?level=preview`}><Download size={14} /> 导出预审稿</a><a className={`primary-button ${dirty || blockingIssues.length || !report.reviewed ? 'disabled-link' : ''}`} aria-disabled={dirty || blockingIssues.length > 0 || !report.reviewed} title={blockingIssues.length ? `正式导出阻断 ${blockingIssues.length} 项` : dirty ? '请先保存正文' : !report.reviewed ? '请先人工核对' : ''} href={dirty || blockingIssues.length || !report.reviewed ? undefined : `/api/projects/${project.id}/reports/${report.id}/export`}><Download size={14} /> 正式导出</a></div></div>
-        </div>
+        </div>}
       </> : null}</div></div>
-    {corpusSource && <CorpusSourceDrawer source={corpusSource} onClose={() => setCorpusSource(null)} onJump={jumpToReport} />}
+    {corpusSource && <CorpusSourceDrawer source={corpusSource} onClose={() => setCorpusSource(null)} onJump={jumpToReport} historicalProject={project.has_corpus} />}
     {source && <FactSourceDrawer source={source} onClose={() => setSource(null)} onOpenFact={(key) => void openSource(key)} />}
   </main>
 }

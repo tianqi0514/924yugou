@@ -115,3 +115,12 @@
 .corpus-material-application{margin:0 0 13px}
 .corpus-material-application .material-panel{border-color:#e5eaf2;background:#fbfcfe;box-shadow:none}
 .corpus-material-application .material-top{padding:10px 13px}
+.workspace-card.corpus-article-composer { margin-bottom: 16px; min-height: 0; }
+.corpus-article-fields { display: grid; grid-template-columns: minmax(150px, 220px) minmax(220px, 1fr) auto; gap: 12px; align-items: end; }
+.corpus-article-fields .primary-button { min-height: 38px; white-space: nowrap; }
+.corpus-article-candidate { margin-top: 16px; }
+.corpus-article-candidate > div { padding: 10px 0; border-bottom: 1px solid #e9edf3; }
+.corpus-article-candidate p { line-height: 1.7; margin: 6px 0; }
+.corpus-article-source { padding: 8px 0; border-bottom: 1px solid #e9edf3; }
+.corpus-article-source b { color: #5c6b82; font-size: 12px; }
+@media (max-width: 850px) { .corpus-article-fields { grid-template-columns: 1fr; } .corpus-article-fields .primary-button { justify-self: start; } }

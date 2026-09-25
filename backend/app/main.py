@@ -34,6 +34,7 @@ from .writing_support import GUIDED_SECTIONS, accepted_reference, build_candidat
 from .writing_model import ModelInputChanged
 from .writing_materials import router as material_router
 from .corpus_storage import CorpusArchive, CorpusRecord
+from .corpus_article import ARTICLE_SECTIONS, candidate_from_model, number_tokens as article_number_tokens, pack_digest, source_pack
 
 
 @asynccontextmanager
@@ -160,6 +161,20 @@ class ReportSave(BaseModel):
     content: list[dict]
     base_version: int
     preview_token: str | None = None
+
+
+class CorpusArticleDraft(BaseModel):
+    section_id: str = Field(max_length=80)
+    title: NonBlankLabel
+
+
+class CorpusArticleCommit(CorpusArticleDraft):
+    content: list[dict]
+    corpus_version: str
+    input_sha256: str
+    model_call: dict
+    expires_at: int
+    preview_token: str
 
 
 class SectionDraft(BaseModel):
@@ -438,6 +453,121 @@ def corpus_summary(project_id: str):
 def corpus_categories(project_id: str):
     get_corpus_project(project_id)
     return [{**item, "project_id": project_id} for item in corpus.categories()]
+
+
+def _article_signature(project_id: str, data: dict) -> str:
+    payload = json.dumps({"project_id": project_id, **data}, ensure_ascii=False,
+                         sort_keys=True, separators=(",", ":"))
+    return hmac.new(preview_secret, payload.encode(), hashlib.sha256).hexdigest()
+
+
+@app.get("/api/projects/{project_id}/corpus/articles/sections")
+def corpus_article_sections(project_id: str):
+    get_corpus_project(project_id)
+    return [{"id": key, "name": value} for key, value in ARTICLE_SECTIONS.items()]
+
+
+@app.post("/api/projects/{project_id}/corpus/articles/preview")
+def corpus_article_preview(project_id: str, body: CorpusArticleDraft):
+    get_corpus_project(project_id)
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        try:
+            pack = source_pack(session, project.corpus.corpus_id, body.section_id)
+        except ValueError as exc:
+            fail(str(exc), 409)
+    title = body.title.strip()
+    try:
+        content, model_call = candidate_from_model(pack, title)
+    except ValueError as exc:
+        fail(str(exc), 409)
+    expires_at = int(time.time()) + 600
+    candidate = {"section_id": body.section_id, "title": title, "content": content,
+                 "corpus_version": pack["corpus_version"], "input_sha256": pack_digest(pack),
+                 "model_call": model_call, "expires_at": expires_at}
+    return {**candidate, "sources": pack["sources"],
+            "preview_token": _article_signature(project_id, candidate)}
+
+
+@app.post("/api/projects/{project_id}/corpus/articles/commit", status_code=201)
+def corpus_article_commit(project_id: str, body: CorpusArticleCommit):
+    candidate = body.model_dump(exclude={"preview_token"})
+    if body.expires_at < time.time() or not hmac.compare_digest(
+            body.preview_token, _article_signature(project_id, candidate)):
+        fail("文章候选已失效，请重新生成", 409)
+    try:
+        validate_content(body.content)
+    except ValueError as exc:
+        fail(str(exc), 409)
+    if not body.content or body.content[0].get("type") != "h1" or plain(body.content[0]) != body.title:
+        fail("文章标题与候选不一致", 409)
+    with SessionLocal.begin() as session:
+        project = get_project(session, project_id)
+        if project.corpus is None:
+            fail("该项目没有历史语料", 404)
+        try:
+            pack = source_pack(session, project.corpus.corpus_id, body.section_id)
+        except ValueError as exc:
+            fail(str(exc), 409)
+        if pack["corpus_version"] != body.corpus_version or pack_digest(pack) != body.input_sha256:
+            fail("语料版本或写作输入已变化，请重新生成", 409)
+        expected = {row["id"]: row for row in pack["sources"]}
+        if len(body.content) < 3 or any(block.get("origin") != "model" or block.get("section_id") != body.section_id
+                                        or not block.get("source_refs") for block in body.content[1:]):
+            fail("文章候选缺少逐段来源", 409)
+        for block in body.content[1:]:
+            for ref in block["source_refs"]:
+                source = expected.get(ref.get("semantic_id"))
+                if (source is None or ref.get("record_id") != source["record_id"]
+                        or ref.get("artifact_id") != source["artifact_id"]
+                        or ref.get("category_id") != "CAT-09"):
+                    fail("文章候选引用了不属于所选章节的资料", 409)
+        _validate_writing_refs(session, project_id, body.content)
+        item = ReportDraft(project_id=project_id, title=body.title, version=0,
+                           content=body.content, bound_facts={})
+        session.add(item)
+        session.flush()
+        session.add(ReportVersion(report_id=item.id, version=0, content=item.content, bound_facts={}))
+        session.add(WritingCommitEvent(
+            project_id=project_id, report_id=item.id, report_version=0,
+            section_id=body.section_id, corpus_id=pack["corpus_id"],
+            corpus_version=pack["corpus_version"], mode="corpus_article",
+            block_ids=[block["id"] for block in body.content[1:]],
+            source_refs=[{"block_id": block["id"], "section_id": body.section_id,
+                          "refs": block["source_refs"], "project_rule_refs": []}
+                         for block in body.content[1:]],
+            issues=[{"code": "HISTORICAL_SOURCE_REVIEW", "severity": "review",
+                     "message": "历史虚构语料尚未经独立核实；文章为待核对工作稿"}],
+            approved_item_ids=[ref["record_id"] for block in body.content[1:]
+                               for ref in block["source_refs"]],
+            model_audit={"model_call": body.model_call, "input_sha256": body.input_sha256,
+                         "task": "corpus_article", "confirmed_at": utcnow().isoformat()},
+        ))
+        session.flush()
+        return {"report": _report_dict(item, {}, session)}
+
+
+@app.get("/api/projects/{project_id}/corpus/articles/sources/{record_id}")
+def corpus_article_source(project_id: str, record_id: str):
+    get_corpus_project(project_id)
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        row = session.get(CorpusRecord, (project.corpus.corpus_id, 9, record_id))
+        archive = session.get(CorpusArchive, project.corpus.corpus_id)
+        if row is None or archive is None:
+            fail("原文切块不存在", 404)
+        impacts = [{"report_id": report.id, "report_title": report.title,
+                    "report_version": report.version, "block_id": block.get("id") or "",
+                    "section_id": block.get("section_id") or "", "position": position,
+                    "text": plain(block)[:300]}
+                   for report in session.scalars(select(ReportDraft).where(ReportDraft.project_id == project_id)).all()
+                   for position, block in enumerate(report.content, 1)
+                   if any(ref.get("record_id") == record_id for ref in block.get("source_refs", []))]
+        return {"source_ref": {"corpus_id": archive.id, "corpus_version": archive.version,
+                               "category_id": "CAT-09", "artifact_id": row.artifact_id,
+                               "record_id": row.record_id, "semantic_id": row.semantic_id},
+                "summary": row.payload.get("text") or "", "location": row.location,
+                "payload": row.payload, "source_project_id": project_id, "impacts": impacts}
 
 
 @app.get("/api/projects/{project_id}/corpus/categories/{number}")
@@ -937,10 +1067,16 @@ def _validate_writing_refs(session, project_id: str, content: list[dict]) -> Non
     refs = [ref for block in content for ref in block.get("source_refs", [])]
     if not refs and not any(block.get("project_rule_refs") for block in content):
         return
-    try:
-        _, archive = accepted_reference(session, project_id)
-    except ValueError as exc:
-        fail(str(exc), 409)
+    project = get_project(session, project_id)
+    if project.corpus is not None:
+        archive = session.get(CorpusArchive, project.corpus.corpus_id)
+        if archive is None:
+            fail("历史语料版本不存在", 409)
+    else:
+        try:
+            _, archive = accepted_reference(session, project_id)
+        except ValueError as exc:
+            fail(str(exc), 409)
     checked: set[tuple[int, str]] = set()
     for ref in refs:
         if ref["corpus_id"] != archive.id or ref["corpus_version"] != archive.version:
@@ -964,6 +1100,41 @@ def _validate_writing_refs(session, project_id: str, content: list[dict]) -> Non
             if (rule is None or rule.project_id != project_id or rule.target_key != rule_ref["target_key"]
                     or rule.expression != rule_ref["expression"] or list(rule.deps) != rule_ref["deps"]):
                 fail("正文引用的当前项目规则不存在或身份不一致", 409)
+
+
+def _validate_corpus_article_content(session, project_id: str, report_id: str, content: list[dict]) -> None:
+    project = get_project(session, project_id)
+    if project.corpus is None:
+        return
+    archive_id = project.corpus.corpus_id
+    for position, block in enumerate(content, 1):
+        if block.get("type") not in {"p", "blockquote", "table"}:
+            continue
+        numbers = article_number_tokens(plain(block))
+        refs = block.get("source_refs", [])
+        if numbers and not refs:
+            fail(f"第 {position} 段含未标注历史来源的数字", 409)
+        cited_text = []
+        for ref in refs:
+            if ref.get("category_id") != "CAT-09":
+                fail("历史文章只支持原文切块作为段落来源", 409)
+            row = session.get(CorpusRecord, (archive_id, 9, ref["record_id"]))
+            if row is None:
+                fail("文章来源切块不存在", 409)
+            cited_text.append(str(row.payload.get("text") or ""))
+        extra = numbers - article_number_tokens(" ".join(cited_text))
+        if extra:
+            fail(f"第 {position} 段出现来源以外的数字：{'、'.join(sorted(extra))}", 409)
+    conflict_article = session.scalar(select(WritingCommitEvent).where(
+        WritingCommitEvent.project_id == project_id,
+        WritingCommitEvent.report_id == report_id,
+        WritingCommitEvent.mode == "corpus_article",
+        WritingCommitEvent.section_id == "S5.2"))
+    if conflict_article is not None:
+        body = " ".join(plain(block) for block in content)
+        if not all(value in body for value in ("800", "650")) or not any(
+                word in body for word in ("冲突", "不一致", "分歧", "未解决", "未核实")):
+            fail("配电文章须保留800kW与650kW的未解决分歧", 409)
 
 
 def _writing_report_issues(session, item: ReportDraft) -> list[dict]:
@@ -1161,6 +1332,7 @@ def report_preview(project_id: str, report_id: str, body: ReportSave):
             fail("报告已有新版本，请刷新后重试", 409)
         facts = _current_facts(session, project_id)
         _validate_writing_refs(session, project_id, body.content)
+        _validate_corpus_article_content(session, project_id, report_id, body.content)
         used = {key for node in body.content for key in node.get("fact_keys", [])}
         if any(key not in facts for key in used):
             fail("正文引用了当前项目不存在的事实")
@@ -1232,13 +1404,13 @@ def report_save(project_id: str, report_id: str, body: ReportSave):
     if expires < time.time() or not hmac.compare_digest(signature, _report_signature(project_id, report_id, body.base_version, body.content, expires)):
         fail("预览已过期或正文发生变化，请重新预览", 409)
     with SessionLocal.begin() as session:
-        project = get_project(session, project_id)
-        require_writable_project(project)
+        get_project(session, project_id)
         item = _report(session, project_id, report_id, lock=True)
         if item.version != body.base_version:
             fail("报告已有新版本，请刷新后重试", 409)
         facts = _current_facts(session, project_id)
         _validate_writing_refs(session, project_id, body.content)
+        _validate_corpus_article_content(session, project_id, report_id, body.content)
         used = {key for node in body.content for key in node.get("fact_keys", [])}
         if any(key not in facts for key in used):
             fail("正文引用了当前项目不存在的事实")

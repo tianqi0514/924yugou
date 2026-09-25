@@ -19,6 +19,9 @@ test('project switch, navigation and project creation remain usable on narrow sc
       integrity: { valid: true }, counts: { nodes: 0, relations: 0 },
     })
     if (path === '/projects/history/corpus/categories') return reply([])
+    if (path === '/projects/history/corpus/articles/sections') return reply([{ id: 'S4', name: '产能与交付' }])
+    if (path === '/projects/history/reports') return reply([])
+    if (path === '/projects/history/facts') return reply({ project_version: 0, facts: [] })
     if (/^\/projects\/(work|created)\/facts$/.test(path)) return reply({ project_version: 0, facts: [] })
     if (/^\/projects\/(work|created)\/rules$/.test(path)) return reply({ rules: [], trace: [] })
     if (/^\/projects\/(work|created)\/reports$/.test(path)) return reply([])
@@ -33,7 +36,11 @@ test('project switch, navigation and project creation remain usable on narrow sc
   await expect(primary.getByRole('button', { name: '报告写作' })).toBeVisible()
   await page.getByLabel('切换项目').selectOption('history')
   await expect(primary.getByRole('button', { name: '项目资料' })).toBeVisible()
-  await expect(primary.getByRole('button')).toHaveCount(1)
+  await expect(primary.getByRole('button')).toHaveCount(2)
+  await primary.getByRole('button', { name: '文章写作' }).click()
+  await expect(page.getByRole('button', { name: '生成候选' })).toBeVisible()
+  await page.reload()
+  await expect(primary.getByRole('button', { name: '文章写作' })).toHaveAttribute('aria-current', 'page')
 
   await page.getByLabel('切换项目').selectOption('work')
   await expect(primary.getByRole('button')).toHaveCount(4)
