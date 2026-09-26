@@ -1,6 +1,9 @@
 """An immutable run drives a reviewed scenario report without rewriting corpus data."""
 
 import os
+import io
+import json
+import zipfile
 from uuid import uuid4
 
 os.environ["DATABASE_URL"] = "postgresql+psycopg://report:local_development_only@127.0.0.1:55432/report_platform_test"
@@ -141,6 +144,7 @@ def test_report_candidate_editor_review_and_export(client):
     second = run(client, base, scenario)
     impact = client.get(base + f"/analysis/reports/{report_id}/impact/{second['id']}")
     assert impact.status_code == 200 and any(row["after"] == "211680" for row in impact.json()["impacts"])
+    assert {row["position"] for row in impact.json()["impacts"] if row["result_key"] == "N034"} == {3, 4}
     chosen = client.post(base + f"/analysis/reports/{report_id}/select", json={
         "run_id": second["id"], "base_version": report["version"]})
     assert chosen.status_code == 200
@@ -273,3 +277,150 @@ def test_rewriting_a_chapter_keeps_manually_edited_blocks(client):
     again = client.post(base + f"/analysis/reports/{report_id}/draft/preview", json={
         "run_id": second["id"], "section_id": "S4", "mode": "computed"})
     assert [row["id"] for row in again.json()["preserved_blocks"]] == [edited["id"]]
+
+
+def _accepted_section(client, base, report_id, run_id, section_id):
+    preview = client.post(base + f"/analysis/reports/{report_id}/draft/preview", json={
+        "run_id": run_id, "section_id": section_id, "mode": "computed"})
+    assert preview.status_code == 200, preview.text
+    committed = client.post(base + f"/analysis/reports/{report_id}/draft/commit", json={
+        **{key: value for key, value in preview.json().items() if key not in {"issues", "preserved_blocks"}},
+        "replace_section": False})
+    assert committed.status_code == 200, committed.text
+    return committed.json()["report"]
+
+
+def test_local_refresh_updates_paragraph_then_table_without_touching_other_text(client):
+    base, scenario = create_history(client)
+    scenario = update(client, base, scenario, {"N017": "300000"})
+    first = run(client, base, scenario)
+    report = client.post(base + "/reports", json={"title": "局部更新产能"}).json()
+    report_id = report["id"]
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": first["id"], "base_version": 0}).status_code == 200
+    report = _accepted_section(client, base, report_id, first["id"], "S4")
+    original_version = report["version"]
+    original_content = report["content"]
+    scenario = update(client, base, scenario, {"N026": "250"})
+    second = run(client, base, scenario)
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": second["id"], "base_version": original_version}).status_code == 200
+    path = base + f"/analysis/reports/{report_id}/refresh"
+    preview = client.get(path + "/preview")
+    assert preview.status_code == 200, preview.text
+    actions = preview.json()["actions"]
+    assert {item["kind"] for item in actions} == {"numbers", "table"}
+    assert client.get(base + f"/reports/{report_id}").json()["content"] == original_content
+    number = next(item for item in actions if item["kind"] == "numbers")
+    table = next(item for item in actions if item["kind"] == "table")
+    assert "254016" in number["before"] and "211680" in number["after"]
+    first_change = client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": preview.json()["report_version"],
+        "operation_ids": [number["id"]]})
+    assert first_change.status_code == 200, first_change.text
+    partial = first_change.json()["report"]
+    assert any(issue["code"] == "ANALYSIS_RUN_STALE" for issue in partial["issues"])
+    assert "211680" in str(partial["content"][number["position"]-1])
+    assert "254016" in str(partial["content"][table["position"]-1])
+    assert client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": preview.json()["report_version"],
+        "operation_ids": [number["id"]]}).status_code == 409
+    assert client.get(base + f"/reports/{report_id}/export?level=scenario").status_code == 409
+    remaining = client.get(path + "/preview").json()
+    assert {item["kind"] for item in remaining["actions"]} == {"table"}
+    complete = client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": remaining["report_version"],
+        "operation_ids": [remaining["actions"][0]["id"]]})
+    assert complete.status_code == 200, complete.text
+    final = complete.json()["report"]
+    assert not any(issue["code"] == "ANALYSIS_RUN_STALE" for issue in final["issues"])
+    assert [block.get("id") for block in final["content"]] == [block.get("id") for block in original_content]
+    assert client.post(base + f"/reports/{report_id}/review").status_code == 200
+    delivery = client.get(base + f"/reports/{report_id}/export?level=scenario")
+    assert delivery.status_code == 200, delivery.text[:200]
+    with zipfile.ZipFile(io.BytesIO(delivery.content)) as archive:
+        audit = json.loads(archive.read("audit.json"))
+        assert second["id"] in json.dumps(audit, ensure_ascii=False)
+        with zipfile.ZipFile(io.BytesIO(archive.read("report.docx"))) as docx:
+            assert b"211680" in docx.read("word/document.xml")
+    old = client.get(base + f"/reports/{report_id}/compare?base={original_version}").json()
+    assert "254016" in str(old["base_content"])
+
+
+def test_local_refresh_keeps_condition_as_a_separate_blocking_choice(client):
+    base, scenario = create_history(client)
+    scenario = update(client, base, scenario, {"N017": "300000"})
+    first = run(client, base, scenario)
+    report = client.post(base + "/reports", json={"title": "条件句变化"}).json()
+    report_id = report["id"]
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": first["id"], "base_version": 0}).status_code == 200
+    report = _accepted_section(client, base, report_id, first["id"], "S4")
+    scenario = update(client, base, scenario, {"N017": "200000"})
+    second = run(client, base, scenario)
+    assert second["snapshot"]["results"]["N035"]["value"] == "200000"
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": second["id"], "base_version": report["version"]}).status_code == 200
+    path = base + f"/analysis/reports/{report_id}/refresh"
+    preview = client.get(path + "/preview").json()
+    assert {item["kind"] for item in preview["actions"]} == {"numbers", "table", "condition"}
+    selected = [item["id"] for item in preview["actions"] if item["kind"] != "condition"]
+    partial = client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": preview["report_version"],
+        "operation_ids": selected})
+    assert partial.status_code == 200, partial.text
+    assert any(issue["code"] == "ANALYSIS_CONDITION_STALE" for issue in partial.json()["report"]["issues"])
+    assert client.post(base + f"/reports/{report_id}/review").status_code == 400
+    remaining = client.get(path + "/preview").json()
+    assert [item["kind"] for item in remaining["actions"]] == ["condition"]
+    changed = client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": remaining["report_version"],
+        "operation_ids": [remaining["actions"][0]["id"]]})
+    assert changed.status_code == 200, changed.text
+    assert "需求低于合格能力" in str(changed.json()["report"]["content"])
+    assert not any(issue["code"] == "ANALYSIS_CONDITION_STALE" for issue in changed.json()["report"]["issues"])
+
+
+def test_supplier_refresh_does_not_overwrite_manual_paragraph(client):
+    base, scenario = create_history(client)
+    first = run(client, base, scenario)
+    report = client.post(base + "/reports", json={"title": "供应商局部更新"}).json()
+    report_id = report["id"]
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": first["id"], "base_version": 0}).status_code == 200
+    report = _accepted_section(client, base, report_id, first["id"], "S7.1")
+    scenario = update(client, base, scenario, {"supplier": "新供应商甲"})
+    second = run(client, base, scenario)
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": second["id"], "base_version": report["version"]}).status_code == 200
+    path = base + f"/analysis/reports/{report_id}/refresh"
+    preview = client.get(path + "/preview").json()
+    assert [item["kind"] for item in preview["actions"]] == ["judgement"]
+    assert "新供应商甲" in preview["actions"][0]["after"]
+    assert "禾进装备" not in preview["actions"][0]["after"]
+    changed = client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": preview["report_version"],
+        "operation_ids": [preview["actions"][0]["id"]]})
+    assert changed.status_code == 200, changed.text
+    assert "新供应商甲" in str(changed.json()["report"]["content"])
+    assert "报价尚未取得" in str(changed.json()["report"]["content"])
+    current = changed.json()["report"]
+    blocks = [dict(block) for block in current["content"]]
+    paragraph = next(block for block in blocks if block.get("section_id") == "S7.1" and block["type"] == "p")
+    paragraph["children"] = [{"text": paragraph["children"][0]["text"] + " 人工补充待核。"}]
+    save_preview = client.post(base + f"/reports/{report_id}/preview", json={
+        "base_version": current["version"], "content": blocks}).json()
+    saved = client.put(base + f"/reports/{report_id}", json={
+        "base_version": current["version"], "content": blocks,
+        "preview_token": save_preview["preview_token"]})
+    assert saved.status_code == 200, saved.text
+    scenario = update(client, base, scenario, {"supplier": "另一供应商乙"})
+    third = run(client, base, scenario)
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": third["id"], "base_version": saved.json()["report"]["version"]}).status_code == 200
+    blocked = client.get(path + "/preview").json()
+    assert [item["kind"] for item in blocked["actions"]] == ["manual"]
+    assert not blocked["actions"][0]["selectable"]
+    assert client.post(path + "/commit", json={
+        "run_id": third["id"], "base_version": blocked["report_version"],
+        "operation_ids": [blocked["actions"][0]["id"]]}).status_code == 409

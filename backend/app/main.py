@@ -37,6 +37,7 @@ from .corpus_storage import CorpusArchive, CorpusRecord
 from .corpus_article import ARTICLE_SECTIONS, candidate_from_model, number_tokens as article_number_tokens, pack_digest, source_pack
 from .analysis import router as analysis_router
 from .analysis_writing import router as analysis_writing_router
+from .analysis_refresh import router as analysis_refresh_router
 
 
 @asynccontextmanager
@@ -61,6 +62,7 @@ app.include_router(model_router)
 app.include_router(material_router)
 app.include_router(analysis_router)
 app.include_router(analysis_writing_router)
+app.include_router(analysis_refresh_router)
 corpus = CorpusRepository()
 preview_secret = secrets.token_bytes(32)
 BUILTIN_PROJECT_ID = "92b09c9d-801c-5fcb-90e6-67bbcd5179a6"
@@ -1351,6 +1353,16 @@ def _analysis_report_state(session, item: ReportDraft, content: list[dict] | Non
         if selected.status == "UNEVALUABLE":
             issues.append({"code": "ANALYSIS_INCOMPLETE", "severity": "block",
                            "message": "当前方案有不可评估的计算结果"})
+        from .analysis_refresh import CONDITIONS, _condition_phrase
+        expected_condition = CONDITIONS.get(selected.snapshot.get("condition"))
+        for position, block in enumerate(blocks, 1):
+            if block.get("section_id") != "S4" or block.get("type") != "p":
+                continue
+            present = _condition_phrase(block)
+            if present and present != expected_condition:
+                issues.append({"code": "ANALYSIS_CONDITION_STALE", "severity": "block",
+                               "position": position,
+                               "message": f"第 {position} 段需求与能力的条件判断仍是旧版本，请核对"})
         if selected.snapshot.get("corpus_id"):
             issues.append({"code": "SCENARIO_ASSUMPTIONS", "severity": "note",
                            "message": "报告采用历史资料及方案假设；交付时须明确标注"})

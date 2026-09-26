@@ -205,7 +205,8 @@ def _manual_blocks(session, report, section_id: str) -> tuple[list[dict], list[s
     """Find blocks changed or added after this section's last accepted candidate."""
     event = (session.query(AnalysisWritingEvent).filter_by(
         project_id=report.project_id, report_id=report.id,
-        section_id=section_id, action="accept_candidate")
+        section_id=section_id).filter(
+        AnalysisWritingEvent.action.in_(("accept_candidate", "refresh_baseline")))
         .order_by(AnalysisWritingEvent.report_version.desc()).first())
     if event is None:
         return [], []
@@ -220,7 +221,9 @@ def _manual_blocks(session, report, section_id: str) -> tuple[list[dict], list[s
         if block.get("section_id") != section_id:
             continue
         old = original.get(block.get("id"))
-        if block.get("origin") == "manual" or old is None or old != block:
+        if (block.get("origin") == "manual"
+                or block.get("id") in event.payload.get("manual_block_ids", [])
+                or old is None or old != block):
             protected.append(block)
     return protected, accepted_ids
 

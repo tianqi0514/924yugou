@@ -325,9 +325,21 @@ def _report(session, project_id: str, report_id: str, *, lock: bool = False) -> 
 def _run_impacts(report: ReportDraft, run: AnalysisRun) -> list[dict]:
     impacts = []
     for index, block in enumerate(report.content, 1):
-        for ref in block.get("analysis_refs", []):
+        refs = list(block.get("analysis_refs", []))
+        if block.get("type") == "table":
+            for row in block.get("children", []):
+                for cell in row.get("children", []):
+                    for paragraph in cell.get("children", []):
+                        refs.extend(paragraph.get("analysis_refs", []))
+        seen: set[tuple[str, str, str, str]] = set()
+        for ref in refs:
+            identity = (ref["run_id"], ref["result_key"], ref["value"], ref["unit"])
+            if identity in seen:
+                continue
+            seen.add(identity)
             proposed = run.snapshot["results"].get(ref["result_key"])
-            if proposed is None or proposed["value"] != ref["value"] or run.id != ref["run_id"]:
+            if (proposed is None or proposed["value"] != ref["value"]
+                    or proposed["unit"] != ref["unit"] or run.id != ref["run_id"]):
                 impacts.append({"position": index, "block_id": block.get("id"),
                                 "result_key": ref["result_key"], "before": ref["value"],
                                 "after": proposed["value"] if proposed else None,
