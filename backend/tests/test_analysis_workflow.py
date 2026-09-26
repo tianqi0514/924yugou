@@ -784,7 +784,8 @@ def test_chapter_add_to_empty_report_is_project_owned_and_idempotent_on_failure(
     assert client.get(base + "/facts").json()["facts"] == []
 
 
-def test_export_history_is_immutable_reusable_and_project_scoped(client):
+def test_export_history_is_immutable_reusable_and_project_scoped(client, monkeypatch):
+    import app.main as main_module
     base, scenario = create_history(client)
     scenario = update(client, base, scenario, {"N017": "300000"})
     chosen = run(client, base, scenario)
@@ -815,6 +816,15 @@ def test_export_history_is_immutable_reusable_and_project_scoped(client):
         assert audit["export_id"] == first_id and audit["export_level"] == "scenario"
         assert audit["report_version"] == report["version"]
         assert audit["analysis_run_id"] == chosen["id"]
+        assert audit["render_version"] == main_module.EXPORT_RENDER_VERSION
+
+    monkeypatch.setattr(main_module, "EXPORT_RENDER_VERSION", "analysis-basis-next-format")
+    upgraded = client.get(url + "/export?level=scenario")
+    assert upgraded.status_code == 200 and upgraded.headers["x-export-id"] != first_id
+    assert len(client.get(url + "/exports").json()) == 2
+    assert client.get(url + f"/exports/{first_id}").content == first.content
+    with zipfile.ZipFile(io.BytesIO(upgraded.content)) as archive:
+        assert json.loads(archive.read("audit.json"))["render_version"] == "analysis-basis-next-format"
 
     heading = next(block for block in report["content"] if block["type"] == "h2")
     renamed = client.post(url + "/sections/change", json={
@@ -825,7 +835,7 @@ def test_export_history_is_immutable_reusable_and_project_scoped(client):
     assert client.post(url + "/review").status_code == 200
     second = client.get(url + "/export?level=scenario")
     assert second.status_code == 200 and second.headers["x-export-id"] != first_id
-    assert len(client.get(url + "/exports").json()) == 2
+    assert len(client.get(url + "/exports").json()) == 3
     assert client.get(url + f"/exports/{first_id}").content == first.content
     with TestClient(app) as restarted:
         assert restarted.get(url + f"/exports/{first_id}").content == first.content

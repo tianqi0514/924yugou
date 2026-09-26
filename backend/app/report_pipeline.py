@@ -29,6 +29,7 @@ from .model_settings import chat_json
 
 ALLOWED_BLOCKS = {"p", "h1", "h2", "h3", "blockquote", "table"}
 TEXT_MARKS = {"bold", "italic", "underline", "strikethrough"}
+EXPORT_RENDER_VERSION = "analysis-basis-v1"
 
 
 def _valid_url(url: str) -> bool:

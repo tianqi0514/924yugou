@@ -27,7 +27,7 @@ from .corpus import CorpusRepository
 from .db import AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectFact, ReportDraft, ReportExport, ReportVersion, RuleRecord, SessionLocal, SourceDocument, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
-from .report_pipeline import change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
+from .report_pipeline import EXPORT_RENDER_VERSION, change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
 from .report_sections import change_section
 from .rules import MAX_DECIMAL_EXPONENT, EvalValue, RuleError, evaluate, parse_expression, sort_rules, unit_dimension, unit_signature
 from .writing import SLOTS, SLOT_BY_ID, render_cases, source_cases
@@ -1906,6 +1906,7 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
             AnalysisWritingEvent.report_version <= item.version).order_by(
                 AnalysisWritingEvent.report_version, AnalysisWritingEvent.created_at)).all()
         audit = {"report_id": item.id, "project_id": project_id, "report_version": item.version,
+                 "render_version": EXPORT_RENDER_VERSION,
                  "content_sha256": content_hash(item.content),
                  "delivery_status": "preview_only" if level == "preview" else
                                     "scenario_assumptions_reviewed" if level == "scenario" else "source_locator_reviewed",
