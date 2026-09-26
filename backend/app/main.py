@@ -1143,12 +1143,27 @@ def _validate_corpus_article_content(session, project_id: str, report_id: str, c
     if project.corpus is None:
         return
     archive_id = project.corpus.corpus_id
+    report = session.get(ReportDraft, report_id)
+    selected_run = (session.scalar(select(AnalysisRun).where(
+        AnalysisRun.id == report.analysis_run_id, AnalysisRun.project_id == project_id))
+        if report is not None and report.project_id == project_id and report.analysis_run_id else None)
     for position, block in enumerate(content, 1):
         if block.get("type") not in {"p", "blockquote", "table"}:
             continue
         numbers = article_number_tokens(plain(block))
         refs = block.get("source_refs", [])
-        analysis_numbers = set().union(*(article_number_tokens(ref["value"]) for ref in block.get("analysis_refs", [])))
+        analysis_refs = list(block.get("analysis_refs", []))
+        if block.get("type") == "table":
+            for row in block.get("children", []):
+                for cell in row.get("children", []):
+                    for paragraph in cell.get("children", []):
+                        analysis_refs.extend(paragraph.get("analysis_refs", []))
+        analysis_numbers = set().union(*(article_number_tokens(ref["value"]) for ref in analysis_refs))
+        if selected_run is not None:
+            analysis_numbers |= set().union(*(article_number_tokens(str(result["value"]))
+                for ref in analysis_refs
+                if (result := selected_run.snapshot["results"].get(ref["result_key"]))
+                and result["value"] is not None))
         if numbers and not refs and not analysis_numbers:
             fail(f"第 {position} 段含未标注历史来源的数字", 409)
         cited_text = []

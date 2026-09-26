@@ -175,6 +175,49 @@ test('环评样本两章引用同一原件，预算变化后条件与正文待�
   expect((await exported.body()).byteLength).toBeGreaterThan(1000)
   const oldVersion = await request.get(`${base}/reports/${report.id}/versions`)
   expect((await oldVersion.json()).length).toBeGreaterThan(2)
+
+  scenario = await send(request, 'put', `${base}/analysis/scenarios/${scenario.id}`, {
+    base_revision: scenario.revision, changes: { budget_limit: '25' },
+  })
+  const thirdRun = await send(request, 'post', `${base}/analysis/scenarios/${scenario.id}/runs`, {
+    scenario_revision: scenario.revision, request_key: `eia-${Date.now()}-3`,
+  })
+  const beforeRebind = await (await request.get(`${base}/reports/${report.id}`)).json()
+  await send(request, 'post', `${base}/analysis/reports/${report.id}/select`, {
+    run_id: thirdRun.id, base_version: beforeRebind.version,
+  })
+  await page.reload()
+  const revisedCondition = page.locator('[contenteditable="true"] .slate-p')
+    .filter({ hasText: /本方案环保投资超过预算上限。.*人工补充：用途另行核对。/ }).first()
+  await revisedCondition.click()
+  await revisedCondition.evaluate((element) => {
+    const range = document.createRange()
+    range.selectNodeContents(element)
+    const selection = window.getSelection()
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+  })
+  await page.keyboard.type('本方案环保投资未超过预算上限。人工补充：用途另行核对。')
+  await expect(page.locator('[contenteditable="true"]')).toContainText('本方案环保投资未超过预算上限。人工补充：用途另行核对。')
+  await page.getByRole('button', { name: '保存', exact: true }).click()
+  await expect(page.locator('.scenario-title')).toContainText('已保存')
+  await page.getByRole('button', { name: /检查/ }).first().click()
+  await page.getByRole('button', { name: '处理变化' }).click()
+  const rebindChoice = page.locator('.scenario-refresh-action').filter({ hasText: '绑定当前推演' })
+  await expect(rebindChoice).toContainText('15万元 → 25万元')
+  await rebindChoice.getByRole('checkbox').check()
+  await page.getByRole('button', { name: '更新所选 1 处' }).click()
+  await expect.poll(async () => {
+    const state = await (await request.get(`${base}/reports/${report.id}`)).json()
+    const row = state.content.find((block: { section_id?: string; children?: { text?: string }[] }) =>
+      block.section_id === 'budget' && block.children?.some((leaf) => leaf.text?.includes('人工补充：用途另行核对。')))
+    return row?.analysis_refs?.every((ref: { run_id: string }) => ref.run_id === thirdRun.id) || false
+  }).toBeTruthy()
+  const rebound = await (await request.get(`${base}/reports/${report.id}`)).json()
+  const reboundCondition = rebound.content.find((block: { section_id?: string; children?: { text?: string }[] }) =>
+    block.section_id === 'budget' && block.children?.some((leaf) => leaf.text?.includes('人工补充：用途另行核对。')))
+  expect(reboundCondition.analysis_refs.every((ref: { run_id: string }) => ref.run_id === thirdRun.id)).toBeTruthy()
+  expect(rebound.issues.some((issue: { code: string }) => issue.code === 'ANALYSIS_RUN_STALE')).toBeTruthy()
   await page.clock.install()
   const editor = page.locator('[contenteditable="true"]')
   await editor.click()

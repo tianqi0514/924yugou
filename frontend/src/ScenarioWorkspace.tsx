@@ -16,7 +16,7 @@ type Issue = { code: string; severity: string; message: string; position?: numbe
 type Report = { id: string; title: string; version: number; content: Block[]; reviewed: boolean; analysis_run_id: string | null; issues: Issue[]; updated_at: string }
 type ReportSummary = { id: string; title: string; version: number; updated_at: string; analysis_run_id: string | null }
 type Preview = { run_id: string; section_id: string; mode: string; base_version: number; content: Block[]; model_audit: Record<string, unknown> & { evidence?: { key: string; label: string; status: string; reason: string | null }[] }; expires_at: number; preview_token: string; issues: Issue[]; preserved_blocks?: Block[] }
-type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'config_condition' | 'judgement' | 'manual_review' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[] }
+type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'config_condition' | 'judgement' | 'manual_review' | 'rebind' | 'detach' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[]; reference_changes?: { key: string; before: string; after: string | null }[] }
 type RefreshPreview = { report_version: number; run_id: string; actions: RefreshAction[] }
 type Panel = 'inputs' | 'results' | 'draft' | 'sources' | 'check' | 'versions' | 'materials' | null
 
@@ -402,6 +402,16 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     } finally { setBusy(false) }
   }
 
+  const chooseRefresh = (action: RefreshAction, checked: boolean) => {
+    setRefreshSelected((old) => {
+      if (!checked) return old.filter((id) => id !== action.id)
+      const conflicting = refreshPreview?.actions.filter((item) => item.block_id === action.block_id &&
+        !(item.kind === 'numbers' && action.kind === 'condition' ||
+          item.kind === 'condition' && action.kind === 'numbers')).map((item) => item.id) || []
+      return [...old.filter((id) => !conflicting.includes(id)), action.id]
+    })
+  }
+
   const locateBlock = (position: number, blockId?: string) => {
     setSelectedPosition(position)
     const block = Array.from(document.querySelectorAll<HTMLElement>('.plate-content [data-block-id]'))
@@ -514,12 +524,13 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
               {refreshPreview.actions.length ? refreshPreview.actions.map((action) => <div className="scenario-refresh-action" key={action.id}>
                 <div className="scenario-refresh-action-head">
                   {action.selectable
-                    ? <label><input type="checkbox" aria-label={`${action.kind === 'manual_review' ? '核对并选择' : '选择'}第 ${action.position} 段${action.label}`} checked={refreshSelected.includes(action.id)} onChange={(event) => setRefreshSelected((old) => event.target.checked ? [...old, action.id] : old.filter((id) => id !== action.id))} /><strong>{action.label}</strong></label>
+                    ? <label><input type="checkbox" aria-label={`${action.kind === 'manual_review' ? '核对并选择' : '选择'}第 ${action.position} 段${action.label}`} checked={refreshSelected.includes(action.id)} onChange={(event) => chooseRefresh(action, event.target.checked)} /><strong>{action.label}</strong></label>
                     : <strong>{action.label}</strong>}
-                  <button type="button" onClick={() => locateBlock(action.position, action.block_id)}>第 {action.position} 段</button>
+                  <button type="button" onClick={() => { locateBlock(action.position, action.block_id); if (!action.selectable) setPanel(null) }}>{action.selectable ? `第 ${action.position} 段` : '编辑正文'}</button>
                 </div>
                 {action.reason && <small>{action.reason}</small>}
-                {action.after && (action.kind === 'manual_review'
+                {!!action.reference_changes?.length && <div className="scenario-refresh-refs">{action.reference_changes.map((change, index) => <div key={`${change.key}-${index}`}><span>{activeRun?.snapshot.definitions.find((field) => field.key === change.key)?.label || change.key}</span><strong>{change.before} → {change.after || '解除引用'}</strong></div>)}</div>}
+                {action.after && !['rebind', 'detach'].includes(action.kind) && (action.kind === 'manual_review'
                   ? <div className="scenario-refresh-compare"><p><b>原文</b> {action.before}</p><p><b>拟更新</b> {action.after}</p></div>
                   : <details><summary>查看变更</summary><p>原文：{action.before}</p><p>更新：{action.after}</p></details>)}
               </div>) : <div className="empty">没有需要更新的位置</div>}

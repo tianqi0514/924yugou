@@ -25,7 +25,7 @@ CONDITIONS = {
 }
 LABELS = {"numbers": "更新数字与引用", "table": "更新结果表",
           "condition": "重写条件句", "config_condition": "更新条件判断", "judgement": "更新供应商判断",
-          "manual_review": "核对人工修改后更新"}
+          "manual_review": "核对人工修改后更新", "rebind": "绑定当前推演", "detach": "解除旧引用"}
 
 
 class RefreshCommit(BaseModel):
@@ -263,7 +263,147 @@ def _manual_update(block: dict, run) -> dict:
     return changed
 
 
+def _visible_count(text: str, token: str) -> int:
+    if not token:
+        return 0
+    if token[0].isdigit():
+        expected = re.fullmatch(r"(\d[\d,]*(?:\.\d+)?)(.*)", token)
+        if expected is None:
+            return 0
+        number, unit = expected.groups()
+        expected_value = Decimal(number.replace(",", ""))
+        return sum(Decimal(match.group().replace(",", "")) == expected_value
+                   and text[match.end():].startswith(unit)
+                   for match in re.finditer(r"(?<![\d.])\d[\d,]*(?:\.\d+)?(?![\d.])", text))
+    return text.count(token)
+
+
+def _old_value_visible(text: str, ref: dict, new_tokens: set[str] | None = None) -> bool:
+    value = str(ref["value"])
+    token = f"{value}{ref['unit']}"
+    if new_tokens is not None and token in new_tokens:
+        return False
+    if value and value[0].isdigit():
+        if new_tokens is not None and any(re.match(r"\d[\d,]*(?:\.\d+)?", item).group() == value
+                                          for item in new_tokens if item and item[0].isdigit()):
+            return bool(_visible_count(text, token))
+        return bool(_visible_count(text, value))
+    return bool(_visible_count(text, token))
+
+
+def _condition_check(block: dict, run, *, detach: bool = False) -> None:
+    text = plain(block)
+    if block.get("section_id") == "S4":
+        phrases = [phrase for phrase in CONDITIONS.values() if phrase in text]
+        expected = CONDITIONS.get(run.snapshot.get("condition"))
+        if phrases and (detach or phrases != [expected]):
+            raise UnsafeUpdate("条件判断尚未按本次推演核对")
+    section = next((item for item in (run.snapshot.get("configuration") or {}).get("sections", [])
+                    if item["id"] == block.get("section_id")), None)
+    for condition in (section or {}).get("conditions", []):
+        phrases = [phrase for phrase in (condition["when_true"], condition["when_false"])
+                   if phrase in text]
+        expected = run.snapshot.get("condition_results", {}).get(
+            f"{section['id']}:{condition['id']}", {}).get("text")
+        if phrases and (detach or phrases != [expected]):
+            raise UnsafeUpdate("条件判断尚未按本次推演核对")
+
+
+def _condition_only_refs(block: dict, refs: list[dict], run) -> bool:
+    configured = _configured_condition(block, run)
+    if configured and configured[1].get("text") in plain(block):
+        return all(ref["result_key"] in configured[1]["deps"] for ref in refs)
+    return False
+
+
+def _rebind_visible(block: dict, refs: list[dict], run) -> None:
+    if not refs:
+        return
+    new_tokens: set[str] = set()
+    expected: dict[str, int] = {}
+    for ref in refs:
+        current = _new_ref(ref, run)
+        token = f"{current['value']}{current['unit']}"
+        new_tokens.add(token)
+        expected[token] = expected.get(token, 0) + 1
+    text = plain(block)
+    if _condition_only_refs(block, refs, run):
+        if any(_old_value_visible(text, ref, new_tokens) for ref in refs):
+            raise UnsafeUpdate("正文仍含旧结果，请先在 Plate 中修改")
+        return
+    for token, count in expected.items():
+        if _visible_count(text, token) != count:
+            raise UnsafeUpdate("正文与当前结果的数值或位置不一致，请先在 Plate 中修改")
+    if any(_old_value_visible(text, ref, new_tokens) for ref in refs):
+        raise UnsafeUpdate("正文仍含旧结果，请先在 Plate 中修改")
+
+
+def _manual_rebind(block: dict, run) -> dict:
+    """Keep the user's edited text and formatting; only change checked references."""
+    changed = deepcopy(block)
+    refs = _refs(changed)
+    if not refs or changed.get("type") not in {"p", "table"}:
+        raise UnsafeUpdate("此处没有可重新绑定的推演引用")
+    _condition_check(changed, run)
+    if changed.get("type") == "table":
+        cell_keys: list[str] = []
+        for row in changed.get("children", []):
+            for cell in row.get("children", []):
+                for paragraph in cell.get("children", []):
+                    cell_refs = paragraph.get("analysis_refs", [])
+                    _rebind_visible(paragraph, cell_refs, run)
+                    cell_keys.extend(ref["result_key"] for ref in cell_refs)
+                    if cell_refs:
+                        paragraph["analysis_refs"] = [_new_ref(ref, run) for ref in cell_refs]
+        if sorted(cell_keys) != sorted(ref["result_key"] for ref in changed.get("analysis_refs", [])):
+            raise UnsafeUpdate("表格的结果引用与单元格不一致")
+    else:
+        _rebind_visible(changed, changed.get("analysis_refs", []), run)
+    if changed.get("analysis_refs"):
+        changed["analysis_refs"] = [_new_ref(ref, run) for ref in changed["analysis_refs"]]
+    changed["origin"] = "manual"
+    return changed
+
+
+def _manual_detach(block: dict, run) -> dict:
+    """Detach only after the visible old values and known conditional claims are removed."""
+    changed = deepcopy(block)
+    refs = _refs(changed)
+    if not refs or changed.get("type") not in {"p", "table"}:
+        raise UnsafeUpdate("此处没有可解除的推演引用")
+    _condition_check(changed, run, detach=True)
+    for ref in refs:
+        if _old_value_visible(plain(changed), ref):
+            raise UnsafeUpdate("正文仍含旧引用值，请先在 Plate 中删除或改写")
+    changed.pop("analysis_refs", None)
+    if changed.get("type") == "table":
+        for row in changed.get("children", []):
+            for cell in row.get("children", []):
+                for paragraph in cell.get("children", []):
+                    paragraph.pop("analysis_refs", None)
+    changed["origin"] = "manual"
+    return changed
+
+
+def _reference_changes(refs: list[dict], run, kind: str) -> list[dict]:
+    changes = []
+    seen: set[tuple[str, str, str | None]] = set()
+    for ref in refs:
+        before = f"{ref['value']}{ref['unit']}"
+        current = _new_ref(ref, run) if kind == "rebind" else None
+        after = f"{current['value']}{current['unit']}" if current else None
+        identity = (ref["result_key"], before, after)
+        if identity not in seen:
+            changes.append({"key": ref["result_key"], "before": before, "after": after})
+            seen.add(identity)
+    return changes
+
+
 def _transform(session, block: dict, run, kind: str) -> dict:
+    if kind == "rebind":
+        return _manual_rebind(block, run)
+    if kind == "detach":
+        return _manual_detach(block, run)
     if kind == "manual_review":
         return _manual_update(block, run)
     if kind == "numbers":
@@ -299,6 +439,7 @@ def _actions(session, report, run) -> list[dict]:
             continue
         manual = block.get("origin") != "guided" or block_id in protected
         if manual:
+            manual_reason = None
             try:
                 changed = _manual_update(block, run)
                 if changed == block:
@@ -310,10 +451,29 @@ def _actions(session, report, run) -> list[dict]:
                                 "selectable": True, "reason": "人工修改已保留，请逐字核对更新内容",
                                 "result_keys": sorted({ref["result_key"] for ref in refs})})
             except UnsafeUpdate as exc:
+                manual_reason = str(exc)
+            for kind in ("rebind", "detach") if refs else ():
+                try:
+                    changed = _transform(session, block, run, kind)
+                    if changed == block:
+                        continue
+                    actions.append({"id": f"{kind}:{block_id}", "kind": kind,
+                                    "label": LABELS[kind], "block_id": block_id,
+                                    "position": position, "section_id": block.get("section_id"),
+                                    "before": plain(block), "after": plain(changed),
+                                    "selectable": True,
+                                    "reason": "正文保持不变；请核对下方引用变化" if kind == "rebind"
+                                              else "正文保持不变；旧推演引用将被解除",
+                                    "result_keys": sorted({ref["result_key"] for ref in refs}),
+                                    "reference_changes": _reference_changes(refs, run, kind)})
+                except UnsafeUpdate:
+                    pass
+            if not any(action["block_id"] == block_id for action in actions):
                 actions.append({"id": f"manual:{block_id}", "kind": "manual", "label": "手工核对",
                                 "block_id": block_id, "position": position,
                                 "section_id": block.get("section_id"), "before": plain(block),
-                                "after": None, "selectable": False, "reason": str(exc)})
+                                "after": None, "selectable": False,
+                                "reason": manual_reason or "请在 Plate 中修改后保存"})
             continue
         kinds = []
         if configured and (stale or config_condition_stale):
@@ -380,6 +540,13 @@ def refresh_commit(project_id: str, report_id: str, body: RefreshCommit):
                    if action["selectable"]}
         if any(operation_id not in offered for operation_id in body.operation_ids):
             raise HTTPException(409, "更新动作已失效，请重新预览")
+        selected_by_block: dict[str, set[str]] = {}
+        for operation_id in body.operation_ids:
+            action = offered[operation_id]
+            selected_by_block.setdefault(action["block_id"], set()).add(action["kind"])
+        if any(len(kinds) > 1 and kinds != {"numbers", "condition"}
+               for kinds in selected_by_block.values()):
+            raise HTTPException(400, "同一段只能选择一种人工更新动作")
         touched_sections = {offered[operation_id]["section_id"] for operation_id in body.operation_ids}
         manual_ids = {section: {block.get("id") for block in _manual_blocks(session, report, section)[0]}
                       for section in touched_sections if section}
@@ -388,6 +555,7 @@ def refresh_commit(project_id: str, report_id: str, body: RefreshCommit):
         ordered = sorted((offered[operation_id] for operation_id in body.operation_ids),
                          key=lambda action: (action["position"],
                                              {"numbers": 0, "table": 0, "judgement": 0, "manual_review": 0,
+                                              "rebind": 0, "detach": 0,
                                               "condition": 1, "config_condition": 1}[action["kind"]]))
         for action in ordered:
             block = by_id[action["block_id"]]

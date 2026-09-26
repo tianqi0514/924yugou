@@ -524,3 +524,170 @@ def test_supplier_refresh_does_not_overwrite_manual_paragraph(client):
     assert client.post(path + "/commit", json={
         "run_id": third["id"], "base_version": blocked["report_version"],
         "operation_ids": [blocked["actions"][0]["id"]]}).status_code == 409
+
+
+def _save_edited(client, base, report_id, report, content):
+    path = base + f"/reports/{report_id}"
+    preview = client.post(path + "/preview", json={
+        "base_version": report["version"], "content": content})
+    assert preview.status_code == 200, preview.text
+    saved = client.put(path, json={
+        "base_version": report["version"], "content": content,
+        "preview_token": preview.json()["preview_token"]})
+    assert saved.status_code == 200, saved.text
+    return saved.json()["report"]
+
+
+def test_ambiguous_manual_values_can_be_corrected_then_rebound(client):
+    base, scenario = create_history(client)
+    scenario = update(client, base, scenario, {"N017": "300000"})
+    first = run(client, base, scenario)
+    report = client.post(base + "/reports", json={"title": "手工重绑测试"}).json()
+    report_id = report["id"]
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": first["id"], "base_version": report["version"]}).status_code == 200
+    report = _accepted_section(client, base, report_id, first["id"], "S4")
+    content = deepcopy(report["content"])
+    paragraph = next(block for block in content if block["type"] == "p" and block.get("analysis_refs"))
+    paragraph["children"][0]["text"] += " 交付安排由项目组复核。"
+    paragraph["origin"] = "manual"
+    report = _save_edited(client, base, report_id, report, content)
+    scenario = update(client, base, scenario, {"N017": "200000"})
+    second = run(client, base, scenario)
+    selected = client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": second["id"], "base_version": report["version"]})
+    assert selected.status_code == 200, selected.text
+    report = client.get(base + f"/reports/{report_id}").json()
+    path = base + f"/analysis/reports/{report_id}/refresh"
+    initial = client.get(path + "/preview").json()
+    assert any(row["kind"] == "manual" and row["block_id"] == paragraph["id"] for row in initial["actions"])
+    assert not any(row["kind"] == "rebind" and row["block_id"] == paragraph["id"] for row in initial["actions"])
+    assert client.get(base + f"/reports/{report_id}/export?level=scenario").status_code == 409
+
+    content = deepcopy(report["content"])
+    edited = next(block for block in content if block.get("id") == paragraph["id"])
+    original = edited["children"][0]["text"]
+    assert original.count("254016套") == 2
+    edited["children"] = [{"text": original.replace("300000套", "200000套")
+                           .replace("计划销售量为254016套", "计划销售量为200000套")
+                           .replace("需求超过合格能力，销售计划受产能限制。",
+                                    "需求低于合格能力，销售计划以需求为限。")},
+                          {"text": "人工格式保留", "bold": True}]
+    report = _save_edited(client, base, report_id, report, content)
+    ready = client.get(path + "/preview").json()
+    rebind = next(row for row in ready["actions"] if row["kind"] == "rebind" and row["block_id"] == edited["id"])
+    assert rebind["selectable"] and rebind["before"] == rebind["after"]
+    assert {row["key"]: row["after"] for row in rebind["reference_changes"]} == {
+        "N017": "200000套/年", "N034": "254016套/年", "N035": "200000套/年"}
+    assert client.get(base + f"/reports/{report_id}").json()["version"] == ready["report_version"]
+    table = next(row for row in ready["actions"] if row["kind"] == "table")
+    committed = client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": ready["report_version"],
+        "operation_ids": [rebind["id"], table["id"]]})
+    assert committed.status_code == 200, committed.text
+    current = committed.json()["report"]
+    result = next(block for block in current["content"] if block.get("id") == edited["id"])
+    assert result["children"] == edited["children"]
+    assert all(ref["run_id"] == second["id"] for ref in result["analysis_refs"])
+    assert not any(issue["code"] in {"ANALYSIS_RUN_STALE", "ANALYSIS_CONDITION_STALE"}
+                   for issue in current["issues"])
+    assert client.post(base + f"/reports/{report_id}/review").status_code == 200
+    exported = client.get(base + f"/reports/{report_id}/export?level=scenario")
+    assert exported.status_code == 200, exported.text[:200]
+    with zipfile.ZipFile(io.BytesIO(exported.content)) as archive:
+        audit = json.loads(archive.read("audit.json"))
+        assert "rebind" in json.dumps(audit, ensure_ascii=False)
+        with zipfile.ZipFile(io.BytesIO(archive.read("report.docx"))) as docx:
+            xml = docx.read("word/document.xml")
+            assert b"200000" in xml and b"300000" not in xml
+        with pymupdf.open(stream=archive.read("report.pdf"), filetype="pdf") as pdf:
+            pdf_text = "\n".join(page.get_text() for page in pdf)
+            assert "200000" in pdf_text and "300000" not in pdf_text
+
+
+def test_detach_requires_old_value_removed_and_checks_version(client):
+    base, scenario = create_history(client)
+    first = run(client, base, scenario)
+    report = client.post(base + "/reports", json={"title": "手工解绑测试"}).json()
+    report_id = report["id"]
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": first["id"], "base_version": 0}).status_code == 200
+    report = _accepted_section(client, base, report_id, first["id"], "S7.1")
+    content = deepcopy(report["content"])
+    paragraph = next(block for block in content if block["type"] == "p" and block.get("analysis_refs"))
+    paragraph["children"][0]["text"] += " 采购结论待核实。"
+    paragraph["origin"] = "manual"
+    report = _save_edited(client, base, report_id, report, content)
+    scenario = update(client, base, scenario, {"supplier": "新供应商甲"})
+    second = run(client, base, scenario)
+    selected = client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": second["id"], "base_version": report["version"]})
+    assert selected.status_code == 200
+    report = client.get(base + f"/reports/{report_id}").json()
+    path = base + f"/analysis/reports/{report_id}/refresh"
+    blocked = client.get(path + "/preview").json()
+    assert any(row["kind"] == "manual" for row in blocked["actions"])
+    assert not any(row["kind"] == "detach" for row in blocked["actions"])
+    content = deepcopy(report["content"])
+    edited = next(block for block in content if block.get("id") == paragraph["id"])
+    edited["children"] = [{"text": "设备来源及报价待补充原件后核对。"}]
+    report = _save_edited(client, base, report_id, report, content)
+    ready = client.get(path + "/preview").json()
+    detach = next(row for row in ready["actions"] if row["kind"] == "detach")
+    assert detach["reference_changes"][0]["after"] is None
+    assert client.get(base + f"/reports/{report_id}").json()["content"] == content
+    assert client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": ready["report_version"] - 1,
+        "operation_ids": [detach["id"]]}).status_code == 409
+    changed = client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": ready["report_version"],
+        "operation_ids": [detach["id"]]})
+    assert changed.status_code == 200, changed.text
+    result = next(block for block in changed.json()["report"]["content"] if block.get("id") == edited["id"])
+    assert "analysis_refs" not in result and result["children"] == edited["children"]
+    assert any(issue["code"] == "NO_FACT_LINK" for issue in changed.json()["report"]["issues"])
+    assert client.post(base + f"/reports/{report_id}/review").status_code == 400
+
+
+def test_manual_rebind_refuses_wrong_value_unit_condition_and_table_position():
+    from app.analysis_refresh import UnsafeUpdate, _manual_detach, _manual_rebind
+    old = {"run_id": "old", "result_key": "demand", "value": "300000", "unit": "套/年"}
+    run = SimpleNamespace(id="new", snapshot={"results": {
+        "demand": {"value": "200000", "unit": "套/年"}}, "condition": "需求低于产能"})
+    block = {"type": "p", "id": "x", "section_id": "S4", "origin": "manual",
+             "children": [{"text": "需求200000套，需求超过合格能力，销售计划受产能限制。"}],
+             "analysis_refs": [old]}
+    with pytest.raises(UnsafeUpdate, match="条件判断"):
+        _manual_rebind(block, run)
+    block["children"][0]["text"] = "需求200000套。"
+    with pytest.raises(UnsafeUpdate, match="数值或位置"):
+        _manual_rebind(block, run)
+    block["children"][0]["text"] = "需求200000套/年。"
+    assert _manual_rebind(block, run)["analysis_refs"][0]["run_id"] == "new"
+    block["children"][0]["text"] = "旧需求300000套/年。"
+    with pytest.raises(UnsafeUpdate, match="正文仍含旧引用值"):
+        _manual_detach(block, run)
+    block["children"][0]["text"] = "旧需求300,000套/年。"
+    with pytest.raises(UnsafeUpdate, match="正文仍含旧引用值"):
+        _manual_detach(block, run)
+    assert block["analysis_refs"][0]["run_id"] == "old"
+
+
+def test_manual_table_rebind_preserves_cell_format_and_checks_top_level_refs():
+    from app.analysis_refresh import UnsafeUpdate, _manual_rebind
+    ref = {"run_id": "old", "result_key": "capacity", "value": "254016", "unit": "套/年"}
+    run = SimpleNamespace(id="new", snapshot={"results": {
+        "capacity": {"value": "211680", "unit": "套/年"}}, "condition": None})
+    paragraph = {"type": "p", "children": [{"text": "合格能力 "},
+                                           {"text": "211,680套/年", "bold": True}],
+                 "analysis_refs": [ref]}
+    table = {"type": "table", "id": "table-edited", "section_id": "S4", "origin": "manual",
+             "analysis_refs": [ref], "children": [{"type": "tr", "children": [
+                 {"type": "td", "children": [paragraph]}]}]}
+    updated = _manual_rebind(table, run)
+    assert updated["children"][0]["children"][0]["children"][0]["children"] == paragraph["children"]
+    assert updated["analysis_refs"][0]["run_id"] == "new"
+    assert updated["children"][0]["children"][0]["children"][0]["analysis_refs"][0]["run_id"] == "new"
+    table["analysis_refs"] = []
+    with pytest.raises(UnsafeUpdate, match="单元格不一致"):
+        _manual_rebind(table, run)
