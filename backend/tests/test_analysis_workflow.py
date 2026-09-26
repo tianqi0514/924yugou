@@ -15,6 +15,7 @@ os.environ["DATABASE_URL"] = "postgresql+psycopg://report:local_development_only
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
+from docx import Document
 
 from app.db import AnalysisRun, Base, Project, ProjectFact, ReportDraft, SessionLocal, WritingCommitEvent, engine
 from app.main import BUILTIN_PROJECT_ID, app
@@ -691,3 +692,92 @@ def test_manual_table_rebind_preserves_cell_format_and_checks_top_level_refs():
     table["analysis_refs"] = []
     with pytest.raises(UnsafeUpdate, match="单元格不一致"):
         _manual_rebind(table, run)
+
+
+def test_chapter_add_rename_move_preserve_links_versions_and_export(client):
+    base, scenario = create_history(client)
+    scenario = update(client, base, scenario, {"N017": "300000"})
+    chosen = run(client, base, scenario)
+    report = client.post(base + "/reports", json={"title": "章节排序报告"}).json()
+    report_id = report["id"]
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": chosen["id"], "base_version": 0}).status_code == 200
+    report = _accepted_section(client, base, report_id, chosen["id"], "S4")
+    report = _accepted_section(client, base, report_id, chosen["id"], "S7.1")
+    original = deepcopy(report["content"])
+    original_version = report["version"]
+    headings = {block["section_id"]: block for block in original if block["type"] == "h2"}
+    path = base + f"/reports/{report_id}/sections/change"
+    renamed = client.post(path, json={"action": "rename", "heading_id": headings["S7.1"]["id"],
+                                      "title": "设备方案（人工命名）", "base_version": report["version"]})
+    assert renamed.status_code == 200, renamed.text
+    report = renamed.json()["report"]
+    assert next(block for block in report["content"] if block.get("id") == headings["S7.1"]["id"])["origin"] == "manual"
+    moved = client.post(path, json={"action": "move", "heading_id": headings["S7.1"]["id"],
+                                    "direction": "up", "base_version": report["version"]})
+    assert moved.status_code == 200, moved.text
+    report = moved.json()["report"]
+    assert [block["section_id"] for block in report["content"] if block["type"] == "h2"] == ["S7.1", "S4"]
+    assert client.post(path, json={"action": "move", "heading_id": headings["S7.1"]["id"],
+                                   "direction": "up", "base_version": report["version"]}).status_code == 400
+    added = client.post(path, json={"action": "add", "title": "项目背景", "base_version": report["version"]})
+    assert added.status_code == 200, added.text
+    report = added.json()["report"]
+    manual_id = added.json()["heading_id"]
+    new_heading = next(block for block in report["content"] if block.get("id") == manual_id)
+    assert new_heading["section_id"].startswith("manual-")
+    assert [block["section_id"] for block in report["content"] if block["type"] == "h2"] == ["S7.1", "S4", new_heading["section_id"]]
+    assert client.post(path, json={"action": "rename", "heading_id": manual_id,
+                                   "title": "  ", "base_version": report["version"]}).status_code == 400
+    assert client.post(path, json={"action": "move", "heading_id": manual_id,
+                                   "direction": "up", "base_version": original_version}).status_code == 409
+    assert client.post(base.replace(BUILTIN_PROJECT_ID, str(uuid4())) + f"/reports/{report_id}/sections/change",
+                       json={"action": "move", "heading_id": manual_id,
+                             "direction": "up", "base_version": report["version"]}).status_code == 404
+    assert client.get(base + f"/reports/{report_id}").json()["version"] == report["version"]
+    for block in original:
+        if block.get("section_id") in {"S4", "S7.1"} and block["type"] != "h2":
+            assert next(current for current in report["content"] if current.get("id") == block["id"]) == block
+    comparison = client.get(base + f"/reports/{report_id}/compare?base={original_version}")
+    assert comparison.status_code == 200 and comparison.json()["base_content"] == original
+
+    preview = client.post(base + f"/analysis/reports/{report_id}/draft/preview", json={
+        "run_id": chosen["id"], "section_id": "S7.1", "mode": "computed"})
+    assert preview.status_code == 200, preview.text
+    accepted = client.post(base + f"/analysis/reports/{report_id}/draft/commit", json={
+        **{key: value for key, value in preview.json().items() if key not in {"issues", "preserved_blocks"}},
+        "replace_section": True})
+    assert accepted.status_code == 200, accepted.text
+    report = accepted.json()["report"]
+    assert next(block for block in report["content"] if block.get("section_id") == "S7.1")["children"] == [{"text": "设备方案（人工命名）"}]
+    assert client.post(base + f"/reports/{report_id}/review").status_code == 200
+    delivery = client.get(base + f"/reports/{report_id}/export?level=scenario")
+    assert delivery.status_code == 200, delivery.text[:200]
+    with zipfile.ZipFile(io.BytesIO(delivery.content)) as archive:
+        word = Document(io.BytesIO(archive.read("report.docx")))
+        word_text = "\n".join(paragraph.text for paragraph in word.paragraphs)
+        with pymupdf.open(stream=archive.read("report.pdf"), filetype="pdf") as pdf:
+            pdf_text = "\n".join(page.get_text() for page in pdf)
+        for text in (word_text, pdf_text):
+            assert text.index("设备方案（人工命名）") < text.index("产能与交付") < text.index("项目背景")
+        audit = json.loads(archive.read("audit.json"))
+        assert audit["analysis_run_id"] == chosen["id"]
+
+
+def test_chapter_add_to_empty_report_is_project_owned_and_idempotent_on_failure(client):
+    project = client.post("/api/projects", json={"name": "章节目录空项目"}).json()
+    base = f"/api/projects/{project['id']}"
+    report = client.post(base + "/reports", json={"title": "空项目报告"}).json()
+    path = base + f"/reports/{report['id']}/sections/change"
+    created = client.post(path, json={"action": "add", "title": "项目背景", "base_version": 0})
+    assert created.status_code == 200, created.text
+    content = created.json()["report"]["content"]
+    assert len(content) == 3 and content[1]["type"] == "h2" and content[2]["type"] == "p"
+    assert content[1]["section_id"] == content[2]["section_id"]
+    assert content[1]["id"] != content[2]["id"]
+    unchanged = client.post(path, json={"action": "rename", "heading_id": content[1]["id"],
+                                        "title": "项目背景", "base_version": 1})
+    assert unchanged.status_code == 200 and unchanged.json()["report"]["version"] == 1
+    assert client.post(path, json={"action": "add", "title": "项目背景", "base_version": 1}).status_code == 400
+    assert client.get(base + f"/reports/{report['id']}").json()["version"] == 1
+    assert client.get(base + "/facts").json()["facts"] == []

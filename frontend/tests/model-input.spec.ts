@@ -107,6 +107,7 @@ test('model basis is reviewed, stale hash is rejected, and candidate stays cance
 
   await page.goto('/')
   await page.getByRole('button', { name: '报告写作' }).click()
+  await expect(page.locator('.report-optional-draft')).toBeVisible()
   await page.setViewportSize({ width: 900, height: 700 })
   const foldedHeights = await page.locator('.report-optional-draft, .report-history').evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height))
   expect(foldedHeights).toHaveLength(2)

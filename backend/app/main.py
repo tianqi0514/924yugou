@@ -14,7 +14,7 @@ from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 from urllib.parse import quote
 from uuid import uuid4
 
@@ -28,6 +28,7 @@ from .db import AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionC
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
 from .report_pipeline import change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
+from .report_sections import change_section
 from .rules import MAX_DECIMAL_EXPONENT, EvalValue, RuleError, evaluate, parse_expression, sort_rules, unit_dimension, unit_signature
 from .writing import SLOTS, SLOT_BY_ID, render_cases, source_cases
 from .writing_support import GUIDED_SECTIONS, accepted_reference, build_candidate, prepare_model_input, package as writing_package, sections as writing_sections
@@ -170,6 +171,14 @@ class ReportSave(BaseModel):
     content: list[dict]
     base_version: int
     preview_token: str | None = None
+
+
+class ReportSectionChange(BaseModel):
+    action: Literal["add", "rename", "move"]
+    base_version: int = Field(ge=0)
+    heading_id: str | None = Field(default=None, max_length=100)
+    title: str | None = Field(default=None, max_length=80)
+    direction: Literal["up", "down"] | None = None
 
 
 class CorpusArticleDraft(BaseModel):
@@ -1585,6 +1594,35 @@ def report_save(project_id: str, report_id: str, body: ReportSave):
                                       bound_facts=item.bound_facts, reviewed_hash=None,
                                       analysis_run_id=item.analysis_run_id))
         return {"report": _report_dict(item, facts, session), "changes": impacts}
+
+
+@app.post("/api/projects/{project_id}/reports/{report_id}/sections/change")
+def report_section_change(project_id: str, report_id: str, body: ReportSectionChange):
+    with SessionLocal.begin() as session:
+        item = _report(session, project_id, report_id, lock=True)
+        if item.version != body.base_version:
+            fail("报告已有新版本，请刷新后重试", 409)
+        try:
+            content, heading_id = change_section(
+                item.content, body.action, heading_id=body.heading_id,
+                title=body.title, direction=body.direction)
+            validate_content(content)
+        except ValueError as exc:
+            fail(str(exc))
+        _validate_writing_refs(session, project_id, content)
+        _validate_corpus_article_content(session, project_id, report_id, content)
+        _analysis_report_state(session, item, content)
+        changes = change_impact(item.content, content)
+        if content == item.content:
+            return {"report": _report_dict(item, _current_facts(session, project_id), session),
+                    "heading_id": heading_id, "changes": []}
+        item.content = content
+        item.reviewed_hash = None
+        item.version += 1
+        session.add(ReportVersion(report_id=item.id, version=item.version, content=content,
+                                  bound_facts=item.bound_facts, analysis_run_id=item.analysis_run_id))
+        return {"report": _report_dict(item, _current_facts(session, project_id), session),
+                "heading_id": heading_id, "changes": changes}
 
 
 @app.post("/api/projects/{project_id}/reports/{report_id}/generate/preview")

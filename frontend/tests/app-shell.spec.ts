@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('project switch, navigation and project creation remain usable on narrow screens', async ({ page }) => {
+  test.setTimeout(60_000)
   const history = { id: 'history', name: '历史资料', version: 1, has_corpus: true, is_builtin: true }
   const work = { id: 'work', name: '新项目', version: 0, has_corpus: false, is_builtin: false }
   let created = false

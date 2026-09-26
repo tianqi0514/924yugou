@@ -91,7 +91,7 @@ test('环评样本两章引用同一原件，预算变化后条件与正文待�
   await page.getByRole('button', { name: '生成候选' }).click()
   await page.getByRole('button', { name: '加入报告' }).click()
   await page.getByRole('button', { name: '生成本章', exact: true }).click()
-  await page.getByRole('complementary').getByLabel('章节').selectOption('budget')
+  await page.getByRole('combobox', { name: '生成章节' }).selectOption('budget')
   await page.getByRole('button', { name: '生成候选' }).click()
   await expect(page.locator('.scenario-candidate')).toContainText('预算内剩余空间3万元')
   await expect(page.locator('.scenario-candidate')).toContainText('证据 1/1')
