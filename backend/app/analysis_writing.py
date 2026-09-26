@@ -16,6 +16,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from .analysis import _report, _run, _source_ref
+from .analysis_evidence import section_evidence
 from .corpus_storage import CorpusRecord
 from .db import AnalysisWritingEvent, ReportVersion, SessionLocal, WritingCommitEvent
 from .model_settings import chat_json
@@ -37,6 +38,7 @@ class DraftCommit(DraftRequest):
     base_version: int = Field(ge=0)
     content: list[dict]
     replace_section: bool = False
+    selected_block_ids: list[str] | None = None
     model_audit: dict = Field(default_factory=dict)
     expires_at: int
     preview_token: str
@@ -69,10 +71,12 @@ def _source(session, run, category: int, semantic_id: str) -> dict:
 
 
 def _p(section_id: str, text: str, *, refs: list[dict] | None = None,
-       source_refs: list[dict] | None = None, origin: str = "guided") -> dict:
+       source_refs: list[dict] | None = None, fact_keys: list[str] | None = None,
+       origin: str = "guided") -> dict:
     return {"type": "p", "id": str(uuid4()), "section_id": section_id,
             "origin": origin, "children": [{"text": text}],
             **({"analysis_refs": refs} if refs else {}),
+            **({"fact_keys": fact_keys} if fact_keys else {}),
             **({"source_refs": source_refs} if source_refs else {})}
 
 
@@ -131,29 +135,92 @@ def _model_paragraph(section_id: str, run, facts: list[dict], rule: str, old_sup
     return _p(section_id, text.strip(), refs=refs, origin="model"), dict(getattr(response, "model_call", {}))
 
 
+def _configured_model(run, section: dict, rows: list[dict], conditions: list[dict], evidence: list[dict]) -> tuple[dict, dict]:
+    if not conditions or not evidence:
+        raise HTTPException(409, "模型起草需要已配置的条件与项目原件证据")
+    if any(item["status"] != "VERIFIED" for item in evidence):
+        raise HTTPException(409, "本章要求的项目原件证据尚未核对，暂不能模型起草")
+    allowed = {row["key"]: row for row in rows}
+    for item in conditions:
+        for key in item["deps"]:
+            allowed[key] = run.snapshot["results"][key]
+    context = {"section": section["title"],
+               "values": [{"key": row["key"], "label": row["label"],
+                           "value": row["value"], "unit": row["unit"]} for row in allowed.values()],
+               "approved_condition_sentences": [item["text"] for item in conditions],
+               "verified_sources": [{"key": item["key"], "label": item["label"],
+                                     "status": "reviewed_original"} for item in evidence],
+               "forbidden_terms": section.get("forbidden_terms", [])}
+    try:
+        response = chat_json("writing", [
+            {"role": "system", "content": "请为专业报告写一段待人工核对的正文。仅使用给出的运行值、已核对来源和已批准条件句。"
+             "至少原样包含一条已批准条件句，不得增加因果、责任、法律或订单结论。"
+             "不得增加输入以外的数字，不要在正文写来源编号、页码、核对过程或内部ID。"
+             "只返回JSON：{\"text\":\"中文段落\",\"used_result_keys\":[\"实际用到的key\"]}。"},
+            {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
+        ], max_tokens=850)
+    except ValueError as exc:
+        raise HTTPException(503, str(exc)) from exc
+    text = response.get("text")
+    keys = response.get("used_result_keys")
+    if (not isinstance(text, str) or not text.strip() or len(text) > 320
+            or not isinstance(keys, list) or not keys or any(key not in allowed for key in keys)
+            or len(set(keys)) != len(keys)):
+        raise HTTPException(422, "模型段落缺少可核对的运行引用")
+    visible = {value.replace(",", "") for value in re.findall(r"(?<!\d)\d[\d,]*(?:\.\d+)?(?!\d)", text)}
+    permitted_numbers = {allowed[key]["value"] for key in keys if allowed[key]["value"] is not None}
+    if visible - permitted_numbers:
+        raise HTTPException(422, "模型段落出现运行以外的数字")
+    if (any(term in text for term in section.get("forbidden_terms", []))
+            or any(item["text"] not in text for item in conditions)
+            or any(condition["when_true" if item["outcome"] is False else "when_false"] in text
+                   for condition, item in zip(section.get("conditions", []), conditions))):
+        raise HTTPException(422, "模型段落含禁用或失效的条件表述")
+    refs = [_ref(run.id, allowed[key]) for key in keys]
+    return _p(section["id"], text.strip(), refs=refs,
+              fact_keys=[item["key"] for item in evidence if item["key"] in keys
+                         and allowed[item["key"]]["value"] in visible],
+              origin="model"), dict(getattr(response, "model_call", {}))
+
+
 def _candidate(session, run, section_id: str, mode: str) -> tuple[list[dict], dict]:
     configuration = run.snapshot.get("configuration")
     if configuration:
         section = next((row for row in configuration["sections"] if row["id"] == section_id), None)
         if section is None:
             raise HTTPException(409, "当前配置没有此章节")
-        if mode != "computed":
-            raise HTTPException(409, "配置章节先核对确定性指标，模型起草尚未开放")
         if run.status != "COMPUTED":
             raise HTTPException(409, "本次推演存在不可评估结果")
         results = run.snapshot["results"]
         rows = [results[key] for key in section["result_keys"]]
         if any(row["value"] is None for row in rows):
             raise HTTPException(409, "本章所需指标仍有缺值")
+        evidence = section_evidence(session, run.project_id, run, section)
+        outcomes = [run.snapshot.get("condition_results", {}).get(f"{section_id}:{item['id']}")
+                    for item in section.get("conditions", [])]
+        if any(item is None or item["outcome"] is None for item in outcomes):
+            raise HTTPException(409, "本章条件因输入缺失而不可评估")
         text = "本方案" + section["title"] + "采用：" + "；".join(
             f"{row['label']}{row['value']}{row['unit']}" for row in rows) + "。以上为当前方案输入与计算结果，结论待核对。"
         blocks = [{"type": "h2", "id": str(uuid4()), "section_id": section_id,
                    "children": [{"text": section["title"]}]},
-                  _p(section_id, text, refs=[_ref(run.id, row) for row in rows]),
+                  _p(section_id, text, refs=[_ref(run.id, row) for row in rows],
+                     fact_keys=[key for key in section.get("evidence_keys", [])
+                                if key in section["result_keys"]]),
                   _table(section_id, run.id, rows)]
+        for item in outcomes:
+            refs = [_ref(run.id, results[key]) for key in item["deps"]]
+            blocks.append(_p(section_id, item["text"], refs=refs))
+        if mode == "model":
+            model, model_call = _configured_model(run, section, rows, outcomes, evidence)
+            blocks.append(model)
+        else:
+            model_call = {}
         validate_content(blocks)
         return blocks, {"configuration_id": configuration["id"],
-                        "configuration_version": configuration["version"]}
+                        "configuration_version": configuration["version"],
+                        "evidence": evidence, "conditions": outcomes,
+                        "model_call": model_call}
     if section_id not in _sections:
         raise HTTPException(409, "该章节尚未完成推演写作配置")
     snapshot = run.snapshot
@@ -265,6 +332,42 @@ def _replacement(candidate: list[dict], protected: list[dict], accepted_ids: lis
     return merged + extras
 
 
+def _partial_section(session, report, candidate: list[dict], selected: list[str],
+                     existing: list[dict], protected: list[dict]) -> tuple[list[dict], dict[str, str], list[dict]]:
+    choices = {block.get("id") for block in candidate[1:]}
+    if not selected or len(set(selected)) != len(selected) or any(block_id not in choices for block_id in selected):
+        raise HTTPException(400, "请选择候选中的正文或表格")
+    event = (session.query(AnalysisWritingEvent).filter_by(
+        project_id=report.project_id, report_id=report.id,
+        section_id=candidate[0]["section_id"], action="accept_candidate")
+        .order_by(AnalysisWritingEvent.report_version.desc()).first())
+    slots = dict(event.payload.get("candidate_slots", {})) if event else {}
+    if event and not slots:
+        slots = {str(index): block_id for index, block_id in enumerate(event.payload.get("block_ids", []))}
+    adopted = deepcopy(existing) if existing else [deepcopy(candidate[0])]
+    if not existing:
+        slots = {"0": candidate[0]["id"]}
+    protected_ids = {block.get("id") for block in protected}
+    inserted: list[dict] = []
+    for index, block in enumerate(candidate[1:], 1):
+        if block["id"] not in selected:
+            continue
+        old_id = slots.get(str(index))
+        position = next((at for at, old in enumerate(adopted) if old.get("id") == old_id), None)
+        if position is not None:
+            if old_id in protected_ids:
+                raise HTTPException(409, "所选位置已有人工修改，请取消该项并在正文中核对")
+            adopted[position] = deepcopy(block)
+        else:
+            preceding = next((slots.get(str(at)) for at in range(index - 1, -1, -1)
+                              if slots.get(str(at)) in {row.get("id") for row in adopted}), None)
+            offset = next((at + 1 for at, old in enumerate(adopted) if old.get("id") == preceding), len(adopted))
+            adopted.insert(offset, deepcopy(block))
+        slots[str(index)] = block["id"]
+        inserted.append(block)
+    return adopted, slots, inserted
+
+
 @router.post("/preview")
 def draft_preview(project_id: str, report_id: str, body: DraftRequest):
     with SessionLocal() as session:
@@ -278,13 +381,17 @@ def draft_preview(project_id: str, report_id: str, body: DraftRequest):
         data = {"run_id": run.id, "section_id": body.section_id, "mode": body.mode,
                 "base_version": report.version, "content": content,
                 "model_audit": model_audit, "expires_at": expires}
+        evidence_issues = [{"code": "CHAPTER_EVIDENCE_MISSING", "severity": "block",
+                            "message": f"{item['label']}：{item['reason']}", "fact_key": item["key"]}
+                           for item in model_audit.get("evidence", []) if item["status"] != "VERIFIED"]
         return {**data, "preview_token": _signature(project_id, report_id, data),
-                "issues": run.snapshot["issues"], "preserved_blocks": protected}
+                "issues": [*run.snapshot["issues"], *evidence_issues],
+                "preserved_blocks": protected}
 
 
 @router.post("/commit")
 def draft_commit(project_id: str, report_id: str, body: DraftCommit):
-    signed = body.model_dump(exclude={"preview_token", "replace_section"})
+    signed = body.model_dump(exclude={"preview_token", "replace_section", "selected_block_ids"})
     if body.expires_at < time.time() or not hmac.compare_digest(
             body.preview_token, _signature(project_id, report_id, signed)):
         raise HTTPException(409, "章节候选已过期或发生变化，请重新生成")
@@ -298,8 +405,14 @@ def draft_commit(project_id: str, report_id: str, body: DraftCommit):
         if existing and not body.replace_section:
             raise HTTPException(409, "本章已有正文，请先查看替换范围")
         protected, accepted_ids = _manual_blocks(session, report, body.section_id)
-        adopted = (_replacement(body.content, protected, accepted_ids)
-                   if body.replace_section else body.content)
+        if body.selected_block_ids is not None:
+            adopted, slots, new_blocks = _partial_section(session, report, body.content,
+                                                          body.selected_block_ids, existing, protected)
+        else:
+            adopted = (_replacement(body.content, protected, accepted_ids)
+                       if body.replace_section else body.content)
+            slots = {str(index): block["id"] for index, block in enumerate(adopted[:len(body.content)])}
+            new_blocks = adopted
         content = []
         inserted = False
         for block in report.content:
@@ -327,18 +440,23 @@ def draft_commit(project_id: str, report_id: str, body: DraftCommit):
                                   analysis_run_id=run.id))
         source_bindings = [{"block_id": block["id"], "section_id": body.section_id,
                             "refs": block.get("source_refs", []), "project_rule_refs": []}
-                           for block in adopted if block.get("source_refs")]
+                           for block in new_blocks if block.get("source_refs")]
         if source_bindings and run.snapshot.get("corpus_id"):
             session.add(WritingCommitEvent(project_id=project_id, report_id=report.id,
                 report_version=report.version, section_id=body.section_id,
                 corpus_id=run.snapshot["corpus_id"], corpus_version=run.snapshot["corpus_version"],
-                mode="analysis", block_ids=[block["id"] for block in adopted],
+                mode="analysis", block_ids=[block["id"] for block in new_blocks],
                 source_refs=source_bindings, issues=[], approved_item_ids=[],
                 model_audit=body.model_audit))
         session.add(AnalysisWritingEvent(project_id=project_id, report_id=report.id,
             report_version=report.version, run_id=run.id, action="accept_candidate",
             section_id=body.section_id,
             payload={"mode": body.mode, "block_ids": [block["id"] for block in adopted],
+                     "candidate_slots": slots,
+                     "selected_block_ids": body.selected_block_ids,
+                     "model_block_ids": [block["id"] for block in new_blocks
+                                         if block.get("origin") == "model" and
+                                         block["id"] in {item["id"] for item in body.content}],
                      "input_sha256": run.input_sha256, "model_audit": body.model_audit,
                      "preserved_block_ids": [block.get("id") for block in protected],
                      "replaced_block_ids": [block.get("id") for block in existing

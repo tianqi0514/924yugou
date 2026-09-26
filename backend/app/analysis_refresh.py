@@ -24,7 +24,7 @@ CONDITIONS = {
     "需求等于产能": "需求与合格能力相等，销售计划与两者一致。",
 }
 LABELS = {"numbers": "更新数字与引用", "table": "更新结果表",
-          "condition": "重写条件句", "judgement": "更新供应商判断"}
+          "condition": "重写条件句", "config_condition": "更新条件判断", "judgement": "更新供应商判断"}
 
 
 class RefreshCommit(BaseModel):
@@ -155,6 +155,32 @@ def _updated_condition(block: dict, run) -> dict:
     return changed
 
 
+def _configured_condition(block: dict, run) -> tuple[dict, dict] | None:
+    configuration = run.snapshot.get("configuration") or {}
+    section = next((item for item in configuration.get("sections", [])
+                    if item["id"] == block.get("section_id")), None)
+    if section is None or block.get("type") != "p":
+        return None
+    for condition in section.get("conditions", []):
+        if plain(block) in {condition["when_true"], condition["when_false"]}:
+            outcome = run.snapshot.get("condition_results", {}).get(
+                f"{section['id']}:{condition['id']}")
+            if outcome is not None:
+                return condition, outcome
+    return None
+
+
+def _updated_config_condition(block: dict, run) -> dict:
+    matched = _configured_condition(block, run)
+    if matched is None or matched[1]["text"] is None:
+        raise UnsafeUpdate("条件配置或本次结果不可用，请人工核对")
+    _, outcome = matched
+    changed = deepcopy(block)
+    changed["children"] = [{"text": outcome["text"]}]
+    changed["analysis_refs"] = [_new_ref({"result_key": key}, run) for key in outcome["deps"]]
+    return changed
+
+
 def _updated_judgement(session, block: dict, run) -> dict:
     generated, _ = _candidate(session, run, "S7.1", "computed")
     new = next(item for item in generated if item["type"] == "p")
@@ -175,6 +201,8 @@ def _transform(session, block: dict, run, kind: str) -> dict:
         return _updated_table(block, run)
     if kind == "condition":
         return _updated_condition(block, run)
+    if kind == "config_condition":
+        return _updated_config_condition(block, run)
     if kind == "judgement":
         return _updated_judgement(session, block, run)
     raise UnsafeUpdate("更新动作不存在")
@@ -191,10 +219,12 @@ def _actions(session, report, run) -> list[dict]:
             continue
         refs = _refs(block)
         stale = any(_is_stale(ref, run) for ref in refs)
+        configured = _configured_condition(block, run)
+        config_condition_stale = bool(configured and configured[1]["text"] != plain(block))
         condition_stale = (block.get("section_id") == "S4" and
                            _condition_phrase(block) is not None and
                            _condition_phrase(block) != CONDITIONS.get(run.snapshot["condition"]))
-        if not stale and not condition_stale:
+        if not stale and not condition_stale and not config_condition_stale:
             continue
         manual = block.get("origin") != "guided" or block_id in protected
         if manual:
@@ -205,7 +235,9 @@ def _actions(session, report, run) -> list[dict]:
                             "reason": "此段经过人工修改，请在正文中核对新运行结果与判断"})
             continue
         kinds = []
-        if stale:
+        if configured and (stale or config_condition_stale):
+            kinds.append("config_condition")
+        elif stale:
             if block.get("type") == "table":
                 kinds.append("table")
             elif block.get("section_id") == "S7.1" and any(ref["result_key"] == "supplier" for ref in refs):
@@ -274,7 +306,8 @@ def refresh_commit(project_id: str, report_id: str, body: RefreshCommit):
         by_id = {block.get("id"): block for block in content}
         ordered = sorted((offered[operation_id] for operation_id in body.operation_ids),
                          key=lambda action: (action["position"],
-                                             {"numbers": 0, "table": 0, "judgement": 0, "condition": 1}[action["kind"]]))
+                                             {"numbers": 0, "table": 0, "judgement": 0,
+                                              "condition": 1, "config_condition": 1}[action["kind"]]))
         for action in ordered:
             block = by_id[action["block_id"]]
             changed = _transform(session, block, run, action["kind"])

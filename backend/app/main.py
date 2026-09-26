@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import delete, select
 
 from .corpus import CorpusRepository
-from .db import AnalysisRun, AnalysisScenario, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectFact, ReportDraft, ReportVersion, RuleRecord, SessionLocal, SourceDocument, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
+from .db import AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectFact, ReportDraft, ReportVersion, RuleRecord, SessionLocal, SourceDocument, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
 from .report_pipeline import change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
@@ -1355,6 +1355,29 @@ def _analysis_report_state(session, item: ReportDraft, content: list[dict] | Non
         if selected.status == "UNEVALUABLE":
             issues.append({"code": "ANALYSIS_INCOMPLETE", "severity": "block",
                            "message": "当前方案有不可评估的计算结果"})
+        if selected.snapshot.get("configuration"):
+            from .analysis_evidence import section_evidence
+            for section in selected.snapshot["configuration"]["sections"]:
+                if not any(block.get("section_id") == section["id"] for block in blocks):
+                    continue
+                for evidence in section_evidence(session, item.project_id, selected, section):
+                    if evidence["status"] != "VERIFIED":
+                        mismatch = evidence["reason"] == "项目事实与本次方案值或单位不一致"
+                        issues.append({"code": "CHAPTER_EVIDENCE_MISMATCH" if mismatch else
+                                       "CHAPTER_EVIDENCE_MISSING", "severity": "block",
+                                       "message": f"{section['title']}：{evidence['label']}：{evidence['reason']}",
+                                       "fact_key": evidence["key"]})
+                for block in blocks:
+                    if block.get("section_id") != section["id"] or block.get("type") != "p":
+                        continue
+                    text = plain(block)
+                    for condition in section.get("conditions", []):
+                        expected = selected.snapshot.get("condition_results", {}).get(
+                            f"{section['id']}:{condition['id']}", {}).get("text")
+                        if text in {condition["when_true"], condition["when_false"]} and text != expected:
+                            issues.append({"code": "ANALYSIS_CONDITION_STALE", "severity": "block",
+                                           "position": blocks.index(block) + 1,
+                                           "message": "条件判断与当前推演结果不一致，请更新或核对"})
         from .analysis_refresh import CONDITIONS, _condition_phrase
         expected_condition = CONDITIONS.get(selected.snapshot.get("condition"))
         for position, block in enumerate(blocks, 1):
@@ -2215,8 +2238,35 @@ def _model_audits(session, project_id: str, report_id: str) -> list[dict]:
     rows = session.scalars(select(WritingCommitEvent).where(
         WritingCommitEvent.project_id == project_id, WritingCommitEvent.report_id == report_id,
         WritingCommitEvent.mode == "model").order_by(WritingCommitEvent.report_version)).all()
-    return [{"event_id": row.id, "report_version": row.report_version, "section_id": row.section_id,
-             "created_at": row.created_at.isoformat(), "model_audit": row.model_audit} for row in rows if row.model_audit]
+    audits = [{"event_id": row.id, "report_version": row.report_version, "section_id": row.section_id,
+               "created_at": row.created_at.isoformat(), "model_audit": row.model_audit}
+              for row in rows if row.model_audit]
+    report = session.get(ReportDraft, report_id)
+    current_ids = {block.get("id") for block in report.content} if report else set()
+    analysis_rows = session.scalars(select(AnalysisWritingEvent).where(
+        AnalysisWritingEvent.project_id == project_id,
+        AnalysisWritingEvent.report_id == report_id,
+        AnalysisWritingEvent.action == "accept_candidate").order_by(
+            AnalysisWritingEvent.report_version)).all()
+    for row in analysis_rows:
+        payload = row.payload or {}
+        model_audit = payload.get("model_audit") or {}
+        if payload.get("mode") != "model" or not model_audit.get("model_call"):
+            continue
+        model_ids = payload.get("model_block_ids")
+        if model_ids is None:  # Previously saved model events have no explicit adoption list.
+            version = session.get(ReportVersion, (report_id, row.report_version))
+            selected = payload.get("selected_block_ids") or payload.get("block_ids", [])
+            model_ids = [block.get("id") for block in version.content
+                         if block.get("origin") == "model" and block.get("id") in selected] if version else []
+        if not model_ids:
+            continue
+        audits.append({"event_id": row.id, "report_version": row.report_version,
+                       "section_id": row.section_id, "run_id": row.run_id,
+                       "created_at": row.created_at.isoformat(), "model_block_ids": model_ids,
+                       "applied_to_current": bool(current_ids.intersection(model_ids)),
+                       "model_audit": model_audit})
+    return sorted(audits, key=lambda item: (item["report_version"], item["created_at"]))
 
 
 @app.get("/api/projects/{project_id}/reports/{report_id}/writing/model-audits")

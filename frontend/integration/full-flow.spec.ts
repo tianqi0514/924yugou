@@ -121,6 +121,7 @@ test('真实用户写作闭环：空项目、原件、事实、规则、章节�
   expect(calculated.facts.find((fact) => fact.key === 'planned_sales')).toMatchObject({ value: '254016', status: 'COMPUTED' })
 
   await checkpoint('3/9 章节写作包与 30 类资料配置模拟')
+  await page.goto(`/?project=${projectId}&workspace=legacy`)
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '报告写作' }).click()
   await page.getByLabel('新报告名称').fill('QA 写作闭环报告')
   await page.getByRole('button', { name: '创建报告' }).click()

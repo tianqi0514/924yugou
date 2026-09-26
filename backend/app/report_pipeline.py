@@ -513,7 +513,7 @@ def _fact_basis(fact: dict, audit: dict) -> str:
         basis += "；输入原文位置已由操作者核对" if evidence.get("status") == "derived_from_reviewed_inputs" else "；输入证据待核对"
         return basis
     if evidence.get("status") == "source_locator_reviewed" and locator(evidence):
-        return f"本项目原件：{locator(evidence)}（原文位置由操作者核对）"
+        return f"本项目原件：{locator(evidence)}（位置已核对）"
     if evidence:
         original = source_display(fact.get("source") or "")
         return f"项目原件位置待核对；原录入来源：{original}" if original else "项目原件位置待核对"
@@ -582,7 +582,7 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
     # missing-glyph box. Use a supported Chinese separator in the PDF header.
     pdf_preview_label = preview_label.replace(" · ", "，") if preview_label else None
     story = ([Paragraph(escape(pdf_preview_label), styles["h2"]), Spacer(1, 7)] if pdf_preview_label else [])
-    story.extend([Paragraph(escape(title), styles["title"]), Spacer(1, 10)])
+    story.extend([Paragraph(escape(title.replace(" · ", "，").replace("·", "，")), styles["title"]), Spacer(1, 10)])
     list_number = 0
     for node in body:
         if node["type"] == "table":

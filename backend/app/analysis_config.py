@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import hmac
 import json
@@ -16,6 +17,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
 from .analysis import _calculate, _canonical, _project, _scenario
+from .analysis_conditions import condition_results
 from .db import AnalysisConfig, SessionLocal, utcnow
 from .rules import RuleError, parse_expression, sort_rules
 
@@ -145,9 +147,48 @@ def _normalize(definitions: list[dict], rules: list[dict], sections: list[dict],
                 or any(key not in by_key or by_key[key]["data_type"] not in {"integer", "decimal"}
                        for key in result_keys)):
             raise HTTPException(400, f"章节 {section_id} 的指标选择无效")
+        evidence_keys = raw.get("evidence_keys", [])
+        if (not isinstance(evidence_keys, list) or any(not isinstance(key, str) for key in evidence_keys)
+                or len(set(evidence_keys)) != len(evidence_keys)
+                or any(key not in by_key or by_key[key]["computed"] for key in evidence_keys)):
+            raise HTTPException(400, f"章节 {section_id} 的证据字段无效")
+        conditions = raw.get("conditions", [])
+        if not isinstance(conditions, list) or len(conditions) > 12:
+            raise HTTPException(400, f"章节 {section_id} 的条件数量无效")
+        checked_conditions = []
+        condition_ids: set[str] = set()
+        for condition in conditions:
+            if not isinstance(condition, dict):
+                raise HTTPException(400, f"章节 {section_id} 的条件无效")
+            condition_id = str(condition.get("id", "")).strip()
+            expression = str(condition.get("expression", "")).strip()
+            yes = str(condition.get("when_true", "")).strip()
+            no = str(condition.get("when_false", "")).strip()
+            if (not _rule_id.fullmatch(condition_id) or condition_id in condition_ids
+                    or not yes or not no or yes == no or len(yes) > 240 or len(no) > 240
+                    or any(char.isdigit() for char in yes + no)):
+                raise HTTPException(400, f"章节 {section_id} 的条件文字或标识无效；数值须由运行引用生成")
+            try:
+                tree, deps = parse_expression(expression)
+            except RuleError as exc:
+                raise HTTPException(400, f"章节条件 {condition_id}：{exc}") from exc
+            if (not isinstance(tree.body, ast.Compare) or
+                    any(key not in by_key or by_key[key]["data_type"] not in {"integer", "decimal"}
+                        for key in deps)):
+                raise HTTPException(400, f"章节条件 {condition_id} 必须比较已配置的数值字段")
+            condition_ids.add(condition_id)
+            checked_conditions.append({"id": condition_id, "expression": expression,
+                                       "deps": deps, "when_true": yes, "when_false": no})
+        forbidden_terms = raw.get("forbidden_terms", [])
+        if (not isinstance(forbidden_terms, list) or len(forbidden_terms) > 20
+                or any(not isinstance(term, str) or not term.strip() or len(term) > 40
+                       for term in forbidden_terms)):
+            raise HTTPException(400, f"章节 {section_id} 的禁用表述无效")
         section_ids.add(section_id)
         normalized_sections.append({"id": section_id, "title": title,
-                                    "result_keys": result_keys})
+                                    "result_keys": result_keys, "evidence_keys": evidence_keys,
+                                    "conditions": checked_conditions,
+                                    "forbidden_terms": [term.strip() for term in forbidden_terms]})
     if complete and (not fields or not normalized_rules or not normalized_sections
                      or {field["key"] for field in fields if field["computed"]} != targets):
         raise HTTPException(400, "发布前须配置输入、每个计算字段的规则及至少一个章节")
@@ -250,9 +291,11 @@ def config_test(project_id: str, config_id: str, body: ConfigTest):
                                 blueprint_version=f"config:{item.id}", corpus_id=None,
                                 corpus_version=None, definitions=fields, rules=rules)
         snapshot = _calculate(trial, inputs)
+        snapshot["condition_results"] = condition_results(snapshot, sections)
         if snapshot["status"] != "COMPUTED" or any(
                 snapshot["results"][key]["value"] is None
-                for section in sections for key in section["result_keys"]):
+                for section in sections for key in section["result_keys"]) or any(
+                result["outcome"] is None for result in snapshot["condition_results"].values()):
             return {"status": "UNEVALUABLE", "snapshot": snapshot, "test_token": None}
         expires = int(time.time()) + 600
         return {"status": "COMPUTED", "snapshot": snapshot,

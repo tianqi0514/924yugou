@@ -463,10 +463,12 @@ def scenario_run(project_id: str, scenario_id: str, body: RunCreate):
             raise HTTPException(409, "方案已变化，请重新推演")
         snapshot = _calculate(item, item.inputs)
         if item.blueprint_version.startswith("config:"):
+            from .analysis_conditions import condition_results
             config = _published_config(session, project_id, item.blueprint_version[7:])
             snapshot["configuration"] = {"id": config.id, "version": config.version,
                                           "checksum": config.checksum,
                                           "sections": deepcopy(config.sections)}
+            snapshot["condition_results"] = condition_results(snapshot, config.sections)
         raw = json.dumps(snapshot, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         run = AnalysisRun(project_id=project_id, scenario_id=scenario_id,
                           scenario_revision=item.revision, request_key=body.request_key,
