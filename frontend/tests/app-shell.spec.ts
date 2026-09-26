@@ -62,7 +62,10 @@ test('project switch, navigation and project creation remain usable on narrow sc
     const button = primary.getByRole('button', { name: label })
     await button.click()
     await expect(button).toHaveAttribute('aria-current', 'page')
-    if (label === '项目资料') await expect(page.getByText('暂无项目资料')).toBeVisible()
+    if (label === '项目资料') {
+      await expect(page.locator('.project-materials-summary')).toContainText('原件 0')
+      await expect(page.locator('.project-materials-section').first()).toContainText('暂无文件')
+    }
   }
   await expect(page.getByRole('heading', { name: '报告写作' })).toBeVisible()
   await page.reload()

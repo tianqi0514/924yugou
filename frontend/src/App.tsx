@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { BookOpenCheck, ChevronDown, Database, FilePenLine, FileSearch, GitBranch, Layers3, Plus, Settings2, X, type LucideIcon } from 'lucide-react'
 import CorpusView from './CorpusView'
 import DocumentsView from './DocumentsView'
+import ProjectMaterialsView from './ProjectMaterialsView'
 import ProjectView from './ProjectView'
 import WritingWorkspaceGateway from './WritingWorkspaceGateway'
 import ModelSettingsView from './ModelSettingsView'
@@ -91,11 +92,12 @@ export default function App() {
     url.searchParams.delete('section')
     url.searchParams.delete('report')
     url.searchParams.delete('workspace')
+    url.searchParams.delete('document')
     window.history.pushState({}, '', url)
     window.localStorage.setItem('report-platform-project', id)
     setSection(savedSection(project))
   }
-  const navigate = (next: Section) => {
+  const navigate = (next: Section, documentId?: string) => {
     if (next !== section) {
       const leaving = new Event('report-platform-before-navigate', { cancelable: true })
       window.dispatchEvent(leaving)
@@ -104,6 +106,8 @@ export default function App() {
     setSection(next)
     const url = new URL(window.location.href)
     url.searchParams.set('section', next)
+    if (next === 'documents' && documentId) url.searchParams.set('document', documentId)
+    else url.searchParams.delete('document')
     window.history.pushState({}, '', url)
     if (projectId && projectSections.includes(next)) window.localStorage.setItem(`report-platform-section:${projectId}`, next)
   }
@@ -125,6 +129,7 @@ export default function App() {
       url.searchParams.delete('section')
       url.searchParams.delete('report')
       url.searchParams.delete('workspace')
+      url.searchParams.delete('document')
       window.history.pushState({}, '', url)
       window.localStorage.setItem('report-platform-project', created.id)
       setProjectName('')
@@ -161,7 +166,9 @@ export default function App() {
       {loadError && <div className="app-error notice error" role="alert"><span>{loadError}</span><button className="text-button" type="button" onClick={() => void loadProjects()}>重试</button></div>}
       {loading ? <main className="page"><div className="app-loading" role="status">加载中…</div></main>
         : section === 'model' ? <ModelSettingsView />
-          : section === 'corpus' && selected ? <CorpusView key={selected.id} project={selected} />
+          : section === 'corpus' && selected ? selected.has_corpus
+            ? <CorpusView key={selected.id} project={selected} />
+            : <ProjectMaterialsView key={selected.id} project={selected} onOpenDocument={(id) => navigate('documents', id)} onOpenFacts={() => navigate('facts')} />
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
               : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} />
                 : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenRules={() => navigate('rules')} />}

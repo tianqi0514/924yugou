@@ -1,0 +1,23 @@
+.project-materials-summary{display:flex;gap:18px;flex-wrap:wrap;margin:3px 0 17px;color:#758399;font-size:12px}
+.project-materials-summary strong{color:#273954;font-size:18px;margin-left:4px}
+.project-materials-search{display:flex;align-items:center;gap:7px;max-width:360px;border:1px solid #dce4ef;background:#fff;border-radius:8px;padding:0 11px;margin-bottom:16px;color:#8392a7}
+.project-materials-search input{border:0;outline:0;background:transparent;width:100%;height:36px;font-size:12px;color:#273954}
+.workspace-card.project-materials-section{margin-bottom:14px;padding:0;min-height:0}
+.project-materials-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-bottom:1px solid #edf1f6}
+.project-materials-head h2{font-size:14px;margin:0}
+.project-materials-list{padding:0 16px}
+.project-materials-row{display:flex;align-items:center;gap:12px;min-height:58px;padding:9px 0;border-bottom:1px solid #edf1f6;min-width:0}
+.project-materials-row:last-child{border:0}
+.project-materials-row>div{display:grid;gap:4px;min-width:0;flex:1}
+.project-materials-row strong{font-size:12px;color:#2e405b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.project-materials-row small{font-size:11px;color:#8492a6}
+.project-materials-row>svg{color:#6e83a8;flex:none}
+.project-materials-row .subtle-button{flex:none}
+.project-materials-value{font-size:12px;color:#263b5c;white-space:nowrap}
+.project-materials-detail{display:grid;gap:8px;max-height:65vh;overflow:auto;color:#445672;font-size:12px}
+.project-materials-detail>strong{font-size:21px;color:#273954}
+.project-materials-detail>small{color:#8392a7}
+.project-materials-detail p{margin:2px 0;line-height:1.6}
+.project-materials-detail blockquote{margin:5px 0;padding:10px 12px;background:#f5f7fb;border-left:3px solid #9ab7ec;white-space:pre-wrap;line-height:1.6}
+.project-materials-detail a{justify-self:start}
+@media(max-width:600px){.project-materials-row{flex-wrap:wrap}.project-materials-row>div{flex-basis:calc(100% - 32px)}.project-materials-row .subtle-button{margin-left:auto}}
