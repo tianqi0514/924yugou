@@ -36,6 +36,7 @@ from .writing_materials import router as material_router
 from .corpus_storage import CorpusArchive, CorpusRecord
 from .corpus_article import ARTICLE_SECTIONS, candidate_from_model, number_tokens as article_number_tokens, pack_digest, source_pack
 from .analysis import router as analysis_router
+from .analysis_config import router as analysis_config_router
 from .analysis_writing import router as analysis_writing_router
 from .analysis_refresh import router as analysis_refresh_router
 
@@ -61,6 +62,7 @@ app = FastAPI(title="通用专业报告平台", version="0.1.0", lifespan=lifesp
 app.include_router(model_router)
 app.include_router(material_router)
 app.include_router(analysis_router)
+app.include_router(analysis_config_router)
 app.include_router(analysis_writing_router)
 app.include_router(analysis_refresh_router)
 corpus = CorpusRepository()

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from copy import deepcopy
 from decimal import Decimal, InvalidOperation
 from types import SimpleNamespace
 from uuid import uuid4
@@ -14,7 +15,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from .corpus_storage import CorpusArchive, CorpusRecord
-from .db import AnalysisRun, AnalysisScenario, AnalysisWritingEvent, Project, ProjectFact, ReportDraft, ReportVersion, RuleRecord, SessionLocal
+from .db import AnalysisConfig, AnalysisRun, AnalysisScenario, AnalysisWritingEvent, Project, ProjectFact, ReportDraft, ReportVersion, RuleRecord, SessionLocal
 from .rules import EvalValue, RuleError, evaluate, sort_rules, unit_dimension, unit_signature
 
 
@@ -39,8 +40,9 @@ CY_RULE_IDS = ("R003", "R004", "R005", "R006")
 
 class ScenarioCreate(BaseModel):
     name: str = Field(min_length=1, max_length=160)
-    source: str = Field(pattern="^(historical|project|copy)$")
+    source: str = Field(pattern="^(historical|project|copy|config)$")
     copy_from: str | None = None
+    config_id: str | None = None
 
 
 class ScenarioChange(BaseModel):
@@ -80,6 +82,15 @@ def _run(session, project_id: str, run_id: str) -> AnalysisRun:
                                                     AnalysisRun.project_id == project_id))
     if item is None:
         raise HTTPException(404, "推演记录不存在")
+    return item
+
+
+def _published_config(session, project_id: str, config_id: str) -> AnalysisConfig:
+    item = session.scalar(select(AnalysisConfig).where(
+        AnalysisConfig.id == config_id, AnalysisConfig.project_id == project_id,
+        AnalysisConfig.status == "PUBLISHED"))
+    if item is None:
+        raise HTTPException(404, "已发布配置不存在")
     return item
 
 
@@ -288,9 +299,11 @@ def _calculate(item: AnalysisScenario, inputs: dict) -> dict:
                        "message": "历史资料和方案假设尚未作为本项目事实独立核实"})
         issues.append({"code": "X001", "severity": "note",
                        "message": "配电资料 800 kW 与 650 kW 存在未解决分歧；不作适配结论"})
-    if inputs.get("supplier_quote", {}).get("value") is None:
+    if "supplier_quote" in inputs and inputs["supplier_quote"]["value"] is None:
         issues.append({"code": "QUOTE_MISSING", "severity": "note", "message": "当前方案设备报价待补"})
     status = "UNEVALUABLE" if any(x["status"] == "UNEVALUABLE" for x in state.values()) else "COMPUTED"
+    if not demand or not capacity:
+        comparison = "部分结果不可评估" if status == "UNEVALUABLE" else "已完成计算"
     return {"scenario_id": item.id, "scenario_revision": item.revision,
             "blueprint_version": item.blueprint_version,
             "corpus_id": item.corpus_id, "corpus_version": item.corpus_version,
@@ -366,6 +379,29 @@ def scenario_create(project_id: str, body: ScenarioCreate):
             base = _scenario(session, project_id, body.copy_from)
             definitions, rules, inputs = base.definitions, base.rules, base.inputs
             corpus_id, corpus_version, blueprint = base.corpus_id, base.corpus_version, base.blueprint_version
+        elif body.source == "config":
+            if not body.config_id:
+                raise HTTPException(400, "请选择已发布配置")
+            config = _published_config(session, project_id, body.config_id)
+            definitions, rules = deepcopy(config.definitions), deepcopy(config.rules)
+            inputs = {field["key"]: {"value": None, "origin": "missing", "source_ref": None,
+                                     "review_status": "unverified"}
+                      for field in definitions if not field["computed"]}
+            if body.copy_from:
+                previous = _scenario(session, project_id, body.copy_from)
+                previous_fields = {field["key"]: field for field in previous.definitions}
+                for field in definitions:
+                    key = field["key"]
+                    old_field = previous_fields.get(key)
+                    if (field["computed"] or old_field is None or old_field["computed"]
+                            or old_field["data_type"] != field["data_type"]
+                            or old_field["unit"] != field["unit"]):
+                        continue
+                    value = previous.inputs.get(key, {}).get("value")
+                    if value is not None:
+                        inputs[key] = {"value": value, "origin": "scenario_assumption",
+                                       "source_ref": None, "review_status": "unverified"}
+            corpus_id, corpus_version, blueprint = None, None, f"config:{config.id}"
         elif body.source == "historical":
             definitions, rules, inputs, corpus_id, corpus_version = _historical_blueprint(session, project)
             blueprint = CY_BLUEPRINT_VERSION
@@ -426,6 +462,11 @@ def scenario_run(project_id: str, scenario_id: str, body: RunCreate):
         if item.revision != body.scenario_revision:
             raise HTTPException(409, "方案已变化，请重新推演")
         snapshot = _calculate(item, item.inputs)
+        if item.blueprint_version.startswith("config:"):
+            config = _published_config(session, project_id, item.blueprint_version[7:])
+            snapshot["configuration"] = {"id": config.id, "version": config.version,
+                                          "checksum": config.checksum,
+                                          "sections": deepcopy(config.sections)}
         raw = json.dumps(snapshot, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         run = AnalysisRun(project_id=project_id, scenario_id=scenario_id,
                           scenario_revision=item.revision, request_key=body.request_key,

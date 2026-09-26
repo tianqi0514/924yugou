@@ -132,6 +132,28 @@ def _model_paragraph(section_id: str, run, facts: list[dict], rule: str, old_sup
 
 
 def _candidate(session, run, section_id: str, mode: str) -> tuple[list[dict], dict]:
+    configuration = run.snapshot.get("configuration")
+    if configuration:
+        section = next((row for row in configuration["sections"] if row["id"] == section_id), None)
+        if section is None:
+            raise HTTPException(409, "当前配置没有此章节")
+        if mode != "computed":
+            raise HTTPException(409, "配置章节先核对确定性指标，模型起草尚未开放")
+        if run.status != "COMPUTED":
+            raise HTTPException(409, "本次推演存在不可评估结果")
+        results = run.snapshot["results"]
+        rows = [results[key] for key in section["result_keys"]]
+        if any(row["value"] is None for row in rows):
+            raise HTTPException(409, "本章所需指标仍有缺值")
+        text = "本方案" + section["title"] + "采用：" + "；".join(
+            f"{row['label']}{row['value']}{row['unit']}" for row in rows) + "。以上为当前方案输入与计算结果，结论待核对。"
+        blocks = [{"type": "h2", "id": str(uuid4()), "section_id": section_id,
+                   "children": [{"text": section["title"]}]},
+                  _p(section_id, text, refs=[_ref(run.id, row) for row in rows]),
+                  _table(section_id, run.id, rows)]
+        validate_content(blocks)
+        return blocks, {"configuration_id": configuration["id"],
+                        "configuration_version": configuration["version"]}
     if section_id not in _sections:
         raise HTTPException(409, "该章节尚未完成推演写作配置")
     snapshot = run.snapshot

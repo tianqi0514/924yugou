@@ -272,6 +272,25 @@ class AnalysisScenario(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
 
+class AnalysisConfig(Base):
+    """Project-owned writing and calculation contract; published rows are immutable."""
+
+    __tablename__ = "analysis_configs"
+    __table_args__ = (UniqueConstraint("project_id", "version", name="uq_analysis_config_version"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="DRAFT")
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    definitions: Mapped[list[dict]] = mapped_column(JSON, nullable=False, default=list)
+    rules: Mapped[list[dict]] = mapped_column(JSON, nullable=False, default=list)
+    sections: Mapped[list[dict]] = mapped_column(JSON, nullable=False, default=list)
+    checksum: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
 class AnalysisRun(Base):
     """Immutable result and provenance for one scenario revision."""
 
