@@ -17,3 +17,51 @@
 .scenario-refresh-refs{display:grid;gap:4px;margin-top:7px}.scenario-refresh-refs>div{display:flex;justify-content:space-between;gap:8px;padding:5px 7px;border:1px solid #e1e9f5;border-radius:5px;background:#fff;font-size:11px}.scenario-refresh-refs span{color:#526782}.scenario-refresh-refs strong{font-weight:600;color:#263d61;text-align:right}
 .scenario-candidate-choice{display:flex;align-items:flex-start;gap:8px;border-bottom:1px solid #e8edf5;padding:8px 0}.scenario-candidate-choice>input{margin-top:4px;accent-color:#2f67da}.scenario-candidate-choice>span{min-width:0}.scenario-candidate-choice p{margin:0 0 4px}.scenario-candidate-choice small{color:#8593a8}
 .scenario-paper .plate-content .report-table{min-width:0}
+
+/* Keep the document readable while a contextual panel is open. */
+@media(min-width:981px){
+  .scenario-workspace.with-panel{grid-template-columns:minmax(0,1fr) 330px;gap:12px}
+  .scenario-workspace.with-panel .scenario-outline{grid-column:1/-1;position:static;max-height:none;display:flex;align-items:center;gap:5px;overflow-x:auto;padding:6px 9px}
+  .scenario-workspace.with-panel .scenario-outline-header{flex:none;padding:6px 10px 6px 5px}
+  .scenario-workspace.with-panel .scenario-outline-row{flex:none}
+  .scenario-workspace.with-panel .scenario-outline-title{width:auto;max-width:220px}
+  .scenario-workspace.with-panel .scenario-outline-add{flex:none;width:auto;margin:0}
+}
+.scenario-topbar{box-shadow:0 2px 14px #22395b06}
+.scenario-title h1{font-size:18px;letter-spacing:.01em}
+.scenario-run-badge{max-width:190px;overflow:hidden;text-overflow:ellipsis;border:1px solid #d8e5fa;border-radius:999px;background:#f3f7ff;padding:6px 10px;color:#375f9c;font-size:12px}
+.scenario-outline-header,.scenario-outline button,.scenario-top-actions>button,.scenario-canvas-tools button{font-size:12px}
+.scenario-outline button{padding:9px 10px}
+.scenario-outline-row.active{box-shadow:inset 2px 0 #2f67da}
+.scenario-panel-head h2{font-size:15px;color:#253b5b}
+.scenario-panel-body{font-size:13px}
+.scenario-panel-actions button,.scenario-segment button,.scenario-input span,.scenario-input-group h3,.scenario-field{font-size:12px}
+.scenario-draft-run{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border:1px solid #e1eaf8;border-radius:8px;background:#f8fbff;color:#73859c;font-size:11px}
+.scenario-draft-run strong{color:#355981;font-weight:600;text-align:right}
+.scenario-draft-basis{border:1px solid #e6ecf4;border-radius:8px;padding:9px 11px;background:#fff;color:#4b6484;font-size:12px}
+.scenario-draft-basis summary{cursor:pointer;font-weight:600}
+.scenario-draft-basis>div{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #edf1f6;padding:8px 0}
+.scenario-draft-basis>div:first-of-type{margin-top:8px}
+.scenario-draft-basis strong{color:#263e61;text-align:right}
+.scenario-candidate{display:grid;gap:10px}
+.scenario-candidate>div.scenario-candidate-choice{border:1px solid #e2e9f3;border-radius:9px;background:#fff;padding:11px 12px;min-width:0}
+.scenario-candidate-choice{display:grid;gap:8px}
+.scenario-candidate-choice>label{display:flex;align-items:center;gap:7px;color:#334e74;font-size:12px;font-weight:600;cursor:pointer}
+.scenario-candidate-choice>label input{width:16px;height:16px;min-width:16px;margin:0;accent-color:#2f67da}
+.scenario-candidate-choice[data-origin="model"]{border-color:#b9cef4;background:#fbfdff}
+.scenario-candidate-choice p{margin:0;color:#273b56;font-size:13px;line-height:1.75}
+.scenario-candidate-table-wrap{overflow-x:auto}
+.scenario-candidate-table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;font-size:12px;color:#354b68}
+.scenario-candidate-table th,.scenario-candidate-table td{border:1px solid #e3e9f2;padding:6px 8px;text-align:left;font-weight:400;white-space:normal;overflow-wrap:anywhere}
+.scenario-candidate-table th{background:#f4f7fc;color:#5b6f8b;font-weight:600}
+.scenario-evidence-ok{border-color:#cce8dc;background:#f3fbf7;color:#2f7359}
+.scenario-candidate-basis{font-size:11px;color:#6c809d}
+.scenario-candidate-basis summary{cursor:pointer;width:max-content;max-width:100%}
+.scenario-candidate-basis button{display:flex;justify-content:space-between;gap:8px;width:100%;border:0;border-bottom:1px solid #edf1f6;background:transparent;padding:7px 2px;color:#49648a;text-align:left;font:inherit}
+.scenario-candidate-basis button:hover{color:#245bc6}
+.scenario-candidate-basis button strong{color:#2b466b}
+.scenario-candidate-basis small{display:block;padding:7px 2px;color:#7085a0}
+@media(max-width:1280px){
+  .scenario-workspace.with-panel{grid-template-columns:minmax(0,1fr)}
+  .scenario-workspace.with-panel .scenario-panel{position:fixed;z-index:30;right:0;top:0;bottom:0;width:min(430px,100vw);max-height:none;border-radius:0;box-shadow:-12px 0 34px #1c315433}
+}

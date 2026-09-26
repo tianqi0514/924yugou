@@ -520,6 +520,59 @@ def _fact_basis(fact: dict, audit: dict) -> str:
     return f"来源：{source_display(fact.get('source') or '')}"
 
 
+def _analysis_basis(audit: dict) -> list[str]:
+    """Render only cited run values and their explicit upstream calculation steps."""
+    snapshot = audit.get("analysis_run") or {}
+    results = snapshot.get("results") or {}
+    inputs = snapshot.get("inputs") or {}
+    traces = {step.get("target"): step for step in snapshot.get("trace", [])
+              if step.get("status") == "COMPUTED"}
+    cited = {ref.get("result_key") for block in audit.get("analysis_refs", [])
+             for ref in block.get("refs", []) if ref.get("result_key") in results}
+    if not cited:
+        return []
+
+    needed: set[str] = set()
+
+    def collect(key: str) -> None:
+        if key in needed:
+            return
+        needed.add(key)
+        for upstream in traces.get(key, {}).get("inputs", {}):
+            if upstream in results:
+                collect(upstream)
+
+    for key in cited:
+        collect(key)
+    labels = {key: row.get("label") or key for key, row in results.items()}
+    origin_labels = {"project_fact": "项目事实快照", "historical_reference": "历史参考",
+                     "scenario_assumption": "方案假设", "missing": "待补"}
+    lines = []
+    for field in snapshot.get("definitions", []):
+        key = field.get("key")
+        if key not in needed or key not in inputs:
+            continue
+        row = results[key]
+        value = row.get("value")
+        origin = origin_labels.get(inputs[key].get("origin"), "方案输入")
+        lines.append(f"输入：{labels[key]} {value if value is not None else '未定义'}{row.get('unit') or ''}（{origin}）")
+    for step in snapshot.get("trace", []):
+        key = step.get("target")
+        if key not in needed or step.get("status") != "COMPUTED" or key not in results:
+            continue
+        expression = re.sub(r"\b[A-Za-z_][A-Za-z_0-9]*\b",
+                            lambda match: labels.get(match.group(), match.group()),
+                            step.get("expression") or "")
+        substitutions = "、".join(
+            f"{labels.get(dependency, dependency)} {value if value is not None else '未定义'}"
+            f"{results.get(dependency, {}).get('unit') or ''}"
+            for dependency, value in step.get("inputs", {}).items())
+        row = results[key]
+        lines.append(f"计算：{labels[key]} {row.get('value')}{row.get('unit') or ''}；"
+                     f"规则：{expression}；代入：{substitutions}")
+    return lines
+
+
 def export_bundle(title: str, content: list[dict], audit: dict, preview_label: str | None = None) -> bytes:
     """Render one frozen report snapshot to DOCX, PDF and a JSON audit record."""
     word = Document()
@@ -561,6 +614,11 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
             elif node.get("indent", 1) > 1:
                 paragraph.paragraph_format.left_indent = Cm(0.7 * node["indent"])
         _word_inline(paragraph, node)
+    basis_lines = _analysis_basis(audit)
+    if basis_lines:
+        word.add_heading("推演依据", level=2)
+        for line in basis_lines:
+            word.add_paragraph(line)
     if audit["facts"]:
         word.add_heading("事实依据", level=2)
         for fact in audit["facts"]:
@@ -576,6 +634,7 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
               for key, size in (("title", 20), ("h1", 16), ("h2", 14), ("h3", 12), ("p", 11))}
     styles["blockquote"] = ParagraphStyle("blockquote", parent=styles["p"], leftIndent=22, rightIndent=10,
                                             textColor=colors.HexColor("#53667F"))
+    styles["basis"] = ParagraphStyle("basis", parent=styles["p"], fontSize=9.5, leading=14, spaceAfter=5)
     styles["table_cell"] = ParagraphStyle("table_cell", parent=styles["p"], fontSize=8, leading=12, spaceAfter=0)
     pdf_buffer = io.BytesIO()
     # STSong-Light renders the middle dot in the DOCX preview marker as a
@@ -621,11 +680,15 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
         else:
             list_number = 0
         story.append(Paragraph(markup or " ", styles[node["type"] if node["type"] in styles else "p"]))
+    if basis_lines:
+        story.extend([Spacer(1, 12), Paragraph("推演依据", styles["h2"])])
+        for line in basis_lines:
+            story.append(Paragraph(escape(line), styles["basis"]))
     if audit["facts"]:
-        story.extend([Spacer(1, 20), Paragraph("事实依据", styles["h2"])])
+        story.extend([Spacer(1, 12), Paragraph("事实依据", styles["h2"])])
         for fact in audit["facts"]:
             citation = f"{fact.get('label') or fact['key']}：{fact['value']}{fact['unit']}。{_fact_basis(fact, audit)}"
-            story.append(Paragraph(escape(citation), styles["p"]))
+            story.append(Paragraph(escape(citation), styles["basis"]))
     def footer(canvas, doc):
         canvas.saveState()
         canvas.setFont("STSong-Light", 9)

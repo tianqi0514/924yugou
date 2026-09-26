@@ -63,6 +63,39 @@ def test_plate_nodes_roundtrip_through_exports():
     assert source_display(audit["facts"][0]["source"]) == "example.pdf，第 7 页，表 1，第 6 行"
 
 
+def test_feasibility_export_shows_cited_inputs_and_calculation_in_both_files():
+    content = [{"type": "p", "id": "area-result", "children": [{"text": "分项面积17268.25㎡，差额0㎡。"}],
+                "analysis_refs": [{"run_id": "run-area", "result_key": "area_difference", "value": "0", "unit": "㎡"}]}]
+    audit = {"facts": [], "analysis_refs": [{"block_id": "area-result", "refs": content[0]["analysis_refs"]}],
+             "analysis_run": {
+                 "definitions": [{"key": key} for key in ("aboveground_area", "underground_area", "reported_total_area", "calculated_total_area", "area_difference", "total_investment")],
+                 "inputs": {"aboveground_area": {"value": "15756.25", "origin": "scenario_assumption"},
+                            "underground_area": {"value": "1512", "origin": "project_fact"},
+                            "reported_total_area": {"value": "17268.25", "origin": "project_fact"},
+                            "total_investment": {"value": "31255.57", "origin": "project_fact"}},
+                 "results": {key: {"label": label, "value": value, "unit": unit} for key, label, value, unit in (
+                     ("aboveground_area", "地上建筑面积", "15756.25", "㎡"),
+                     ("underground_area", "地下建筑面积", "1512", "㎡"),
+                     ("reported_total_area", "原文总建筑面积", "17268.25", "㎡"),
+                     ("calculated_total_area", "分项计算建筑面积", "17268.25", "㎡"),
+                     ("area_difference", "原文与分项差额", "0", "㎡"),
+                     ("total_investment", "原文总投资", "31255.57", "万元"))},
+                 "trace": [
+                     {"target": "calculated_total_area", "status": "COMPUTED", "expression": "aboveground_area + underground_area", "inputs": {"aboveground_area": "15756.25", "underground_area": "1512"}},
+                     {"target": "area_difference", "status": "COMPUTED", "expression": "reported_total_area - calculated_total_area", "inputs": {"reported_total_area": "17268.25", "calculated_total_area": "17268.25"}},
+                 ]}}
+    with ZipFile(BytesIO(export_bundle("可研面积核对", content, audit))) as bundle:
+        word = Document(BytesIO(bundle.read("report.docx")))
+        word_text = "\n".join(paragraph.text for paragraph in word.paragraphs)
+        with pymupdf.open(stream=bundle.read("report.pdf"), filetype="pdf") as pdf:
+            pdf_text = "\n".join(page.get_text() for page in pdf)
+    for text in ("推演依据", "地上建筑面积 15756.25㎡（方案假设）", "地下建筑面积 1512㎡（项目事实快照）",
+                 "计算：分项计算建筑面积 17268.25㎡", "规则：地上建筑面积 + 地下建筑面积", "计算：原文与分项差额 0㎡"):
+        assert text in word_text
+        assert text in pdf_text
+    assert "原文总投资 31255.57" not in word_text
+
+
 def test_inserted_blocks_do_not_make_unchanged_paragraphs_look_rewritten():
     before = sample_content()
     inserted = {"type": "p", "id": "new-paragraph", "children": [{"text": "新增段落"}]}

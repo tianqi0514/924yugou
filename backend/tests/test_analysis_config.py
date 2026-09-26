@@ -5,6 +5,7 @@ import json
 import os
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
 from uuid import uuid4
 
 os.environ["DATABASE_URL"] = "postgresql+psycopg://report:local_development_only@127.0.0.1:55432/report_platform_test"
@@ -14,6 +15,48 @@ from fastapi.testclient import TestClient
 
 from app.db import Base, engine
 from app.main import app
+from app.model_settings import ChatResult
+
+
+def test_feasibility_model_retries_invalid_references_without_weakening_guard(monkeypatch):
+    import app.analysis_writing as writing
+
+    run = SimpleNamespace(id="run-beijing", snapshot={"results": {
+        "reported_total_area": {"key": "reported_total_area", "label": "原文总建筑面积", "value": "17268.25", "unit": "㎡"},
+        "area_difference": {"key": "area_difference", "label": "原文与分项差额", "value": "0", "unit": "㎡"},
+    }})
+    section = {"id": "area", "title": "建筑面积核对", "forbidden_terms": ["已获批准"],
+               "conditions": [{"when_true": "本方案建筑面积分项与原文总量一致。",
+                               "when_false": "本方案建筑面积分项与原文总量不一致。"}]}
+    rows = [run.snapshot["results"]["reported_total_area"], run.snapshot["results"]["area_difference"]]
+    conditions = [{"text": "本方案建筑面积分项与原文总量一致。", "outcome": True, "deps": ["area_difference"]}]
+    evidence = [{"key": "reported_total_area", "label": "原文总建筑面积", "status": "VERIFIED"}]
+    calls = []
+
+    def response(_task, messages, **_kwargs):
+        calls.append(messages)
+        if len(calls) == 1:
+            return ChatResult({"text": "本方案建筑面积分项与原文总量一致。", "used_result_keys": []}, {})
+        return ChatResult({"text": "原文总建筑面积17268.25㎡。本方案建筑面积分项与原文总量一致。",
+                           "used_result_keys": ["reported_total_area"]}, {"model_id": "qa-model"})
+
+    monkeypatch.setattr(writing, "chat_json", response)
+    block, audit = writing._configured_model(run, section, rows, conditions, evidence)
+    assert len(calls) == 2
+    assert block["analysis_refs"][0]["result_key"] == "reported_total_area"
+    assert audit == {"model_id": "qa-model", "validation_attempts": 2}
+
+    def unsupported(_task, _messages, **_kwargs):
+        calls.append("invalid")
+        return ChatResult({"text": "总建筑面积999㎡。本方案建筑面积分项与原文总量一致。",
+                           "used_result_keys": ["reported_total_area"]}, {})
+
+    monkeypatch.setattr(writing, "chat_json", unsupported)
+    with pytest.raises(Exception) as rejected:
+        writing._configured_model(run, section, rows, conditions, evidence)
+    assert rejected.value.status_code == 422
+    assert "运行以外的数字" in rejected.value.detail
+    assert len(calls) == 4
 
 
 @pytest.fixture(autouse=True)

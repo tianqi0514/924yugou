@@ -151,36 +151,48 @@ def _configured_model(run, section: dict, rows: list[dict], conditions: list[dic
                "verified_sources": [{"key": item["key"], "label": item["label"],
                                      "status": "reviewed_original"} for item in evidence],
                "forbidden_terms": section.get("forbidden_terms", [])}
-    try:
-        response = chat_json("writing", [
-            {"role": "system", "content": "请为专业报告写一段待人工核对的正文。仅使用给出的运行值、已核对来源和已批准条件句。"
-             "至少原样包含一条已批准条件句，不得增加因果、责任、法律或订单结论。"
-             "不得增加输入以外的数字，不要在正文写来源编号、页码、核对过程或内部ID。"
-             "只返回JSON：{\"text\":\"中文段落\",\"used_result_keys\":[\"实际用到的key\"]}。"},
-            {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
-        ], max_tokens=850)
-    except ValueError as exc:
-        raise HTTPException(503, str(exc)) from exc
-    text = response.get("text")
-    keys = response.get("used_result_keys")
-    if (not isinstance(text, str) or not text.strip() or len(text) > 320
-            or not isinstance(keys, list) or not keys or any(key not in allowed for key in keys)
-            or len(set(keys)) != len(keys)):
-        raise HTTPException(422, "模型段落缺少可核对的运行引用")
-    visible = {value.replace(",", "") for value in re.findall(r"(?<!\d)\d[\d,]*(?:\.\d+)?(?!\d)", text)}
-    permitted_numbers = {allowed[key]["value"] for key in keys if allowed[key]["value"] is not None}
-    if visible - permitted_numbers:
-        raise HTTPException(422, "模型段落出现运行以外的数字")
-    if (any(term in text for term in section.get("forbidden_terms", []))
-            or any(item["text"] not in text for item in conditions)
-            or any(condition["when_true" if item["outcome"] is False else "when_false"] in text
-                   for condition, item in zip(section.get("conditions", []), conditions))):
-        raise HTTPException(422, "模型段落含禁用或失效的条件表述")
-    refs = [_ref(run.id, allowed[key]) for key in keys]
-    return _p(section["id"], text.strip(), refs=refs,
-              fact_keys=[item["key"] for item in evidence if item["key"] in keys
-                         and allowed[item["key"]]["value"] in visible],
-              origin="model"), dict(getattr(response, "model_call", {}))
+    messages = [
+        {"role": "system", "content": "请为专业报告写一段待人工核对的正文。仅使用给出的运行值、已核对来源和已批准条件句。"
+         "逐条原样包含已批准条件句，不得增加因果、责任、法律或订单结论。"
+         "不得增加输入以外的数字，不要在正文写来源编号、页码、核对过程或内部ID。"
+         "只返回JSON：{\"text\":\"中文段落\",\"used_result_keys\":[\"实际用到的key\"]}。"
+         "used_result_keys必须使用values中的key，至少一个；正文出现的每个数字都要列出对应key。"},
+        {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
+    ]
+    last_error = "模型段落未通过来源与条件校验"
+    for attempt in range(2):
+        try:
+            response = chat_json("writing", messages, max_tokens=850)
+        except ValueError as exc:
+            raise HTTPException(503, str(exc)) from exc
+        text = response.get("text")
+        keys = response.get("used_result_keys")
+        if (not isinstance(text, str) or not text.strip() or len(text) > 320
+                or not isinstance(keys, list) or not keys or any(not isinstance(key, str) or key not in allowed for key in keys)
+                or len(set(keys)) != len(keys)):
+            last_error = "模型段落缺少可核对的运行引用"
+        else:
+            visible = {value.replace(",", "") for value in re.findall(r"(?<!\d)\d[\d,]*(?:\.\d+)?(?!\d)", text)}
+            permitted_numbers = {allowed[key]["value"] for key in keys if allowed[key]["value"] is not None}
+            if visible - permitted_numbers:
+                last_error = "模型段落出现运行以外的数字"
+            elif (any(term in text for term in section.get("forbidden_terms", []))
+                  or any(item["text"] not in text for item in conditions)
+                  or any(condition["when_true" if item["outcome"] is False else "when_false"] in text
+                         for condition, item in zip(section.get("conditions", []), conditions))):
+                last_error = "模型段落含禁用或失效的条件表述"
+            else:
+                refs = [_ref(run.id, allowed[key]) for key in keys]
+                audit = dict(getattr(response, "model_call", {}))
+                audit["validation_attempts"] = attempt + 1
+                return _p(section["id"], text.strip(), refs=refs,
+                          fact_keys=[item["key"] for item in evidence if item["key"] in keys
+                                     and allowed[item["key"]]["value"] in visible],
+                          origin="model"), audit
+        if attempt == 0:
+            messages.append({"role": "user", "content": "上一候选未通过校验：" + last_error + "。请重新生成，保持给定的全部条件句和数字原样，"
+                             "使用values中的key逐项列出正文实际引用的结果；没有依据的内容不要写。"})
+    raise HTTPException(422, last_error + "；已重试，报告未改变")
 
 
 def _candidate(session, run, section_id: str, mode: str) -> tuple[list[dict], dict]:

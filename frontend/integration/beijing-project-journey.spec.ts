@@ -123,8 +123,14 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   await page.goto(`/?project=${projectId}&report=${report.id}`)
   await expect(page.locator('.scenario-title h1')).toHaveText('建筑面积与投资核对报告')
   await page.getByRole('button', { name: '生成本章', exact: true }).click()
+  await expect(page.locator('.scenario-draft-run')).toContainText('原文复算')
   await page.getByRole('button', { name: '生成候选' }).click()
   await expect(page.locator('.scenario-candidate')).toContainText('分项与原文总量一致')
+  await expect(page.locator('.scenario-candidate-choice')).toHaveCount(3)
+  await expect(page.locator('.scenario-candidate-table')).toContainText('原文与分项差额')
+  await expect(page.locator('.scenario-candidate-table')).toContainText('0㎡')
+  await page.locator('.scenario-candidate-basis summary').first().click()
+  await expect(page.locator('.scenario-candidate-basis').first()).toContainText('原文总建筑面积')
   await page.getByRole('button', { name: '取消候选' }).click()
   expect((await (await request.get(`${base}/reports/${report.id}`)).json()).content.some(
     (block: { section_id?: string }) => block.section_id === 'area')).toBeFalsy()
@@ -164,6 +170,8 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   const checked = execFileSync(resolve(root, '.venv/bin/python'), [resolve(root, 'backend/scripts/check_scenario_export.py'),
     firstArchive, '--project', projectId, '--report', report.id, '--run', firstRun.id,
     '--text', '17268.25', '--text', '31255.57', '--text', '人工核对：面积口径来自公开原件。',
+    '--text', '推演依据', '--text', '地上建筑面积 15756.25㎡（方案假设）',
+    '--text', '规则：地上建筑面积 + 地下建筑面积',
     '--result', 'calculated_total_area=17268.25', '--result', 'area_difference=0',
   ], { cwd: root, env: { ...process.env, ...backendEnvironment }, encoding: 'utf8' })
   expect(JSON.parse(checked).docx_tables).toBeGreaterThan(0)
@@ -244,10 +252,12 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   const checkedAgain = execFileSync(resolve(root, '.venv/bin/python'), [resolve(root, 'backend/scripts/check_scenario_export.py'),
     secondArchive, '--project', projectId, '--report', report.id, '--run', secondRun.id,
     '--text', '16512', '--text', '756.25', '--text', '分项与原文总量不一致',
+    '--text', '地上建筑面积 15000㎡（方案假设）', '--text', '计算：原文与分项差额 756.25㎡',
     '--text', '人工核对：面积口径来自公开原件。',
     '--result', 'calculated_total_area=16512', '--result', 'area_difference=756.25',
   ], { cwd: root, env: { ...process.env, ...backendEnvironment }, encoding: 'utf8' })
   expect(JSON.parse(checkedAgain).docx_tables).toBeGreaterThan(0)
+  expect(JSON.parse(checkedAgain).pdf_pages).toBe(1)
   expect((await request.get(`${base}/reports/${report.id}/export?level=formal`)).status()).toBe(409)
   await page.getByRole('button', { name: '返回报告列表' }).click()
   await expect(page.locator('.scenario-report-row').filter({ hasText: '建筑面积与投资核对报告' })).toContainText('已核对')
