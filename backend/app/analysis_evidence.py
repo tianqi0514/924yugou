@@ -31,15 +31,21 @@ def section_evidence(session, project_id: str, run, section: dict) -> list[dict]
         if result is None or result["value"] is None:
             reason = "本次运行缺少字段值"
         elif fact is None:
-            reason = "本项目尚未建立同名事实"
+            assumed = ("project_fact_baseline" in run.snapshot and
+                       run.snapshot.get("inputs", {}).get(key, {}).get("origin") == "scenario_assumption")
+            reason = "本次采用方案假设，项目事实尚未建立" if assumed else "本项目尚未建立同名事实"
         elif not _same_value(fact.value_text, result["value"]) or fact.unit != result["unit"]:
-            reason = "项目事实与本次方案值或单位不一致"
+            assumed = ("project_fact_baseline" in run.snapshot and
+                       key not in run.snapshot["project_fact_baseline"] and
+                       run.snapshot.get("inputs", {}).get(key, {}).get("origin") == "scenario_assumption")
+            reason = "本次采用方案假设，与项目事实不同" if assumed else "项目事实与本次方案值或单位不一致"
         else:
             binding = _reviewed_fact_binding(session, project_id, fact)
             if binding is None:
                 reason = "项目事实原件位置尚未核对"
         rows.append({"key": key, "label": result["label"] if result else key,
-                     "status": "VERIFIED" if reason is None else "MISSING",
+                     "status": "VERIFIED" if reason is None else
+                               "ASSUMPTION" if reason and reason.startswith("本次采用方案假设") else "MISSING",
                      "reason": reason, "fact_revision": fact.revision if fact else None,
                      "document_id": binding[1].id if binding else None,
                      "source_refs": binding[0].source_refs if binding else []})

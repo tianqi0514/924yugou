@@ -803,6 +803,31 @@ def document_pages(project_id: str, document_id: str):
         return {"document_id": document_id, "pages": pages}
 
 
+@app.get("/api/projects/{project_id}/documents/{document_id}/search")
+def document_search(project_id: str, document_id: str, q: str = Query(min_length=2, max_length=100),
+                    offset: int = Query(0, ge=0), limit: int = Query(20, ge=1, le=50)):
+    """Search stored, located text without opening every page in the browser."""
+    needle = q.strip().casefold()
+    if len(needle) < 2:
+        fail("至少输入两个字符")
+    with SessionLocal() as session:
+        item = _document(session, project_id, document_id)
+        hits = []
+        for segment in item.segments:
+            body = segment["text"]
+            start = body.casefold().find(needle)
+            if start < 0:
+                continue
+            excerpt_start = max(0, start - 55)
+            excerpt_end = min(len(body), start + len(q.strip()) + 85)
+            hits.append({"ref": segment["ref"], "page": segment["page"],
+                         "locator": segment.get("locator", ""),
+                         "excerpt": ("…" if excerpt_start else "") + body[excerpt_start:excerpt_end]
+                         + ("…" if excerpt_end < len(body) else "")})
+        return {"query": q.strip(), "total": len(hits), "offset": offset,
+                "results": hits[offset:offset + limit]}
+
+
 @app.get("/api/projects/{project_id}/documents/{document_id}/original")
 def document_original(project_id: str, document_id: str):
     with SessionLocal() as session:
@@ -1386,9 +1411,11 @@ def _analysis_report_state(session, item: ReportDraft, content: list[dict] | Non
                     continue
                 for evidence in section_evidence(session, item.project_id, selected, section):
                     if evidence["status"] != "VERIFIED":
+                        assumption = evidence["status"] == "ASSUMPTION"
                         mismatch = evidence["reason"] == "项目事实与本次方案值或单位不一致"
-                        issues.append({"code": "CHAPTER_EVIDENCE_MISMATCH" if mismatch else
-                                       "CHAPTER_EVIDENCE_MISSING", "severity": "block",
+                        issues.append({"code": "CHAPTER_SCENARIO_ASSUMPTION" if assumption else
+                                       "CHAPTER_EVIDENCE_MISMATCH" if mismatch else
+                                       "CHAPTER_EVIDENCE_MISSING", "severity": "note" if assumption else "block",
                                        "message": f"{section['title']}：{evidence['label']}：{evidence['reason']}",
                                        "fact_key": evidence["key"]})
                 for block in blocks:
@@ -1439,9 +1466,21 @@ def reports_list(project_id: str):
     with SessionLocal() as session:
         get_project(session, project_id)
         items = session.scalars(select(ReportDraft).where(ReportDraft.project_id == project_id).order_by(ReportDraft.updated_at.desc())).all()
-        return [{"id": item.id, "title": item.title, "version": item.version,
-                 "analysis_run_id": item.analysis_run_id,
-                 "updated_at": item.updated_at.isoformat()} for item in items]
+        facts = _current_facts(session, project_id)
+        rows = []
+        for item in items:
+            state = _report_dict(item, facts, session)
+            substantive = any(block.get("type") not in ("h1",) and
+                              any(leaf.get("text", "").strip() for leaf in block.get("children", [])
+                                  if isinstance(leaf, dict)) for block in item.content)
+            status = ("已核对" if state["reviewed"] and not any(issue["severity"] == "block" for issue in state["issues"]) else
+                      "待核对" if substantive else "工作稿")
+            rows.append({"id": item.id, "title": item.title, "version": item.version,
+                         "analysis_run_id": item.analysis_run_id, "status": status,
+                         "has_scenario_assumption": any(issue["code"] == "CHAPTER_SCENARIO_ASSUMPTION"
+                                                        for issue in state["issues"]),
+                         "updated_at": item.updated_at.isoformat()})
+        return rows
 
 
 @app.post("/api/projects/{project_id}/reports", status_code=201)
@@ -1921,7 +1960,14 @@ def facts_list(project_id: str):
     with SessionLocal() as session:
         project = get_project(session, project_id)
         facts = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id).order_by(ProjectFact.created_at, ProjectFact.key)).all()
-        return {"project_version": project.version, "facts": [fact_dict(fact) for fact in facts]}
+        bindings = {row.fact_key: row for row in session.scalars(select(FactEvidenceBinding).where(
+            FactEvidenceBinding.project_id == project_id)).all()}
+        return {"project_version": project.version, "facts": [fact_dict(fact) | {
+            "evidence_status": ("SOURCE_LOCATOR_REVIEWED" if
+                                (binding := bindings.get(fact.key)) is not None and
+                                binding.fact_revision == fact.revision and binding.value_text == fact.value_text
+                                else "UNVERIFIED") if fact.value_status == "PROVIDED" else None
+        } for fact in facts]}
 
 
 @app.get("/api/projects/{project_id}/facts/{fact_key}/source")

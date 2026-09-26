@@ -201,7 +201,7 @@ def _candidate(session, run, section_id: str, mode: str) -> tuple[list[dict], di
         if any(item is None or item["outcome"] is None for item in outcomes):
             raise HTTPException(409, "本章条件因输入缺失而不可评估")
         text = "本方案" + section["title"] + "采用：" + "；".join(
-            f"{row['label']}{row['value']}{row['unit']}" for row in rows) + "。以上为当前方案输入与计算结果，结论待核对。"
+            f"{row['label']}{row['value']}{row['unit']}" for row in rows) + "。"
         blocks = [{"type": "h2", "id": str(uuid4()), "section_id": section_id,
                    "children": [{"text": section["title"]}]},
                   _p(section_id, text, refs=[_ref(run.id, row) for row in rows],
@@ -381,7 +381,9 @@ def draft_preview(project_id: str, report_id: str, body: DraftRequest):
         data = {"run_id": run.id, "section_id": body.section_id, "mode": body.mode,
                 "base_version": report.version, "content": content,
                 "model_audit": model_audit, "expires_at": expires}
-        evidence_issues = [{"code": "CHAPTER_EVIDENCE_MISSING", "severity": "block",
+        evidence_issues = [{"code": "CHAPTER_SCENARIO_ASSUMPTION" if item["status"] == "ASSUMPTION" else
+                            "CHAPTER_EVIDENCE_MISSING",
+                            "severity": "note" if item["status"] == "ASSUMPTION" else "block",
                             "message": f"{item['label']}：{item['reason']}", "fact_key": item["key"]}
                            for item in model_audit.get("evidence", []) if item["status"] != "VERIFIED"]
         return {**data, "preview_token": _signature(project_id, report_id, data),

@@ -24,7 +24,7 @@ function savedSection(project: Project): Section {
   if (new URLSearchParams(window.location.search).get('project') === project.id && requested && [...projectSections, 'model'].includes(requested)) return requested
   if (new URLSearchParams(window.location.search).get('report')) return 'reports'
   const stored = window.localStorage.getItem(`report-platform-section:${project.id}`) as Section | null
-  return stored && projectSections.includes(stored) ? stored : project.has_corpus ? 'corpus' : 'facts'
+  return stored && projectSections.includes(stored) ? stored : project.has_corpus ? 'corpus' : 'documents'
 }
 
 export default function App() {
@@ -93,11 +93,13 @@ export default function App() {
     url.searchParams.delete('report')
     url.searchParams.delete('workspace')
     url.searchParams.delete('document')
+    url.searchParams.delete('page')
+    url.searchParams.delete('segment')
     window.history.pushState({}, '', url)
     window.localStorage.setItem('report-platform-project', id)
     setSection(savedSection(project))
   }
-  const navigate = (next: Section, documentId?: string) => {
+  const navigate = (next: Section, documentId?: string, page?: number, segment?: string) => {
     if (next !== section) {
       const leaving = new Event('report-platform-before-navigate', { cancelable: true })
       window.dispatchEvent(leaving)
@@ -108,6 +110,10 @@ export default function App() {
     url.searchParams.set('section', next)
     if (next === 'documents' && documentId) url.searchParams.set('document', documentId)
     else url.searchParams.delete('document')
+    if (next === 'documents' && page) url.searchParams.set('page', String(page))
+    else url.searchParams.delete('page')
+    if (next === 'documents' && segment) url.searchParams.set('segment', segment)
+    else url.searchParams.delete('segment')
     window.history.pushState({}, '', url)
     if (projectId && projectSections.includes(next)) window.localStorage.setItem(`report-platform-section:${projectId}`, next)
   }
@@ -130,12 +136,14 @@ export default function App() {
       url.searchParams.delete('report')
       url.searchParams.delete('workspace')
       url.searchParams.delete('document')
+      url.searchParams.delete('page')
+      url.searchParams.delete('segment')
       window.history.pushState({}, '', url)
       window.localStorage.setItem('report-platform-project', created.id)
       setProjectName('')
       setCreateOpen(false)
-      setSection('facts')
-      window.localStorage.setItem(`report-platform-section:${created.id}`, 'facts')
+      setSection('documents')
+      window.localStorage.setItem(`report-platform-section:${created.id}`, 'documents')
       setNotice('项目已创建')
     } catch (cause) {
       setFormError((cause as Error).message)
@@ -168,7 +176,7 @@ export default function App() {
         : section === 'model' ? <ModelSettingsView />
           : section === 'corpus' && selected ? selected.has_corpus
             ? <CorpusView key={selected.id} project={selected} />
-            : <ProjectMaterialsView key={selected.id} project={selected} onOpenDocument={(id) => navigate('documents', id)} onOpenFacts={() => navigate('facts')} />
+            : <ProjectMaterialsView key={selected.id} project={selected} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} onOpenFacts={() => navigate('facts')} />
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
               : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} />
                 : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenRules={() => navigate('rules')} />}

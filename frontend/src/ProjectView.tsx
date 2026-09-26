@@ -8,6 +8,7 @@ type EvidenceStatus = { fact_key: string; fact_revision: number; status: 'UNVERI
 type EvidenceDocument = { id: string; filename: string; pages: number }
 type EvidenceSegment = { ref: string; page: number; text: string; locator?: string }
 const emptyFact: FactForm = { key: '', label: '', data_type: 'decimal', unit: '', caliber: '', as_of: '', source: '' }
+const newFact = (): FactForm => ({ ...emptyFact, key: `fact_${window.crypto.randomUUID().replaceAll('-', '').slice(0, 12)}` })
 const statusText: Record<string, string> = { UNDEFINED: '未定义', UNEVALUABLE: '不可评估', PROVIDED: '已提供', COMPUTED: '已计算' }
 const displayValue = (value: string | null, status?: string | null) => value ?? (statusText[status || ''] || '—')
 
@@ -16,7 +17,12 @@ function FactStatus({ status }: { status: string }) {
 }
 
 function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
-  return <div className="drawer-backdrop" onClick={onClose}><aside className="drawer" onClick={(event) => event.stopPropagation()}><div className="drawer-header"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="关闭"><X size={20} /></button></div><div className="drawer-content">{children}</div></aside></div>
+  useEffect(() => {
+    const dismiss = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
+    window.addEventListener('keydown', dismiss)
+    return () => window.removeEventListener('keydown', dismiss)
+  }, [onClose])
+  return <div className="drawer-backdrop" onClick={onClose}><aside className="drawer" role="dialog" aria-modal="true" aria-label={title} onClick={(event) => event.stopPropagation()}><div className="drawer-header"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="关闭"><X size={20} /></button></div><div className="drawer-content">{children}</div></aside></div>
 }
 
 function FieldInput({ label, value, onChange, placeholder, type = 'text' }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string; type?: string }) {
@@ -29,6 +35,7 @@ export default function ProjectView({ project, section, onProjectChange, notify,
   const [trace, setTrace] = useState<Trace[]>([])
   const [version, setVersion] = useState(0)
   const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [dialog, setDialog] = useState<'fact' | 'rule' | 'edit' | 'history' | 'evidence' | null>(null)
   const [factForm, setFactForm] = useState<FactForm>(emptyFact)
   const [ruleForm, setRuleForm] = useState({ name: '', target_key: '', expression: '' })
@@ -59,7 +66,9 @@ export default function ProjectView({ project, section, onProjectChange, notify,
   }, [project, onProjectChange])
 
   useEffect(() => { void load() }, [load])
-  const filtered = useMemo(() => facts.filter((fact) => `${fact.key} ${fact.label} ${fact.unit} ${fact.status}`.toLowerCase().includes(query.toLowerCase())), [facts, query])
+  const filtered = useMemo(() => facts.filter((fact) =>
+    `${fact.key} ${fact.label} ${fact.unit} ${fact.status}`.toLowerCase().includes(query.toLowerCase()) &&
+    (statusFilter === 'all' || (statusFilter === 'needs-source' ? fact.status === 'PROVIDED' && fact.evidence_status !== 'SOURCE_LOCATOR_REVIEWED' : fact.status === statusFilter))), [facts, query, statusFilter])
 
   const createFact = async (openEditor: boolean) => {
     if (!project) return
@@ -96,7 +105,9 @@ export default function ProjectView({ project, section, onProjectChange, notify,
       ])
       setEvidenceStatus(status); setEvidenceDocuments(documents)
       setEvidenceDocumentId(status.document_id || documents[0]?.id || '')
-      setEvidenceRefs(status.source_refs || []); setEvidencePage(1)
+      setEvidenceRefs(status.source_refs || [])
+      const boundPage = /^p(\d+)-/.exec(status.source_refs?.[0] || '')
+      setEvidencePage(boundPage ? Number(boundPage[1]) : 1)
     } catch (cause) { setError((cause as Error).message) }
   }
   useEffect(() => {
@@ -137,17 +148,16 @@ export default function ProjectView({ project, section, onProjectChange, notify,
 
   return <main className="page">
     <div className="breadcrumb">项目 / {project.name} / {section === 'facts' ? '事实台账' : '规则计算'}</div>
-    <div className="page-header"><h1>{section === 'facts' ? '项目事实' : '规则计算'}</h1>{project.has_corpus ? <span className="status status-neutral">只读</span> : <button className="primary-button" onClick={() => { setError(''); if (section === 'facts') { setFactForm(emptyFact); setDialog('fact') } else { setRuleForm({ name: '', target_key: '', expression: '' }); setDialog('rule') } }}><Plus size={16} />{section === 'facts' ? '新增事实' : '新增规则'}</button>}</div>
+    <div className="page-header"><h1>{section === 'facts' ? '项目事实' : '规则计算'}</h1>{project.has_corpus ? <span className="status status-neutral">只读</span> : <button className="primary-button" onClick={() => { setError(''); if (section === 'facts') { setFactForm(newFact()); setDialog('fact') } else { setRuleForm({ name: '', target_key: '', expression: '' }); setDialog('rule') } }}><Plus size={16} />{section === 'facts' ? '新增事实' : '新增规则'}</button>}</div>
     {error && !dialog && <div className="notice error">{error}</div>}
     <div className="project-summary"><span>{facts.length} 项事实</span><span>{facts.filter((fact) => fact.status === 'UNDEFINED' || fact.status === 'UNEVALUABLE').length} 项待补</span><span>v{version}</span></div>
-    {section === 'facts' ? <section className="workspace-card"><div className="workspace-toolbar"><h2>事实台账</h2><div className="search-input"><Search size={16} /><input aria-label="搜索事实" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索名称、key 或单位" /></div></div><div className="table-wrap"><table><thead><tr><th>事实</th><th>值</th><th>状态</th><th>操作</th></tr></thead><tbody>{filtered.map((fact) => { const computed = rules.some((rule) => rule.target_key === fact.key); return <tr key={fact.id}><td><strong>{fact.label}</strong></td><td className="fact-value">{fact.value === null ? '—' : fact.value}{fact.value !== null && fact.unit ? ` ${fact.unit}` : ''}</td><td><FactStatus status={fact.status} /></td><td><div className="inline-actions">{computed ? <button onClick={onOpenRules}>规则</button> : !project.has_corpus && <><button onClick={() => editFact(fact)}>编辑</button>{fact.status === 'PROVIDED' && <button onClick={() => void openEvidence(fact)}>证据</button>}</>}<button onClick={() => showHistory(fact)}>历史</button></div></td></tr> })}</tbody></table>{filtered.length === 0 && <div className="empty">{facts.length === 0 ? '暂无事实' : '没有匹配事实'}</div>}</div></section> : <section className="workspace-card"><div className="workspace-toolbar"><h2>规则与结果</h2></div>{rules.length === 0 ? <div className="empty">暂无规则</div> : <div className="rule-list">{rules.map((rule) => { const item = trace.find((entry) => entry.rule_id === rule.id); return <div className="rule-card" key={rule.id}><div className="rule-card-head"><span className="rule-symbol"><Calculator size={18} /></span><div><strong>{rule.name}</strong><small>{rule.target_key} ← {rule.deps.join('、')}</small></div><FactStatus status={item?.status || 'UNDEFINED'} /></div><div className="expression">{rule.expression}</div><div className="rule-result">{item?.status === 'UNEVALUABLE' ? <>缺少输入：{item.missing?.join('、')}</> : <>当前结果：<b>{item?.result ?? '—'}</b></>}</div></div> })}</div>}</section>}
+    {section === 'facts' ? <section className="workspace-card"><div className="workspace-toolbar"><h2>事实台账</h2><div className="fact-list-tools"><select aria-label="筛选事实状态" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">全部状态</option><option value="UNDEFINED">未定义</option><option value="UNEVALUABLE">不可评估</option><option value="PROVIDED">已提供</option><option value="COMPUTED">已计算</option><option value="needs-source">来源待核对</option></select><div className="search-input"><Search size={16} /><input aria-label="搜索事实" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索名称或单位" /></div></div></div><div className="table-wrap"><table><thead><tr><th>事实</th><th>值</th><th>状态</th><th>操作</th></tr></thead><tbody>{filtered.map((fact) => { const computed = rules.some((rule) => rule.target_key === fact.key); return <tr key={fact.id}><td><strong>{fact.label}</strong></td><td className="fact-value">{fact.value === null ? '—' : fact.value}{fact.value !== null && fact.unit ? ` ${fact.unit}` : ''}</td><td><FactStatus status={fact.status} />{fact.status === 'PROVIDED' && <small className="fact-source-state">{fact.evidence_status === 'SOURCE_LOCATOR_REVIEWED' ? '原文位置已核对' : '来源待核对'}</small>}</td><td><div className="inline-actions">{computed ? <button onClick={onOpenRules}>规则</button> : !project.has_corpus && <><button onClick={() => editFact(fact)}>编辑</button>{fact.status === 'PROVIDED' && <button onClick={() => void openEvidence(fact)}>证据</button>}</>}<button onClick={() => showHistory(fact)}>历史</button></div></td></tr> })}</tbody></table>{filtered.length === 0 && <div className="empty">{facts.length === 0 ? '暂无事实，点击右上角新增' : '没有匹配事实'}</div>}</div></section> : <section className="workspace-card"><div className="workspace-toolbar"><h2>规则与结果</h2></div>{rules.length === 0 ? <div className="empty">暂无规则</div> : <div className="rule-list">{rules.map((rule) => { const item = trace.find((entry) => entry.rule_id === rule.id); return <div className="rule-card" key={rule.id}><div className="rule-card-head"><span className="rule-symbol"><Calculator size={18} /></span><div><strong>{rule.name}</strong><small>{rule.target_key} ← {rule.deps.join('、')}</small></div><FactStatus status={item?.status || 'UNDEFINED'} /></div><div className="expression">{rule.expression}</div><div className="rule-result">{item?.status === 'UNEVALUABLE' ? <>缺少输入：{item.missing?.join('、')}</> : <>当前结果：<b>{item?.result ?? '—'}</b></>}</div></div> })}</div>}</section>}
 
     {dialog === 'fact' && <Modal title="新增事实" onClose={() => setDialog(null)}><div className="form-stack">
       <FieldInput label="名称" value={factForm.label} onChange={(value) => setFactForm({ ...factForm, label: value })} placeholder="首年需求" />
-      <FieldInput label="字段 key" value={factForm.key} onChange={(value) => setFactForm({ ...factForm, key: value })} placeholder="first_year_demand" />
       <label className="form-field"><span>类型</span><select value={factForm.data_type} onChange={(event) => setFactForm({ ...factForm, data_type: event.target.value })}>{[['decimal', '小数'], ['integer', '整数'], ['boolean', '布尔'], ['date', '日期'], ['text', '文本'], ['enum', '选项']].map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <FieldInput label="单位" value={factForm.unit} onChange={(value) => setFactForm({ ...factForm, unit: value })} placeholder="套" />
-      <details className="project-more"><summary>更多属性</summary><FieldInput label="口径" value={factForm.caliber} onChange={(value) => setFactForm({ ...factForm, caliber: value })} /><FieldInput label="时点" value={factForm.as_of} onChange={(value) => setFactForm({ ...factForm, as_of: value })} placeholder="YYYY-MM-DD" /><FieldInput label="来源" value={factForm.source} onChange={(value) => setFactForm({ ...factForm, source: value })} /></details>
+      <details className="project-more"><summary>更多属性</summary><FieldInput label="字段 key" value={factForm.key} onChange={(value) => setFactForm({ ...factForm, key: value })} /><FieldInput label="口径" value={factForm.caliber} onChange={(value) => setFactForm({ ...factForm, caliber: value })} /><FieldInput label="时点" value={factForm.as_of} onChange={(value) => setFactForm({ ...factForm, as_of: value })} placeholder="YYYY-MM-DD" /><FieldInput label="来源" value={factForm.source} onChange={(value) => setFactForm({ ...factForm, source: value })} /></details>
       {error && <div className="notice error">{error}</div>}<div className="form-actions"><button onClick={() => setDialog(null)}>取消</button><button disabled={!factForm.key || !factForm.label || busy} onClick={() => void createFact(false)}>仅创建</button><button className="primary-button" disabled={!factForm.key || !factForm.label || busy} onClick={() => void createFact(true)}>创建并录入值</button></div>
     </div></Modal>}
     {dialog === 'rule' && <Modal title="新增规则" onClose={() => setDialog(null)}><div className="form-stack">

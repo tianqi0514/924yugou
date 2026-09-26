@@ -43,7 +43,7 @@ test('project switch, navigation and project creation remain usable on narrow sc
   await expect(primary.getByRole('button')).toHaveCount(labels.length)
   await primary.getByRole('button', { name: '项目文件' }).click()
   await expect(page.getByRole('heading', { name: '项目文件' })).toBeVisible()
-  await expect(page.getByText('暂无文件')).toBeVisible()
+  await expect(page.getByText('暂无文件', { exact: true })).toBeVisible()
   await expect(page.getByText('上传 PDF / DOCX')).toHaveCount(0)
   await primary.getByRole('button', { name: '项目事实' }).click()
   await expect(page.getByText('暂无事实')).toBeVisible()
@@ -64,7 +64,7 @@ test('project switch, navigation and project creation remain usable on narrow sc
     await expect(button).toHaveAttribute('aria-current', 'page')
     if (label === '项目资料') {
       await expect(page.locator('.project-materials-summary')).toContainText('原件 0')
-      await expect(page.locator('.project-materials-section').first()).toContainText('暂无文件')
+      await expect(page.locator('.project-materials-section').first()).toContainText('上传首份原件')
     }
   }
   await expect(page.getByRole('heading', { name: '报告写作' })).toBeVisible()
@@ -89,5 +89,5 @@ test('project switch, navigation and project creation remain usable on narrow sc
   await page.getByPlaceholder('输入项目名称').fill('演示项目')
   await page.getByRole('dialog').getByRole('button', { name: '创建项目' }).click()
   await expect(page.getByLabel('切换项目')).toHaveValue('created')
-  await expect(primary.getByRole('button', { name: '项目事实' })).toHaveAttribute('aria-current', 'page')
+  await expect(primary.getByRole('button', { name: '项目文件' })).toHaveAttribute('aria-current', 'page')
 })

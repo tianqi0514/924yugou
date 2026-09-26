@@ -462,6 +462,17 @@ def scenario_run(project_id: str, scenario_id: str, body: RunCreate):
         if item.revision != body.scenario_revision:
             raise HTTPException(409, "方案已变化，请重新推演")
         snapshot = _calculate(item, item.inputs)
+        # Record facts that agreed with this run when it was created. A later
+        # fact revision must not be mistaken for an intentional scenario change.
+        from .analysis_evidence import _same_value
+        fact_rows = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id)).all()
+        input_fields = {field["key"]: field for field in item.definitions if not field["computed"]}
+        snapshot["project_fact_baseline"] = {
+            fact.key: {"revision": fact.revision, "value": fact.value_text, "unit": fact.unit}
+            for fact in fact_rows if fact.key in input_fields and fact.value_text is not None
+            and _same_value(fact.value_text, item.inputs.get(fact.key, {}).get("value"))
+            and fact.unit == input_fields[fact.key]["unit"]
+        }
         if item.blueprint_version.startswith("config:"):
             from .analysis_conditions import condition_results
             config = _published_config(session, project_id, item.blueprint_version[7:])

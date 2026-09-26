@@ -1,5 +1,13 @@
 .document-list{min-height:0}
+.document-list-search{width:100%;margin:8px 0 10px;border:1px solid #dfe6ef;border-radius:7px;padding:8px 10px;background:#fff;color:#334762}
 .document-main>.workspace-card{min-height:0}
+.document-search{display:flex;gap:7px;align-items:center;margin:10px 0;flex-wrap:wrap}
+.document-search input{flex:1;min-width:160px;border:1px solid #dfe6ef;border-radius:7px;padding:8px 10px;background:#fff;color:#334762}
+.document-search-results{display:grid;gap:5px;max-height:230px;overflow:auto;padding:9px;border:1px solid #e3eaf4;border-radius:8px;background:#f9fbff;margin-bottom:10px}
+.document-search-results>strong{font-size:11px;color:#637895}
+.document-search-results>button:not(.subtle-button){display:grid;gap:4px;text-align:left;border:1px solid #e4ebf4;border-radius:6px;background:#fff;padding:7px 9px;color:#425b7a}
+.document-search-results b{font-size:11px}.document-search-results span{font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.document-segment-active{background:#fff8e9;border-left:3px solid #e6aa4f;padding-left:9px}
 .document-source-scroll{max-height:46vh;min-height:125px;overflow:auto;overscroll-behavior:contain;padding:0 4px;border-top:1px solid #eef1f6}
 .document-source-scroll .document-segment:last-child{border-bottom:0}
 .candidate-support{margin:10px 0;border-top:1px solid #edf1f6;padding-top:9px}

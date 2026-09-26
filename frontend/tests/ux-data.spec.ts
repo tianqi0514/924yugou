@@ -43,8 +43,10 @@ test('a new fact opens value entry, previews zero without writing, then commits'
     return reply({ detail: `未模拟：${request.method()} ${path}` }, 501)
   })
   await page.goto('/')
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '项目事实' }).click()
   await page.getByRole('button', { name: '新增事实' }).click()
   await page.getByRole('textbox', { name: '名称', exact: true }).fill('首年需求')
+  await page.locator('details.project-more > summary').click()
   await page.getByRole('textbox', { name: '字段 key' }).fill('first_year_demand')
   await page.getByRole('combobox', { name: '类型' }).selectOption('integer')
   await page.getByRole('textbox', { name: '单位' }).fill('套')
@@ -68,6 +70,7 @@ test('a new fact opens value entry, previews zero without writing, then commits'
   const previewsBeforeResultFact = previews
   await page.getByRole('button', { name: '新增事实' }).click()
   await page.getByRole('textbox', { name: '名称', exact: true }).fill('计划销售量')
+  await page.locator('details.project-more > summary').click()
   await page.getByRole('textbox', { name: '字段 key' }).fill('planned_sales')
   await page.getByRole('textbox', { name: '单位' }).fill('套')
   await page.getByRole('button', { name: '仅创建' }).click()
