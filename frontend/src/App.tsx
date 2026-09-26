@@ -4,25 +4,26 @@ import CorpusView from './CorpusView'
 import DocumentsView from './DocumentsView'
 import ProjectView from './ProjectView'
 import WritingWorkspaceGateway from './WritingWorkspaceGateway'
-import WritingView from './WritingView'
 import ModelSettingsView from './ModelSettingsView'
 import { api, post, type Project } from './api'
 
-type Section = 'facts' | 'rules' | 'writing' | 'corpus' | 'documents' | 'reports' | 'model'
+type Section = 'facts' | 'rules' | 'corpus' | 'documents' | 'reports' | 'model'
 type NavItem = { id: Section; label: string; icon: LucideIcon }
 
 const projectNav: NavItem[] = [
   { id: 'documents', label: '项目文件', icon: FileSearch },
+  { id: 'corpus', label: '项目资料', icon: Layers3 },
   { id: 'facts', label: '项目事实', icon: Database },
   { id: 'rules', label: '规则计算', icon: GitBranch },
   { id: 'reports', label: '报告写作', icon: FilePenLine },
 ]
-const projectSections: Section[] = ['documents', 'facts', 'rules', 'reports', 'writing']
+const projectSections: Section[] = projectNav.map((item) => item.id)
 function savedSection(project: Project): Section {
+  const requested = new URLSearchParams(window.location.search).get('section') as Section | null
+  if (new URLSearchParams(window.location.search).get('project') === project.id && requested && [...projectSections, 'model'].includes(requested)) return requested
   if (new URLSearchParams(window.location.search).get('report')) return 'reports'
   const stored = window.localStorage.getItem(`report-platform-section:${project.id}`) as Section | null
-  if (project.has_corpus) return stored === 'reports' ? 'reports' : 'corpus'
-  return stored && projectSections.includes(stored) ? stored : 'facts'
+  return stored && projectSections.includes(stored) ? stored : project.has_corpus ? 'corpus' : 'facts'
 }
 
 export default function App() {
@@ -61,6 +62,17 @@ export default function App() {
 
   useEffect(() => { void loadProjects() }, [loadProjects])
   useEffect(() => {
+    const restore = () => {
+      const requested = new URLSearchParams(window.location.search).get('project')
+      const project = projects.find((item) => item.id === requested)
+      if (!project) return
+      setProjectId(project.id)
+      setSection(savedSection(project))
+    }
+    window.addEventListener('popstate', restore)
+    return () => window.removeEventListener('popstate', restore)
+  }, [projects])
+  useEffect(() => {
     if (!notice) return
     const timer = window.setTimeout(() => setNotice(''), 3500)
     return () => window.clearTimeout(timer)
@@ -70,9 +82,13 @@ export default function App() {
   const selectProject = (id: string) => {
     const project = projects.find((item) => item.id === id)
     if (!project) return
+    const leaving = new Event('report-platform-before-navigate', { cancelable: true })
+    window.dispatchEvent(leaving)
+    if (leaving.defaultPrevented) return
     setProjectId(id)
     const url = new URL(window.location.href)
     url.searchParams.set('project', id)
+    url.searchParams.delete('section')
     url.searchParams.delete('report')
     url.searchParams.delete('workspace')
     window.history.pushState({}, '', url)
@@ -80,18 +96,24 @@ export default function App() {
     setSection(savedSection(project))
   }
   const navigate = (next: Section) => {
-    setSection(next)
-    if (next !== 'reports') {
-      const url = new URL(window.location.href)
-      url.searchParams.delete('report')
-      window.history.pushState({}, '', url)
+    if (next !== section) {
+      const leaving = new Event('report-platform-before-navigate', { cancelable: true })
+      window.dispatchEvent(leaving)
+      if (leaving.defaultPrevented) return
     }
+    setSection(next)
+    const url = new URL(window.location.href)
+    url.searchParams.set('section', next)
+    window.history.pushState({}, '', url)
     if (projectId && projectSections.includes(next)) window.localStorage.setItem(`report-platform-section:${projectId}`, next)
   }
   const onProjectChange = useCallback((project: Project) => setProjects((items) => items.map((item) => item.id === project.id ? project : item)), [])
   const closeCreate = () => { setCreateOpen(false); setFormError('') }
   const createProject = async () => {
     if (!projectName.trim() || creating) return
+    const leaving = new Event('report-platform-before-navigate', { cancelable: true })
+    window.dispatchEvent(leaving)
+    if (leaving.defaultPrevented) { setCreateOpen(false); return }
     setCreating(true)
     setFormError('')
     try {
@@ -100,6 +122,7 @@ export default function App() {
       setProjectId(created.id)
       const url = new URL(window.location.href)
       url.searchParams.set('project', created.id)
+      url.searchParams.delete('section')
       url.searchParams.delete('report')
       url.searchParams.delete('workspace')
       window.history.pushState({}, '', url)
@@ -131,19 +154,17 @@ export default function App() {
         <div className="picker-row"><select id="project-picker" aria-label="切换项目" value={projectId} disabled={loading || !projects.length} onChange={(event) => selectProject(event.target.value)}><option value="" disabled>选择项目</option>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}{project.is_builtin ? '（内置）' : ''}</option>)}</select><ChevronDown size={15} aria-hidden="true" /></div>
         <button type="button" onClick={() => { setCreateOpen(true); setFormError('') }}><Plus size={15} aria-hidden="true" />新建项目</button>
       </div>
-      <nav aria-label="主导航">{selected?.has_corpus ? <>{navButton({ id: 'corpus', label: '项目资料', icon: Layers3 })}{navButton({ id: 'reports', label: '文章写作', icon: FilePenLine })}</> : selected ? projectNav.map(navButton) : null}</nav>
-      <nav className="sidebar-secondary" aria-label="其他功能">{selected && !selected.has_corpus && navButton({ id: 'writing', label: '案例验证', icon: FileSearch })}{navButton({ id: 'model', label: '模型配置', icon: Settings2 })}</nav>
+      <nav aria-label="主导航">{selected ? projectNav.map(navButton) : null}</nav>
+      <nav className="sidebar-secondary" aria-label="其他功能">{navButton({ id: 'model', label: '模型配置', icon: Settings2 })}</nav>
     </aside>
     <div className="main-area">
       {loadError && <div className="app-error notice error" role="alert"><span>{loadError}</span><button className="text-button" type="button" onClick={() => void loadProjects()}>重试</button></div>}
       {loading ? <main className="page"><div className="app-loading" role="status">加载中…</div></main>
         : section === 'model' ? <ModelSettingsView />
-          : selected?.has_corpus && section === 'corpus' ? <CorpusView key={selected.id} project={selected} />
-            : selected?.has_corpus && section === 'reports' ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('corpus')} onOpenDocuments={() => navigate('corpus')} onOpenProjectFacts={() => navigate('corpus')} onOpenCorpus={() => navigate('corpus')} />
+          : section === 'corpus' && selected ? <CorpusView key={selected.id} project={selected} />
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
-              : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('writing')} />
-                : section === 'writing' && selected ? <WritingView key={selected.id} project={selected} onProjectChange={onProjectChange} notify={setNotice} onChooseReference={() => navigate('reports')} />
-                  : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenRules={() => navigate('rules')} />}
+              : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} />
+                : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenRules={() => navigate('rules')} />}
     </div>
     {notice && <div className="toast" role="status">{notice}</div>}
     {createOpen && <div className="dialog-backdrop" onClick={closeCreate}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="create-project-title" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === 'Escape') closeCreate() }}><div className="dialog-head"><h2 id="create-project-title">新建项目</h2><button type="button" className="icon-button" onClick={closeCreate} aria-label="关闭"><X size={19} /></button></div><label className="form-field"><span>项目名称</span><input autoFocus value={projectName} onChange={(event) => setProjectName(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') void createProject() }} placeholder="输入项目名称" /></label>{formError && <div className="notice error" role="alert">{formError}</div>}<div className="form-actions"><button type="button" onClick={closeCreate}>取消</button><button type="button" className="primary-button" disabled={!projectName.trim() || creating} onClick={createProject}>{creating ? '创建中…' : '创建项目'}</button></div></div></div>}

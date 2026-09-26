@@ -281,16 +281,17 @@ export default function CorpusView({ project }: { project: Project }) {
   const [categoryFilesOpen, setCategoryFilesOpen] = useState(false)
 
   useEffect(() => {
+    if (!project.has_corpus) return
     Promise.all([api<CorpusSummary>(corpusPath(project.id, '/summary')), api<Category[]>(corpusPath(project.id, '/categories'))]).then(([one, two]) => { setSummary(one); setCategories(two) }).catch((cause: Error) => setError(cause.message))
-  }, [project.id])
+  }, [project.id, project.has_corpus])
   useEffect(() => {
-    if (selected === null) return
+    if (!project.has_corpus || selected === null) return
     let active = true
     const params = new URLSearchParams({ page: String(pageNo), size: selected === 4 || selected === 27 ? '100' : '30', search: query })
     for (const [key, value] of Object.entries(recordFilters)) if (value) params.set(key, value)
     api<CategoryPage>(corpusPath(project.id, `/categories/${selected}?${params}`)).then((result) => { if (active) { setPage(result); setError('') } }).catch((cause: Error) => { if (active) setError(cause.message) })
     return () => { active = false }
-  }, [project.id, selected, pageNo, query, recordFilters])
+  }, [project.id, project.has_corpus, selected, pageNo, query, recordFilters])
 
   const selectedCategory = selected === null ? null : categories.find((item) => item.number === selected)
   const visibleGroups = useMemo(() => summary?.groups.filter((group) => filter === '全部' || group.name === filter) || [], [summary, filter])
@@ -318,6 +319,8 @@ export default function CorpusView({ project }: { project: Project }) {
       setDetail({ title: `${entity.id} · ${entity.label}`, record: result.detail || result.entity, category: result.category_number, source: entity.source, artifactId: categories.flatMap((item) => item.artifacts || []).find((item) => item.path === entity.source)?.artifact_id })
     } catch (cause) { setError((cause as Error).message) }
   }
+
+  if (!project.has_corpus) return <main className="page"><div className="breadcrumb">项目 / {project.name} / 项目资料</div><div className="page-header"><h1>项目资料</h1></div><section className="workspace-card"><div className="empty">暂无项目资料</div></section></main>
 
   return <main className="page">
     {selected === null ? <>

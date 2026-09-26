@@ -1,0 +1,153 @@
+import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
+import { expect, test, type APIRequestContext } from '@playwright/test'
+import { attach, watch } from './diagnostics'
+
+test.beforeEach(async ({ page }) => watch(page))
+test.afterEach(async ({ page }, info) => attach(page, info))
+
+async function send(request: APIRequestContext, method: 'post' | 'put', url: string, data: unknown) {
+  const response = await request[method](url, { data })
+  expect(response.ok(), `${url}: ${await response.text()}`).toBeTruthy()
+  return response.json()
+}
+
+test('环评样本两章引用同一原件，预算变化后条件与正文待更新', async ({ page, request }) => {
+  test.setTimeout(240_000)
+  const project = await send(request, 'post', '/api/projects', { name: `环评写作 QA ${Date.now()}` })
+  const base = `/api/projects/${project.id}`
+  const source = await readFile(resolve(process.cwd(), '../test-fixtures/public-reports/02_jiangmen_eia.pdf'))
+  const uploaded = await request.post(`${base}/documents`, { multipart: {
+    file: { name: '江门环境影响报告表.pdf', mimeType: 'application/pdf', buffer: source },
+  } })
+  expect(uploaded.status(), await uploaded.text()).toBe(201)
+  const documentId = (await uploaded.json()).id
+  const sourcePage = await (await request.get(`${base}/documents/${documentId}?page=5`)).json()
+  const sourceRef = sourcePage.segments.find((row: { text: string }) => row.text.includes('总投资') && row.text.includes('500') && row.text.includes('17'))?.ref
+  expect(sourceRef, '原件表格中的总投资和环保投资应位于同一可追溯行').toBeTruthy()
+  for (const [key, label, value] of [
+    ['total_investment', '总投资', '500'], ['environmental_investment', '环保投资', '17'],
+  ]) {
+    await send(request, 'post', `${base}/facts`, { key, label, data_type: 'decimal', unit: '万元', source: '江门公开环评报告表' })
+    const change = { fact_key: key, value, source: '江门公开环评报告表', reason: '原件定位核对' }
+    const preview = await send(request, 'post', `${base}/changes/preview`, change)
+    await send(request, 'post', `${base}/changes/commit`, {
+      ...change, base_version: preview.base_version, preview_token: preview.preview_token,
+    })
+    await send(request, 'post', `${base}/facts/${key}/evidence/bind`, {
+      document_id: documentId, source_refs: [sourceRef],
+    })
+  }
+  let config = await send(request, 'post', `${base}/analysis/configs`, { name: '环评投资情景' })
+  config = await send(request, 'put', `${base}/analysis/configs/${config.id}`, {
+    revision: config.revision, name: config.name,
+    definitions: [
+      { key: 'total_investment', label: '总投资', data_type: 'decimal', unit: '万元', group: '原件', computed: false },
+      { key: 'environmental_investment', label: '环保投资', data_type: 'decimal', unit: '万元', group: '原件', computed: false },
+      { key: 'budget_limit', label: '方案预算上限', data_type: 'decimal', unit: '万元', group: '假设', computed: false },
+      { key: 'budget_remaining', label: '预算内剩余空间', data_type: 'decimal', unit: '万元', group: '推演', computed: true },
+    ],
+    rules: [{ id: 'remaining_budget', name: '预算差额', target_key: 'budget_remaining', expression: 'max(budget_limit - environmental_investment, 0)' }],
+    sections: [
+      { id: 'investment', title: '投资基本情况', result_keys: ['total_investment', 'environmental_investment'],
+        evidence_keys: ['total_investment', 'environmental_investment'], forbidden_terms: ['禾进装备', '已获批复'] },
+      { id: 'budget', title: '环保投入情景', result_keys: ['environmental_investment', 'budget_limit', 'budget_remaining'],
+        evidence_keys: ['environmental_investment'], forbidden_terms: ['排放达标', '法定合规', '项目已获批复'],
+        conditions: [{ id: 'within_budget', expression: 'environmental_investment <= budget_limit',
+          when_true: '本方案环保投资未超过预算上限。', when_false: '本方案环保投资超过预算上限。' }] },
+    ],
+  })
+  const trial = await send(request, 'post', `${base}/analysis/configs/${config.id}/test`, {
+    revision: config.revision, sample_inputs: { total_investment: '500', environmental_investment: '17', budget_limit: '20' },
+  })
+  expect(trial.snapshot.results.budget_remaining.value).toBe('3')
+  await send(request, 'post', `${base}/analysis/configs/${config.id}/publish`, {
+    revision: config.revision, test_token: trial.test_token,
+  })
+  let scenario = await send(request, 'post', `${base}/analysis/scenarios`, {
+    name: '20万元预算情景', source: 'config', config_id: config.id,
+  })
+  scenario = await send(request, 'put', `${base}/analysis/scenarios/${scenario.id}`, {
+    base_revision: scenario.revision,
+    changes: { total_investment: '500', environmental_investment: '17', budget_limit: '20' },
+  })
+  const firstRun = await send(request, 'post', `${base}/analysis/scenarios/${scenario.id}/runs`, {
+    scenario_revision: scenario.revision, request_key: `eia-${Date.now()}`,
+  })
+  expect(firstRun.snapshot.results.budget_remaining.value).toBe('3')
+  const report = await send(request, 'post', `${base}/reports`, { title: '环保投资情景分析' })
+  await send(request, 'post', `${base}/analysis/reports/${report.id}/select`, {
+    run_id: firstRun.id, base_version: report.version,
+  })
+
+  await page.goto(`/?project=${project.id}&report=${report.id}`)
+  await expect(page.locator('.scenario-title h1')).toHaveText('环保投资情景分析')
+  await page.getByRole('button', { name: '生成本章', exact: true }).click()
+  await page.getByRole('button', { name: '生成候选' }).click()
+  await expect(page.locator('.scenario-candidate')).toContainText('证据 2/2')
+  await page.getByRole('button', { name: '取消候选' }).click()
+  expect((await (await request.get(`${base}/reports/${report.id}`)).json()).content.some(
+    (block: { section_id?: string }) => block.section_id === 'investment')).toBeFalsy()
+  await page.getByRole('button', { name: '生成候选' }).click()
+  await page.getByRole('button', { name: '加入报告' }).click()
+  await page.getByRole('button', { name: '生成本章', exact: true }).click()
+  await page.getByRole('complementary').getByLabel('章节').selectOption('budget')
+  await page.getByRole('button', { name: '生成候选' }).click()
+  await expect(page.locator('.scenario-candidate')).toContainText('预算内剩余空间3万元')
+  await expect(page.locator('.scenario-candidate')).toContainText('证据 1/1')
+  await page.getByRole('button', { name: '加入报告' }).click()
+  await expect(page.locator('[contenteditable="true"]')).toContainText('本方案环保投资未超过预算上限')
+  await page.reload()
+  await expect(page.locator('[contenteditable="true"]')).toContainText('预算内剩余空间3万元')
+
+  scenario = await send(request, 'put', `${base}/analysis/scenarios/${scenario.id}`, {
+    base_revision: scenario.revision, changes: { budget_limit: '15' },
+  })
+  const secondRun = await send(request, 'post', `${base}/analysis/scenarios/${scenario.id}/runs`, {
+    scenario_revision: scenario.revision, request_key: `eia-${Date.now()}-2`,
+  })
+  expect(secondRun.snapshot.results.budget_remaining.value).toBe('0')
+  const current = await (await request.get(`${base}/reports/${report.id}`)).json()
+  await send(request, 'post', `${base}/analysis/reports/${report.id}/select`, {
+    run_id: secondRun.id, base_version: current.version,
+  })
+  await page.reload()
+  await page.getByRole('button', { name: /检查/ }).first().click()
+  await expect(page.locator('.scenario-refresh')).toContainText('推演变化')
+  await page.getByRole('button', { name: '处理变化' }).click()
+  await expect(page.locator('.scenario-refresh')).toContainText('本方案环保投资超过预算上限')
+  const beforeUpdate = await (await request.get(`${base}/reports/${report.id}`)).json()
+  expect(beforeUpdate.issues.some((issue: { severity: string }) => issue.severity === 'block')).toBeTruthy()
+  const selectable = page.locator('.scenario-refresh input[type="checkbox"]')
+  const count = await selectable.count()
+  expect(count).toBeGreaterThan(0)
+  for (let index = 0; index < count; index++) await selectable.nth(index).check()
+  await page.getByRole('button', { name: `更新所选 ${count} 处` }).click()
+  await expect(page.locator('[contenteditable="true"]')).toContainText('本方案环保投资超过预算上限。')
+  await expect(page.locator('[contenteditable="true"]')).toContainText('预算内剩余空间0万元')
+  const updated = await (await request.get(`${base}/reports/${report.id}`)).json()
+  expect(updated.issues.some((issue: { code: string }) => issue.code === 'ANALYSIS_RUN_STALE')).toBeFalsy()
+  const reviewedResponse = await request.post(`${base}/reports/${report.id}/review`)
+  expect(reviewedResponse.ok(), await reviewedResponse.text()).toBeTruthy()
+  const exported = await request.get(`${base}/reports/${report.id}/export?level=scenario`)
+  expect(exported.ok(), await exported.text()).toBeTruthy()
+  expect((await exported.body()).byteLength).toBeGreaterThan(1000)
+  const oldVersion = await request.get(`${base}/reports/${report.id}/versions`)
+  expect((await oldVersion.json()).length).toBeGreaterThan(2)
+  await page.clock.install()
+  const editor = page.locator('[contenteditable="true"]')
+  await editor.click()
+  await editor.press('End')
+  await editor.type('待保存测试')
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '项目资料' }).click()
+  await expect(page.locator('.scenario-title h1')).toHaveText('环保投资情景分析')
+  await expect(page.getByRole('alert')).toContainText('请先保存正文')
+  await page.clock.runFor(1500)
+  await expect(page.locator('.scenario-title')).toContainText('已保存')
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '项目资料' }).click()
+  await expect(page.getByText('暂无项目资料')).toBeVisible()
+  await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '报告写作' }).click()
+  await expect(page.locator('.scenario-title h1')).toHaveText('环保投资情景分析')
+  await page.setViewportSize({ width: 500, height: 700 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy()
+})

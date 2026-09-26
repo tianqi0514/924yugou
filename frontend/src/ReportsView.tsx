@@ -485,6 +485,16 @@ export default function ReportsView({ project, notify, onEditFacts, onOpenDocume
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const dirty = !!report && JSON.stringify(normalizedBlocks(content)) !== JSON.stringify(normalizedBlocks(report.content))
+  useEffect(() => {
+    const beforeNavigate = (event: Event) => {
+      if (dirty) {
+        event.preventDefault()
+        setError('请先保存正文')
+      }
+    }
+    window.addEventListener('report-platform-before-navigate', beforeNavigate)
+    return () => window.removeEventListener('report-platform-before-navigate', beforeNavigate)
+  }, [dirty])
   const usable = useMemo(() => facts.filter((fact) => fact.value !== null && ['PROVIDED', 'COMPUTED'].includes(fact.status)), [facts])
   const loadReports = useCallback(async () => {
     const items = await api<ReportSummary[]>(`/projects/${project.id}/reports`)
@@ -633,7 +643,7 @@ export default function ReportsView({ project, notify, onEditFacts, onOpenDocume
   const blockingIssues = report?.issues.filter((issue) => issue.severity === 'block') || []
   const reviewIssues = report?.issues.filter((issue) => issue.severity !== 'block') || []
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  return <main className="page"><div className="breadcrumb">项目 / {project.name} / {project.has_corpus ? '文章写作' : '报告写作'}</div><div className="page-header"><h1>{project.has_corpus ? '文章写作' : '报告写作'}</h1>{report && <span className="status status-neutral">v{report.version} · {dirty ? '未保存' : report.reviewed ? '已核对' : '待核对'}</span>}</div>
+  return <main className="page"><div className="breadcrumb">项目 / {project.name} / 报告写作</div><div className="page-header"><h1>报告写作</h1>{report && <span className="status status-neutral">v{report.version} · {dirty ? '未保存' : report.reviewed ? '已核对' : '待核对'}</span>}</div>
     {error && <div className="notice error">{error}</div>}
     {project.has_corpus && <CorpusArticleComposer project={project} onSaved={(id) => { void loadReports(); setReportId(id); window.localStorage.setItem(`report-platform-report:${project.id}`, id); notify('文章已保存，可在 Plate 继续编辑') }} />}
     <div className="reports-layout"><aside className="workspace-card report-list"><h2>{project.has_corpus ? '已保存文章' : '本项目报告'}</h2>{reports.map((item) => <button className={item.id === reportId ? 'active' : ''} key={item.id} onClick={() => { if (dirty && !window.confirm('当前修改尚未保存，确定切换报告？')) return; candidateRequest.current += 1; setSectionPreview(null); setReportId(item.id); window.localStorage.setItem(`report-platform-report:${project.id}`, item.id) }}><strong>{item.title}</strong><small>v{item.version}</small></button>)}{!project.has_corpus && <><label className="form-field"><span>新报告名称</span><input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="如：项目情况报告" /></label><button className="primary-button" disabled={!title.trim() || busy} onClick={() => void create()}><Plus size={14} /> 创建报告</button></>}</aside>

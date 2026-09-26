@@ -38,6 +38,16 @@ export default function AnalysisConfigView({ projectId, scenarios, onClose, onPu
   const selected = configs.find((item) => item.id === selectedId) || null
   const changed = !!selected && !!editing && JSON.stringify([editing.name, editing.definitions, editing.rules, editing.sections]) !==
     JSON.stringify([selected.name, selected.definitions, selected.rules, selected.sections])
+  useEffect(() => {
+    const beforeNavigate = (event: Event) => {
+      if (changed) {
+        event.preventDefault()
+        setError('请先保存或放弃草稿修改')
+      }
+    }
+    window.addEventListener('report-platform-before-navigate', beforeNavigate)
+    return () => window.removeEventListener('report-platform-before-navigate', beforeNavigate)
+  }, [changed])
 
   const load = useCallback(async (preferred?: string) => {
     const rows = await api<AnalysisConfig[]>(base)

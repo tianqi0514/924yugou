@@ -33,7 +33,7 @@ test('historical article candidate can be canceled then confirmed and opened in 
     return reply({ detail: '未配置接口' }, 404)
   })
   await page.goto('/')
-  await page.getByRole('button', { name: '文章写作' }).click()
+  await page.getByRole('button', { name: '报告写作' }).click()
   await page.getByRole('textbox', { name: '文章标题' }).fill('产能专题整理')
   await page.getByRole('button', { name: '生成候选' }).click()
   await expect(page.getByText('首年需求180,000套应按原文口径核对。')).toBeVisible()
