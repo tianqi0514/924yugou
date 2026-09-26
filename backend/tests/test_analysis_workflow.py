@@ -4,6 +4,10 @@ import os
 import io
 import json
 import zipfile
+from copy import deepcopy
+from types import SimpleNamespace
+
+import pymupdf
 from uuid import uuid4
 
 os.environ["DATABASE_URL"] = "postgresql+psycopg://report:local_development_only@127.0.0.1:55432/report_platform_test"
@@ -345,6 +349,102 @@ def test_local_refresh_updates_paragraph_then_table_without_touching_other_text(
             assert b"211680" in docx.read("word/document.xml")
     old = client.get(base + f"/reports/{report_id}/compare?base={original_version}").json()
     assert "254016" in str(old["base_content"])
+
+
+def test_manual_sentence_and_table_require_reviewed_local_update(client):
+    base, scenario = create_history(client)
+    scenario = update(client, base, scenario, {"N017": "300000"})
+    first = run(client, base, scenario)
+    report = client.post(base + "/reports", json={"title": "人工编辑局部更新"}).json()
+    report_id = report["id"]
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": first["id"], "base_version": 0}).status_code == 200
+    report = _accepted_section(client, base, report_id, first["id"], "S4")
+    edited = deepcopy(report["content"])
+    paragraph = next(block for block in edited if block["type"] == "p" and block.get("analysis_refs"))
+    table = next(block for block in edited if block["type"] == "table")
+    paragraph["children"][0]["text"] += " 人工补充：交付节奏另行核实。"
+    table["children"][0]["children"][0]["children"][0]["children"][0]["text"] += "（人工列名）"
+    saved_preview = client.post(base + f"/reports/{report_id}/preview", json={
+        "base_version": report["version"], "content": edited}).json()
+    saved = client.put(base + f"/reports/{report_id}", json={
+        "base_version": report["version"], "content": edited,
+        "preview_token": saved_preview["preview_token"]})
+    assert saved.status_code == 200, saved.text
+    before_change = saved.json()["report"]
+    scenario = update(client, base, scenario, {"N026": "250"})
+    second = run(client, base, scenario)
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": second["id"], "base_version": before_change["version"]}).status_code == 200
+    path = base + f"/analysis/reports/{report_id}/refresh"
+    proposed = client.get(path + "/preview").json()
+    manual = [action for action in proposed["actions"] if action["kind"] == "manual_review"]
+    assert {action["block_id"] for action in manual} == {paragraph["id"], table["id"]}
+    assert all(action["selectable"] and "211680" in action["after"] for action in manual)
+    assert "人工补充：交付节奏另行核实" in next(
+        action["after"] for action in manual if action["block_id"] == paragraph["id"])
+    assert client.get(base + f"/reports/{report_id}/export?level=scenario").status_code == 409
+    updated = client.post(path + "/commit", json={
+        "run_id": second["id"], "base_version": proposed["report_version"],
+        "operation_ids": [action["id"] for action in manual]})
+    assert updated.status_code == 200, updated.text
+    current = updated.json()["report"]
+    assert not any(issue["code"] == "ANALYSIS_RUN_STALE" for issue in current["issues"])
+    assert "人工补充：交付节奏另行核实" in str(current["content"])
+    assert "人工列名" in str(current["content"])
+    assert "254016" not in str(current["content"])
+    assert [block.get("id") for block in current["content"]] == [block.get("id") for block in edited]
+    assert client.post(base + f"/reports/{report_id}/review").status_code == 200
+    delivery = client.get(base + f"/reports/{report_id}/export?level=scenario")
+    assert delivery.status_code == 200, delivery.text[:200]
+    with zipfile.ZipFile(io.BytesIO(delivery.content)) as archive:
+        audit = json.loads(archive.read("audit.json"))
+        assert second["id"] == audit["analysis_run_id"]
+        assert "manual_review" in json.dumps(audit, ensure_ascii=False)
+        with zipfile.ZipFile(io.BytesIO(archive.read("report.docx"))) as word:
+            xml = word.read("word/document.xml")
+            assert b"211680" in xml and b"254016" not in xml
+        with pymupdf.open(stream=archive.read("report.pdf"), filetype="pdf") as pdf:
+            pdf_text = "\n".join(page.get_text() for page in pdf)
+            assert "211680" in pdf_text and "254016" not in pdf_text
+            assert "交付节奏另行核实" in pdf_text and "人工列名" in pdf_text
+    old = client.get(base + f"/reports/{report_id}/compare?base={before_change['version']}").json()
+    assert "254016" in str(old["base_content"])
+
+
+def test_manual_update_refuses_ambiguous_numeric_location():
+    from app.analysis_refresh import UnsafeUpdate, _manual_update
+    block = {"type": "p", "id": "edited", "section_id": "S4", "origin": "manual",
+             "children": [{"text": "合格能力254016套，人工另记254016套。"}],
+             "analysis_refs": [{"run_id": "old", "result_key": "capacity",
+                                "value": "254016", "unit": "套"}]}
+    run = SimpleNamespace(id="new", snapshot={"results": {
+        "capacity": {"value": "211680", "unit": "套"}}, "condition": None})
+    with pytest.raises(UnsafeUpdate, match="位置不唯一"):
+        _manual_update(block, run)
+    assert block["analysis_refs"][0]["run_id"] == "old"
+
+
+def test_manual_condition_sentence_preserves_added_text_and_rebinds_dependencies():
+    from app.analysis_refresh import _manual_update
+    block = {"type": "p", "id": "condition-edited", "section_id": "budget", "origin": "manual",
+             "children": [{"text": "本方案环保投资未超过预算上限。人工补充：用途另行核对。"}],
+             "analysis_refs": [{"run_id": "old", "result_key": key, "value": value, "unit": "万元"}
+                               for key, value in (("environmental_investment", "17"), ("budget_limit", "20"))]}
+    condition = {"id": "within_budget", "when_true": "本方案环保投资未超过预算上限。",
+                 "when_false": "本方案环保投资超过预算上限。"}
+    run = SimpleNamespace(id="new", snapshot={
+        "results": {key: {"value": value, "unit": "万元"}
+                    for key, value in (("environmental_investment", "17"), ("budget_limit", "15"))},
+        "configuration": {"sections": [{"id": "budget", "conditions": [condition]}]},
+        "condition_results": {"budget:within_budget": {
+            "text": condition["when_false"], "deps": ["environmental_investment", "budget_limit"]}},
+    })
+    changed = _manual_update(block, run)
+    assert changed["children"] == [{"text": "本方案环保投资超过预算上限。人工补充：用途另行核对。"}]
+    assert [ref["value"] for ref in changed["analysis_refs"]] == ["17", "15"]
+    assert all(ref["run_id"] == "new" for ref in changed["analysis_refs"])
+    assert "未超过" in block["children"][0]["text"]
 
 
 def test_local_refresh_keeps_condition_as_a_separate_blocking_choice(client):

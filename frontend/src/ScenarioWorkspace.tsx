@@ -16,7 +16,7 @@ type Issue = { code: string; severity: string; message: string; position?: numbe
 type Report = { id: string; title: string; version: number; content: Block[]; reviewed: boolean; analysis_run_id: string | null; issues: Issue[]; updated_at: string }
 type ReportSummary = { id: string; title: string; version: number; updated_at: string; analysis_run_id: string | null }
 type Preview = { run_id: string; section_id: string; mode: string; base_version: number; content: Block[]; model_audit: Record<string, unknown> & { evidence?: { key: string; label: string; status: string; reason: string | null }[] }; expires_at: number; preview_token: string; issues: Issue[]; preserved_blocks?: Block[] }
-type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'judgement' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[] }
+type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'config_condition' | 'judgement' | 'manual_review' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[] }
 type RefreshPreview = { report_version: number; run_id: string; actions: RefreshAction[] }
 type Panel = 'inputs' | 'results' | 'draft' | 'sources' | 'check' | 'versions' | 'materials' | null
 
@@ -514,12 +514,14 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
               {refreshPreview.actions.length ? refreshPreview.actions.map((action) => <div className="scenario-refresh-action" key={action.id}>
                 <div className="scenario-refresh-action-head">
                   {action.selectable
-                    ? <label><input type="checkbox" aria-label={`选择第 ${action.position} 段${action.label}`} checked={refreshSelected.includes(action.id)} onChange={(event) => setRefreshSelected((old) => event.target.checked ? [...old, action.id] : old.filter((id) => id !== action.id))} /><strong>{action.label}</strong></label>
+                    ? <label><input type="checkbox" aria-label={`${action.kind === 'manual_review' ? '核对并选择' : '选择'}第 ${action.position} 段${action.label}`} checked={refreshSelected.includes(action.id)} onChange={(event) => setRefreshSelected((old) => event.target.checked ? [...old, action.id] : old.filter((id) => id !== action.id))} /><strong>{action.label}</strong></label>
                     : <strong>{action.label}</strong>}
                   <button type="button" onClick={() => locateBlock(action.position, action.block_id)}>第 {action.position} 段</button>
                 </div>
                 {action.reason && <small>{action.reason}</small>}
-                {action.after && <details><summary>查看变更</summary><p>原文：{action.before}</p><p>更新：{action.after}</p></details>}
+                {action.after && (action.kind === 'manual_review'
+                  ? <div className="scenario-refresh-compare"><p><b>原文</b> {action.before}</p><p><b>拟更新</b> {action.after}</p></div>
+                  : <details><summary>查看变更</summary><p>原文：{action.before}</p><p>更新：{action.after}</p></details>)}
               </div>) : <div className="empty">没有需要更新的位置</div>}
               <div className="scenario-panel-actions"><button onClick={() => { setRefreshPreview(null); setRefreshSelected([]) }}>取消</button><button className="primary-button" disabled={!refreshSelected.length || busy || dirty} onClick={() => void applyRefresh()}>更新所选 {refreshSelected.length} 处</button></div>
             </>}

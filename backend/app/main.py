@@ -1374,7 +1374,9 @@ def _analysis_report_state(session, item: ReportDraft, content: list[dict] | Non
                     for condition in section.get("conditions", []):
                         expected = selected.snapshot.get("condition_results", {}).get(
                             f"{section['id']}:{condition['id']}", {}).get("text")
-                        if text in {condition["when_true"], condition["when_false"]} and text != expected:
+                        phrases = (condition["when_true"], condition["when_false"])
+                        present = [phrase for phrase in phrases if phrase in text]
+                        if present and (len(present) != 1 or present[0] != expected):
                             issues.append({"code": "ANALYSIS_CONDITION_STALE", "severity": "block",
                                            "position": blocks.index(block) + 1,
                                            "message": "条件判断与当前推演结果不一致，请更新或核对"})
@@ -1777,6 +1779,12 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
                                    "project_rule": {"rule_id": rule.id, "expression": rule.expression,
                                                     "target_key": rule.target_key, "deps": rule.deps} if rule else None,
                                    "input_fact_refs": input_fact_refs})
+        refresh_events = session.scalars(select(AnalysisWritingEvent).where(
+            AnalysisWritingEvent.project_id == project_id,
+            AnalysisWritingEvent.report_id == report_id,
+            AnalysisWritingEvent.action == "apply_refresh",
+            AnalysisWritingEvent.report_version <= item.version).order_by(
+                AnalysisWritingEvent.report_version, AnalysisWritingEvent.created_at)).all()
         audit = {"report_id": item.id, "project_id": project_id, "report_version": item.version,
                  "content_sha256": content_hash(item.content),
                  "delivery_status": "preview_only" if level == "preview" else
@@ -1794,6 +1802,10 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
                                  for block in item.content if block.get("source_refs")],
                  "writing_issues": issues,
                  "writing_model_audits": _model_audits(session, project_id, report_id),
+                 "analysis_refreshes": [{"event_id": row.id, "report_version": row.report_version,
+                                          "run_id": row.run_id, "created_at": row.created_at.isoformat(),
+                                          "operations": row.payload.get("operations", [])}
+                                         for row in refresh_events],
                  "evidence_bindings": evidence_audit,
                  "facts": [{"key": key, "label": facts[key].label, "value": facts[key].value_text, "unit": facts[key].unit,
                             "revision": facts[key].revision, "source": facts[key].source} for key in sorted(used)]}

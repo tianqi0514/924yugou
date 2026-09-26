@@ -24,7 +24,8 @@ CONDITIONS = {
     "需求等于产能": "需求与合格能力相等，销售计划与两者一致。",
 }
 LABELS = {"numbers": "更新数字与引用", "table": "更新结果表",
-          "condition": "重写条件句", "config_condition": "更新条件判断", "judgement": "更新供应商判断"}
+          "condition": "重写条件句", "config_condition": "更新条件判断", "judgement": "更新供应商判断",
+          "manual_review": "核对人工修改后更新"}
 
 
 class RefreshCommit(BaseModel):
@@ -161,8 +162,10 @@ def _configured_condition(block: dict, run) -> tuple[dict, dict] | None:
                     if item["id"] == block.get("section_id")), None)
     if section is None or block.get("type") != "p":
         return None
+    text = plain(block)
     for condition in section.get("conditions", []):
-        if plain(block) in {condition["when_true"], condition["when_false"]}:
+        phrases = (condition["when_true"], condition["when_false"])
+        if sum(text.count(phrase) for phrase in phrases) == 1:
             outcome = run.snapshot.get("condition_results", {}).get(
                 f"{section['id']}:{condition['id']}")
             if outcome is not None:
@@ -174,7 +177,9 @@ def _updated_config_condition(block: dict, run) -> dict:
     matched = _configured_condition(block, run)
     if matched is None or matched[1]["text"] is None:
         raise UnsafeUpdate("条件配置或本次结果不可用，请人工核对")
-    _, outcome = matched
+    condition, outcome = matched
+    if plain(block) not in {condition["when_true"], condition["when_false"]}:
+        raise UnsafeUpdate("条件句包含人工文字，请逐处核对后更新")
     changed = deepcopy(block)
     changed["children"] = [{"text": outcome["text"]}]
     changed["analysis_refs"] = [_new_ref({"result_key": key}, run) for key in outcome["deps"]]
@@ -194,7 +199,73 @@ def _updated_judgement(session, block: dict, run) -> dict:
     return changed
 
 
+def _manual_token_check(block: dict, refs: list[dict], run) -> None:
+    """Only offer an in-place proposal when every bound value has one visible location."""
+    tokens: dict[str, list[str]] = {}
+    for ref in refs:
+        next_ref = _new_ref(ref, run)
+        tokens.setdefault(f"{ref['value']}{ref['unit']}", []).append(
+            f"{next_ref['value']}{next_ref['unit']}")
+    if any(not token or len(re.findall(r"(?<!\d)" + re.escape(token) + r"(?!\d)", plain(block))) != len(replacements)
+           or len(set(replacements)) != 1 for token, replacements in tokens.items()):
+        raise UnsafeUpdate("人工内容中的旧数值位置不唯一，请在 Plate 中核对")
+
+
+def _manual_update(block: dict, run) -> dict:
+    """Preserve edited leaves and formatting; require an explicit review in the UI."""
+    changed = deepcopy(block)
+    if changed.get("type") == "table":
+        if not changed.get("analysis_refs"):
+            raise UnsafeUpdate("人工表格缺少可核对的运行引用")
+        cell_keys: set[str] = set()
+        for row in changed.get("children", []):
+            for cell in row.get("children", []):
+                for paragraph in cell.get("children", []):
+                    refs = paragraph.get("analysis_refs", [])
+                    if refs:
+                        cell_keys.update(ref["result_key"] for ref in refs)
+                        if not _numeric(refs):
+                            raise UnsafeUpdate("人工表格包含非数值引用")
+                        _manual_token_check(paragraph, refs, run)
+        if any(ref["result_key"] not in cell_keys for ref in changed["analysis_refs"]):
+            raise UnsafeUpdate("人工表格有未定位到单元格的结果引用")
+        changed = _updated_table(changed, run)
+    elif changed.get("type") == "p":
+        refs = changed.get("analysis_refs", [])
+        configured = _configured_condition(changed, run)
+        if refs:
+            if not _numeric(refs):
+                raise UnsafeUpdate("人工段落包含非数值引用，请在 Plate 中核对")
+            new_refs = [_new_ref(ref, run) for ref in refs]
+            condition_only = bool(configured and all(
+                ref["result_key"] in configured[1]["deps"] for ref in refs)
+                and all(f"{ref['value']}{ref['unit']}" not in plain(changed) for ref in refs))
+            if not condition_only:
+                _manual_token_check(changed, refs, run)
+                _substitute(changed, [(f"{old['value']}{old['unit']}", f"{new['value']}{new['unit']}")
+                                      for old, new in zip(refs, new_refs)])
+            changed["analysis_refs"] = new_refs
+        configured = _configured_condition(changed, run)
+        if configured and configured[1]["text"] != plain(changed):
+            condition, outcome = configured
+            old = next((phrase for phrase in (condition["when_true"], condition["when_false"])
+                        if phrase in plain(changed)), None)
+            if old and outcome["text"] and old != outcome["text"]:
+                _substitute(changed, [(old, outcome["text"])])
+        elif changed.get("section_id") == "S4":
+            old = _condition_phrase(changed)
+            new = CONDITIONS.get(run.snapshot.get("condition"))
+            if old and new and old != new:
+                _substitute(changed, [(old, new)])
+    else:
+        raise UnsafeUpdate("此类人工内容需要在 Plate 中核对")
+    changed["origin"] = "manual"
+    return changed
+
+
 def _transform(session, block: dict, run, kind: str) -> dict:
+    if kind == "manual_review":
+        return _manual_update(block, run)
     if kind == "numbers":
         return _updated_text(session, block, run)
     if kind == "table":
@@ -220,7 +291,7 @@ def _actions(session, report, run) -> list[dict]:
         refs = _refs(block)
         stale = any(_is_stale(ref, run) for ref in refs)
         configured = _configured_condition(block, run)
-        config_condition_stale = bool(configured and configured[1]["text"] != plain(block))
+        config_condition_stale = bool(configured and configured[1]["text"] not in plain(block))
         condition_stale = (block.get("section_id") == "S4" and
                            _condition_phrase(block) is not None and
                            _condition_phrase(block) != CONDITIONS.get(run.snapshot["condition"]))
@@ -228,11 +299,21 @@ def _actions(session, report, run) -> list[dict]:
             continue
         manual = block.get("origin") != "guided" or block_id in protected
         if manual:
-            actions.append({"id": f"manual:{block_id}", "kind": "manual", "label": "手工核对",
-                            "block_id": block_id, "position": position,
-                            "section_id": block.get("section_id"), "before": plain(block),
-                            "after": None, "selectable": False,
-                            "reason": "此段经过人工修改，请在正文中核对新运行结果与判断"})
+            try:
+                changed = _manual_update(block, run)
+                if changed == block:
+                    raise UnsafeUpdate("人工内容没有可定位的更新，请在 Plate 中核对")
+                actions.append({"id": f"manual_review:{block_id}", "kind": "manual_review",
+                                "label": LABELS["manual_review"], "block_id": block_id,
+                                "position": position, "section_id": block.get("section_id"),
+                                "before": plain(block), "after": plain(changed),
+                                "selectable": True, "reason": "人工修改已保留，请逐字核对更新内容",
+                                "result_keys": sorted({ref["result_key"] for ref in refs})})
+            except UnsafeUpdate as exc:
+                actions.append({"id": f"manual:{block_id}", "kind": "manual", "label": "手工核对",
+                                "block_id": block_id, "position": position,
+                                "section_id": block.get("section_id"), "before": plain(block),
+                                "after": None, "selectable": False, "reason": str(exc)})
             continue
         kinds = []
         if configured and (stale or config_condition_stale):
@@ -306,7 +387,7 @@ def refresh_commit(project_id: str, report_id: str, body: RefreshCommit):
         by_id = {block.get("id"): block for block in content}
         ordered = sorted((offered[operation_id] for operation_id in body.operation_ids),
                          key=lambda action: (action["position"],
-                                             {"numbers": 0, "table": 0, "judgement": 0,
+                                             {"numbers": 0, "table": 0, "judgement": 0, "manual_review": 0,
                                               "condition": 1, "config_condition": 1}[action["kind"]]))
         for action in ordered:
             block = by_id[action["block_id"]]

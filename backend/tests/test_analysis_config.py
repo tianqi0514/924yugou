@@ -298,7 +298,8 @@ def test_accident_sample_conditions_evidence_model_and_partial_adoption(client, 
     assert changed.status_code == 200, changed.text
     assert any(row["kind"] == "config_condition" and "损失高于" in row["after"]
                for row in changed.json()["actions"])
-    actions = [row["id"] for row in changed.json()["actions"] if row["selectable"]]
+    actions = [row["id"] for row in changed.json()["actions"]
+               if row["selectable"] and row["kind"] != "manual_review"]
     refreshed = client.post(base + f"/analysis/reports/{report_id}/refresh/commit", json={
         "run_id": second["id"], "base_version": changed.json()["report_version"],
         "operation_ids": actions})
@@ -306,17 +307,18 @@ def test_accident_sample_conditions_evidence_model_and_partial_adoption(client, 
     assert "损失高于本方案设定阈值" in str(refreshed.json()["report"]["content"])
     assert "2.9761" in str(refreshed.json()["report"]["content"])  # 旧模型句仍须人工重写
     assert any(issue["code"] == "ANALYSIS_RUN_STALE" for issue in refreshed.json()["report"]["issues"])
-    monkeypatch.setattr(writing, "chat_json", lambda *_args, **_kwargs: ChatResult({
-        "text": "直接经济损失为77.0239万元，距本方案阈值差额为0万元。损失高于本方案设定阈值。",
-        "used_result_keys": ["direct_loss", "remaining"]}, {"model_id": "qa-model"}))
-    revised = client.post(base + f"/analysis/reports/{report_id}/draft/preview", json={
-        "run_id": second["id"], "section_id": "loss", "mode": "model"})
-    assert revised.status_code == 200, revised.text
-    accepted = client.post(base + f"/analysis/reports/{report_id}/draft/commit", json={
-        **{key: value for key, value in revised.json().items() if key not in {"issues", "preserved_blocks"}},
-        "replace_section": True})
-    assert accepted.status_code == 200, accepted.text
-    assert "2.9761" not in str(accepted.json()["report"]["content"])
+    manual_preview = client.get(base + f"/analysis/reports/{report_id}/refresh/preview").json()
+    manual = [row for row in manual_preview["actions"] if row["kind"] == "manual_review"]
+    assert len(manual) == 1 and manual[0]["selectable"]
+    assert "距本方案阈值差额为0万元" in manual[0]["after"]
+    assert "损失高于本方案设定阈值" in manual[0]["after"]
+    assert client.get(base + f"/reports/{report_id}/export?level=scenario").status_code == 409
+    manual_saved = client.post(base + f"/analysis/reports/{report_id}/refresh/commit", json={
+        "run_id": second["id"], "base_version": manual_preview["report_version"],
+        "operation_ids": [manual[0]["id"]]})
+    assert manual_saved.status_code == 200, manual_saved.text
+    assert not any(issue["code"] == "ANALYSIS_RUN_STALE" for issue in manual_saved.json()["report"]["issues"])
+    assert "2.9761" not in str(manual_saved.json()["report"]["content"])
     reviewed = client.post(base + f"/reports/{report_id}/review")
     assert reviewed.status_code == 200, reviewed.text
     exported = client.get(base + f"/reports/{report_id}/export?level=scenario")
@@ -324,8 +326,10 @@ def test_accident_sample_conditions_evidence_model_and_partial_adoption(client, 
     with zipfile.ZipFile(io.BytesIO(exported.content)) as archive:
         audit = json.loads(archive.read("audit.json"))
         assert audit["analysis_run_id"] == second["id"]
-        assert any(item["run_id"] == second["id"] and item["applied_to_current"]
+        assert any(item["run_id"] == run["id"] and item["applied_to_current"]
                    for item in audit["writing_model_audits"])
+        assert any(operation["kind"] == "manual_review"
+                   for event in audit["analysis_refreshes"] for operation in event["operations"])
         with zipfile.ZipFile(io.BytesIO(archive.read("report.docx"))) as word:
             xml = word.read("word/document.xml")
             assert b"77.0239" in xml and b"2.9761" not in xml
