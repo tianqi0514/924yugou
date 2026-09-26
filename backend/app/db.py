@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint, create_engine, text
+from sqlalchemy import DateTime, ForeignKey, Integer, JSON, LargeBinary, String, Text, UniqueConstraint, create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 
@@ -134,6 +134,25 @@ class ReportVersion(Base):
     analysis_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     report: Mapped[ReportDraft] = relationship(back_populates="versions")
+
+
+class ReportExport(Base):
+    """Immutable, downloadable delivery bytes for one checked report watermark."""
+
+    __tablename__ = "report_exports"
+    __table_args__ = (UniqueConstraint("report_id", "report_version", "level", "watermark_sha256",
+                                       name="uq_report_export_watermark"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_id: Mapped[str] = mapped_column(ForeignKey("report_drafts.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    level: Mapped[str] = mapped_column(String(12), nullable=False)
+    analysis_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    watermark_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    archive_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    filename: Mapped[str] = mapped_column(String(180), nullable=False)
+    archive: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class ProjectCorpus(Base):

@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import delete, select
 
 from .corpus import CorpusRepository
-from .db import AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectFact, ReportDraft, ReportVersion, RuleRecord, SessionLocal, SourceDocument, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
+from .db import AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectFact, ReportDraft, ReportExport, ReportVersion, RuleRecord, SessionLocal, SourceDocument, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
 from .report_pipeline import change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
@@ -1751,10 +1751,38 @@ def report_review(project_id: str, report_id: str):
         return _report_dict(item, facts, session)
 
 
+@app.get("/api/projects/{project_id}/reports/{report_id}/exports")
+def report_exports(project_id: str, report_id: str):
+    with SessionLocal() as session:
+        _report(session, project_id, report_id)
+        rows = session.execute(select(
+            ReportExport.id, ReportExport.report_version, ReportExport.level,
+            ReportExport.analysis_run_id, ReportExport.archive_sha256, ReportExport.created_at,
+        ).where(ReportExport.project_id == project_id, ReportExport.report_id == report_id)
+         .order_by(ReportExport.created_at.desc())).all()
+        return [{"id": row.id, "report_version": row.report_version, "level": row.level,
+                 "analysis_run_id": row.analysis_run_id, "sha256": row.archive_sha256,
+                 "created_at": row.created_at.isoformat()} for row in rows]
+
+
+@app.get("/api/projects/{project_id}/reports/{report_id}/exports/{export_id}")
+def report_export_saved(project_id: str, report_id: str, export_id: str):
+    with SessionLocal() as session:
+        _report(session, project_id, report_id)
+        saved = session.get(ReportExport, export_id)
+        if saved is None or saved.project_id != project_id or saved.report_id != report_id:
+            fail("交付记录不存在", 404)
+        if hashlib.sha256(saved.archive).hexdigest() != saved.archive_sha256:
+            fail("交付文件校验失败", 500)
+        return Response(content=saved.archive, media_type="application/zip",
+                        headers={"Content-Disposition": f'attachment; filename="{saved.filename}"',
+                                 "X-Archive-SHA256": saved.archive_sha256})
+
+
 @app.get("/api/projects/{project_id}/reports/{report_id}/export")
 def report_export(project_id: str, report_id: str, level: str = Query("formal", pattern="^(formal|preview|scenario)$")):
-    with SessionLocal() as session:
-        item = _report(session, project_id, report_id)
+    with SessionLocal.begin() as session:
+        item = _report(session, project_id, report_id, lock=True)
         if level == "preview" and not any(block.get("type") not in {"h1", "h2", "h3"} and plain(block).strip()
                                            for block in item.content):
             fail("报告尚无可预览的正文", 409)
@@ -1862,11 +1890,30 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
                  "evidence_bindings": evidence_audit,
                  "facts": [{"key": key, "label": facts[key].label, "value": facts[key].value_text, "unit": facts[key].unit,
                             "revision": facts[key].revision, "source": facts[key].source} for key in sorted(used)]}
-        data = export_bundle(item.title, item.content, audit,
-                             preview_label="预审稿 · 来源待核 · 不构成正式结论" if level == "preview" else
-                             "情景分析 · 假设待核 · 不构成现实项目事实结论" if level == "scenario" else None)
-        return Response(content=data, media_type="application/zip",
-                        headers={"Content-Disposition": f'attachment; filename="report-{item.id[:8]}-v{item.version}{"-preview" if level == "preview" else "-scenario" if level == "scenario" else ""}.zip"'})
+        watermark = hashlib.sha256(json.dumps(audit, ensure_ascii=False, sort_keys=True,
+                                              separators=(",", ":")).encode("utf-8")).hexdigest()
+        saved = session.scalar(select(ReportExport).where(
+            ReportExport.report_id == report_id, ReportExport.report_version == item.version,
+            ReportExport.level == level, ReportExport.watermark_sha256 == watermark))
+        if saved is None:
+            export_id = str(uuid4())
+            created_at = utcnow()
+            audit.update({"export_id": export_id, "exported_at": created_at.isoformat(),
+                          "export_level": level, "export_watermark_sha256": watermark})
+            data = export_bundle(item.title, item.content, audit,
+                                 preview_label="预审稿 · 来源待核 · 不构成正式结论" if level == "preview" else
+                                 "情景分析 · 假设待核 · 不构成现实项目事实结论" if level == "scenario" else None)
+            saved = ReportExport(
+                id=export_id, project_id=project_id, report_id=report_id, report_version=item.version,
+                level=level, analysis_run_id=item.analysis_run_id, watermark_sha256=watermark,
+                archive_sha256=hashlib.sha256(data).hexdigest(),
+                filename=f'report-{item.id[:8]}-v{item.version}{"-preview" if level == "preview" else "-scenario" if level == "scenario" else ""}.zip',
+                archive=data, created_at=created_at)
+            session.add(saved)
+        return Response(content=saved.archive, media_type="application/zip",
+                        headers={"Content-Disposition": f'attachment; filename="{saved.filename}"',
+                                 "X-Archive-SHA256": saved.archive_sha256,
+                                 "X-Export-ID": saved.id})
 
 
 @app.get("/api/projects/{project_id}/facts")

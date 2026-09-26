@@ -3,6 +3,7 @@
 import os
 import io
 import json
+import hashlib
 import zipfile
 from copy import deepcopy
 from types import SimpleNamespace
@@ -781,3 +782,53 @@ def test_chapter_add_to_empty_report_is_project_owned_and_idempotent_on_failure(
     assert client.post(path, json={"action": "add", "title": "项目背景", "base_version": 1}).status_code == 400
     assert client.get(base + f"/reports/{report['id']}").json()["version"] == 1
     assert client.get(base + "/facts").json()["facts"] == []
+
+
+def test_export_history_is_immutable_reusable_and_project_scoped(client):
+    base, scenario = create_history(client)
+    scenario = update(client, base, scenario, {"N017": "300000"})
+    chosen = run(client, base, scenario)
+    created = client.post(base + "/reports", json={"title": "交付历史核对"}).json()
+    report_id = created["id"]
+    url = base + f"/reports/{report_id}"
+    assert client.get(url + "/export?level=preview").status_code == 409
+    assert client.get(url + "/exports").json() == []
+    assert client.post(base + f"/analysis/reports/{report_id}/select", json={
+        "run_id": chosen["id"], "base_version": 0}).status_code == 200
+    report = _accepted_section(client, base, report_id, chosen["id"], "S4")
+    assert client.get(url + "/export?level=scenario").status_code == 409
+    assert client.get(url + "/exports").json() == []
+    assert client.post(url + "/review").status_code == 200
+    first = client.get(url + "/export?level=scenario")
+    assert first.status_code == 200, first.text[:200]
+    repeated = client.get(url + "/export?level=scenario")
+    assert repeated.status_code == 200 and repeated.content == first.content
+    assert repeated.headers["x-export-id"] == first.headers["x-export-id"]
+    first_id = first.headers["x-export-id"]
+    first_sha = hashlib.sha256(first.content).hexdigest()
+    assert first.headers["x-archive-sha256"] == first_sha
+    rows = client.get(url + "/exports").json()
+    assert len(rows) == 1 and rows[0]["id"] == first_id
+    assert rows[0]["sha256"] == first_sha and rows[0]["report_version"] == report["version"]
+    with zipfile.ZipFile(io.BytesIO(first.content)) as archive:
+        audit = json.loads(archive.read("audit.json"))
+        assert audit["export_id"] == first_id and audit["export_level"] == "scenario"
+        assert audit["report_version"] == report["version"]
+        assert audit["analysis_run_id"] == chosen["id"]
+
+    heading = next(block for block in report["content"] if block["type"] == "h2")
+    renamed = client.post(url + "/sections/change", json={
+        "action": "rename", "heading_id": heading["id"], "title": "产能方案复核",
+        "base_version": report["version"]})
+    assert renamed.status_code == 200, renamed.text
+    assert client.get(url + "/export?level=scenario").status_code == 409
+    assert client.post(url + "/review").status_code == 200
+    second = client.get(url + "/export?level=scenario")
+    assert second.status_code == 200 and second.headers["x-export-id"] != first_id
+    assert len(client.get(url + "/exports").json()) == 2
+    assert client.get(url + f"/exports/{first_id}").content == first.content
+    with TestClient(app) as restarted:
+        assert restarted.get(url + f"/exports/{first_id}").content == first.content
+    other = client.post("/api/projects", json={"name": "另一项目"}).json()
+    assert client.get(f"/api/projects/{other['id']}/reports/{report_id}/exports/{first_id}").status_code == 404
+    assert client.get(url + f"/exports/{uuid4()}").status_code == 404

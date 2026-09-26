@@ -30,7 +30,7 @@ type TableCell = { type: 'td' | 'th'; children: TextBlock[]; id?: string }
 type TableRow = { type: 'tr'; children: TableCell[]; id?: string }
 type TableBlock = { type: 'table'; children: TableRow[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[]; analysis_refs?: AnalysisRef[] }
 export type Block = TextBlock | TableBlock
-export type EditorActions = { insertFact: (fact: Fact) => void; insertResult: (result: { key: string; label: string; value: string; unit: string }, runId: string) => void }
+export type EditorActions = { insertFact: (fact: Fact) => void; insertResult: (result: { key: string; label: string; value: string; unit: string }, runId: string) => void; focus: () => void; focusBlock: (blockId: string) => void }
 type Issue = { code: string; message: string; severity: string; fact_key?: string }
 type FactImpact = { position: number; text: string; fact_key: string; before: { value: string | null; revision: number } | null; after: { value: string | null; revision: number } | null }
 type FactSource = {
@@ -265,7 +265,8 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
   const clearedInheritedSources = useRef(new Set<string>())
   const manuallyEditedModelBlocks = useRef(new Set<string>())
   const reportChange = (value: Value) => {
-    if (repairingSplitIds.current || hasTransientSlash(value)) return
+    if (repairingSplitIds.current || hasTransientSlash(value) ||
+        editor.operations.every((operation) => operation.type === 'set_selection')) return
     const next = normalizedBlocks(value as Block[])
     const before = previousBlocks.current
     const beforeIds = new Set(before.map((block) => block.id).filter((id): id is string => !!id))
@@ -344,7 +345,12 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
     onChange(next)
   }
   useEffect(() => {
-    actionsRef.current = { insertFact: (fact) => {
+    actionsRef.current = { focus: () => editor.tf.focus(), focusBlock: (blockId) => {
+      const index = (editor.children as Block[]).findIndex((block) => block.id === blockId)
+      if (index < 0) return
+      editor.tf.select(editor.api.start([index]))
+      editor.tf.focus()
+    }, insertFact: (fact) => {
       if (!editor.selection) editor.tf.select(editor.api.end([editor.children.length - 1]))
       const topIndex = editor.selection?.anchor.path[0]
       if (topIndex === undefined) return

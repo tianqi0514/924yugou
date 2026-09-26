@@ -15,6 +15,8 @@ type Run = { id: string; scenario_id: string; scenario_revision: number; status:
 type Issue = { code: string; severity: string; message: string; position?: number }
 type Report = { id: string; title: string; version: number; content: Block[]; reviewed: boolean; analysis_run_id: string | null; issues: Issue[]; updated_at: string }
 type ReportSummary = { id: string; title: string; version: number; updated_at: string; analysis_run_id: string | null }
+type ExportEntry = { id: string; report_version: number; level: 'preview' | 'scenario' | 'formal'; analysis_run_id: string | null; sha256: string; created_at: string }
+type PendingReport = { baseVersion: number; content: Block[]; savedAt: number }
 type ChapterDialog = { action: 'add' | 'rename'; headingId?: string; title: string }
 type Preview = { run_id: string; section_id: string; mode: string; base_version: number; content: Block[]; model_audit: Record<string, unknown> & { evidence?: { key: string; label: string; status: string; reason: string | null }[] }; expires_at: number; preview_token: string; issues: Issue[]; preserved_blocks?: Block[] }
 type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'config_condition' | 'judgement' | 'manual_review' | 'rebind' | 'detach' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[]; reference_changes?: { key: string; before: string; after: string | null }[] }
@@ -60,6 +62,20 @@ function inputStored(field: Definition, scenario: Scenario, value: string): stri
 function timeLabel(value: string): string { return new Date(value).toLocaleString('zh-CN', { hour12: false }) }
 
 const pendingKey = (projectId: string, scenarioId: string) => `report-platform-scenario-input:${projectId}:${scenarioId}`
+const reportPendingKey = (projectId: string, reportId: string) => `report-platform-report-draft:${projectId}:${reportId}`
+function readReportPending(projectId: string, reportId: string): PendingReport | null {
+  try {
+    const value = JSON.parse(window.sessionStorage.getItem(reportPendingKey(projectId, reportId)) || 'null')
+    return value && Number.isInteger(value.baseVersion) && Array.isArray(value.content) ? value as PendingReport : null
+  } catch { return null }
+}
+function writeReportPending(projectId: string, reportId: string, pending: PendingReport | null): boolean {
+  try {
+    if (pending) window.sessionStorage.setItem(reportPendingKey(projectId, reportId), JSON.stringify(pending))
+    else window.sessionStorage.removeItem(reportPendingKey(projectId, reportId))
+    return true
+  } catch { return false }
+}
 function readPending(projectId: string, scenarioId: string): Record<string, string | null> {
   if (!scenarioId) return {}
   try {
@@ -90,6 +106,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   const saving = useRef(false)
   const [saveState, setSaveState] = useState('已保存')
   const [editorKey, setEditorKey] = useState(0)
+  const [recovery, setRecovery] = useState<PendingReport | null>(null)
   const editorActions = useRef<EditorActions | null>(null)
   const [panel, setPanel] = useState<Panel>(null)
   const [moreOpen, setMoreOpen] = useState(false)
@@ -135,6 +152,8 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     source_ref?: SourceRef & { corpus_id?: string }; payload?: { status?: string; limitations?: string[] } } | null>(null)
   const [facts, setFacts] = useState<Fact[]>([])
   const [busy, setBusy] = useState(false)
+  const [exports, setExports] = useState<ExportEntry[]>([])
+  const [exportsOpen, setExportsOpen] = useState(false)
 
   const loadLists = useCallback(async () => {
     const [reportRows, scenarioRows, factData, configRows] = await Promise.all([
@@ -153,9 +172,12 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   const loadReport = useCallback(async (id: string) => {
     const item = await api<Report>(`${base}/reports/${id}`)
     setReport(item); setContent(item.content); contentRef.current = item.content
+    const pending = readReportPending(project.id, id)
+    if (pending && JSON.stringify(pending.content) !== JSON.stringify(item.content)) setRecovery(pending)
+    else { setRecovery(null); if (pending) writeReportPending(project.id, id, null) }
     setRefreshPreview(null); setRefreshSelected([])
     setDirty(false); dirtyRef.current = false; setSaveState('已保存'); setEditorKey((key) => key + 1)
-  }, [base])
+  }, [base, project.id])
 
   const loadRuns = useCallback(async (id: string) => {
     const request = ++runsRequest.current
@@ -204,6 +226,8 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     window.history.pushState({}, '', url)
     setReportId(id); setPanel(null); setCandidate(null); setRefreshPreview(null); setRefreshSelected([]); setError('')
     setSelectedHeadingId(null); setSelectedPosition(0); setChapterDialog(null)
+    setExports([]); setExportsOpen(false)
+    setRecovery(null)
   }
 
   const createReport = async () => {
@@ -338,9 +362,16 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
       const changedSince = JSON.stringify(contentRef.current) !== JSON.stringify(captured)
       dirtyRef.current = changedSince; setDirty(changedSince)
       setSaveState(changedSince ? '等待保存' : '已保存')
+      writeReportPending(project.id, reportId, changedSince
+        ? { baseVersion: response.report.version, content: contentRef.current, savedAt: Date.now() } : null)
     } catch (cause) { setSaveState('保存失败'); setError((cause as Error).message) }
     finally { saving.current = false }
-  }, [base, reportId, report])
+  }, [base, reportId, report, project.id])
+
+  const closePanel = useCallback(() => {
+    setPanel(null)
+    window.requestAnimationFrame(() => editorActions.current?.focus())
+  }, [])
 
   useEffect(() => {
     if (!dirty || saveState === '保存失败') return
@@ -352,11 +383,15 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
         event.preventDefault(); if (!event.isComposing) void persistBody()
       }
-      if (event.key === 'Escape') { setPanel(null); setMoreOpen(false); setChapterDialog(null) }
+      if (event.key === 'Escape' && !event.defaultPrevented) {
+        if (chapterDialog) setChapterDialog(null)
+        else if (panel) closePanel()
+        setMoreOpen(false)
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [persistBody])
+  }, [persistBody, panel, chapterDialog, closePanel])
 
   const selectRun = async (id: string) => {
     if (!report || dirtyRef.current) { setError('请先保存正文'); return }
@@ -428,9 +463,11 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
 
   const locateBlock = (position: number, blockId?: string) => {
     selectPosition(position)
+    const targetId = blockId || contentRef.current[position - 1]?.id
     const block = Array.from(document.querySelectorAll<HTMLElement>('.plate-content [data-block-id]'))
-      .find((element) => element.dataset.blockId === blockId)
+      .find((element) => element.dataset.blockId === targetId)
     block?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    if (targetId) editorActions.current?.focusBlock(targetId)
   }
 
   const changeChapter = async (action: 'add' | 'rename' | 'move', headingId?: string, title?: string, direction?: 'up' | 'down') => {
@@ -449,6 +486,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
         selectPosition(index + 1)
         window.requestAnimationFrame(() => {
           document.querySelector<HTMLElement>(`.plate-content [data-block-id="${changed.heading_id}"]`)?.scrollIntoView({ block: 'center' })
+          editorActions.current?.focusBlock(changed.heading_id)
         })
       }
       notify(action === 'add' ? '章节已添加' : action === 'rename' ? '章节已重命名' : '章节顺序已调整')
@@ -503,6 +541,36 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     catch (cause) { setError((cause as Error).message) }
   }
 
+  const toggleExports = async () => {
+    if (exportsOpen) { setExportsOpen(false); return }
+    if (!report) return
+    try { setExports(await api<ExportEntry[]>(`${base}/reports/${report.id}/exports`)); setExportsOpen(true) }
+    catch (cause) { setError((cause as Error).message) }
+  }
+
+  const downloadExport = async (level?: 'preview' | 'scenario', exportId?: string) => {
+    if (!report || busy || (!exportId && dirtyRef.current)) return
+    setBusy(true); setError('')
+    try {
+      const url = exportId ? `${base}/reports/${report.id}/exports/${exportId}`
+        : `${base}/reports/${report.id}/export?level=${level}`
+      const response = await fetch(`/api${url}`)
+      if (!response.ok) {
+        const detail = await response.json().catch(() => ({})) as { detail?: string }
+        throw new Error(detail.detail || `下载失败（${response.status}）`)
+      }
+      const filename = response.headers.get('Content-Disposition')?.match(/filename="([^"]+)"/)?.[1] || 'report.zip'
+      const objectUrl = URL.createObjectURL(await response.blob())
+      const anchor = document.createElement('a')
+      anchor.href = objectUrl; anchor.download = filename
+      document.body.append(anchor); anchor.click(); anchor.remove()
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 10_000)
+      const refreshed = await api<ExportEntry[]>(`${base}/reports/${report.id}/exports`).catch(() => null)
+      if (refreshed) setExports(refreshed)
+    } catch (cause) { setError((cause as Error).message) }
+    finally { setBusy(false) }
+  }
+
   const source = async (ref: SourceRef) => {
     setPanel('sources'); setSourceDetail(null); setError('')
     try {
@@ -513,6 +581,35 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
         throw new Error('来源记录版本或身份不一致')
       setSourceDetail(detail)
     } catch (cause) { setError((cause as Error).message) }
+  }
+
+  const changeBody = (next: Block[]) => {
+    if (!report || recovery) return
+    contentRef.current = next; setContent(next)
+    const changed = JSON.stringify(next) !== JSON.stringify(report.content)
+    dirtyRef.current = changed; setDirty(changed); setSaveState(changed ? '等待保存' : '已保存')
+    if (!writeReportPending(project.id, report.id, changed
+      ? { baseVersion: report.version, content: next, savedAt: Date.now() } : null)) {
+      setError('本地恢复副本保存失败，请立即保存正文')
+    }
+  }
+
+  const restoreBody = () => {
+    if (!recovery || !report) return
+    contentRef.current = recovery.content; setContent(recovery.content)
+    dirtyRef.current = true; setDirty(true); setSaveState('等待保存')
+    setRecovery(null); setEditorKey((key) => key + 1)
+  }
+
+  const discardRecovery = () => {
+    if (report) writeReportPending(project.id, report.id, null)
+    setRecovery(null)
+  }
+
+  const copyRecovery = async () => {
+    if (!recovery) return
+    try { await navigator.clipboard.writeText(recovery.content.map(textOf).join('\n')); notify('本地文字已复制') }
+    catch { setError('复制失败，请选择恢复本地稿后再复制') }
   }
 
   const selectedBlock = selectedPosition > 0 ? content[selectedPosition - 1] : null
@@ -543,8 +640,8 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     </> : <>
       <div className="scenario-topbar"><button className="scenario-back" onClick={() => openReport(null)} aria-label="返回报告列表"><ArrowLeft size={17} /></button><div className="scenario-title"><h1>{report.title}</h1><small>v{report.version} · {saveState}{report.reviewed ? ' · 已核对' : ''}</small></div><div className="scenario-run-badge">{activeRun ? `方案结果 · ${activeRun.scenario_revision} 版` : '未选择推演结果'}</div><div className="scenario-top-actions"><button onClick={() => setPanel(panel === 'inputs' ? null : 'inputs')}>输入数据</button><button onClick={() => setPanel(panel === 'results' ? null : 'results')}>推演结果</button><button className="primary-button" disabled={!report.analysis_run_id || dirty || busy} onClick={() => setPanel('draft')}><Sparkles size={14} /> 生成本章</button><button className="scenario-more" aria-label="更多操作" aria-expanded={moreOpen} onClick={() => setMoreOpen((old) => !old)}><MoreHorizontal size={18} /></button>{moreOpen && <div className="scenario-more-menu"><button onClick={() => { setPanel('sources'); setMoreOpen(false) }}>资料与来源</button><button onClick={() => { setPanel('materials'); setMoreOpen(false) }}>项目资料</button><button onClick={() => { setPanel('check'); setMoreOpen(false) }}>检查与导出</button><button onClick={() => { openConfig(); setMoreOpen(false) }}>规则与章节配置</button><button onClick={() => { void openVersions(); setMoreOpen(false) }}>版本</button><button onClick={() => { setMoreOpen(false); onLegacy() }}>{project.has_corpus ? "历史文章整理" : "资料起草"}</button></div>}</div></div>
       <div className={`scenario-workspace ${panel ? 'with-panel' : ''}`}><aside className="scenario-outline"><div className="scenario-outline-header">章节</div>{reportHeadings.map(({ block, index }, chapterIndex) => <div key={block.id || index} className={`scenario-outline-row ${selectedHeadingId === block.id ? 'active' : ''}`}><button className="scenario-outline-title" onClick={() => locateBlock(index + 1, block.id)} title={textOf(block)}>{textOf(block) || '未命名章节'}</button><div className="scenario-outline-controls"><button aria-label={`重命名章节 ${textOf(block)}`} title="重命名" onClick={() => setChapterDialog({ action: 'rename', headingId: block.id, title: textOf(block) })}><Pencil size={12} /></button><button aria-label={`上移章节 ${textOf(block)}`} title="上移" disabled={chapterIndex === 0 || busy} onClick={() => void changeChapter('move', block.id, undefined, 'up')}><ArrowUp size={12} /></button><button aria-label={`下移章节 ${textOf(block)}`} title="下移" disabled={chapterIndex === reportHeadings.length - 1 || busy} onClick={() => void changeChapter('move', block.id, undefined, 'down')}><ArrowDown size={12} /></button></div></div>)}<button className="scenario-outline-add" onClick={() => setChapterDialog({ action: 'add', title: '' })}><Plus size={13} /> 添加章节</button></aside>
-        <section className="scenario-canvas"><div className="scenario-canvas-tools"><span>{selectedBlock?.section_id ? availableSections.find((item) => item.id === selectedBlock.section_id)?.label || '报告正文' : '报告正文'}</span><button onClick={() => void persistBody()} disabled={!dirty || saveState === '保存中…'}><Save size={13} /> 保存</button><button onClick={() => setPanel('sources')} disabled={!selectedBlock}>查看依据</button><button onClick={() => setPanel('check')}>检查 {blocking.length > 0 ? `· ${blocking.length}` : ''}</button></div><div className="scenario-paper"><EditorPane key={`${report.id}-${editorKey}`} initial={content} facts={facts.filter((item) => item.value != null)} actionsRef={editorActions} staleFactKeys={[]} onOpenFact={() => { setPanel('sources') }} onSelectPosition={selectPosition} onChange={(next) => { contentRef.current = next; setContent(next); const changed = JSON.stringify(next) !== JSON.stringify(report.content); dirtyRef.current = changed; setDirty(changed); setSaveState(changed ? '等待保存' : '已保存') }} /></div></section>
-        {panel && <aside className="scenario-panel" role="complementary"><div className="scenario-panel-head"><h2>{({ inputs: '输入数据', results: '推演结果', draft: '生成本章', sources: '资料与来源', check: '检查与导出', versions: '版本', materials: '资料应用' })[panel]}</h2><button onClick={() => setPanel(null)} aria-label="关闭面板"><X size={18} /></button></div><div className="scenario-panel-body">
+        <section className="scenario-canvas"><div className="scenario-canvas-tools"><span>{selectedBlock?.section_id ? availableSections.find((item) => item.id === selectedBlock.section_id)?.label || '报告正文' : '报告正文'}</span><button onClick={() => void persistBody()} disabled={!dirty || saveState === '保存中…'}><Save size={13} /> 保存</button><button onClick={() => setPanel('sources')} disabled={!selectedBlock}>查看依据</button><button onClick={() => setPanel('check')}>检查 {blocking.length > 0 ? `· ${blocking.length}` : ''}</button></div><div className="scenario-paper"><EditorPane key={`${report.id}-${editorKey}`} initial={content} facts={facts.filter((item) => item.value != null)} actionsRef={editorActions} staleFactKeys={[]} onOpenFact={() => { setPanel('sources') }} onSelectPosition={selectPosition} onChange={changeBody} /></div></section>
+        {panel && <aside className="scenario-panel" role="complementary"><div className="scenario-panel-head"><h2>{({ inputs: '输入数据', results: '推演结果', draft: '生成本章', sources: '资料与来源', check: '检查与导出', versions: '版本', materials: '资料应用' })[panel]}</h2><button onClick={closePanel} aria-label="关闭面板"><X size={18} /></button></div><div className="scenario-panel-body">
           {panel === 'inputs' && <>
             <div className="scenario-panel-line"><select aria-label="选择方案" value={scenarioId} onChange={(event) => switchScenario(event.target.value)}><option value="">选择方案</option>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>{scenario && <button onClick={() => void createScenario('copy')} title="复制当前方案"><FilePlus2 size={15} /></button>}</div>
             <details className="scenario-create"><summary>新建方案</summary><input aria-label="方案名称" value={scenarioName} onChange={(event) => setScenarioName(event.target.value)} placeholder="如：工期调整方案" /><div className="scenario-inline">{project.has_corpus && <button onClick={() => void createScenario('historical')} disabled={busy}>采用澄岳历史输入</button>}<button onClick={() => void createScenario('project')} disabled={busy}>从项目事实创建</button></div></details>
@@ -576,12 +673,19 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
               <div className="scenario-panel-actions"><button onClick={() => { setRefreshPreview(null); setRefreshSelected([]) }}>取消</button><button className="primary-button" disabled={!refreshSelected.length || busy || dirty} onClick={() => void applyRefresh()}>更新所选 {refreshSelected.length} 处</button></div>
             </>}
           </section>}
-          {panel === 'check' && <><div className="scenario-check-state"><strong>{report.reviewed ? '已核对' : '待核对'}</strong><span>{blocking.length ? `${blocking.length} 项待处理` : '无阻断项'}</span></div>{visibleIssues.length ? visibleIssues.map((issue, index) => <button className="scenario-issue" key={`${issue.code}-${index}`} onClick={() => { if (issue.position) { locateBlock(issue.position, report.content[issue.position - 1]?.id); setPanel('sources') } }}><span>{issue.message}</span><small>{issue.severity === 'block' ? '待处理' : '保留事项'}</small></button>) : <div className="empty">暂无问题</div>}<div className="scenario-panel-actions"><button onClick={() => void review()} disabled={!!blocking.filter((issue) => issue.code !== 'UNREVIEWED').length || busy || dirty || report.reviewed}>我已核对</button></div><div className="scenario-delivery"><a href={`/api${base}/reports/${report.id}/export?level=preview`} className={dirty ? 'disabled-link' : ''} aria-disabled={dirty}><Download size={14} /> 预审稿</a><a href={report.reviewed && !blocking.length && !dirty ? `/api${base}/reports/${report.id}/export?level=scenario` : undefined} className={report.reviewed && !blocking.length && !dirty ? 'primary-button' : 'disabled-link'} aria-disabled={!report.reviewed || !!blocking.length || dirty}><Download size={14} /> 情景分析报告</a></div></>}
+          {panel === 'check' && <>
+            <div className="scenario-check-state"><strong>{report.reviewed ? '已核对' : '待核对'}</strong><span>{blocking.length ? `${blocking.length} 项待处理` : '无阻断项'}</span></div>
+            {visibleIssues.length ? visibleIssues.map((issue, index) => <button className="scenario-issue" key={`${issue.code}-${index}`} onClick={() => { if (issue.position) { locateBlock(issue.position, report.content[issue.position - 1]?.id); setPanel('sources') } }}><span>{issue.message}</span><small>{issue.severity === 'block' ? '待处理' : '保留事项'}</small></button>) : <div className="empty">暂无问题</div>}
+            <div className="scenario-panel-actions"><button onClick={() => void review()} disabled={!!blocking.filter((issue) => issue.code !== 'UNREVIEWED').length || busy || dirty || report.reviewed}>我已核对</button></div>
+            <div className="scenario-delivery"><button onClick={() => void downloadExport('preview')} disabled={busy || dirty}><Download size={14} /> 预审稿</button><button className="primary-button" disabled={!report.reviewed || !!blocking.length || dirty || busy} onClick={() => void downloadExport('scenario')}><Download size={14} /> 情景分析报告</button></div>
+            <div className="scenario-export-history"><button className="scenario-export-toggle" aria-expanded={exportsOpen} onClick={() => void toggleExports()}>历史交付 <ChevronDown size={13} /></button>{exportsOpen && (exports.length ? exports.map((entry) => <button className="scenario-export-row" key={entry.id} title={entry.sha256} onClick={() => void downloadExport(undefined, entry.id)} disabled={busy}><span>v{entry.report_version} · {entry.level === 'preview' ? '预审稿' : entry.level === 'scenario' ? '情景分析' : '正式稿'}</span><small>{timeLabel(entry.created_at)} · 下载</small></button>) : <div className="empty">暂无交付记录</div>)}</div>
+          </>}
           {panel === 'versions' && <>{versions.map((version) => <button className="scenario-version" key={version.version} onClick={() => void compareVersion(version.version)}><span>v{version.version} · {timeLabel(version.created_at)}</span><small>{version.reviewed ? '已核对' : '工作稿'}</small></button>)}{comparison && <div className="scenario-diff">{comparison.changes.length ? comparison.changes.map((change) => <div key={change.position}><strong>第 {change.position} 段</strong><p>原文：{change.before || '—'}</p><p>当前：{change.after || '—'}</p></div>) : '正文无变化'}</div>}</>}
           {panel === 'materials' && <><div className="scenario-material-row"><strong>本章资料</strong><button onClick={onOpenCorpus}>查看项目资料</button></div>{report.content.filter((block) => block.section_id === effectiveSection).flatMap((block) => block.source_refs || []).map((ref, index) => <button key={index} className="scenario-source-row" onClick={() => void source(ref)}>{ref.semantic_id || ref.record_id} · 查看作用与原文</button>)}</>}
         </div></aside>}
       </div>
       {chapterDialog && <div className="dialog-backdrop" onClick={() => setChapterDialog(null)}><div className="dialog" role="dialog" aria-modal="true" aria-label={chapterDialog.action === 'add' ? '添加章节' : '重命名章节'} onClick={(event) => event.stopPropagation()}><div className="dialog-head"><h2>{chapterDialog.action === 'add' ? '添加章节' : '重命名章节'}</h2><button className="icon-button" onClick={() => setChapterDialog(null)} aria-label="关闭"><X size={18} /></button></div><label className="form-field"><span>章节标题</span><input autoFocus maxLength={80} value={chapterDialog.title} onChange={(event) => setChapterDialog({ ...chapterDialog, title: event.target.value })} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing && chapterDialog.title.trim()) void changeChapter(chapterDialog.action, chapterDialog.headingId, chapterDialog.title) }} /></label><div className="form-actions"><button onClick={() => setChapterDialog(null)}>取消</button><button className="primary-button" disabled={!chapterDialog.title.trim() || busy} onClick={() => void changeChapter(chapterDialog.action, chapterDialog.headingId, chapterDialog.title)}>{chapterDialog.action === 'add' ? '添加' : '保存'}</button></div></div></div>}
+      {recovery && <div className="dialog-backdrop"><div className="dialog" role="dialog" aria-modal="true" aria-label="恢复未保存正文"><div className="dialog-head"><h2>发现未保存正文</h2></div>{recovery.baseVersion !== report.version && <p className="scenario-recovery-note">服务器已更新至 v{report.version}。恢复本地稿并保存会生成新版本；服务器原版可在“版本”中查看。</p>}<div className="form-actions"><button onClick={discardRecovery}>使用服务器版本</button>{recovery.baseVersion !== report.version && <button onClick={() => void copyRecovery()}>复制本地文字</button>}<button className="primary-button" onClick={restoreBody}>恢复本地稿</button></div></div></div>}
     </>}
   </main>
 }
