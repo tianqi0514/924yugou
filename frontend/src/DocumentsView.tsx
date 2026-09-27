@@ -10,6 +10,8 @@ type Detail = { document: DocumentItem; page: number; segments: Segment[]; candi
 type PageInfo = { page: number; segment_count: number; char_count: number; candidate_count: number; pending_count: number; invalid_count: number; extractable: boolean; reason: string }
 type BatchResult = { page: number; created?: number; refreshed?: number; error?: string; skipped?: string }
 type SearchHit = { ref: string; page: number; locator: string; excerpt: string }
+type FactDraft = { id: string; key: string; label: string; data_type: string; value: string; unit: string; caliber: string; as_of: string; source_ref: string; excerpt: string }
+type FactBatchPreview = { base_version: number; preview_token: string; items: { key: string; label: string; value: string | null; unit: string; locator: string; status: string }[]; request: { document_id: string; items: Record<string, string | null>[] } }
 function parsePageRange(input: string, maximum: number): number[] {
   const selected = new Set<number>()
   for (const part of input.trim().split(/[,，\s]+/).filter(Boolean)) {
@@ -85,6 +87,10 @@ export default function DocumentsView({ project, notify }: { project: Project; n
   const [evidenceFacts, setEvidenceFacts] = useState<Fact[]>([])
   const [registeredRefs, setRegisteredRefs] = useState<string[]>([])
   const [evidenceBusy, setEvidenceBusy] = useState(false)
+  const [factDrafts, setFactDrafts] = useState<FactDraft[]>([])
+  const [factPreview, setFactPreview] = useState<FactBatchPreview | null>(null)
+  const [factBusy, setFactBusy] = useState(false)
+  const [factError, setFactError] = useState('')
   const searchGeneration = useRef(0)
   const loadList = useCallback(async () => {
     const items = await api<DocumentItem[]>(`/projects/${project.id}/documents`)
@@ -102,6 +108,14 @@ export default function DocumentsView({ project, notify }: { project: Project; n
     setPageMap(result.pages)
   }, [project.id, documentId])
   useEffect(() => { void loadList().catch((cause: Error) => setError(cause.message)); void api<{ configured: boolean; ocr_configured?: boolean }>('/model/status').then((value) => { setModelReady(value.configured); setOcrReady(Boolean(value.ocr_configured)) }) }, [loadList])
+  useEffect(() => {
+    if (!factDrafts.length) return
+    const protectDrafts = (event: Event) => {
+      if (!window.confirm('放弃当前未保存的事实录入？')) event.preventDefault()
+    }
+    window.addEventListener('report-platform-before-navigate', protectDrafts)
+    return () => window.removeEventListener('report-platform-before-navigate', protectDrafts)
+  }, [factDrafts.length])
   useEffect(() => { void loadDetail().catch((cause: Error) => setError(cause.message)) }, [loadDetail])
   useEffect(() => { void loadPageMap().catch((cause: Error) => setError(cause.message)) }, [loadPageMap])
   useEffect(() => {
@@ -141,7 +155,9 @@ export default function DocumentsView({ project, notify }: { project: Project; n
     else url.searchParams.delete('segment')
     window.history.replaceState({}, '', url)
   }
-  const chooseDocument = (id: string) => {
+  const chooseDocument = (id: string, discardConfirmed = false) => {
+    if (id !== documentId && factDrafts.length && !discardConfirmed && !window.confirm('放弃当前未保存的事实录入？')) return
+    setFactDrafts([]); setFactPreview(null); setFactError('')
     searchGeneration.current += 1
     setDocumentId(id); setPage(1); setRangeValue('1'); setActiveSegment(''); setPageMap([]); setBatchResults([])
     setSearchHits([]); setSearchTotal(0); setSourceQuery(''); setSearched(false); setSearchBusy(false)
@@ -167,8 +183,43 @@ export default function DocumentsView({ project, notify }: { project: Project; n
     searchGeneration.current += 1
     setSourceQuery(value); setSearchHits([]); setSearchTotal(0); setSearched(false); setSearchBusy(false)
   }
+  const addFactDraft = (segment: Segment) => {
+    if (factDrafts.length >= 20) { setFactError('一次最多录入 20 项事实'); return }
+    setFactDrafts((old) => [...old, { id: window.crypto.randomUUID(),
+      key: `fact_${window.crypto.randomUUID().replaceAll('-', '').slice(0, 12)}`,
+      label: '', data_type: 'decimal', value: '', unit: '', caliber: '', as_of: '',
+      source_ref: segment.ref, excerpt: segment.text }])
+    setFactPreview(null); setFactError('')
+    window.requestAnimationFrame(() => document.getElementById('document-fact-tray')?.scrollIntoView({ block: 'nearest' }))
+  }
+  const updateFactDraft = (id: string, patch: Partial<FactDraft>) => {
+    setFactDrafts((old) => old.map((item) => item.id === id ? { ...item, ...patch } : item))
+    setFactPreview(null); setFactError('')
+  }
+  const previewFacts = async () => {
+    if (!documentId || !factDrafts.length || factDrafts.some((item) => !item.label.trim())) return
+    const request = { document_id: documentId, items: factDrafts.map(({ key, label, data_type, value, unit, caliber, as_of, source_ref }) =>
+      ({ key, label: label.trim(), data_type, value: value.trim() === '' ? null : value.trim(), unit: unit.trim(), caliber: caliber.trim(), as_of: as_of.trim(), source_ref })) }
+    setFactBusy(true); setFactError(''); setFactPreview(null)
+    try {
+      const result = await post<Omit<FactBatchPreview, 'request'>>(`/projects/${project.id}/facts/from-document/preview`, request)
+      setFactPreview({ ...result, request })
+    } catch (cause) { setFactError((cause as Error).message) } finally { setFactBusy(false) }
+  }
+  const commitFacts = async () => {
+    if (!factPreview) return
+    setFactBusy(true); setFactError('')
+    try {
+      const result = await post<{ facts: Fact[] }>(`/projects/${project.id}/facts/from-document/commit`, {
+        ...factPreview.request, base_version: factPreview.base_version, preview_token: factPreview.preview_token,
+      })
+      setFactDrafts([]); setFactPreview(null); notify(`已录入 ${result.facts.length} 项事实`)
+    } catch (cause) { setFactError((cause as Error).message); setFactPreview(null) } finally { setFactBusy(false) }
+  }
   const upload = async (file: File | undefined) => {
     if (!file) return
+    if (factDrafts.length && !window.confirm('放弃当前未保存的事实录入并上传文件？')) return
+    if (factDrafts.length) { setFactDrafts([]); setFactPreview(null); setFactError('') }
     if (!/\.(pdf|docx)$/i.test(file.name)) { setError('只支持 PDF 或 DOCX 文件'); return }
     if (!file.size || file.size > 30 * 1024 * 1024) { setError('文件为空或超过 30 MB'); return }
     setBusy(true); setError('')
@@ -177,7 +228,7 @@ export default function DocumentsView({ project, notify }: { project: Project; n
       const response = await fetch(`/api/projects/${project.id}/documents`, { method: 'POST', body: form })
       if (!response.ok) { const body = await response.json(); throw new Error(body.detail || '上传失败') }
       const created = await response.json() as DocumentItem
-      await loadList(); chooseDocument(created.id); notify('原件已保存')
+      await loadList(); chooseDocument(created.id, true); notify('原件已保存')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
   const recognize = async () => {
@@ -226,14 +277,26 @@ export default function DocumentsView({ project, notify }: { project: Project; n
   return <main className="page"><div className="breadcrumb">项目 / {project.name} / 项目文件</div><div className="page-header"><div><h1>项目文件</h1></div>{project.has_corpus ? <span className="status status-neutral">只读</span> : <label className="primary-button upload-button"><FileUp size={15} /> 上传 PDF / DOCX<input type="file" accept=".pdf,.docx" disabled={busy || batchBusy} onChange={(event) => { void upload(event.target.files?.[0]); event.target.value = '' }} /></label>}</div>
     {error && <div className="notice error" role="alert">{error}</div>}
     <div className="document-layout"><aside className="workspace-card document-list"><h2>已上传文件</h2>{documents.length > 1 && <input aria-label="搜索文件" className="document-list-search" value={fileQuery} onChange={(event) => setFileQuery(event.target.value)} placeholder="搜索文件名" />}{documents.length === 0 ? <p className="empty">{project.has_corpus ? '暂无文件' : '暂无文件，点击右上角上传'}</p> : visibleDocuments.length ? visibleDocuments.map((item) => <button className={item.id === documentId ? 'active' : ''} key={item.id} disabled={busy || batchBusy} onClick={() => chooseDocument(item.id)}><strong>{item.filename}</strong><small>{item.file_kind.toUpperCase()} · {item.pages} {item.file_kind === 'pdf' ? '页' : '份'} · {item.status === 'OCR_REQUIRED' ? '部分页需 OCR' : '可查看'}</small></button>) : <div className="empty">没有匹配文件</div>}</aside>
-      <div className="document-main">{detail ? <><section className="workspace-card"><div className="workspace-toolbar"><div><h2>{detail.document.filename}</h2></div><div className="toolbar"><a className="subtle-button" href={`/api/projects/${project.id}/documents/${documentId}/original`} target="_blank" rel="noreferrer">打开原件</a><button className="subtle-button" onClick={() => void loadDetail()}><RefreshCw size={13} /> 刷新</button></div></div><div className="document-search"><input aria-label="搜索原文" value={sourceQuery} onChange={(event) => updateSourceQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') void runSearch() }} placeholder="搜索全文" /><button disabled={searchBusy || sourceQuery.trim().length < 2} onClick={() => void runSearch()}>{searchBusy ? '搜索中…' : '搜索'}</button>{searched && <button className="text-button" onClick={() => updateSourceQuery('')}>清除</button>}</div>{searched && <div className="document-search-results"><strong>匹配片段 {searchTotal}</strong>{searchHits.map((hit) => <button key={hit.ref} onClick={() => navigate(hit.page, hit.ref)}><b>第 {hit.page} 页 · {hit.ref}</b><span>{hit.excerpt}</span></button>)}{searchHits.length < searchTotal && <button className="subtle-button" disabled={searchBusy} onClick={() => void runSearch(searchHits.length)}>查看更多</button>}</div>}<div className="document-page-nav"><button disabled={page <= 1 || batchBusy} onClick={() => navigate(page - 1)}>上一页</button><span>{detail.document.file_kind === 'pdf' ? `PDF 第 ${page} / ${detail.document.pages} 页` : 'DOCX 文字与表格'}</span><button disabled={page >= detail.document.pages || batchBusy} onClick={() => navigate(page + 1)}>下一页</button><label>跳转 <input aria-label="跳转页码" type="number" min={1} max={detail.document.pages} value={jumpValue} onChange={(event) => setJumpValue(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') navigate(Number(jumpValue)) }} /></label><button disabled={batchBusy} onClick={() => navigate(Number(jumpValue))}>前往</button></div>{pageMap.find((item) => item.page === page) && <div className="document-page-status">{pageMap.find((item) => item.page === page)?.segment_count} 段原文 · {pageMap.find((item) => item.page === page)?.pending_count} 条待审</div>}{pendingPages.length > 0 && <div className="document-pending-pages"><strong>待审页</strong>{pendingPages.slice(0, 24).map((item) => <button key={item.page} className={page === item.page ? 'active' : ''} disabled={batchBusy} onClick={() => navigate(item.page)}>{item.page} <small>{item.pending_count}</small></button>)}{pendingPages.length > 24 && <span>另有 {pendingPages.length - 24} 页</span>}{nextPendingPage && <button className="subtle-button" disabled={batchBusy} onClick={() => navigate(nextPendingPage.page)}>{nextPendingPage.page > page ? '下一待审页' : '返回首个待审页'}</button>}</div>}<div className="document-source-scroll">{detail.segments.length ? detail.segments.map((segment) => <div id={`segment-${segment.ref}`} className={`document-segment ${segment.kind === 'table_row' ? 'document-table-row' : ''} ${activeSegment === segment.ref ? 'document-segment-active' : ''}`} key={segment.ref}><small>{segment.ref} {segment.locator || ''}{segment.kind === 'table_row' ? ' · 表格行' : segment.kind === 'ocr' ? ' · OCR 待核对' : ''}</small><p>{segment.text}</p>{!project.has_corpus && <div className="document-evidence-actions"><button type="button" className="subtle-button" onClick={() => startEvidence(segment)}>登记证据</button>{registeredRefs.includes(segment.ref) && <small>已登记</small>}</div>}
+      <div className="document-main">{detail ? <><section className="workspace-card"><div className="workspace-toolbar"><div><h2>{detail.document.filename}</h2></div><div className="toolbar"><a className="subtle-button" href={`/api/projects/${project.id}/documents/${documentId}/original`} target="_blank" rel="noreferrer">打开原件</a><button className="subtle-button" onClick={() => void loadDetail()}><RefreshCw size={13} /> 刷新</button></div></div><div className="document-search"><input aria-label="搜索原文" value={sourceQuery} onChange={(event) => updateSourceQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') void runSearch() }} placeholder="搜索全文" /><button disabled={searchBusy || sourceQuery.trim().length < 2} onClick={() => void runSearch()}>{searchBusy ? '搜索中…' : '搜索'}</button>{searched && <button className="text-button" onClick={() => updateSourceQuery('')}>清除</button>}</div>{searched && <div className="document-search-results"><strong>匹配片段 {searchTotal}</strong>{searchHits.map((hit) => <button key={hit.ref} onClick={() => navigate(hit.page, hit.ref)}><b>第 {hit.page} 页 · {hit.ref}</b><span>{hit.excerpt}</span></button>)}{searchHits.length < searchTotal && <button className="subtle-button" disabled={searchBusy} onClick={() => void runSearch(searchHits.length)}>查看更多</button>}</div>}<div className="document-page-nav"><button disabled={page <= 1 || batchBusy} onClick={() => navigate(page - 1)}>上一页</button><span>{detail.document.file_kind === 'pdf' ? `PDF 第 ${page} / ${detail.document.pages} 页` : 'DOCX 文字与表格'}</span><button disabled={page >= detail.document.pages || batchBusy} onClick={() => navigate(page + 1)}>下一页</button><label>跳转 <input aria-label="跳转页码" type="number" min={1} max={detail.document.pages} value={jumpValue} onChange={(event) => setJumpValue(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') navigate(Number(jumpValue)) }} /></label><button disabled={batchBusy} onClick={() => navigate(Number(jumpValue))}>前往</button></div>{pageMap.find((item) => item.page === page) && <div className="document-page-status">{pageMap.find((item) => item.page === page)?.segment_count} 段原文 · {pageMap.find((item) => item.page === page)?.pending_count} 条待审</div>}{pendingPages.length > 0 && <div className="document-pending-pages"><strong>待审页</strong>{pendingPages.slice(0, 24).map((item) => <button key={item.page} className={page === item.page ? 'active' : ''} disabled={batchBusy} onClick={() => navigate(item.page)}>{item.page} <small>{item.pending_count}</small></button>)}{pendingPages.length > 24 && <span>另有 {pendingPages.length - 24} 页</span>}{nextPendingPage && <button className="subtle-button" disabled={batchBusy} onClick={() => navigate(nextPendingPage.page)}>{nextPendingPage.page > page ? '下一待审页' : '返回首个待审页'}</button>}</div>}<div className="document-source-scroll">{detail.segments.length ? detail.segments.map((segment) => <div id={`segment-${segment.ref}`} className={`document-segment ${segment.kind === 'table_row' ? 'document-table-row' : ''} ${activeSegment === segment.ref ? 'document-segment-active' : ''}`} key={segment.ref}><small>{segment.ref} {segment.locator || ''}{segment.kind === 'table_row' ? ' · 表格行' : segment.kind === 'ocr' ? ' · OCR 待核对' : ''}</small><p>{segment.text}</p>{!project.has_corpus && <div className="document-evidence-actions"><button type="button" className="subtle-button" onClick={() => addFactDraft(segment)}>录入事实</button><button type="button" className="subtle-button" onClick={() => startEvidence(segment)}>登记证据</button>{registeredRefs.includes(segment.ref) && <small>已登记</small>}</div>}
       {evidenceRef === segment.ref && <div className="document-evidence-form">
         <label>名称<input aria-label="证据名称" value={evidenceLabel} onChange={(event) => setEvidenceLabel(event.target.value)} /></label>
         <label>引用原文<textarea aria-label="证据陈述" value={evidenceStatement} onChange={(event) => setEvidenceStatement(event.target.value)} rows={3} /></label>
         <label>关联事实<select aria-label="关联事实" value={evidenceFactKey} onChange={(event) => setEvidenceFactKey(event.target.value)}><option value="">独立文字证据</option>{evidenceFacts.map((fact) => <option key={fact.key} value={fact.key}>{fact.label}</option>)}</select></label>
         <label>来源类型<select aria-label="来源类型" value={evidenceSourceType} onChange={(event) => setEvidenceSourceType(event.target.value as 'original' | 'secondary')}><option value="original">本项目原件</option><option value="secondary">二手材料</option></select></label>
         <div className="inline-actions"><button onClick={() => setEvidenceRef('')}>取消</button><button className="primary-button" disabled={evidenceBusy || !evidenceLabel.trim() || !evidenceStatement.trim()} onClick={() => void registerEvidence()}>确认登记</button></div>
-      </div>}</div>) : <div className="empty">本页无可读取文字。{detail.document.file_kind === 'pdf' && <div className="inline-actions"><button className="primary-button" disabled={busy || batchBusy || !ocrReady} onClick={() => void recognize()}>{busy ? '识别中…' : '识别当前页'}</button>{!ocrReady && <small>扫描页识别未配置</small>}</div>}</div>}</div></section>
+      </div>}</div>) : <div className="empty">本页无可读取文字。{detail.document.file_kind === 'pdf' && <div className="inline-actions"><button className="primary-button" disabled={busy || batchBusy || !ocrReady} onClick={() => void recognize()}>{busy ? '识别中…' : '识别当前页'}</button>{!ocrReady && <small>扫描页识别未配置</small>}</div>}</div>}</div>
+      {factDrafts.length > 0 && <div id="document-fact-tray" className="document-fact-tray" role="region" aria-label="原件旁录入事实">
+        <div className="document-fact-tray-head"><strong>待录入事实 · {factDrafts.length}</strong><button type="button" onClick={() => { setFactDrafts([]); setFactPreview(null); setFactError('') }}>放弃本批</button></div>
+        {factDrafts.map((draft, index) => <div className="document-fact-row" key={draft.id}>
+          <div className="document-fact-row-head"><span>{index + 1}. {draft.source_ref}</span><button type="button" aria-label={`移除事实 ${index + 1}`} onClick={() => { setFactDrafts((old) => old.filter((item) => item.id !== draft.id)); setFactPreview(null) }}><X size={13} /></button></div>
+          <small className="document-fact-excerpt">{draft.excerpt.slice(0, 180)}</small>
+          <div className="document-fact-fields"><label>名称<input aria-label={`事实名称 ${index + 1}`} value={draft.label} onChange={(event) => updateFactDraft(draft.id, { label: event.target.value })} /></label><label>类型<select aria-label={`事实类型 ${index + 1}`} value={draft.data_type} onChange={(event) => updateFactDraft(draft.id, { data_type: event.target.value })}><option value="decimal">小数</option><option value="integer">整数</option><option value="text">文本</option><option value="date">日期</option><option value="boolean">布尔</option></select></label><label>值<input aria-label={`事实值 ${index + 1}`} value={draft.value} inputMode={['decimal', 'integer'].includes(draft.data_type) ? 'decimal' : undefined} placeholder="留空为未定义" onChange={(event) => updateFactDraft(draft.id, { value: event.target.value })} /></label><label>单位<input aria-label={`事实单位 ${index + 1}`} value={draft.unit} onChange={(event) => updateFactDraft(draft.id, { unit: event.target.value })} /></label></div>
+          <details><summary>口径、时点与字段 key</summary><div className="document-fact-fields"><label>字段 key<input aria-label={`事实 key ${index + 1}`} value={draft.key} onChange={(event) => updateFactDraft(draft.id, { key: event.target.value })} /></label><label>口径<input value={draft.caliber} onChange={(event) => updateFactDraft(draft.id, { caliber: event.target.value })} /></label><label>时点<input value={draft.as_of} placeholder="YYYY-MM-DD" onChange={(event) => updateFactDraft(draft.id, { as_of: event.target.value })} /></label></div></details>
+        </div>)}
+        {factError && <div className="notice error" role="alert">{factError}</div>}
+        {factPreview && <div className="document-fact-preview"><strong>录入预览</strong><small>原文位置与数值已匹配；单位、口径及真实性仍需人工核对。</small>{factPreview.items.map((item) => <div key={item.key}><span>{item.label} · {item.locator}</span><b>{item.value ?? '未定义'}{item.value !== null && item.unit ? ` ${item.unit}` : ''}</b><small>{item.status}</small></div>)}</div>}
+        <div className="inline-actions"><button type="button" disabled={factBusy || factDrafts.some((item) => !item.label.trim())} onClick={() => void (factPreview ? commitFacts() : previewFacts())} className="primary-button">{factBusy ? '处理中…' : factPreview ? '确认录入' : '预览录入'}</button>{factPreview && <button type="button" onClick={() => setFactPreview(null)}>返回修改</button>}</div>
+      </div>}</section>
         {!project.has_corpus && <><section className="workspace-card"><div className="workspace-toolbar"><h2>抽取事实</h2></div><div className="document-batch-controls"><input aria-label="待抽取页码" value={rangeValue} onChange={(event) => setRangeValue(event.target.value)} placeholder="如 5,8-10" disabled={batchBusy || busy} /><button className="primary-button" disabled={batchBusy || busy || !modelReady || !pageMap.length} onClick={() => void extractSelected()}><FileSearch size={14} /> {batchBusy ? '抽取中…' : '抽取'}</button>{batchBusy && <button className="subtle-button" onClick={() => { cancelBatch.current = true }}>当前页完成后停止</button>}</div>{batchProgress.total > 0 && <div className="document-batch-progress">已处理 {batchProgress.done}/{batchProgress.total} 页{batchBusy && ` · 正在处理第 ${batchProgress.current} 页`}</div>}{batchResults.length > 0 && <div className="document-batch-results">{batchResults.map((row) => <button key={row.page} type="button" onClick={() => navigate(row.page)} disabled={batchBusy}><b>第 {row.page} 页</b><span>{row.error ? `失败：${row.error}` : row.skipped ? `跳过：${row.skipped}` : `新增 ${row.created} 条${row.refreshed ? `，更新 ${row.refreshed} 条来源校验` : ''}`}</span></button>)}</div>}</section><section className="workspace-card"><div className="workspace-toolbar"><h2>本页候选</h2>{nextCandidate && <button className="subtle-button" onClick={() => { setActiveCandidateId(nextCandidate.id); window.requestAnimationFrame(() => document.getElementById(`candidate-${nextCandidate.id}`)?.scrollIntoView({ block: 'center' })) }}>下一待审项</button>}</div>{!modelReady && <div className="notice warn">事实抽取模型未配置</div>}{detail.candidates.length ? <><div className="candidate-counts">{pendingCandidates.length} 条待审 · {pendingCandidates.filter((candidate) => !candidate.source_valid).length} 条引用需核对</div>{detail.candidates.map((candidate) => <CandidateCard key={candidate.id} item={candidate} segments={detail.segments} projectId={project.id} documentId={documentId} reload={reloadCurrent} expanded={activeCandidateId === candidate.id} onToggle={() => setActiveCandidateId((old) => old === candidate.id ? null : candidate.id)} />)}</> : <div className="empty">暂无候选</div>}</section></>}</> : documents.length ? <div className="workspace-card empty">选择文件</div> : null}</div></div>
   </main>
 }

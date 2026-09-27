@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { NodeIdPlugin } from '@platejs/core'
 import type { Value } from 'platejs'
 import { BlockquotePlugin, BoldPlugin, H1Plugin, H2Plugin, H3Plugin, ItalicPlugin, StrikethroughPlugin, UnderlinePlugin } from '@platejs/basic-nodes/react'
@@ -235,7 +235,7 @@ function SlashInputElement(props: PlateElementProps) {
   </PlateElement>
 }
 
-export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFact, staleFactKeys, facts }: {
+export const EditorPane = memo(function EditorPane({ initial, onChange, onSelectPosition, actionsRef, onOpenFact, staleFactKeys, facts }: {
   initial: Block[]; onChange: (value: Block[]) => void; onSelectPosition: (position: number) => void;
   actionsRef: { current: EditorActions | null }; onOpenFact: (key: string) => void; staleFactKeys: string[]; facts: Fact[]
 }) {
@@ -411,10 +411,7 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
     if (blockId) {
       const index = (editor.children as Block[]).findIndex((block) => block.id === blockId)
       if (index >= 0) {
-        const block = (editor.children as Block[])[index]
-        const directBinding = !!(block.project_evidence_refs?.length || block.source_refs?.length || block.fact_keys?.length) && !block.analysis_refs?.length
-        if (phase === 'down' && directBinding || phase === 'keyboard') onSelectPosition(index + 1)
-        else if (phase === 'click' && !directBinding) window.setTimeout(() => selectedBlock(), 0)
+        if (phase === 'down' || phase === 'keyboard') onSelectPosition(index + 1)
         return
       }
     }
@@ -425,15 +422,12 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
       if (root && top) {
         const index = Array.from(root.children).indexOf(top)
         if (index >= 0 && index < editor.children.length) {
-          const block = (editor.children as Block[])[index]
-          const directBinding = !!(block.project_evidence_refs?.length || block.source_refs?.length || block.fact_keys?.length) && !block.analysis_refs?.length
-          if (phase === 'down' && directBinding || phase === 'keyboard') onSelectPosition(index + 1)
-          else if (phase === 'click' && !directBinding) window.setTimeout(() => selectedBlock(), 0)
+          if (phase === 'down' || phase === 'keyboard') onSelectPosition(index + 1)
           return
         }
       }
     }
-    if (phase === 'click') { window.setTimeout(() => selectedBlock(), 0); return }
+    if (phase === 'click') return
     if (phase !== 'keyboard') return
     const path = editor.selection?.anchor.path
     if (!path) return
@@ -465,7 +459,7 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
     </div>
     <PlateContent className="plate-content" placeholder="开始撰写报告正文…" onKeyUp={(event) => selectedBlock(event)} onMouseDown={(event) => selectedBlock(event, 'down')} onClick={(event) => selectedBlock(event, 'click')} />
   </Plate></LinkEditorContext.Provider></FactReferenceContext.Provider>
-}
+})
 
 function sourceLink(projectId: string, fact: Fact): string | null {
   const match = /^document:([a-f0-9-]+)#(p(\d+)-(?:s\d+|t\d+-r\d+)|d-[\w-]+)/.exec(fact.source)

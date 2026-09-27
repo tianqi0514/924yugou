@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDown, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, Download, GitCompareArrows, MoreHorizontal, Pencil, Play, Plus, Save, Sparkles, X } from 'lucide-react'
 import { api, post, type Fact, type Project } from './api'
 import { EditorPane, type AnalysisRef, type Block, type EditorActions } from './ReportsView'
@@ -18,7 +18,9 @@ type Issue = { code: string; severity: string; message: string; position?: numbe
 type Report = { id: string; title: string; version: number; content: Block[]; reviewed: boolean; analysis_run_id: string | null; report_type: string; template_version: string; template_snapshot: { label?: string; sections?: { id: string; title: string; kind: string }[] }; issues: Issue[]; updated_at: string }
 type ReportSummary = { id: string; title: string; version: number; updated_at: string; analysis_run_id: string | null; status: '工作稿' | '待核对' | '已核对'; has_scenario_assumption?: boolean }
 type ReportType = { id: string; label: string; stage: string; version: string; sections: { id: string; title: string; kind: string }[] }
-type ChapterStatus = { section_id: string; heading_id: string; title: string; kind: string; status: string; missing_fact_keys: string[]; config_id: string | null }
+type ChapterStatus = { section_id: string; heading_id: string; title: string; kind: string; status: string; missing_fact_keys: string[]; config_id: string | null;
+  next_actions: { kind: string; key: string | null; label: string; action: 'new_fact' | 'edit_fact' | 'review_source' | 'inputs' | 'config' }[];
+  open_issues: { id: string; kind: string; title: string; status: string }[] }
 type ExportEntry = { id: string; report_version: number; level: 'preview' | 'scenario' | 'formal'; analysis_run_id: string | null; sha256: string; created_at: string }
 type WorkTask = { id: string; report_id: string; kind: 'model_draft' | 'export'; status: string; stage: string;
   attempt: number; result: { candidate_id?: string; export_id?: string }; error: string | null }
@@ -34,10 +36,11 @@ type ChapterPack = { report_version: number; section_id: string; config_id: stri
 type Preview = { candidate_id?: string; run_id?: string; config_id?: string; section_id: string; mode: string; base_version: number; content: Block[]; model_audit: Record<string, unknown> & { evidence?: CandidateEvidence[] }; expires_at: number; preview_token: string; issues: Issue[]; preserved_blocks?: Block[] }
 type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'config_condition' | 'judgement' | 'manual_review' | 'rebind' | 'detach' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[]; reference_changes?: { key: string; before: string; after: string | null }[] }
 type RefreshPreview = { report_version: number; run_id: string; actions: RefreshAction[] }
-type Panel = 'inputs' | 'results' | 'draft' | 'sources' | 'check' | 'versions' | 'materials' | null
+type Panel = 'inputs' | 'results' | 'draft' | 'sources' | 'check' | 'versions' | 'materials' | 'preparation' | null
 type ScenarioCreateSource = 'project' | 'historical' | 'copy' | 'config_facts' | 'config' | 'config_copy'
 
 const sections = [{ id: 'S4', label: '产能与交付' }, { id: 'S7.1', label: '设备购置与报价' }, { id: 'S5.2', label: '配电资料分歧' }]
+const noStaleFactKeys: string[] = []
 const groups: Record<string, string> = { demand: '需求', capacity: '产能参数', sales: '销售', supplier: '设备与供应商', project: '项目输入' }
 const sourceLabel = (origin: string) => origin === 'historical_reference' ? '历史参考' : origin === 'project_fact' ? '项目事实' : origin === 'scenario_assumption' ? '方案假设' : '待补'
 
@@ -113,7 +116,7 @@ function writePending(projectId: string, scenarioId: string, changes: Record<str
 }
 
 export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpenCorpus, onOpenDocument, onLegacy }: {
-  project: Project; notify: (message: string) => void; onOpenFacts: () => void; onOpenCorpus: () => void; onOpenDocument: (id: string, page: number, segment: string) => void; onLegacy: () => void
+  project: Project; notify: (message: string) => void; onOpenFacts: (key?: string, action?: 'new' | 'edit' | 'source', label?: string) => void; onOpenCorpus: () => void; onOpenDocument: (id: string, page: number, segment: string) => void; onLegacy: () => void
 }) {
   const base = `/projects/${project.id}`
   const analysis = `${base}/analysis`
@@ -124,6 +127,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   const [configOpen, setConfigOpen] = useState(new URLSearchParams(location.search).get('config') === '1')
   const [report, setReport] = useState<Report | null>(null)
   const [chapterStatuses, setChapterStatuses] = useState<ChapterStatus[]>([])
+  const [focusedIssueId, setFocusedIssueId] = useState('')
   const [content, setContent] = useState<Block[]>([])
   const contentRef = useRef<Block[]>([])
   const [dirty, setDirty] = useState(false)
@@ -168,6 +172,8 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   const effectiveSection = selectedHeadingId
     ? selectedHeading && availableSections.some((item) => item.id === selectedHeading.section_id) ? selectedHeading.section_id || '' : ''
     : availableSections.some((item) => item.id === selectedSection) ? selectedSection : availableSections[0]?.id || ''
+  const selectedChapterStatus = chapterStatuses.find((item) => item.heading_id === selectedHeadingId)
+    || chapterStatuses.find((item) => item.section_id === effectiveSection)
   const selectedConfigSection = writingConfig?.sections.find((item) => item.id === effectiveSection) || activeRun?.snapshot.configuration?.sections.find((item) => item.id === effectiveSection)
   const narrativeSection = selectedConfigSection?.kind === 'narrative'
   const draftReady = narrativeSection ? !!writingConfig?.id : !!report?.analysis_run_id
@@ -641,13 +647,13 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
 
-  const selectPosition = (position: number) => {
+  const selectPosition = useCallback((position: number) => {
     setSelectedPosition(position)
     setProposalPreview(null); setProposalFactKey(''); setProposalValue(''); setProposalSource('')
     const heading = contentRef.current.slice(0, position).reverse().find((block) => block.type === 'h2')
     setSelectedHeadingId(heading?.id || null)
     if (heading) setSelectedSection(heading.section_id || '')
-  }
+  }, [])
 
   const locateBlock = (position: number, blockId?: string) => {
     selectPosition(position)
@@ -886,7 +892,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     } catch (cause) { setError((cause as Error).message) }
   }
 
-  const changeBody = (next: Block[]) => {
+  const changeBody = useCallback((next: Block[]) => {
     if (!report || recovery) return
     contentRef.current = next; setContent(next)
     const changed = JSON.stringify(next) !== JSON.stringify(report.content)
@@ -895,7 +901,9 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
       ? { baseVersion: report.version, content: next, savedAt: Date.now() } : null)) {
       setError('本地恢复副本保存失败，请立即保存正文')
     }
-  }
+  }, [report, recovery, project.id])
+  const editorFacts = useMemo(() => facts.filter((item) => item.value != null), [facts])
+  const openEditorFact = useCallback(() => setPanel('sources'), [])
 
   const restoreBody = () => {
     if (!recovery || !report) return
@@ -952,9 +960,22 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     </> : <>
       <div className="scenario-topbar"><button className="scenario-back" onClick={() => openReport(null)} aria-label="返回报告列表"><ArrowLeft size={17} /></button><div className="scenario-title"><h1>{report.title}</h1><small>v{report.version} · {saveState}{report.reviewed ? ' · 已核对' : ''}{report.issues.some((issue) => issue.code === 'CHAPTER_SCENARIO_ASSUMPTION') ? ' · 方案假设' : ''}</small></div><div className="scenario-run-badge" title={activeRun ? '当前报告采用的方案运行' : '计算章节需选择推演运行'}>{activeRun ? `${scenarios.find((item) => item.id === activeRun.scenario_id)?.name || '方案'} · 运行 ${activeRun.scenario_revision}` : '文字章节可直接起草'}</div><div className="scenario-top-actions"><button onClick={() => setPanel(panel === 'inputs' ? null : 'inputs')}>输入数据</button><button onClick={() => setPanel(panel === 'results' ? null : 'results')}>推演结果</button><button className="primary-button" disabled={!draftReady || dirty || busy} onClick={() => setPanel('draft')}><Sparkles size={14} /> 生成本章</button><button className="scenario-more" aria-label="更多操作" aria-expanded={moreOpen} onClick={() => setMoreOpen((old) => !old)}><MoreHorizontal size={18} /></button>{moreOpen && <div className="scenario-more-menu"><button onClick={() => { setPanel('sources'); setMoreOpen(false) }}>资料与来源</button><button onClick={() => { setPanel('materials'); setMoreOpen(false) }}>项目资料</button><button onClick={() => { setPanel('check'); setMoreOpen(false) }}>检查与导出</button><button onClick={() => { openConfig(); setMoreOpen(false) }}>规则与章节配置</button><button onClick={() => { void openVersions(); setMoreOpen(false) }}>版本</button><button onClick={() => { setMoreOpen(false); onLegacy() }}>{project.has_corpus ? "历史文章整理" : "资料起草"}</button></div>}</div></div>
       {activeTask && ['PENDING', 'RUNNING', 'FAILED', 'UNCERTAIN', 'COMPLETED'].includes(activeTask.status) && <button className="scenario-task-shortcut" onClick={() => setPanel(activeTask.kind === 'model_draft' ? 'draft' : 'check')}>{activeTask.kind === 'model_draft' ? '模型起草' : '导出'} · {activeTask.status === 'COMPLETED' ? '已完成' : activeTask.status === 'RUNNING' ? '处理中' : activeTask.status === 'PENDING' ? '排队中' : '待处理'}</button>}
-      <div className={`scenario-workspace ${panel ? 'with-panel' : ''}`}><aside className="scenario-outline"><div className="scenario-outline-header">章节</div>{reportHeadings.map(({ block, index }, chapterIndex) => { const state = chapterStatuses.find((item) => item.heading_id === block.id); return <div key={block.id || index} className={`scenario-outline-row ${selectedHeadingId === block.id ? 'active' : ''}`}><button className="scenario-outline-title" onClick={() => locateBlock(index + 1, block.id)} title={state?.missing_fact_keys.length ? `缺少：${state.missing_fact_keys.join('、')}` : textOf(block)}>{textOf(block) || '未命名章节'}</button>{state && <small className="scenario-chapter-status">{state.status}</small>}<div className="scenario-outline-controls"><button aria-label={`重命名章节 ${textOf(block)}`} title="重命名" onClick={() => setChapterDialog({ action: 'rename', headingId: block.id, title: textOf(block) })}><Pencil size={12} /></button><button aria-label={`上移章节 ${textOf(block)}`} title="上移" disabled={chapterIndex === 0 || busy} onClick={() => void changeChapter('move', block.id, undefined, 'up')}><ArrowUp size={12} /></button><button aria-label={`下移章节 ${textOf(block)}`} title="下移" disabled={chapterIndex === reportHeadings.length - 1 || busy} onClick={() => void changeChapter('move', block.id, undefined, 'down')}><ArrowDown size={12} /></button></div></div> })}<button className="scenario-outline-add" onClick={() => setChapterDialog({ action: 'add', title: '' })}><Plus size={13} /> 添加章节</button></aside>
-        <section className="scenario-canvas"><div className="scenario-canvas-tools"><span>{selectedBlock?.section_id ? availableSections.find((item) => item.id === selectedBlock.section_id)?.label || '报告正文' : '报告正文'}</span><button onClick={() => void persistBody()} disabled={!dirty || saveState === '保存中…'}><Save size={13} /> 保存</button><button onClick={() => setPanel('sources')} disabled={!selectedBlock}>查看依据</button><button onClick={() => setPanel('check')}>检查 {blocking.length > 0 ? `· ${blocking.length}` : ''}</button></div><div className="scenario-paper"><EditorPane key={`${report.id}-${editorKey}`} initial={content} facts={facts.filter((item) => item.value != null)} actionsRef={editorActions} staleFactKeys={[]} onOpenFact={() => { setPanel('sources') }} onSelectPosition={selectPosition} onChange={changeBody} /></div></section>
-        {panel && <aside className="scenario-panel" role="complementary"><div className="scenario-panel-head"><h2>{({ inputs: '输入数据', results: '推演结果', draft: '生成本章', sources: '资料与来源', check: '检查与导出', versions: '版本', materials: '资料应用' })[panel]}</h2><button onClick={closePanel} aria-label="关闭面板"><X size={18} /></button></div><div className="scenario-panel-body">
+      <div className={`scenario-workspace ${panel ? 'with-panel' : ''}`}><aside className="scenario-outline"><div className="scenario-outline-header">章节</div>{reportHeadings.map(({ block, index }, chapterIndex) => { const state = chapterStatuses.find((item) => item.heading_id === block.id); return <div key={block.id || index} className={`scenario-outline-row ${selectedHeadingId === block.id ? 'active' : ''}`}><button className="scenario-outline-title" onClick={() => locateBlock(index + 1, block.id)} title={state?.missing_fact_keys.length ? `缺少：${state.missing_fact_keys.join('、')}` : textOf(block)}>{textOf(block) || '未命名章节'}</button>{state && <button type="button" className="scenario-chapter-status" aria-label={`${textOf(block)} · ${state.status} · 查看准备情况`} onClick={() => { setSelectedHeadingId(block.id || null); setSelectedSection(block.section_id || ''); setPanel('preparation') }}>{state.status}{state.open_issues?.length ? ` · ${state.open_issues.length} 项问题` : ''}</button>}<div className="scenario-outline-controls"><button aria-label={`重命名章节 ${textOf(block)}`} title="重命名" onClick={() => setChapterDialog({ action: 'rename', headingId: block.id, title: textOf(block) })}><Pencil size={12} /></button><button aria-label={`上移章节 ${textOf(block)}`} title="上移" disabled={chapterIndex === 0 || busy} onClick={() => void changeChapter('move', block.id, undefined, 'up')}><ArrowUp size={12} /></button><button aria-label={`下移章节 ${textOf(block)}`} title="下移" disabled={chapterIndex === reportHeadings.length - 1 || busy} onClick={() => void changeChapter('move', block.id, undefined, 'down')}><ArrowDown size={12} /></button></div></div> })}<button className="scenario-outline-add" onClick={() => setChapterDialog({ action: 'add', title: '' })}><Plus size={13} /> 添加章节</button></aside>
+        <section className="scenario-canvas"><div className="scenario-canvas-tools"><span>{selectedBlock?.section_id ? availableSections.find((item) => item.id === selectedBlock.section_id)?.label || '报告正文' : '报告正文'}</span><button onClick={() => void persistBody()} disabled={!dirty || saveState === '保存中…'}><Save size={13} /> 保存</button><button onClick={() => setPanel('sources')} disabled={!selectedBlock}>查看依据</button><button onClick={() => setPanel('check')}>检查 {blocking.length > 0 ? `· ${blocking.length}` : ''}</button></div><div className="scenario-paper"><EditorPane key={`${report.id}-${editorKey}`} initial={content} facts={editorFacts} actionsRef={editorActions} staleFactKeys={noStaleFactKeys} onOpenFact={openEditorFact} onSelectPosition={selectPosition} onChange={changeBody} /></div></section>
+        {panel && <aside className="scenario-panel" role="complementary"><div className="scenario-panel-head"><h2>{({ inputs: '输入数据', results: '推演结果', draft: '生成本章', sources: '资料与来源', check: '检查与导出', versions: '版本', materials: '资料应用', preparation: '本章准备' })[panel]}</h2><button onClick={closePanel} aria-label="关闭面板"><X size={18} /></button></div><div className="scenario-panel-body">
+          {panel === 'preparation' && selectedChapterStatus && <div className="scenario-preparation">
+            <div className="scenario-preparation-heading"><strong>{selectedChapterStatus.title}</strong><span className="status status-neutral">{selectedChapterStatus.status}</span></div>
+            {(selectedChapterStatus.next_actions || []).map((item, index) => <button className="scenario-preparation-action" key={`${item.kind}-${item.key}-${index}`} onClick={() => {
+              if (item.action === 'new_fact') onOpenFacts(item.key || undefined, 'new', item.label)
+              else if (item.action === 'edit_fact') onOpenFacts(item.key || undefined, 'edit')
+              else if (item.action === 'review_source') onOpenFacts(item.key || undefined, 'source')
+              else if (item.action === 'inputs') setPanel('inputs')
+              else openConfig()
+            }}><span>{item.action === 'new_fact' ? `录入 ${item.label}` : item.action === 'edit_fact' ? `填写 ${item.label}` : item.action === 'review_source' ? `核对 ${item.label} 来源` : item.action === 'inputs' ? '填写输入并推演' : '配置本章'}</span><ChevronDown size={13} /></button>)}
+            {(selectedChapterStatus.open_issues || []).length > 0 && <div className="scenario-preparation-issues"><strong>待处理问题 · {selectedChapterStatus.open_issues.length}</strong>{selectedChapterStatus.open_issues.map((issue) => <button className="scenario-preparation-action" key={issue.id} onClick={() => { setFocusedIssueId(issue.id); setPanel('check') }}><span>{issue.title}</span><small>{issue.kind === 'conflict' ? '冲突' : issue.kind === 'claim' ? '论断' : '缺口'}</small></button>)}</div>}
+            {selectedChapterStatus.status === '可起草' && <button className="primary-button" onClick={() => setPanel('draft')}>生成本章</button>}
+            {selectedChapterStatus.status === '待核对' && <button className="primary-button" onClick={() => setPanel('check')}>检查本章</button>}
+          </div>}
           {panel === 'inputs' && <>
             <div className="scenario-panel-line"><select aria-label="选择方案" value={scenarioId} onChange={(event) => switchScenario(event.target.value)}><option value="">选择方案</option>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><button type="button" onClick={openScenarioCreate}><Plus size={14} /> 新建</button></div>
             {scenarioCreateOpen && <div className="scenario-create-card">
@@ -966,7 +987,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
               {scenarioCreateSource.startsWith('config') && <label className="scenario-field">写作配置<select aria-label="选择写作配置" value={configId} onChange={(event) => setConfigId(event.target.value)}>{configs.filter((item) => item.status === 'PUBLISHED').map((item) => <option key={item.id} value={item.id}>v{item.version} · {item.name}</option>)}</select></label>}
               <div className="scenario-panel-actions"><button type="button" onClick={() => setScenarioCreateOpen(false)}>取消</button><button type="button" className="primary-button" disabled={busy || scenarioCreateSource.startsWith('config') && !configId} onClick={createSelectedScenario}>{busy ? '创建中…' : '创建方案'}</button></div>
             </div>}
-            {scenario && <>{inputFields.length ? inputGroups.map((group) => { const fields = inputFields.filter((field) => (field.group || 'project') === group); return <section className="scenario-input-group" key={group}><h3>{groups[group] || group}</h3>{fields.map((field) => { const entry = scenario.inputs[field.key]; const value = Object.prototype.hasOwnProperty.call(edits, field.key) ? edits[field.key] : entry?.value; const pending = Object.prototype.hasOwnProperty.call(edits, field.key) && value !== entry?.value; const origin = pending ? (value == null ? "missing" : "scenario_assumption") : entry?.origin || "missing"; return <label key={field.key} className="scenario-input"><span>{field.label}<small>{sourceLabel(origin)}{percentageInput(field, scenario) ? ' · %' : field.unit ? ` · ${field.unit}` : ''}</small></span><input aria-label={field.label} value={inputDisplay(field, scenario, value)} type={field.data_type === 'text' ? 'text' : 'number'} step={field.data_type === 'integer' ? '1' : 'any'} onChange={(event) => changeInput(field, event.target.value)} /></label> })}</section> }) : <div className="empty">本项目尚无输入字段。请先录入项目事实与规则。<button onClick={onOpenFacts}>打开项目事实</button></div>}
+            {scenario && <>{inputFields.length ? inputGroups.map((group) => { const fields = inputFields.filter((field) => (field.group || 'project') === group); return <section className="scenario-input-group" key={group}><h3>{groups[group] || group}</h3>{fields.map((field) => { const entry = scenario.inputs[field.key]; const value = Object.prototype.hasOwnProperty.call(edits, field.key) ? edits[field.key] : entry?.value; const pending = Object.prototype.hasOwnProperty.call(edits, field.key) && value !== entry?.value; const origin = pending ? (value == null ? "missing" : "scenario_assumption") : entry?.origin || "missing"; return <label key={field.key} className="scenario-input"><span>{field.label}<small>{sourceLabel(origin)}{percentageInput(field, scenario) ? ' · %' : field.unit ? ` · ${field.unit}` : ''}</small></span><input aria-label={field.label} value={inputDisplay(field, scenario, value)} type={field.data_type === 'text' ? 'text' : 'number'} step={field.data_type === 'integer' ? '1' : 'any'} onChange={(event) => changeInput(field, event.target.value)} /></label> })}</section> }) : <div className="empty">本项目尚无输入字段。请先录入项目事实与规则。<button onClick={() => onOpenFacts()}>打开项目事实</button></div>}
               <div className="scenario-panel-actions"><button onClick={discardInputs} disabled={!changeCount}>放弃修改</button><button onClick={() => void persistScenario()} disabled={!changeCount || busy}>保存方案</button><button className="primary-button" onClick={() => void previewInputs()} disabled={busy || !inputFields.length}><Play size={14} /> 预览推演</button></div>
               {simulation && <div className="scenario-preview"><h3>预览结果</h3>{Object.values(simulation.results).filter((result) => scenario.definitions.some((field) => field.key === result.key && field.computed) || result.origin === 'calculated').map((result) => <div key={result.key}><span>{result.label}</span><strong>{shown(result.value, result.unit)}</strong></div>)}<small>{simulation.condition}</small><div className="scenario-panel-actions"><button onClick={() => setSimulation(null)}>取消预览</button><button className="primary-button" onClick={() => void persistRun()} disabled={busy}>保存方案并运行</button></div></div>}
             </>}
@@ -1044,7 +1065,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
             {activeTask?.kind === 'export' && taskControls}
             <div className="scenario-check-state"><strong>{report.reviewed ? '已核对' : '待核对'}</strong><span>{blocking.length ? `${blocking.length} 项待处理` : '无阻断项'}</span></div>
             {visibleIssues.length ? visibleIssues.map((issue, index) => <button className="scenario-issue" key={`${issue.code}-${index}`} onClick={() => { if (issue.position) { locateBlock(issue.position, report.content[issue.position - 1]?.id); setPanel('sources') } }}><span>{issue.message}</span><small>{issue.severity === 'block' ? '待处理' : '保留事项'}</small></button>) : <div className="empty">暂无问题</div>}
-            <IssuePanel projectId={project.id} reportId={report.id} sectionId={effectiveSection}
+            <IssuePanel projectId={project.id} reportId={report.id} sectionId={effectiveSection} focusIssueId={focusedIssueId}
               onChanged={() => loadReport(report.id)} onLocate={(position) => locateBlock(position)}
               onOpenDocument={onOpenDocument} />
             <div className="scenario-panel-actions"><button onClick={() => void review()} disabled={!!blocking.filter((issue) => issue.code !== 'UNREVIEWED').length || busy || dirty || report.reviewed}>我已核对</button></div>

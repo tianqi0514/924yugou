@@ -96,6 +96,9 @@ export default function App() {
     url.searchParams.delete('document')
     url.searchParams.delete('page')
     url.searchParams.delete('segment')
+    url.searchParams.delete('focus_fact')
+    url.searchParams.delete('focus_action')
+    url.searchParams.delete('focus_label')
     window.history.pushState({}, '', url)
     window.localStorage.setItem('report-platform-project', id)
     setSection(savedSection(project))
@@ -115,8 +118,20 @@ export default function App() {
     else url.searchParams.delete('page')
     if (next === 'documents' && segment) url.searchParams.set('segment', segment)
     else url.searchParams.delete('segment')
+    url.searchParams.delete('focus_fact')
+    url.searchParams.delete('focus_action')
+    url.searchParams.delete('focus_label')
     window.history.pushState({}, '', url)
     if (projectId && projectSections.includes(next)) window.localStorage.setItem(`report-platform-section:${projectId}`, next)
+  }
+  const openFactTask = (key?: string, action?: 'new' | 'edit' | 'source', label?: string) => {
+    navigate('facts')
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('section') !== 'facts' || !action) return
+    url.searchParams.set('focus_action', action)
+    if (key) url.searchParams.set('focus_fact', key)
+    if (label) url.searchParams.set('focus_label', label)
+    window.history.replaceState({}, '', url)
   }
   const openAnalysisConfig = (configId?: string) => {
     navigate('reports')
@@ -189,7 +204,7 @@ export default function App() {
             ? <CorpusView key={selected.id} project={selected} />
             : <ProjectMaterialsView key={selected.id} project={selected} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} onOpenFacts={() => navigate('facts')} />
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
-              : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} />
+              : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={openFactTask} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} />
                 : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenFacts={() => navigate('facts')} onOpenRules={() => navigate('rules')} onOpenAnalysisConfig={openAnalysisConfig} />}
       </Suspense>
     </div>

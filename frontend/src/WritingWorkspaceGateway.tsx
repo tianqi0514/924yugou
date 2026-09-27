@@ -8,7 +8,7 @@ type Mode = 'analysis' | 'legacy'
 export default function WritingWorkspaceGateway({ project, notify, onEditFacts, onOpenDocuments, onOpenProjectFacts, onOpenCorpus, onOpenDocument }: {
   project: Project
   notify: (message: string) => void
-  onEditFacts: () => void
+  onEditFacts: (key?: string, action?: 'new' | 'edit' | 'source', label?: string) => void
   onOpenDocuments: () => void
   onOpenProjectFacts: () => void
   onOpenCorpus: () => void

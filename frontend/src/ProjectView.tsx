@@ -206,6 +206,28 @@ export default function ProjectView({ project, section, onProjectChange, notify,
       setEvidenceStatus(status); await load(); notify('原文位置已绑定')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
+  useEffect(() => {
+    if (!project || section !== 'facts') return
+    const url = new URL(window.location.href)
+    const action = url.searchParams.get('focus_action')
+    if (!action) return
+    const key = url.searchParams.get('focus_fact') || ''
+    if (action !== 'new' && !facts.length) return
+    if (action === 'new') {
+      const draft = newFact()
+      setFactForm({ ...draft, key: key || draft.key, label: url.searchParams.get('focus_label') || '' })
+      setError(''); setDialog('fact')
+    } else {
+      const fact = facts.find((item) => item.key === key)
+      if (!fact) { setError('未找到该事实，请刷新后重试') }
+      else if (action === 'edit' || fact.value === null) editFact(fact)
+      else if (action === 'source') void openEvidence(fact)
+    }
+    url.searchParams.delete('focus_action')
+    url.searchParams.delete('focus_fact')
+    url.searchParams.delete('focus_label')
+    window.history.replaceState({}, '', url)
+  }, [project?.id, section, facts])
   const previewChange = async () => {
     if (!project) return
     setBusy(true); setError('')

@@ -68,6 +68,7 @@ def _dict(session, item: ProjectIssue) -> dict:
     by_id = {row.id: row for row in evidence}
     def sources(ids: list[str]) -> list[dict]:
         return [{"id": key, "label": by_id[key].label, "statement": by_id[key].statement,
+                 "excerpt": by_id[key].excerpt,
                  "source_type": by_id[key].source_type, "document_id": by_id[key].document_id,
                  "source_refs": by_id[key].source_refs} for key in ids if key in by_id]
     return {"id": item.id, "project_id": item.project_id, "kind": item.kind,

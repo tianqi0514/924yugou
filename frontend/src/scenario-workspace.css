@@ -86,7 +86,14 @@
 .scenario-evidence-choice span{display:grid;gap:2px;min-width:0;flex:1}
 .scenario-evidence-choice small{text-align:left;overflow-wrap:anywhere}
 .scenario-evidence-list .scenario-evidence-choice button{width:auto;margin:0;padding:4px 6px;border:0;white-space:nowrap}
-.scenario-chapter-status{flex:none;font-size:10px;color:#758398;white-space:nowrap}
+.scenario-chapter-status{flex:none;font-size:10px;color:#516783;white-space:nowrap;border:0;background:transparent;padding:2px 0;cursor:pointer;text-align:left}
+.scenario-chapter-status:hover,.scenario-chapter-status:focus-visible{color:#205dc6;text-decoration:underline}
+.scenario-preparation{display:grid;gap:10px}
+.scenario-preparation-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:10px;border-bottom:1px solid #e9eef5}
+.scenario-preparation-action{display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px;padding:10px;border:1px solid #dde6f1;border-radius:7px;background:#fff;color:#274160;text-align:left;cursor:pointer}
+.scenario-preparation-action:hover{border-color:#94b8ed;background:#f7faff}
+.scenario-preparation-action small{color:#718097}
+.scenario-preparation-issues{display:grid;gap:8px;padding-top:8px;border-top:1px solid #e9eef5}
 .scenario-material-summary{display:flex;gap:12px;color:#65758e;font-size:11px;padding:8px 0;border-bottom:1px solid #edf1f6}
 .scenario-material-group{border-bottom:1px solid #edf1f6;padding:7px 0}
 .scenario-material-group>summary{cursor:pointer;font-weight:600;color:#3c4f6c;font-size:12px}

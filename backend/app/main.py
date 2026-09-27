@@ -138,6 +138,20 @@ class FactCreate(BaseModel):
     value: str | int | bool | None = None
 
 
+class DocumentFactItem(FactCreate):
+    source_ref: str = Field(min_length=1, max_length=160)
+
+
+class DocumentFactBatch(BaseModel):
+    document_id: str
+    items: list[DocumentFactItem] = Field(min_length=1, max_length=20)
+
+
+class DocumentFactBatchCommit(DocumentFactBatch):
+    base_version: int = Field(ge=0)
+    preview_token: str
+
+
 class RuleCreate(BaseModel):
     name: NonBlankLabel
     target_key: str
@@ -1686,6 +1700,9 @@ def report_chapter_status(project_id: str, report_id: str):
             AnalysisRun.id == report.analysis_run_id,
             AnalysisRun.project_id == project_id)) if report.analysis_run_id else None
         facts = _current_facts(session, project_id)
+        project_issues = session.scalars(select(ProjectIssue).where(
+            ProjectIssue.project_id == project_id,
+            ProjectIssue.status != "RESOLVED")).all()
         report_is_reviewed = _report_dict(report, facts, session)["reviewed"]
         headings = [block for block in report.content if block.get("type") == "h2"]
         rows = []
@@ -1699,15 +1716,25 @@ def report_chapter_status(project_id: str, report_id: str):
                     and block.get("id") != heading.get("id")]
             substantive = any(plain(block).strip() for block in body)
             missing = []
+            actions = []
             status = "待配置"
-            if substantive:
-                status = "已核对" if report_is_reviewed else "待核对"
-            elif configured:
+            if configured:
                 config, definition = configured
+                labels = {item["key"]: item["label"] for item in config.definitions}
                 for key in definition.get("evidence_keys", []):
                     fact = facts.get(key)
-                    if fact is None or not _fact_has_project_evidence(session, project_id, fact, set()):
+                    if fact is None:
                         missing.append(key)
+                        actions.append({"kind": "fact_missing", "key": key,
+                                        "label": labels.get(key, key), "action": "new_fact"})
+                    elif fact.value_text is None:
+                        missing.append(key)
+                        actions.append({"kind": "value_missing", "key": key,
+                                        "label": fact.label, "action": "edit_fact"})
+                    elif not _fact_has_project_evidence(session, project_id, fact, set()):
+                        missing.append(key)
+                        actions.append({"kind": "source_unverified", "key": key,
+                                        "label": fact.label, "action": "review_source"})
                 if missing:
                     status = "缺资料"
                 elif definition.get("kind") != "narrative":
@@ -1717,14 +1744,25 @@ def report_chapter_status(project_id: str, report_id: str):
                             or any(run.snapshot["results"].get(key, {}).get("value") is None
                                    for key in definition.get("result_keys", []))):
                         status = "待推演"
+                        actions.append({"kind": "run_missing", "key": None,
+                                        "label": "计算结果", "action": "inputs"})
                     else:
                         status = "可起草"
                 else:
                     status = "可起草"
+            else:
+                actions.append({"kind": "config_missing", "key": None,
+                                "label": "本章写作配置", "action": "config"})
+            if substantive:
+                status = "已核对" if report_is_reviewed else "待核对"
+            scoped_issues = [{"id": issue.id, "kind": issue.kind, "title": issue.title,
+                              "status": issue.status} for issue in project_issues
+                             if section_id in issue.section_ids]
             rows.append({"section_id": section_id, "heading_id": heading.get("id"),
                          "title": plain(heading), "kind": source.get("kind") if source else
                          configured[1].get("kind", "custom") if configured else "custom",
                          "status": status, "missing_fact_keys": missing,
+                         "next_actions": actions, "open_issues": scoped_issues,
                          "config_id": configured[0].id if configured else None,
                          "config_version": configured[0].version if configured else None})
         return {"report_id": report.id, "report_version": report.version,
@@ -2454,6 +2492,122 @@ def facts_create(project_id: str, body: FactCreate):
             ))
         session.flush()
         return fact_dict(fact)
+
+
+def _prepare_document_fact_batch(session, project_id: str, body: DocumentFactBatch):
+    document = session.scalar(select(SourceDocument).where(
+        SourceDocument.id == body.document_id, SourceDocument.project_id == project_id))
+    if document is None:
+        fail("本项目原件不存在", 404)
+    parsed = session.scalar(select(SourceParseRevision).where(
+        SourceParseRevision.document_id == document.id,
+        SourceParseRevision.revision == document.parse_revision))
+    if parsed is None or parsed.document_sha256 != document.sha256:
+        fail("原件解析版本已变化，请刷新后重试", 409)
+    refs = {str(part.get("ref")): part for part in parsed.segments}
+    keys = [item.key for item in body.items]
+    if len(set(keys)) != len(keys):
+        fail("批次中的事实 key 不能重复", 409)
+    existing = set(session.scalars(select(ProjectFact.key).where(
+        ProjectFact.project_id == project_id, ProjectFact.key.in_(keys))).all())
+    if existing:
+        fail(f"事实 key 已存在：{'、'.join(sorted(existing))}", 409)
+    prepared = []
+    for item in body.items:
+        if item.data_type not in ("decimal", "integer", "boolean", "date", "text", "enum"):
+            fail("不支持的事实类型")
+        segment = refs.get(item.source_ref)
+        if segment is None:
+            fail(f"原文位置 {item.source_ref} 已失效", 409)
+        try:
+            value = canonical_value(item.value, item.data_type)
+        except RuleError as exc:
+            fail(str(exc))
+        if value is not None and not source_supports(value, str(segment.get("text", ""))):
+            fail(f"{item.label} 的值未出现在所选原文位置；请核对后录入", 409)
+        prepared.append({"key": item.key, "label": item.label.strip(), "data_type": item.data_type,
+                         "value": value, "unit": item.unit.strip(), "caliber": item.caliber.strip(),
+                         "as_of": item.as_of.strip(), "source_ref": item.source_ref,
+                         "source": f"document:{document.id}#{item.source_ref}" if value is not None else "",
+                         "excerpt": str(segment.get("text", "")), "locator": segment.get("locator") or item.source_ref,
+                         "page": segment.get("page")})
+    return document, parsed, prepared
+
+
+def _document_batch_signature(project_id: str, version: int, document: SourceDocument,
+                              parsed: SourceParseRevision, prepared: list[dict], expires: int) -> str:
+    payload = {"kind": "document_fact_batch", "project_id": project_id, "version": version,
+               "document_id": document.id, "document_sha256": document.sha256,
+               "parse_revision_id": parsed.id, "items": [{key: row[key] for key in (
+                   "key", "label", "data_type", "value", "unit", "caliber", "as_of", "source_ref")}
+                                                    for row in prepared], "expires": expires}
+    data = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hmac.new(preview_secret, data.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+@app.post("/api/projects/{project_id}/facts/from-document/preview")
+def document_facts_preview(project_id: str, body: DocumentFactBatch):
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        require_writable_project(project)
+        document, parsed, prepared = _prepare_document_fact_batch(session, project_id, body)
+        expires = int(time.time()) + 600
+        token = _document_batch_signature(project_id, project.version, document, parsed, prepared, expires)
+        return {"base_version": project.version, "expires_at": expires,
+                "preview_token": f"{expires}.{token}",
+                "items": [{key: row[key] for key in ("key", "label", "value", "unit", "source_ref",
+                                                     "locator", "page", "excerpt")} |
+                          {"status": "未定义" if row["value"] is None else "原文值匹配，待确认"}
+                          for row in prepared]}
+
+
+@app.post("/api/projects/{project_id}/facts/from-document/commit", status_code=201)
+def document_facts_commit(project_id: str, body: DocumentFactBatchCommit):
+    try:
+        expires_text, signature = body.preview_token.split(".", 1)
+        expires = int(expires_text)
+    except (ValueError, AttributeError):
+        fail("预览凭证无效", 409)
+    if expires < time.time():
+        fail("预览凭证已过期", 409)
+    with SessionLocal.begin() as session:
+        project = get_project(session, project_id, lock=True)
+        require_writable_project(project)
+        if project.version != body.base_version:
+            fail("项目已有新版本，请重新预览", 409)
+        document, parsed, prepared = _prepare_document_fact_batch(session, project_id, body)
+        expected = _document_batch_signature(project_id, project.version, document, parsed, prepared, expires)
+        if not hmac.compare_digest(signature, expected):
+            fail("预览内容已变化，请重新预览", 409)
+        project.version += 1
+        created = []
+        for row in prepared:
+            fact = ProjectFact(project_id=project_id, key=row["key"], label=row["label"],
+                               data_type=row["data_type"], unit=row["unit"], caliber=row["caliber"],
+                               as_of=row["as_of"], source=row["source"], value_text=row["value"],
+                               value_status="UNDEFINED" if row["value"] is None else "PROVIDED",
+                               revision=0 if row["value"] is None else 1)
+            session.add(fact)
+            if row["value"] is not None:
+                session.add(FactRevision(project_id=project_id, fact_key=fact.key,
+                                         project_version=project.version,
+                                         before={"value": None, "status": "UNDEFINED", "source": "",
+                                                 "caliber": row["caliber"], "as_of": row["as_of"]},
+                                         after={"value": row["value"], "status": "PROVIDED",
+                                                "source": row["source"], "caliber": row["caliber"],
+                                                "as_of": row["as_of"]}, reason="从项目原件录入"))
+                session.add(FactEvidenceBinding(project_id=project_id, fact_key=fact.key,
+                                                fact_revision=1, document_id=document.id,
+                                                source_refs=[row["source_ref"]], value_text=row["value"]))
+                session.add(ProjectEvidence(project_id=project_id, document_id=document.id,
+                                            document_sha256=document.sha256, parse_revision_id=parsed.id,
+                                            source_refs=[row["source_ref"]], excerpt=row["excerpt"],
+                                            statement=row["value"], label=row["label"],
+                                            asserted_at=row["as_of"], source_type="original",
+                                            fact_key=fact.key, fact_revision=1))
+            created.append(fact)
+        session.flush()
+        return {"project_version": project.version, "facts": [fact_dict(fact) for fact in created]}
 
 
 @app.get("/api/projects/{project_id}/rules")
