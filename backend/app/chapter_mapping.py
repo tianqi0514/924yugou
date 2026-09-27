@@ -60,7 +60,8 @@ def _scope(session, project_id: str, report_id: str, section_id: str):
 
 
 def _source(session, project_id: str, fact: ProjectFact) -> dict:
-    from .main import _fact_has_project_evidence, _reviewed_fact_binding
+    from .main import (_current_original_fact_evidence, _fact_has_project_evidence,
+                       _reviewed_fact_binding)
 
     binding = _reviewed_fact_binding(session, project_id, fact)
     location = None
@@ -68,6 +69,13 @@ def _source(session, project_id: str, fact: ProjectFact) -> dict:
         record, document, segments = binding
         location = {"document_id": document.id, "filename": document.filename,
                     "ref": record.source_refs[0], "page": segments[0].get("page") or 1}
+    else:
+        original = _current_original_fact_evidence(session, project_id, fact)
+        if original is not None:
+            record, document, segments = original
+            location = {"document_id": document.id, "filename": document.filename,
+                        "ref": record.source_refs[0], "page": segments[0].get("page") or 1,
+                        "evidence_id": record.id, "parse_revision_id": record.parse_revision_id}
     return {"verified": _fact_has_project_evidence(session, project_id, fact, set()),
             "location": location}
 

@@ -56,6 +56,10 @@ def chapter_pack(session, project_id: str, report: ReportDraft, section_id: str)
     evidence = session.scalars(select(ProjectEvidence).where(
         ProjectEvidence.project_id == project_id).order_by(ProjectEvidence.created_at.desc())).all()
     evidence = [row for row in evidence if row.fact_key in expected_keys]
+    superseded = set(session.scalars(select(ProjectEvidence.supersedes_id).where(
+        ProjectEvidence.project_id == project_id,
+        ProjectEvidence.supersedes_id.in_([row.id for row in evidence]))).all()) if evidence else set()
+    fact_revisions = {fact.key: fact.revision for fact in facts}
     project_corpus = session.get(ProjectCorpus, project_id)
     reference = session.get(WritingReference, project_id)
     corpus_id = project_corpus.corpus_id if project_corpus else reference.corpus_id if reference else None
@@ -125,7 +129,12 @@ def chapter_pack(session, project_id: str, report: ReportDraft, section_id: str)
             "project_evidence": [{"id": row.id, "label": row.label,
                                   "fact_key": row.fact_key, "fact_revision": row.fact_revision,
                                   "parse_revision_id": row.parse_revision_id,
-                                  "source_type": row.source_type} for row in evidence],
+                                  "source_type": row.source_type,
+                                  "source_state": ("已更新" if row.id in superseded else
+                                                   "旧事实修订" if fact_revisions.get(row.fact_key) != row.fact_revision else
+                                                   "二手材料" if row.source_type == "secondary" else
+                                                   "当前原文位置")}
+                                 for row in evidence],
             "groups": [{"name": group["name"], "numbers": group["numbers"]} for group in GROUPS],
             "categories": categories}
 

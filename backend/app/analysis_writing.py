@@ -19,6 +19,7 @@ from .analysis import _report, _run, _source_ref
 from .analysis_evidence import section_evidence
 from .corpus_storage import CorpusRecord
 from .db import AnalysisCandidate, AnalysisConfig, AnalysisWritingEvent, ProjectEvidence, ProjectFact, ProjectIssue, ReportVersion, SessionLocal, SourceDocument, SourceParseRevision, WorkTask, WritingCommitEvent
+from .document_pipeline import source_supports
 from .model_settings import chat_json
 from .report_pipeline import change_impact, content_hash, plain, validate_content
 from .chapter_materials import chapter_pack
@@ -326,7 +327,7 @@ def _candidate(session, run, section_id: str, mode: str) -> tuple[list[dict], di
 
 def _narrative_candidate(session, project_id: str, config_id: str, section_id: str,
                          mode: str, evidence_ids: list[str], report_type: str) -> tuple[list[dict], dict]:
-    from .main import _reviewed_fact_binding
+    from .main import _current_original_fact_evidence, _reviewed_fact_binding
     from .report_pipeline import numeric_tokens
 
     config = session.query(AnalysisConfig).filter_by(id=config_id, project_id=project_id,
@@ -358,12 +359,22 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
             raise HTTPException(409, f"本章资料 {fact.label} 未选择当前修订的证据")
         if linked:
             for item in linked:
+                if session.query(ProjectEvidence.id).filter_by(
+                        project_id=project_id, supersedes_id=item.id).first():
+                    raise HTTPException(409, "所选证据已有新版本，请重新选择")
                 document = session.get(SourceDocument, item.document_id)
                 if document is None or document.project_id != project_id or document.sha256 != item.document_sha256:
                     raise HTTPException(409, "所选证据的原件版本已失效")
                 parsed = session.get(SourceParseRevision, item.parse_revision_id) if item.parse_revision_id else None
-                if item.parse_revision_id and (parsed is None or parsed.document_id != document.id):
+                if item.parse_revision_id and (parsed is None or parsed.document_id != document.id
+                                               or parsed.document_sha256 != document.sha256):
                     raise HTTPException(409, "所选证据的解析版本已失效")
+                by_ref = {str(part.get("ref")): part for part in
+                          (parsed.segments if parsed else document.segments)}
+                if (not item.source_refs or any(ref not in by_ref for ref in item.source_refs)
+                        or not any(source_supports(fact.value_text, str(by_ref[ref].get("text", "")))
+                                   for ref in item.source_refs)):
+                    raise HTTPException(409, "所选证据不再支持本项目事实的当前值")
                 evidence.append({"key": key, "label": fact.label, "value": fact.value_text,
                                  "fact_revision": fact.revision, "evidence_id": item.id,
                                  "document_id": document.id, "document_sha256": document.sha256,
@@ -374,16 +385,27 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
                                  "source_type": item.source_type})
         else:
             resolved = _reviewed_fact_binding(session, project_id, fact)
-            if resolved is None:
-                raise HTTPException(409, f"本章资料 {fact.label} 缺少当前修订的原文定位")
-            binding, document, segments = resolved
-            evidence.append({"key": key, "label": fact.label, "value": fact.value_text,
-                             "fact_revision": fact.revision, "evidence_id": None,
-                             "document_id": document.id, "document_sha256": document.sha256,
-                             "source_refs": binding.source_refs,
-                             "excerpt": "\n".join(str(part["text"]) for part in segments),
-                             "status": "VERIFIED", "reason": None,
-                             "independent_verification": "not_recorded", "source_type": "original"})
+            if resolved is not None:
+                binding, document, segments = resolved
+                evidence.append({"key": key, "label": fact.label, "value": fact.value_text,
+                                 "fact_revision": fact.revision, "evidence_id": None,
+                                 "document_id": document.id, "document_sha256": document.sha256,
+                                 "source_refs": binding.source_refs,
+                                 "excerpt": "\n".join(str(part["text"]) for part in segments),
+                                 "status": "VERIFIED", "reason": None,
+                                 "independent_verification": "not_recorded", "source_type": "original"})
+            else:
+                original = _current_original_fact_evidence(session, project_id, fact)
+                if original is None:
+                    raise HTTPException(409, f"本章资料 {fact.label} 缺少当前修订的原文定位")
+                item, document, segments = original
+                evidence.append({"key": key, "label": fact.label, "value": fact.value_text,
+                                 "fact_revision": fact.revision, "evidence_id": item.id,
+                                 "document_id": document.id, "document_sha256": document.sha256,
+                                 "parse_revision_id": item.parse_revision_id,
+                                 "source_refs": item.source_refs, "excerpt": item.excerpt,
+                                 "status": "VERIFIED", "reason": None,
+                                 "independent_verification": "not_recorded", "source_type": "original"})
     if selected and any(item.fact_key not in section["evidence_keys"] for item in selected):
         raise HTTPException(409, "所选证据不属于本章所需的项目资料")
     heading = {"type": "h2", "id": str(uuid4()), "section_id": section_id,
@@ -417,6 +439,7 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
         raise HTTPException(422, "模型候选段落结构无效")
     forbidden = section.get("forbidden_terms", [])
     blocks = [heading]
+    used_fact_keys: set[str] = set()
     for item in paragraphs:
         if not isinstance(item, dict):
             raise HTTPException(422, "候选段落结构无效")
@@ -425,6 +448,7 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
                 or not isinstance(keys, list) or not keys or len(set(keys)) != len(keys)
                 or any(key not in by_key for key in keys)):
             raise HTTPException(422, "候选段落缺少可核对的项目来源")
+        used_fact_keys.update(keys)
         if any(term in text_value for term in forbidden):
             raise HTTPException(422, "候选包含本章禁用或高风险确定性表述")
         allowed_numbers = set().union(*(numeric_tokens(by_key[key]["value"]) for key in keys))
@@ -462,7 +486,9 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
     validate_content(blocks)
     return blocks, {"configuration_id": config.id, "configuration_version": config.version,
                     "evidence": [{key: value for key, value in item.items() if key not in {"value", "excerpt"}}
-                                 for item in evidence], "model_call": model_call}
+                                 for item in evidence], "model_call": model_call,
+                    "used_fact_keys": sorted(used_fact_keys),
+                    "unused_fact_keys": sorted(set(section["evidence_keys"]) - used_fact_keys)}
 
 
 def _manual_blocks(session, report, section_id: str) -> tuple[list[dict], list[str]]:

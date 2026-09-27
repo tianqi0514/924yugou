@@ -43,6 +43,13 @@ def _project(session, project_id: str):
     return get_project(session, project_id)
 
 
+def _writable_project(session, project_id: str):
+    project = _project(session, project_id)
+    if project.corpus is not None:
+        raise HTTPException(403, "内置历史语料项目只读")
+    return project
+
+
 def _prepare(session, project_id: str, body: EvidenceCreate) -> dict:
     document = session.scalar(select(SourceDocument).where(SourceDocument.id == body.document_id,
                                                            SourceDocument.project_id == project_id))
@@ -140,23 +147,37 @@ def evidence_list(project_id: str, fact_key: str | None = None, document_id: str
             SourceDocument.id.in_([row.document_id for row in rows]))).all()} if rows else {}
         parsed = {rev.id: rev for rev in session.scalars(select(SourceParseRevision).where(
             SourceParseRevision.id.in_([row.parse_revision_id for row in rows if row.parse_revision_id]))).all()} if rows else {}
-        return {"items": [_dict(row, docs.get(row.document_id), parsed.get(row.parse_revision_id)) for row in rows]}
+        successors = {row.supersedes_id: row.id for row in session.scalars(select(ProjectEvidence).where(
+            ProjectEvidence.project_id == project_id,
+            ProjectEvidence.supersedes_id.in_([item.id for item in rows]))).all()} if rows else {}
+        return {"items": [{**_dict(row, docs.get(row.document_id), parsed.get(row.parse_revision_id)),
+                            "superseded_by_id": successors.get(row.id)} for row in rows]}
 
 
 @router.post("", status_code=201)
 def evidence_create(project_id: str, body: EvidenceCreate):
     with SessionLocal.begin() as session:
-        _project(session, project_id)
+        _writable_project(session, project_id)
         values = _prepare(session, project_id, body)
         previous = session.scalars(select(ProjectEvidence).where(
             ProjectEvidence.project_id == project_id,
             ProjectEvidence.document_id == values["document_id"],
             ProjectEvidence.fact_key == values["fact_key"],
             ProjectEvidence.statement == values["statement"])).all()
-        for item in previous:
-            if item.source_refs == values["source_refs"] and item.fact_revision == values["fact_revision"]:
-                return _dict(item, session.get(SourceDocument, item.document_id),
-                             session.get(SourceParseRevision, item.parse_revision_id))
+        matches = [item for item in previous
+                   if item.source_refs == values["source_refs"]
+                   and item.fact_revision == values["fact_revision"]
+                   and item.source_type == values["source_type"]
+                   and item.parse_revision_id == values["parse_revision_id"]]
+        successors = set(session.scalars(select(ProjectEvidence.supersedes_id).where(
+            ProjectEvidence.project_id == project_id,
+            ProjectEvidence.supersedes_id.in_([item.id for item in matches]))).all()) if matches else set()
+        current = next((item for item in reversed(matches) if item.id not in successors), None)
+        if current is not None:
+            return _dict(current, session.get(SourceDocument, current.document_id),
+                         session.get(SourceParseRevision, current.parse_revision_id))
+        if matches:
+            raise HTTPException(409, "该证据已有新版本，请使用当前版本")
         item = ProjectEvidence(**values)
         session.add(item); session.flush()
         return _dict(item, session.get(SourceDocument, item.document_id),
@@ -167,8 +188,12 @@ def evidence_create(project_id: str, body: EvidenceCreate):
 def evidence_get(project_id: str, evidence_id: str):
     with SessionLocal() as session:
         item = _evidence(session, project_id, evidence_id)
+        successor = session.scalar(select(ProjectEvidence.id).where(
+            ProjectEvidence.project_id == project_id,
+            ProjectEvidence.supersedes_id == evidence_id))
         return {**_dict(item, session.get(SourceDocument, item.document_id),
                         session.get(SourceParseRevision, item.parse_revision_id)),
+                "superseded_by_id": successor,
                 "impacts": _impacts(session, project_id, evidence_id)}
 
 
@@ -181,6 +206,7 @@ def _token(project_id: str, evidence_id: str, values: dict, impacts: list[dict],
 @router.post("/{evidence_id}/replacement/preview")
 def evidence_replacement_preview(project_id: str, evidence_id: str, body: EvidenceCreate):
     with SessionLocal() as session:
+        _writable_project(session, project_id)
         old = _evidence(session, project_id, evidence_id)
         values = _prepare(session, project_id, body)
         impacts = _impacts(session, project_id, old.id)
@@ -197,6 +223,7 @@ def evidence_replacement_commit(project_id: str, evidence_id: str, body: Evidenc
     if not body.expires_at or body.expires_at < time.time() or not body.preview_token:
         raise HTTPException(409, "替换预览已过期")
     with SessionLocal.begin() as session:
+        _writable_project(session, project_id)
         old = _evidence(session, project_id, evidence_id)
         values = _prepare(session, project_id, body)
         impacts = _impacts(session, project_id, old.id)

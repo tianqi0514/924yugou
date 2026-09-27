@@ -1419,6 +1419,43 @@ def _reviewed_fact_binding(session, project_id: str, fact: ProjectFact):
     return binding, document, segments
 
 
+def _current_original_fact_evidence(session, project_id: str, fact: ProjectFact):
+    """Resolve one unsuperseded, locatable original for the current fact revision."""
+    if fact.value_status != "PROVIDED" or fact.value_text is None:
+        return None
+    rows = session.scalars(select(ProjectEvidence).where(
+        ProjectEvidence.project_id == project_id,
+        ProjectEvidence.fact_key == fact.key,
+        ProjectEvidence.fact_revision == fact.revision,
+        ProjectEvidence.source_type == "original",
+    ).order_by(ProjectEvidence.created_at.desc(), ProjectEvidence.id.desc())).all()
+    superseded = set(session.scalars(select(ProjectEvidence.supersedes_id).where(
+        ProjectEvidence.project_id == project_id,
+        ProjectEvidence.supersedes_id.in_([row.id for row in rows]))).all()) if rows else set()
+    for row in rows:
+        if row.id in superseded:
+            continue
+        document = session.scalar(select(SourceDocument).where(
+            SourceDocument.id == row.document_id,
+            SourceDocument.project_id == project_id))
+        if document is None or document.sha256 != row.document_sha256:
+            continue
+        parsed = session.get(SourceParseRevision, row.parse_revision_id) if row.parse_revision_id else None
+        if row.parse_revision_id and (parsed is None or parsed.document_id != document.id
+                                      or parsed.document_sha256 != document.sha256):
+            continue
+        by_ref = {str(part.get("ref")): part for part in
+                  (parsed.segments if parsed else document.segments)}
+        if not row.source_refs or any(ref not in by_ref for ref in row.source_refs):
+            continue
+        segments = [by_ref[ref] for ref in row.source_refs]
+        if not any(source_supports(fact.value_text, str(part.get("text", "")))
+                   for part in segments):
+            continue
+        return row, document, segments
+    return None
+
+
 def _fact_has_project_evidence(session, project_id: str, fact: ProjectFact, checked: set[str]) -> bool:
     if fact.key in checked:
         return False
@@ -1436,10 +1473,7 @@ def _fact_has_project_evidence(session, project_id: str, fact: ProjectFact, chec
                    for dependency in dependencies)
     if _reviewed_fact_binding(session, project_id, fact) is not None:
         return True
-    return session.scalar(select(ProjectEvidence.id).where(
-        ProjectEvidence.project_id == project_id, ProjectEvidence.fact_key == fact.key,
-        ProjectEvidence.fact_revision == fact.revision,
-        ProjectEvidence.source_type == "original")) is not None
+    return _current_original_fact_evidence(session, project_id, fact) is not None
 
 
 def _project_evidence_issues(session, item: ReportDraft) -> list[dict]:

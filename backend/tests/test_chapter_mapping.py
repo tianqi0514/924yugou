@@ -14,7 +14,7 @@ from fastapi.testclient import TestClient
 import pymupdf
 from sqlalchemy import func, select
 
-from app.db import AnalysisConfig, Base, SessionLocal, engine
+from app.db import AnalysisConfig, Base, ProjectCorpus, SessionLocal, engine
 from app.main import app
 
 
@@ -288,3 +288,142 @@ def test_two_public_feasibility_reports_keep_own_source_and_chapter(client):
     second = client.get(paths[1][0] + f"/reports/{paths[1][1]}/chapter-mapping/{paths[1][2]}").json()
     assert [row["key"] for row in first["facts"]] == [paths[0][3]]
     assert [row["key"] for row in second["facts"]] == [paths[1][3]]
+
+
+def test_evidence_only_fact_maps_and_drafts_from_current_original(client):
+    statement = "本项目拟建设公交换乘枢纽，并与轨道交通衔接。"
+    base, doc_id, segments, report_id = setup_project(client, [statement])
+    created = client.post(base + "/facts", json={
+        "key": "transit_plan", "label": "换乘方案", "data_type": "text",
+        "value": statement, "source": "项目原文"})
+    assert created.status_code == 201, created.text
+    first_payload = {"document_id": doc_id, "source_refs": [segments[0]["ref"]],
+                     "statement": statement, "label": "原文方案", "fact_key": "transit_plan"}
+    first = client.post(base + "/evidence", json=first_payload)
+    assert first.status_code == 201, first.text
+    path = base + f"/reports/{report_id}/chapter-mapping/necessity"
+    option = client.get(path).json()["facts"][0]
+    assert option["source"]["verified"] is True
+    assert option["source"]["location"]["evidence_id"] == first.json()["id"]
+    choice = {"mode": "narrative", "fact_keys": ["transit_plan"], "result_keys": []}
+    preview = client.post(path + "/preview", json=choice)
+    assert preview.status_code == 200, preview.text
+    config = client.post(path + "/commit", json={
+        **choice, **{key: preview.json()[key] for key in
+                   ("preview_digest", "preview_token", "expires_at")}})
+    assert config.status_code == 200, config.text
+    draft = base + f"/analysis/reports/{report_id}/draft/preview"
+    candidate = client.post(draft, json={
+        "config_id": config.json()["id"], "section_id": "necessity", "mode": "excerpt"})
+    assert candidate.status_code == 200, candidate.text
+    assert candidate.json()["content"][1]["project_evidence_refs"][0]["evidence_id"] == first.json()["id"]
+    adopted = client.post(base + f"/analysis/reports/{report_id}/draft/commit", json={
+        **{key: value for key, value in candidate.json().items()
+           if key not in {"issues", "preserved_blocks"}}, "replace_section": True})
+    assert adopted.status_code == 200, adopted.text
+    exported = client.get(base + f"/reports/{report_id}/export?level=preview")
+    assert exported.status_code == 200, exported.text[:300]
+    with ZipFile(io.BytesIO(exported.content)) as archive:
+        docx = Document(io.BytesIO(archive.read("report.docx")))
+        with pymupdf.open(stream=archive.read("report.pdf"), filetype="pdf") as pdf:
+            pdf_text = "".join(page.get_text() for page in pdf)
+        audit = archive.read("audit.json").decode()
+    assert statement in "\n".join(paragraph.text for paragraph in docx.paragraphs)
+    assert statement in pdf_text
+    assert first.json()["id"] in audit
+
+    supplement = Document(); supplement.add_paragraph("补充来源：" + statement)
+    stream = io.BytesIO(); supplement.save(stream)
+    uploaded = client.post(base + "/documents", files={"file": (
+        "补充来源.docx", stream.getvalue(),
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document")})
+    assert uploaded.status_code == 201, uploaded.text
+    second_id = uploaded.json()["id"]
+    second_ref = client.get(base + f"/documents/{second_id}").json()["segments"][0]["ref"]
+    second_payload = {**first_payload, "document_id": second_id, "source_refs": [second_ref]}
+    second = client.post(base + "/evidence", json=second_payload)
+    assert second.status_code == 201, second.text
+    both = client.post(draft, json={
+        "config_id": config.json()["id"], "section_id": "necessity", "mode": "excerpt",
+        "evidence_ids": [first.json()["id"], second.json()["id"]]})
+    assert both.status_code == 200, both.text
+    assert {row["evidence_id"] for row in both.json()["content"][1]["project_evidence_refs"]} == {
+        first.json()["id"], second.json()["id"]}
+
+    replacement_preview = client.post(base + f"/evidence/{first.json()['id']}/replacement/preview",
+                                      json=second_payload)
+    assert replacement_preview.status_code == 200, replacement_preview.text
+    replacement = client.post(base + f"/evidence/{first.json()['id']}/replacement/commit", json={
+        **second_payload, **{key: replacement_preview.json()[key] for key in
+                           ("base_report_versions", "expires_at", "preview_token")}})
+    assert replacement.status_code == 201, replacement.text
+    assert client.post(base + "/evidence", json=first_payload).status_code == 409
+    repeated_current = client.post(base + "/evidence", json=second_payload)
+    assert repeated_current.status_code == 201 and repeated_current.json()["id"] in {
+        second.json()["id"], replacement.json()["id"]}
+    listed = client.get(base + "/evidence?fact_key=transit_plan").json()["items"]
+    assert next(row for row in listed if row["id"] == first.json()["id"])["superseded_by_id"] == replacement.json()["id"]
+    assert next(row for row in listed if row["id"] == second.json()["id"])["superseded_by_id"] is None
+    materials = client.get(base + f"/reports/{report_id}/materials?section_id=necessity").json()
+    states = {row["id"]: row["source_state"] for row in materials["project_evidence"]}
+    assert states[first.json()["id"]] == "已更新"
+    assert states[second.json()["id"]] == "当前原文位置"
+    stale = client.post(draft, json={
+        "config_id": config.json()["id"], "section_id": "necessity", "mode": "excerpt",
+        "evidence_ids": [first.json()["id"]]})
+    assert stale.status_code == 409
+    fresh = client.post(draft, json={
+        "config_id": config.json()["id"], "section_id": "necessity", "mode": "excerpt"})
+    assert fresh.status_code == 200, fresh.text
+    assert fresh.json()["content"][1]["project_evidence_refs"][0]["evidence_id"] != first.json()["id"]
+
+
+def test_secondary_replacement_does_not_keep_original_gate_open(client):
+    statement = "本项目拟建设公交换乘枢纽。"
+    base, doc_id, segments, report_id = setup_project(client, [statement])
+    assert client.post(base + "/facts", json={
+        "key": "transit_plan", "label": "换乘方案", "data_type": "text",
+        "value": statement, "source": "项目原文"}).status_code == 201
+    payload = {"document_id": doc_id, "source_refs": [segments[0]["ref"]],
+               "statement": statement, "label": "原文方案", "fact_key": "transit_plan"}
+    original = client.post(base + "/evidence", json=payload)
+    assert original.status_code == 201, original.text
+    path = base + f"/reports/{report_id}/chapter-mapping/necessity"
+    choice = {"mode": "narrative", "fact_keys": ["transit_plan"], "result_keys": []}
+    mapping_preview = client.post(path + "/preview", json=choice)
+    assert mapping_preview.status_code == 200, mapping_preview.text
+    replacement_body = {**payload, "source_type": "secondary"}
+    preview = client.post(base + f"/evidence/{original.json()['id']}/replacement/preview",
+                          json=replacement_body)
+    assert preview.status_code == 200, preview.text
+    replaced = client.post(base + f"/evidence/{original.json()['id']}/replacement/commit", json={
+        **replacement_body, **{key: preview.json()[key] for key in
+                              ("base_report_versions", "expires_at", "preview_token")}})
+    assert replaced.status_code == 201, replaced.text
+    assert client.post(base + "/evidence", json=payload).status_code == 409
+    secondary_retry = client.post(base + "/evidence", json=replacement_body)
+    assert secondary_retry.status_code == 201 and secondary_retry.json()["id"] == replaced.json()["id"]
+    source = client.get(path).json()["facts"][0]["source"]
+    assert source == {"verified": False, "location": None}
+    stale = client.post(path + "/commit", json={
+        **choice, **{key: mapping_preview.json()[key] for key in
+                   ("preview_digest", "preview_token", "expires_at")}})
+    assert stale.status_code == 409
+    assert client.post(path + "/preview", json={
+        **choice}).status_code == 409
+
+
+def test_historical_project_cannot_create_or_replace_project_evidence(client):
+    statement = "历史项目原文仅供查阅。"
+    base, doc_id, segments, _ = setup_project(client, [statement])
+    payload = {"document_id": doc_id, "source_refs": [segments[0]["ref"]],
+               "statement": statement, "label": "历史来源"}
+    original = client.post(base + "/evidence", json=payload)
+    assert original.status_code == 201, original.text
+    project_id = base.removeprefix("/api/projects/")
+    with SessionLocal.begin() as session:
+        session.add(ProjectCorpus(project_id=project_id, corpus_id="qa-frozen-history"))
+    assert client.post(base + "/evidence", json=payload).status_code == 403
+    assert client.post(base + f"/evidence/{original.json()['id']}/replacement/preview",
+                       json=payload).status_code == 403
+    assert client.get(base + f"/evidence/{original.json()['id']}").status_code == 200

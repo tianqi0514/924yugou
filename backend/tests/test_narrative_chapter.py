@@ -140,7 +140,17 @@ def test_beijing_necessity_uses_real_original_without_a_calculation_run(client, 
     assert first.status_code == 200, first.text
     assert "run_id" not in first.json()
     assert len(first.json()["content"]) == 3
+    assert sorted(first.json()["model_audit"]["used_fact_keys"]) == sorted(statements)
+    assert first.json()["model_audit"]["unused_fact_keys"] == []
     assert "计划" in first.json()["content"][1]["children"][0]["text"]
+    import app.analysis_writing as writing
+    monkeypatch.setattr(writing, "chat_json", lambda *_args, **_kwargs: ChatResult({
+        "paragraphs": [{"text": statements["station_plan"],
+                        "used_fact_keys": ["station_plan"]}]}, {"model": "qa-only"}))
+    partial = client.post(draft + "/preview", json={**request, "mode": "model"})
+    assert partial.status_code == 200, partial.text
+    assert partial.json()["model_audit"]["used_fact_keys"] == ["station_plan"]
+    assert partial.json()["model_audit"]["unused_fact_keys"] == ["transfer_functions"]
     assert client.post(draft + f"/candidates/{first.json()['candidate_id']}/decline").status_code == 200
     assert client.get(base + f"/reports/{report['id']}").json()["version"] == 0
     second = client.post(draft + "/preview", json=request)
