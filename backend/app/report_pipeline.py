@@ -29,7 +29,7 @@ from .model_settings import chat_json
 
 ALLOWED_BLOCKS = {"p", "h1", "h2", "h3", "blockquote", "table"}
 TEXT_MARKS = {"bold", "italic", "underline", "strikethrough"}
-EXPORT_RENDER_VERSION = "chapter-layout-v3"
+EXPORT_RENDER_VERSION = "chapter-layout-v4"
 
 
 def _valid_url(url: str) -> bool:
@@ -104,7 +104,10 @@ def _validate_metadata(node: dict) -> set[str]:
     if not isinstance(project_rules, list) or len(project_rules) > 20:
         raise ValueError("项目规则引用结构不正确")
     for rule in project_rules:
-        if (not isinstance(rule, dict) or set(rule) != {"rule_id", "expression", "target_key", "deps", "input_fact_revisions", "target_fact_revision"}
+        if (not isinstance(rule, dict)
+                or set(rule) not in ({"rule_id", "expression", "target_key", "deps", "input_fact_revisions", "target_fact_revision"},
+                                    {"rule_id", "revision", "expression", "target_key", "deps", "input_fact_revisions", "target_fact_revision"})
+                or ("revision" in rule and (not isinstance(rule["revision"], int) or rule["revision"] < 1))
                 or any(not isinstance(rule[key], str) or not rule[key] for key in ("rule_id", "expression", "target_key"))
                 or not isinstance(rule["deps"], list) or any(not isinstance(key, str) or not key for key in rule["deps"])
                 or not isinstance(rule["input_fact_revisions"], list)
@@ -592,12 +595,36 @@ def _analysis_basis(audit: dict) -> list[str]:
     return lines
 
 
+def _render_body(content: list[dict], title: str) -> list[dict]:
+    """Leave unfinished outline headings in the editor, not in a delivered file."""
+    body = content[1:] if content and content[0].get("type") == "h1" and plain(content[0]).strip() == title.strip() else content
+    rendered = []
+    for index, node in enumerate(body):
+        kind = node.get("type", "")
+        if kind in {"h1", "h2", "h3"}:
+            level = int(kind[1])
+            descendants = []
+            for later in body[index + 1:]:
+                later_type = later.get("type", "")
+                if later_type in {"h1", "h2", "h3"} and int(later_type[1]) <= level:
+                    break
+                descendants.append(later)
+            if (node.get("origin") != "manual" and not any(
+                    part.get("type") not in {"h1", "h2", "h3"}
+                    and (part.get("type") == "table" or plain(part).strip()) for part in descendants)):
+                continue
+        elif kind != "table" and not plain(node).strip():
+            continue
+        rendered.append(node)
+    return rendered
+
+
 def export_bundle(title: str, content: list[dict], audit: dict, preview_label: str | None = None) -> bytes:
     """Render one frozen report snapshot to DOCX, PDF and a JSON audit record."""
     word = Document()
     section = word.sections[0]
     section.top_margin = section.bottom_margin = Cm(2.3)
-    body = content[1:] if content and content[0].get("type") == "h1" and plain(content[0]).strip() == title.strip() else content
+    body = _render_body(content, title)
     landscape_tables = any(node.get("type") == "table" and
         len(node.get("children", [{}])[0].get("children", [])) >= 6 for node in body)
     if landscape_tables:

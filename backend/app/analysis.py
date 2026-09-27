@@ -184,8 +184,11 @@ def _project_blueprint(session, project: Project) -> tuple[list[dict], list[dict
               for fact in facts if fact.key not in targets}
     rules = [{"id": rule.id, "name": rule.name, "target_key": rule.target_key,
               "expression": rule.expression, "deps": rule.deps,
-              "version": hashlib.sha256(json.dumps([rule.expression, rule.deps], sort_keys=True).encode()).hexdigest()[:16],
-              "source_ref": {"project_id": project.id, "rule_id": rule.id}}
+              "revision": rule.revision,
+              "version": f"r{rule.revision}:" + hashlib.sha256(json.dumps(
+                  [rule.expression, rule.deps], sort_keys=True).encode()).hexdigest()[:16],
+              "source_ref": {"project_id": project.id, "rule_id": rule.id,
+                             "revision": rule.revision}}
              for rule in project_rules]
     return definitions, rules, inputs, None, None
 

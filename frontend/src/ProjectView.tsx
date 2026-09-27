@@ -13,6 +13,7 @@ type RulePreview = {
   inputs: { key: string; label: string; value: string | null; unit: string; status: string }[];
   result: Trace; changes: { key: string }[]; report_impacts: { report_title: string; position: number }[]
 }
+type RuleRevision = { revision: number; name: string; expression: string; created_at: string; project_version: number | null }
 type WritingConfig = { id: string; name: string; version: number; status: string;
   definitions: { key: string; label: string; unit: string }[];
   rules: { id: string; name: string; target_key: string; expression: string; deps: string[] }[];
@@ -54,10 +55,14 @@ export default function ProjectView({ project, section, onProjectChange, notify,
   const [version, setVersion] = useState(0)
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [dialog, setDialog] = useState<'fact' | 'rule' | 'rule-detail' | 'config-detail' | 'detail' | 'edit' | 'history' | 'evidence' | null>(null)
+  const [dialog, setDialog] = useState<'fact' | 'rule' | 'rule-detail' | 'rule-edit' | 'rule-history' | 'config-detail' | 'detail' | 'edit' | 'history' | 'evidence' | null>(null)
   const [factForm, setFactForm] = useState<FactForm>(emptyFact)
   const [ruleForm, setRuleForm] = useState({ name: '', target_key: '', expression: '' })
   const [rulePreview, setRulePreview] = useState<RulePreview | null>(null)
+  const [ruleEditForm, setRuleEditForm] = useState({ name: '', expression: '', base_revision: 1 })
+  const [ruleEditPreview, setRuleEditPreview] = useState<(RulePreview & { next_revision: number }) | null>(null)
+  const [ruleHistory, setRuleHistory] = useState<RuleRevision[]>([])
+  const [ruleHistoryLoading, setRuleHistoryLoading] = useState(false)
   const [currentRule, setCurrentRule] = useState<Rule | null>(null)
   const [currentConfig, setCurrentConfig] = useState<WritingConfig | null>(null)
   const ruleExpressionInput = useRef<HTMLInputElement>(null)
@@ -123,6 +128,32 @@ export default function ProjectView({ project, section, onProjectChange, notify,
       await post(`/projects/${project.id}/rules/commit`, { ...ruleForm, base_version: rulePreview.base_version, preview_token: rulePreview.preview_token })
       setDialog(null); setRulePreview(null); setRuleForm({ name: '', target_key: '', expression: '' }); await load(); notify('规则已保存并重新计算')
     } catch (cause) { setError((cause as Error).message); setRulePreview(null) } finally { setBusy(false) }
+  }
+  const editRule = (rule: Rule) => {
+    setCurrentRule(rule); setRuleEditForm({ name: rule.name, expression: rule.expression, base_revision: rule.revision })
+    setRuleEditPreview(null); setError(''); setDialog('rule-edit')
+  }
+  const previewRuleEdit = async () => {
+    if (!project || !currentRule) return
+    setBusy(true); setError('')
+    try { setRuleEditPreview(await post(`/projects/${project.id}/rules/${currentRule.id}/preview`, ruleEditForm)) }
+    catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
+  }
+  const commitRuleEdit = async () => {
+    if (!project || !currentRule || !ruleEditPreview) return
+    setBusy(true); setError('')
+    try {
+      await post(`/projects/${project.id}/rules/${currentRule.id}/commit`, {
+        ...ruleEditForm, base_version: ruleEditPreview.base_version, preview_token: ruleEditPreview.preview_token,
+      })
+      setDialog(null); setRuleEditPreview(null); await load(); notify('规则已保存为新修订')
+    } catch (cause) { setError((cause as Error).message); setRuleEditPreview(null) } finally { setBusy(false) }
+  }
+  const showRuleHistory = async (rule: Rule) => {
+    if (!project) return
+    setCurrentRule(rule); setRuleHistory([]); setRuleHistoryLoading(true); setError(''); setDialog('rule-history')
+    try { setRuleHistory(await api<RuleRevision[]>(`/projects/${project.id}/rules/${rule.id}/revisions`)) }
+    catch (cause) { setError((cause as Error).message) } finally { setRuleHistoryLoading(false) }
   }
   const insertRuleFact = (key: string) => {
     const input = ruleExpressionInput.current
@@ -250,7 +281,14 @@ export default function ProjectView({ project, section, onProjectChange, notify,
       {rulePreview && <div className="rule-preview preview-box"><div className="rule-preview-result"><span>{rulePreview.target.label}</span><strong>{displayValue(rulePreview.target.after.value, rulePreview.target.after.status)}{rulePreview.target.after.value !== null && rulePreview.target.unit ? ` ${rulePreview.target.unit}` : ''}</strong><FactStatus status={rulePreview.target.after.status} /></div>{rulePreview.target.before.value !== null && <small>原值：{rulePreview.target.before.value}{rulePreview.target.unit ? ` ${rulePreview.target.unit}` : ''}</small>}<div className="rule-preview-inputs">{rulePreview.inputs.map((item) => <div key={item.key}><span>{item.label}</span><b>{displayValue(item.value, item.status)}{item.value !== null && item.unit ? ` ${item.unit}` : ''}</b></div>)}</div>{rulePreview.result.status === 'UNEVALUABLE' && <small>待补：{(rulePreview.result.missing || []).map((key) => rulePreview.inputs.find((item) => item.key === key)?.label || key).join('、')}。单位与除零待输入后验证。</small>}{rulePreview.report_impacts.length > 0 && <small>{rulePreview.report_impacts.length} 处正文引用需重新核对</small>}</div>}
       {error && <div className="notice error">{error}</div>}<div className="form-actions"><button type="button" onClick={() => setDialog(null)}>取消</button>{rulePreview ? <button type="button" className="primary-button" disabled={busy} onClick={() => void createRule()}>{busy ? '保存中…' : '确认保存'}</button> : <button type="button" className="primary-button" disabled={!ruleForm.name.trim() || !ruleForm.target_key || !ruleForm.expression.trim() || busy} onClick={() => void previewRule()}>{busy ? '计算中…' : '预览计算'}</button>}</div>
     </div></Modal>}
-    {dialog === 'rule-detail' && currentRule && <Modal title={currentRule.name} onClose={() => setDialog(null)}><div className="rule-detail">{(() => { const item = trace.find((entry) => entry.rule_id === currentRule.id); const calculationError = trace.find((entry) => entry.status === 'ERROR'); const target = facts.find((fact) => fact.key === currentRule.target_key); const status = item?.status || (calculationError ? 'ERROR' : target?.status || 'UNDEFINED'); return <><div className="rule-detail-result"><span>{target?.label || currentRule.target_key}</span><strong>{displayValue(item?.result ?? null, status)}{item?.result != null && target?.unit ? ` ${target.unit}` : ''}</strong><FactStatus status={status} /></div><div className="rule-detail-inputs"><h3>输入依据</h3>{currentRule.deps.map((key) => { const fact = facts.find((entry) => entry.key === key); return <button type="button" key={key} onClick={() => fact && showDetail(fact)}><span>{fact?.label || key}</span><b>{fact ? displayValue(fact.value, fact.status) : '未找到'}{fact?.value != null && fact.unit ? ` ${fact.unit}` : ''}</b><ChevronRight size={14} /></button> })}</div>{item?.status === 'UNEVALUABLE' && <div className="notice warn">待补：{(item.missing || []).map((key) => facts.find((fact) => fact.key === key)?.label || key).join('、')}</div>}{calculationError && <div className="notice error">{calculationError.reason || '规则计算失败'}</div>}<details className="project-more"><summary>查看公式</summary><div className="expression">{currentRule.expression}</div></details></> })()}</div></Modal>}
+    {dialog === 'rule-detail' && currentRule && <Modal title={currentRule.name} onClose={() => setDialog(null)}><div className="rule-detail">{(() => { const item = trace.find((entry) => entry.rule_id === currentRule.id); const calculationError = trace.find((entry) => entry.status === 'ERROR'); const target = facts.find((fact) => fact.key === currentRule.target_key); const status = item?.status || (calculationError ? 'ERROR' : target?.status || 'UNDEFINED'); return <><div className="rule-detail-result"><span>{target?.label || currentRule.target_key}</span><strong>{displayValue(item?.result ?? null, status)}{item?.result != null && target?.unit ? ` ${target.unit}` : ''}</strong><FactStatus status={status} /></div><div className="rule-detail-inputs"><h3>输入依据</h3>{currentRule.deps.map((key) => { const fact = facts.find((entry) => entry.key === key); return <button type="button" key={key} onClick={() => fact && showDetail(fact)}><span>{fact?.label || key}</span><b>{fact ? displayValue(fact.value, fact.status) : '未找到'}{fact?.value != null && fact.unit ? ` ${fact.unit}` : ''}</b><ChevronRight size={14} /></button> })}</div>{item?.status === 'UNEVALUABLE' && <div className="notice warn">待补：{(item.missing || []).map((key) => facts.find((fact) => fact.key === key)?.label || key).join('、')}</div>}{calculationError && <div className="notice error">{calculationError.reason || '规则计算失败'}</div>}<details className="project-more"><summary>查看公式</summary><div className="expression">{currentRule.expression}</div></details><div className="form-actions"><button type="button" onClick={() => void showRuleHistory(currentRule)}>修订记录</button>{!project.has_corpus && <button type="button" className="primary-button" onClick={() => editRule(currentRule)}>修改规则</button>}</div></> })()}</div></Modal>}
+    {dialog === 'rule-edit' && currentRule && <Modal title={`修改规则 · v${currentRule.revision}`} onClose={() => setDialog(null)}><div className="form-stack">
+      <FieldInput label="名称" value={ruleEditForm.name} onChange={(name) => { setRuleEditForm({ ...ruleEditForm, name }); setRuleEditPreview(null) }} />
+      <label className="form-field"><span>计算式</span><input aria-label="计算式" value={ruleEditForm.expression} onChange={(event) => { setRuleEditForm({ ...ruleEditForm, expression: event.target.value }); setRuleEditPreview(null) }} /></label>
+      {ruleEditPreview && <div className="rule-preview preview-box"><div className="rule-preview-result"><span>{ruleEditPreview.target.label} · v{ruleEditPreview.next_revision}</span><strong>{displayValue(ruleEditPreview.target.after.value, ruleEditPreview.target.after.status)}{ruleEditPreview.target.after.value !== null && ruleEditPreview.target.unit ? ` ${ruleEditPreview.target.unit}` : ''}</strong><FactStatus status={ruleEditPreview.target.after.status} /></div><small>原值：{displayValue(ruleEditPreview.target.before.value, ruleEditPreview.target.before.status)}{ruleEditPreview.target.before.value !== null && ruleEditPreview.target.unit ? ` ${ruleEditPreview.target.unit}` : ''}</small><div className="rule-preview-inputs">{ruleEditPreview.inputs.map((item) => <div key={item.key}><span>{item.label}</span><b>{displayValue(item.value, item.status)}{item.value !== null && item.unit ? ` ${item.unit}` : ''}</b></div>)}</div>{ruleEditPreview.result.status === 'UNEVALUABLE' && <small>待补：{(ruleEditPreview.result.missing || []).map((key) => ruleEditPreview.inputs.find((item) => item.key === key)?.label || key).join('、')}。补齐输入后需重新计算。</small>}{ruleEditPreview.report_impacts.length > 0 && <small>{ruleEditPreview.report_impacts.length} 处正文引用需重新核对</small>}</div>}
+      {error && <div className="notice error">{error}</div>}<div className="form-actions"><button type="button" onClick={() => setDialog(null)}>取消</button>{ruleEditPreview ? <button type="button" className="primary-button" disabled={busy} onClick={() => void commitRuleEdit()}>{busy ? '保存中…' : '确认新修订'}</button> : <button type="button" className="primary-button" disabled={busy || !ruleEditForm.name.trim() || !ruleEditForm.expression.trim()} onClick={() => void previewRuleEdit()}>{busy ? '计算中…' : '预览计算'}</button>}</div>
+    </div></Modal>}
+    {dialog === 'rule-history' && currentRule && <Modal title={`${currentRule.name} · 修订记录`} onClose={() => setDialog(null)}><div className="rule-detail"><div className="rule-detail-inputs">{ruleHistory.map((entry) => <div className="rule-history-row" key={entry.revision}><span>v{entry.revision}{entry.project_version !== null ? ` · 项目 v${entry.project_version}` : ' · 历史版本'}</span><strong>{entry.name}</strong><small>{entry.expression}</small></div>)}</div>{ruleHistoryLoading && <div className="empty">加载中…</div>}{!ruleHistoryLoading && ruleHistory.length === 0 && !error && <div className="empty">暂无修订记录</div>}{error && <div className="notice error">{error}</div>}</div></Modal>}
     {dialog === 'config-detail' && currentConfig && <Modal title={currentConfig.name} onClose={() => setDialog(null)}><div className="rule-detail"><div className="rule-config-meta"><span>v{currentConfig.version}</span><span>{currentConfig.status === 'PUBLISHED' ? '已发布' : '草稿'}</span><span>{currentConfig.sections.length} 章</span></div><div className="rule-detail-inputs"><h3>规则定义</h3>{currentConfig.rules.length ? currentConfig.rules.map((rule) => { const target = currentConfig.definitions.find((item) => item.key === rule.target_key); return <details className="rule-config-row" key={rule.id}><summary><span>{rule.name}</span><b>{target?.label || rule.target_key}</b></summary><div className="expression">{rule.expression}</div><small>输入：{(rule.deps || []).map((key) => currentConfig.definitions.find((item) => item.key === key)?.label || key).join('、')}</small></details> }) : <div className="empty">暂无规则定义</div>}</div>{!project.has_corpus && <button type="button" className="primary-button" onClick={() => { setDialog(null); onOpenAnalysisConfig(currentConfig.id) }}>管理配置</button>}</div></Modal>}
     {dialog === 'detail' && current && <Modal title={current.label} onClose={() => setDialog(null)}><div className="fact-detail">
       <div className="fact-detail-value"><strong>{displayValue(current.value, current.status)}{current.value !== null && current.unit ? ` ${current.unit}` : ''}</strong><FactStatus status={current.status} /></div>

@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import delete, select
 
 from .corpus import CorpusRepository
-from .db import AnalysisConfig, AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectEvidence, ProjectFact, ProjectIssue, ReportDraft, ReportExport, ReportFactProposal, ReportVersion, RuleRecord, SessionLocal, SourceDocument, SourceParseRevision, WorkTask, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
+from .db import AnalysisConfig, AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectEvidence, ProjectFact, ProjectIssue, ReportDraft, ReportExport, ReportFactProposal, ReportVersion, RuleRecord, RuleRevision, SessionLocal, SourceDocument, SourceParseRevision, WorkTask, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
 from .report_pipeline import EXPORT_RENDER_VERSION, change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
@@ -145,6 +145,17 @@ class RuleCreate(BaseModel):
 
 
 class RuleCommit(RuleCreate):
+    base_version: int = Field(ge=0)
+    preview_token: str
+
+
+class RuleUpdate(BaseModel):
+    name: str = Field(min_length=1, max_length=160)
+    expression: str = Field(min_length=1, max_length=1000)
+    base_revision: int = Field(ge=1)
+
+
+class RuleUpdateCommit(RuleUpdate):
     base_version: int = Field(ge=0)
     preview_token: str
 
@@ -484,6 +495,11 @@ def _rule_signature(project_id: str, version: int, rule: RuleCreate, expires: in
     return hmac.new(preview_secret, payload.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
+def _rule_update_signature(project_id: str, rule_id: str, version: int, body: RuleUpdate, expires: int) -> str:
+    payload = json.dumps({"kind": "rule_update", "project_id": project_id, "rule_id": rule_id,
+                          "version": version, "update": body.model_dump(), "expires": expires},
+                         sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hmac.new(preview_secret, payload.encode("utf-8"), hashlib.sha256).hexdigest()
 @app.get("/api/health")
 def health():
     return {"status": "ok", "service": "report-platform"}
@@ -1234,8 +1250,17 @@ def _validate_writing_refs(session, project_id: str, content: list[dict]) -> Non
     for block in content:
         for rule_ref in block.get("project_rule_refs", []):
             rule = session.get(RuleRecord, rule_ref["rule_id"])
-            if (rule is None or rule.project_id != project_id or rule.target_key != rule_ref["target_key"]
-                    or rule.expression != rule_ref["expression"] or list(rule.deps) != rule_ref["deps"]):
+            revision = rule_ref.get("revision")
+            historical = (session.get(RuleRevision, (rule_ref["rule_id"], revision))
+                          if isinstance(revision, int) else session.scalar(select(RuleRevision).where(
+                              RuleRevision.rule_id == rule_ref["rule_id"],
+                              RuleRevision.project_id == project_id,
+                              RuleRevision.target_key == rule_ref["target_key"],
+                              RuleRevision.expression == rule_ref["expression"])))
+            if (rule is None or rule.project_id != project_id or historical is None
+                    or historical.project_id != project_id or historical.target_key != rule_ref["target_key"]
+                    or historical.expression != rule_ref["expression"]
+                    or list(historical.deps) != rule_ref["deps"]):
                 fail("正文引用的当前项目规则不存在或身份不一致", 409)
 
 
@@ -1319,7 +1344,9 @@ def _writing_report_issues(session, item: ReportDraft) -> list[dict]:
         for rule_ref in block.get("project_rule_refs", []):
             rule = session.get(RuleRecord, rule_ref["rule_id"])
             if (rule is None or rule.project_id != item.project_id or rule.expression != rule_ref["expression"]
-                    or rule.target_key != rule_ref["target_key"] or list(rule.deps) != rule_ref["deps"]):
+                    or rule.target_key != rule_ref["target_key"] or list(rule.deps) != rule_ref["deps"]
+                    or (isinstance(rule_ref.get("revision"), int) and
+                        rule.revision != rule_ref["revision"])):
                 issues.append({"code": "PROJECT_RULE_CHANGED", "severity": "block",
                                "message": f"第 {position} 段的项目计算规则无法核对", "position": position})
                 continue
@@ -2439,7 +2466,9 @@ def rules_list(project_id: str):
             _, trace = simulate(facts, rules)
         except RuleError as exc:
             trace = [{"status": "ERROR", "reason": str(exc)}]
-        return {"rules": [{"id": rule.id, "name": rule.name, "target_key": rule.target_key, "expression": rule.expression, "deps": rule.deps} for rule in rules], "trace": trace}
+        return {"rules": [{"id": rule.id, "name": rule.name, "target_key": rule.target_key,
+                            "expression": rule.expression, "deps": rule.deps, "revision": rule.revision}
+                           for rule in rules], "trace": trace}
 
 
 def _prepare_new_rule(project_id: str, body: RuleCreate, facts: list[ProjectFact], rules: list[RuleRecord]):
@@ -2467,6 +2496,10 @@ def _prepare_new_rule(project_id: str, body: RuleCreate, facts: list[ProjectFact
 def _save_new_rule(session, project: Project, facts: list[ProjectFact], rule: RuleRecord, state: dict):
     project.version += 1
     session.add(rule)
+    session.flush()
+    session.add(RuleRevision(rule_id=rule.id, revision=1, project_id=project.id,
+                             name=rule.name, target_key=rule.target_key, expression=rule.expression,
+                             deps=list(rule.deps), project_version=project.version))
     for fact in facts:
         new = state[fact.key]
         if fact.value_text != new["value"] or fact.value_status != new["status"]:
@@ -2479,7 +2512,8 @@ def _save_new_rule(session, project: Project, facts: list[ProjectFact], rule: Ru
                                      reason="新增规则后重算"))
     session.flush()
     return {"id": rule.id, "name": rule.name, "target_key": rule.target_key,
-            "expression": rule.expression, "deps": rule.deps, "project_version": project.version}
+            "expression": rule.expression, "deps": rule.deps, "revision": rule.revision,
+            "project_version": project.version}
 
 
 @app.post("/api/projects/{project_id}/rules/preview")
@@ -2532,6 +2566,125 @@ def rules_commit(project_id: str, body: RuleCommit):
         rules = session.scalars(select(RuleRecord).where(RuleRecord.project_id == project_id)).all()
         rule, state, _, _ = _prepare_new_rule(project_id, rule_body, facts, rules)
         return _save_new_rule(session, project, facts, rule, state)
+
+
+def _project_rule(session, project_id: str, rule_id: str, *, lock: bool = False) -> RuleRecord:
+    query = select(RuleRecord).where(RuleRecord.id == rule_id, RuleRecord.project_id == project_id)
+    rule = session.scalar(query.with_for_update() if lock else query)
+    if rule is None:
+        fail("项目规则不存在", 404)
+    return rule
+
+
+def _prepare_rule_update(project_id: str, current: RuleRecord, body: RuleUpdate,
+                         facts: list[ProjectFact], rules: list[RuleRecord]):
+    if current.revision != body.base_revision:
+        fail("规则已有新修订，请重新打开", 409)
+    name, expression = body.name.strip(), body.expression.strip()
+    if not name or not expression:
+        fail("规则名称和计算式不能为空")
+    if name == current.name and expression == current.expression:
+        fail("规则内容没有变化")
+    try:
+        _, deps = parse_expression(expression)
+        proposed = RuleRecord(id=current.id, project_id=project_id, name=name,
+                              target_key=current.target_key, expression=expression, deps=deps,
+                              revision=current.revision + 1)
+        state, trace = simulate(facts, [proposed if rule.id == current.id else rule for rule in rules])
+    except RuleError as exc:
+        fail(str(exc))
+    return proposed, state, trace, differences(facts, state)
+
+
+@app.get("/api/projects/{project_id}/rules/{rule_id}/revisions")
+def rule_revisions(project_id: str, rule_id: str):
+    with SessionLocal() as session:
+        get_project(session, project_id)
+        _project_rule(session, project_id, rule_id)
+        rows = session.scalars(select(RuleRevision).where(
+            RuleRevision.project_id == project_id, RuleRevision.rule_id == rule_id)
+            .order_by(RuleRevision.revision.desc())).all()
+        return [{"revision": row.revision, "name": row.name, "target_key": row.target_key,
+                 "expression": row.expression, "deps": row.deps,
+                 "project_version": row.project_version, "created_at": row.created_at.isoformat()}
+                for row in rows]
+
+
+@app.post("/api/projects/{project_id}/rules/{rule_id}/preview")
+def rule_update_preview(project_id: str, rule_id: str, body: RuleUpdate):
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        require_writable_project(project)
+        current = _project_rule(session, project_id, rule_id)
+        facts = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id)).all()
+        rules = session.scalars(select(RuleRecord).where(RuleRecord.project_id == project_id)).all()
+        proposed, state, trace, changes = _prepare_rule_update(project_id, current, body, facts, rules)
+        target = next(fact for fact in facts if fact.key == current.target_key)
+        by_key = {fact.key: fact for fact in facts}
+        result = next(item for item in trace if item["target"] == current.target_key)
+        changed = {item["key"] for item in changes}
+        impacts = []
+        reports = session.scalars(select(ReportDraft).where(ReportDraft.project_id == project_id)).all()
+        for report in reports:
+            for position, node in enumerate(report.content, 1):
+                if (changed.intersection(node.get("fact_keys", [])) or
+                        any(ref.get("rule_id") == rule_id for ref in node.get("project_rule_refs", []))):
+                    impacts.append({"report_id": report.id, "report_title": report.title,
+                                    "position": position, "text": plain(node)})
+        expires = int(time.time()) + 600
+        return {"base_version": project.version, "base_revision": current.revision,
+                "next_revision": proposed.revision, "expires_at": expires,
+                "preview_token": f"{expires}.{_rule_update_signature(project_id, rule_id, project.version, body, expires)}",
+                "target": {"key": target.key, "label": target.label, "unit": target.unit,
+                           "before": {"value": target.value_text, "status": target.value_status},
+                           "after": {"value": state[target.key]["value"], "status": state[target.key]["status"]}},
+                "inputs": [{"key": key, "label": by_key[key].label, "value": state[key]["value"],
+                            "unit": by_key[key].unit, "status": state[key]["status"]}
+                           for key in proposed.deps],
+                "result": result, "changes": changes, "report_impacts": impacts}
+
+
+@app.post("/api/projects/{project_id}/rules/{rule_id}/commit")
+def rule_update_commit(project_id: str, rule_id: str, body: RuleUpdateCommit):
+    update = RuleUpdate(**body.model_dump(include={"name", "expression", "base_revision"}))
+    try:
+        expires_text, signature = body.preview_token.split(".", 1)
+        expires = int(expires_text)
+    except (ValueError, AttributeError):
+        fail("预览凭证无效", 409)
+    if expires < time.time() or not hmac.compare_digest(
+            signature, _rule_update_signature(project_id, rule_id, body.base_version, update, expires)):
+        fail("预览凭证无效或已过期", 409)
+    with SessionLocal.begin() as session:
+        project = get_project(session, project_id, lock=True)
+        require_writable_project(project)
+        if project.version != body.base_version:
+            fail("项目已有新版本，请重新预览", 409)
+        current = _project_rule(session, project_id, rule_id, lock=True)
+        facts = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id)).all()
+        rules = session.scalars(select(RuleRecord).where(RuleRecord.project_id == project_id)).all()
+        proposed, state, _, _ = _prepare_rule_update(project_id, current, update, facts, rules)
+        project.version += 1
+        current.name, current.expression, current.deps, current.revision = (
+            proposed.name, proposed.expression, list(proposed.deps), proposed.revision)
+        session.add(RuleRevision(rule_id=current.id, revision=current.revision, project_id=project_id,
+                                 name=current.name, target_key=current.target_key,
+                                 expression=current.expression, deps=list(current.deps),
+                                 project_version=project.version))
+        for fact in facts:
+            new = state[fact.key]
+            if fact.value_text != new["value"] or fact.value_status != new["status"]:
+                before = {"value": fact.value_text, "status": fact.value_status}
+                fact.value_text, fact.value_status = new["value"], new["status"]
+                fact.revision += 1
+                session.add(FactRevision(project_id=project_id, fact_key=fact.key,
+                                         project_version=project.version, before=before,
+                                         after={"value": fact.value_text, "status": fact.value_status},
+                                         reason=f"规则修订 v{current.revision} 后重算"))
+        session.flush()
+        return {"id": current.id, "name": current.name, "target_key": current.target_key,
+                "expression": current.expression, "deps": current.deps,
+                "revision": current.revision, "project_version": project.version}
 
 
 @app.post("/api/projects/{project_id}/rules", status_code=201)
@@ -3139,10 +3292,16 @@ def writing_setup(project_id: str):
         session.flush()
         target = session.scalar(select(ProjectFact).where(ProjectFact.project_id == project_id, ProjectFact.key == "planned_sales"))
         target.value_status = "UNEVALUABLE"
-        session.add(RuleRecord(project_id=project_id, name="首年计划销售量", target_key="planned_sales",
-                               expression="min(first_year_demand, qualified_capacity)",
-                               deps=["first_year_demand", "qualified_capacity"]))
         project.version += 1
+        rule = RuleRecord(project_id=project_id, name="首年计划销售量", target_key="planned_sales",
+                          expression="min(first_year_demand, qualified_capacity)",
+                          deps=["first_year_demand", "qualified_capacity"])
+        session.add(rule)
+        session.flush()
+        session.add(RuleRevision(rule_id=rule.id, revision=1, project_id=project_id,
+                                 name=rule.name, target_key=rule.target_key,
+                                 expression=rule.expression, deps=list(rule.deps),
+                                 project_version=project.version))
         return {"project_id": project_id, "project_version": project.version, "created_fact_count": len(SLOTS),
                 "historical_values_copied": 0, "bindings_created": 0}
 

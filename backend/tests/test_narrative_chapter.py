@@ -2,17 +2,24 @@
 
 import io
 import os
+import re
+from pathlib import Path
 from uuid import uuid4
+from zipfile import ZipFile
 
 os.environ["DATABASE_URL"] = "postgresql+psycopg://report:local_development_only@127.0.0.1:55432/report_platform_test"
 
 import pytest
 from docx import Document
 from fastapi.testclient import TestClient
+import pymupdf
 
 from app.db import Base, SessionLocal, ReportDraft, SourceDocument, SourceParseRevision, engine
 from app.main import app
 from app.model_settings import ChatResult
+
+
+BEIJING_PDF = Path(__file__).resolve().parents[2] / "test-fixtures/public-reports/01_beijing_feasibility.pdf"
 
 
 @pytest.fixture(autouse=True)
@@ -78,6 +85,90 @@ def setup_narrative(client, monkeypatch, tmp_path):
     return base, config, report, statement, doc_id
 
 
+def test_beijing_necessity_uses_real_original_without_a_calculation_run(client, monkeypatch, tmp_path):
+    import app.main as main
+    monkeypatch.setattr(main, "STORAGE", tmp_path)
+    project = client.post("/api/projects", json={"name": "北京必要性原文 QA"}).json()
+    base = f"/api/projects/{project['id']}"
+    uploaded = client.post(base + "/documents", files={"file": (
+        "北京交通枢纽项目建议书.pdf", BEIJING_PDF.read_bytes(), "application/pdf")})
+    assert uploaded.status_code == 201, uploaded.text
+    document_id = uploaded.json()["id"]
+    page = client.get(base + f"/documents/{document_id}?page=17").json()
+    source = next(part for part in page["segments"] if "计划与地铁同期开通" in part["text"]
+                  and "枢纽具有公交" in part["text"])
+    assert source["page"] == 17
+    statements = {
+        "station_plan": re.search(r"马昌营公共交通枢纽紧邻.{0,85}?承接地铁客流", source["text"]).group(),
+        "transfer_functions": re.search(r"枢纽具有公交.{0,150}?接驳换乘的功能", source["text"]).group(),
+    }
+    evidence_ids = []
+    for key, value in statements.items():
+        fact = client.post(base + "/facts", json={"key": key, "label": key,
+            "data_type": "text", "value": value, "source": "北京公开可研原文第17页"})
+        assert fact.status_code == 201, fact.text
+        binding = client.post(base + f"/facts/{key}/evidence/bind", json={
+            "document_id": document_id, "source_refs": [source["ref"]]})
+        assert binding.status_code == 200, binding.text
+        evidence = client.post(base + "/evidence", json={"document_id": document_id,
+            "source_refs": [source["ref"]], "statement": value, "label": key,
+            "subject": "马昌营公共交通枢纽", "fact_key": key})
+        assert evidence.status_code == 201, evidence.text
+        assert evidence.json()["page"] == 17
+        assert evidence.json()["independent_verification"] == "not_recorded"
+        evidence_ids.append(evidence.json()["id"])
+    config = client.post(base + "/analysis/configs", json={"name": "建设背景与必要性"}).json()
+    definitions = [{"key": key, "label": key, "data_type": "text", "unit": "",
+                    "group": "原文", "computed": False} for key in statements]
+    saved = client.put(base + f"/analysis/configs/{config['id']}", json={
+        "revision": config["revision"], "name": config["name"], "definitions": definitions,
+        "rules": [], "sections": [{"id": "necessity", "title": "建设背景与必要性",
+            "kind": "narrative", "result_keys": [], "evidence_keys": list(statements),
+            "forbidden_terms": ["已开通", "客流已达到", "资金已落实"]}]})
+    assert saved.status_code == 200, saved.text
+    checked = client.post(base + f"/analysis/configs/{config['id']}/test", json={
+        "revision": saved.json()["revision"], "sample_inputs": statements})
+    assert checked.status_code == 200 and checked.json()["test_token"], checked.text
+    assert client.post(base + f"/analysis/configs/{config['id']}/publish", json={
+        "revision": saved.json()["revision"], "test_token": checked.json()["test_token"]}).status_code == 200
+    report = client.post(base + "/reports", json={"title": "建设必要性来源核对",
+        "report_type": "government_feasibility"}).json()
+    draft = base + f"/analysis/reports/{report['id']}/draft"
+    request = {"config_id": config["id"], "section_id": "necessity", "mode": "excerpt",
+               "evidence_ids": evidence_ids}
+    first = client.post(draft + "/preview", json=request)
+    assert first.status_code == 200, first.text
+    assert "run_id" not in first.json()
+    assert len(first.json()["content"]) == 3
+    assert "计划" in first.json()["content"][1]["children"][0]["text"]
+    assert client.post(draft + f"/candidates/{first.json()['candidate_id']}/decline").status_code == 200
+    assert client.get(base + f"/reports/{report['id']}").json()["version"] == 0
+    second = client.post(draft + "/preview", json=request)
+    assert second.status_code == 200, second.text
+    proposal = {key: value for key, value in second.json().items()
+                if key not in {"issues", "preserved_blocks"}}
+    adopted = client.post(draft + "/commit", json={**proposal, "replace_section": True})
+    assert adopted.status_code == 200, adopted.text
+    stored = client.get(base + f"/reports/{report['id']}").json()
+    assert stored["version"] == 1
+    sourced = [block for block in stored["content"] if block.get("section_id") == "necessity"
+               and block.get("type") == "p"]
+    assert len(sourced) == 2 and all(block.get("project_evidence_refs") for block in sourced)
+    assert all("已开通" not in str(block) for block in stored["content"])
+    exported = client.get(base + f"/reports/{report['id']}/export?level=preview")
+    assert exported.status_code == 200, exported.text[:300]
+    with ZipFile(io.BytesIO(exported.content)) as archive:
+        docx = Document(io.BytesIO(archive.read("report.docx")))
+        with pymupdf.open(stream=archive.read("report.pdf"), filetype="pdf") as pdf:
+            pdf_text = "".join(page.get_text() for page in pdf)
+        audit = archive.read("audit.json").decode()
+    docx_text = "\n".join(paragraph.text for paragraph in docx.paragraphs)
+    assert "计划与地铁同期开通" in docx_text and "计划与地铁同期开通" in pdf_text
+    assert "已开通" not in docx_text and "已开通" not in pdf_text
+    assert "投资估算与资金筹措" not in docx_text and "投资估算与资金筹措" not in pdf_text
+    assert "preview_only" in audit and evidence_ids[0] in audit
+
+
 def test_narrative_excerpt_cancel_commit_review_and_stale(client, monkeypatch, tmp_path):
     base, config, report, statement, doc_id = setup_narrative(client, monkeypatch, tmp_path)
     path = base + f"/analysis/reports/{report['id']}/draft"
@@ -128,6 +219,7 @@ def test_narrative_model_guard_and_no_run(client, monkeypatch, tmp_path):
     valid = client.post(path, json=request)
     assert valid.status_code == 200, valid.text
     assert valid.json()["content"][1]["origin"] == "model"
+    assert valid.json()["content"][1]["children"][0]["text"].startswith("据本项目原文记载，")
     assert valid.json()["model_audit"]["model_call"]["model"] == "qa-only"
 
 

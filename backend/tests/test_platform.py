@@ -215,6 +215,88 @@ def test_rule_preview_is_read_only_and_commit_is_version_bound(client: TestClien
     assert client.post(f"{endpoint}/preview", json=proposal).status_code == 409
 
 
+def test_rule_update_creates_immutable_revision_and_preserves_old_run(client: TestClient):
+    project_id = create_project(client)
+    base = f"/api/projects/{project_id}"
+    for key, value in (("demand", "300000"), ("capacity", "254016"),
+                       ("buffer", "1000"), ("sales", None)):
+        assert client.post(base + "/facts", json={"key": key, "label": key,
+            "data_type": "integer", "unit": "套", "value": value}).status_code == 201
+    created = client.post(base + "/rules", json={"name": "计划销售", "target_key": "sales",
+        "expression": "min(demand, capacity)"})
+    assert created.status_code == 201, created.text
+    rule = created.json()
+    path = base + f"/rules/{rule['id']}"
+    assert rule["revision"] == 1
+    scenario = client.post(base + "/analysis/scenarios", json={"name": "旧口径",
+        "source": "project"})
+    assert scenario.status_code == 201, scenario.text
+    old_scenario = scenario.json()
+    run = client.post(base + f"/analysis/scenarios/{old_scenario['id']}/runs", json={
+        "scenario_revision": old_scenario["revision"], "request_key": "rule-revision-old-run"})
+    assert run.status_code == 201, run.text
+    old_run = run.json()
+    assert old_run["snapshot"]["results"]["sales"]["value"] == "254016"
+    assert old_scenario["rules"][0]["revision"] == 1
+
+    change = {"name": "计划销售（保留量）", "expression": "min(demand, capacity) - buffer",
+              "base_revision": 1}
+    before = client.get(base + "/facts").json()
+    shown = client.post(path + "/preview", json=change)
+    assert shown.status_code == 200, shown.text
+    proposed = shown.json()
+    assert proposed["target"]["after"] == {"value": "253016", "status": "COMPUTED"}
+    assert proposed["next_revision"] == 2
+    assert client.get(base + "/facts").json() == before
+    assert len(client.get(path + "/revisions").json()) == 1  # cancel: no commit
+    assert client.post(path + "/commit", json={**change, "expression": "max(demand, capacity)",
+        "base_version": proposed["base_version"], "preview_token": proposed["preview_token"]}).status_code == 409
+    saved = client.post(path + "/commit", json={**change,
+        "base_version": proposed["base_version"], "preview_token": proposed["preview_token"]})
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["revision"] == 2
+    assert client.post(path + "/commit", json={**change,
+        "base_version": proposed["base_version"], "preview_token": proposed["preview_token"]}).status_code == 409
+    revisions = client.get(path + "/revisions").json()
+    assert [(row["revision"], row["expression"]) for row in revisions] == [
+        (2, "min(demand, capacity) - buffer"), (1, "min(demand, capacity)")]
+    assert {row["key"]: row for row in client.get(base + "/facts").json()["facts"]}["sales"]["value"] == "253016"
+    assert client.get(base + f"/analysis/runs/{old_run['id']}").json() == old_run
+    assert client.get(base + f"/analysis/scenarios/{old_scenario['id']}").json()["rules"] == old_scenario["rules"]
+    fresh = client.post(base + "/analysis/scenarios", json={"name": "新口径", "source": "project"})
+    assert fresh.status_code == 201 and fresh.json()["rules"][0]["revision"] == 2
+    other = create_project(client)
+    assert client.get(f"/api/projects/{other}/rules/{rule['id']}/revisions").status_code == 404
+
+
+def test_rule_update_rejects_stale_and_invalid_without_partial_revision(client: TestClient):
+    project_id = create_project(client)
+    base = f"/api/projects/{project_id}"
+    for key, unit, value in (("demand", "套", "300000"), ("capacity", "套", "254016"),
+                             ("wrong", "kW", "650"), ("sales", "套", None)):
+        assert client.post(base + "/facts", json={"key": key, "label": key,
+            "data_type": "integer", "unit": unit, "value": value}).status_code == 201
+    rule = client.post(base + "/rules", json={"name": "计划销售", "target_key": "sales",
+        "expression": "min(demand, capacity)"}).json()
+    path = base + f"/rules/{rule['id']}"
+    for expression in ("min(demand, wrong)", "demand / 0", "sales + 1", "__import__('os')"):
+        invalid = client.post(path + "/preview", json={"name": "错误口径",
+            "expression": expression, "base_revision": 1})
+        assert invalid.status_code == 400, (expression, invalid.text)
+    valid = {"name": "新口径", "expression": "max(demand, capacity)",
+             "base_revision": 1}
+    previewed = client.post(path + "/preview", json=valid)
+    assert previewed.status_code == 200, previewed.text
+    changed, fact_preview = preview(client, project_id, "demand", "200000")
+    commit(client, project_id, changed, fact_preview)
+    stale = client.post(path + "/commit", json={**valid,
+        "base_version": previewed.json()["base_version"],
+        "preview_token": previewed.json()["preview_token"]})
+    assert stale.status_code == 409
+    assert len(client.get(path + "/revisions").json()) == 1
+    assert client.get(base + "/rules").json()["rules"][0]["expression"] == "min(demand, capacity)"
+
+
 def test_rule_preview_shows_missing_and_rejects_invalid_rules_without_writes(client: TestClient):
     project_id = create_project(client)
     endpoint = f"/api/projects/{project_id}/rules"

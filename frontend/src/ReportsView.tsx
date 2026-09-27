@@ -22,7 +22,7 @@ type TextLeaf = { type?: undefined; text: string; bold?: true; italic?: true; un
 type FactRef = { type: 'fact_ref'; fact_key: string; display: string; children: [{ text: '' }] }
 type Link = { type: 'a'; url: string; target?: '_blank'; children: TextLeaf[] }
 type Inline = TextLeaf | FactRef | Link
-type ProjectRuleRef = { rule_id: string; expression: string; target_key: string; deps: string[];
+type ProjectRuleRef = { rule_id: string; revision?: number; expression: string; target_key: string; deps: string[];
   input_fact_revisions: { fact_key: string; revision: number; value: string | null }[]; target_fact_revision: number }
 export type AnalysisRef = { run_id: string; result_key: string; value: string; unit: string }
 export type ProjectEvidenceRef = { evidence_id: string; document_sha256: string; parse_revision_id?: string }

@@ -368,6 +368,7 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
                                  "parse_revision_id": item.parse_revision_id,
                                  "source_refs": item.source_refs, "excerpt": item.excerpt,
                                  "status": "VERIFIED", "reason": None,
+                                 "independent_verification": "not_recorded",
                                  "source_type": item.source_type})
         else:
             resolved = _reviewed_fact_binding(session, project_id, fact)
@@ -379,7 +380,8 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
                              "document_id": document.id, "document_sha256": document.sha256,
                              "source_refs": binding.source_refs,
                              "excerpt": "\n".join(str(part["text"]) for part in segments),
-                             "status": "VERIFIED", "reason": None, "source_type": "original"})
+                             "status": "VERIFIED", "reason": None,
+                             "independent_verification": "not_recorded", "source_type": "original"})
     if selected and any(item.fact_key not in section["evidence_keys"] for item in selected):
         raise HTTPException(409, "所选证据不属于本章所需的项目资料")
     heading = {"type": "h2", "id": str(uuid4()), "section_id": section_id,
@@ -395,12 +397,14 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
             raise HTTPException(409, "本章存在相互矛盾的来源；请先人工核对，可使用原文摘录预审")
         context = {"section": section["title"], "source_assertions": [
             {"key": item["key"], "label": item["label"], "text": item["value"],
-             "excerpt": item["excerpt"][:1600]} for item in evidence],
+             "excerpt": item["excerpt"][:1600],
+             "independent_verification": item["independent_verification"]} for item in evidence],
             "forbidden_terms": section.get("forbidden_terms", [])}
         response = chat_json("writing", [
             {"role": "system", "content": "依据本项目有定位的原文，为报告文字章节起草简洁的待人工核对文字，每条依据最多一段。"
              "仅转述来源明确陈述的内容，保留拟实施、拟申请、预测、原文时点等限定；"
-             "不得把来源判断升级为独立核实结论，不得编造数字、法规、批复或主体；不要推断未披露事项的审批、到位或额度。"
+             "未经独立核实的效果或必要性判断只能写成原报告观点，不得升级为已证实结论；"
+             "不得编造数字、法规、批复或主体；不要推断未披露事项的审批、到位或额度。"
              "只返回 JSON：{\"paragraphs\":[{\"text\":\"段落\",\"used_fact_keys\":[\"实际使用的key\"]}]}。"},
             {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
         ], max_tokens=1300)
@@ -447,7 +451,10 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
                          "document_sha256": row["document_sha256"],
                          **({"parse_revision_id": row["parse_revision_id"]} if row.get("parse_revision_id") else {})}
                         for row in evidence if row["key"] in keys and row["evidence_id"]]
-        blocks.append(_p(section_id, text_value.strip(), fact_keys=keys,
+        rendered = text_value.strip()
+        if mode == "model" and not re.match(r"^(?:据.{0,12}(?:原文|原报告)|原报告|报告原文)", rendered):
+            rendered = "据本项目原文记载，" + rendered
+        blocks.append(_p(section_id, rendered, fact_keys=keys,
                          project_evidence_refs=project_refs,
                          origin="model" if mode == "model" else "guided"))
     validate_content(blocks)

@@ -234,6 +234,41 @@ def test_guided_two_sections_preview_cancel_commit_and_preview_export(client):
         "first_year_demand", "qualified_capacity"}
 
 
+def test_rule_revision_keeps_old_report_and_saved_delivery_readable(client):
+    pid = make_project(client)
+    setup(client, pid)
+    set_fact(client, pid, "first_year_demand", "300000")
+    set_fact(client, pid, "qualified_capacity", "254016")
+    rid = new_report(client, pid)
+    commit(client, pid, rid, ok(candidate(client, pid, rid, "S4")))
+    original = ok(client.get(f"/api/projects/{pid}/reports/{rid}"))
+    old_ref = next(block["project_rule_refs"][0] for block in original["content"]
+                   if block.get("project_rule_refs"))
+    assert old_ref["revision"] == 1
+    delivered = client.get(f"/api/projects/{pid}/reports/{rid}/export?level=preview")
+    assert delivered.status_code == 200, delivered.text
+    history = ok(client.get(f"/api/projects/{pid}/reports/{rid}/exports"))
+    assert len(history) == 1
+    rule = ok(client.get(f"/api/projects/{pid}/rules"))["rules"][0]
+    path = f"/api/projects/{pid}/rules/{rule['id']}"
+    update = {"name": "销售上限新口径", "expression": "max(first_year_demand, qualified_capacity)",
+              "base_revision": 1}
+    previewed = ok(client.post(path + "/preview", json=update))
+    ok(client.post(path + "/commit", json={**update, "base_version": previewed["base_version"],
+                                        "preview_token": previewed["preview_token"]}))
+    current = ok(client.get(f"/api/projects/{pid}/reports/{rid}"))
+    assert current["content"] == original["content"]
+    assert any(issue["code"] == "PROJECT_RULE_CHANGED" for issue in current["issues"])
+    assert client.post(f"/api/projects/{pid}/reports/{rid}/review", json={}).status_code == 400
+    old_delivery = client.get(f"/api/projects/{pid}/reports/{rid}/exports/{history[0]['id']}")
+    assert old_delivery.status_code == 200 and old_delivery.content == delivered.content
+    assert old_delivery.headers["X-Archive-SHA256"] == history[0]["sha256"]
+    with ZipFile(BytesIO(old_delivery.content)) as archive:
+        audit = json.loads(archive.read("audit.json"))
+    assert any(ref["revision"] == 1 for row in audit["source_refs"]
+               for ref in row["project_rule_refs"])
+
+
 def test_conflict_disclosure_and_removed_source_link(client):
     pid = make_project(client)
     rid = new_report(client, pid)

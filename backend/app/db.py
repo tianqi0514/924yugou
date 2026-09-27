@@ -315,8 +315,24 @@ class RuleRecord(Base):
     target_key: Mapped[str] = mapped_column(String(100), nullable=False)
     expression: Mapped[str] = mapped_column(Text, nullable=False)
     deps: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     project: Mapped[Project] = relationship(back_populates="rules")
+
+
+class RuleRevision(Base):
+    """Immutable expression used by a project rule at one revision."""
+
+    __tablename__ = "rule_revisions"
+    rule_id: Mapped[str] = mapped_column(ForeignKey("rules.id", ondelete="CASCADE"), primary_key=True)
+    revision: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    target_key: Mapped[str] = mapped_column(String(100), nullable=False)
+    expression: Mapped[str] = mapped_column(Text, nullable=False)
+    deps: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    project_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class FactRevision(Base):
@@ -509,10 +525,13 @@ def init_db() -> None:
         connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS evidence_ids JSON NOT NULL DEFAULT '[]'::json"))
         connection.execute(text("ALTER TABLE report_fact_proposals ADD COLUMN IF NOT EXISTS proposed_source text NOT NULL DEFAULT ''"))
         connection.execute(text("ALTER TABLE work_tasks ADD COLUMN IF NOT EXISTS stage varchar(24) NOT NULL DEFAULT 'QUEUED'"))
+        connection.execute(text("ALTER TABLE rules ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1"))
+        connection.execute(text("INSERT INTO rule_revisions(rule_id, revision, project_id, name, target_key, expression, deps, project_version, created_at) SELECT id, 1, project_id, name, target_key, expression, deps, NULL, created_at FROM rules ON CONFLICT (rule_id, revision) DO NOTHING"))
         connection.execute(text("UPDATE work_tasks SET stage = CASE status WHEN 'COMPLETED' THEN 'DONE' WHEN 'FAILED' THEN 'FAILED' WHEN 'CANCELLED' THEN 'CANCELLED' WHEN 'UNCERTAIN' THEN 'RETRY_REQUIRED' WHEN 'RUNNING' THEN CASE kind WHEN 'model_draft' THEN 'CALLING_MODEL' ELSE 'RENDERING' END ELSE stage END WHERE stage = 'QUEUED' AND status <> 'PENDING'"))
         connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_next28_40') ON CONFLICT DO NOTHING"))
         connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_next35_proposal') ON CONFLICT DO NOTHING"))
         connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_fact_entry_ux') ON CONFLICT DO NOTHING"))
+        connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_rule_revision') ON CONFLICT DO NOTHING"))
     # Older parser output can be pinned from the current snapshot. Existing evidence
     # with no parse_revision_id remains legacy; do not claim its historical parse
     # revision has been reconstructed from later OCR output.

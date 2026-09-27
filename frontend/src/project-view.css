@@ -68,3 +68,7 @@
 .rule-config-row summary{display:flex;justify-content:space-between;gap:12px;cursor:pointer;font-size:12px;color:#30435e}
 .rule-config-row summary b{font-weight:600;color:#71829a}
 .rule-config-row small{display:block;margin-top:6px;color:#8291a5;font-size:11px}
+.rule-history-row { display: grid; gap: 5px; padding: 12px 0; border-bottom: 1px solid #edf0f4; }
+.rule-history-row span, .rule-history-row small { color: #64748b; font-size: 12px; }
+.rule-history-row strong { font-size: 14px; }
+.rule-history-row small { overflow-wrap: anywhere; }

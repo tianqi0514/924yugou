@@ -233,7 +233,8 @@ def build_candidate(session: Session, pack: dict, state: dict[str, dict], rules:
                 if project_rule is None:
                     raise ValueError("当前项目缺少计划销售量规则")
                 paragraph["project_rule_refs"] = [{
-                    "rule_id": project_rule.id, "expression": project_rule.expression,
+                    "rule_id": project_rule.id, "revision": project_rule.revision,
+                    "expression": project_rule.expression,
                     "target_key": project_rule.target_key, "deps": list(project_rule.deps),
                     "input_fact_revisions": [{"fact_key": key, "revision": state[key]["revision"],
                                               "value": str(state[key]["value"])} for key in project_rule.deps],

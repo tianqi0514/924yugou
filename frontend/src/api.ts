@@ -18,7 +18,7 @@ export type CorpusSummary = {
 }
 export type Project = { id: string; name: string; version: number; created_at?: string; has_corpus: boolean; is_builtin: boolean }
 export type Fact = { id: string; key: string; label: string; data_type: string; value: string | null; status: string; unit: string; caliber: string; as_of: string; source: string; revision: number; updated_at: string | null; evidence_status?: 'SOURCE_LOCATOR_REVIEWED' | 'UNVERIFIED' | null }
-export type Rule = { id: string; name: string; target_key: string; expression: string; deps: string[] }
+export type Rule = { id: string; name: string; target_key: string; expression: string; deps: string[]; revision: number }
 export type Trace = { rule_id?: string; name?: string; target?: string; expression?: string; deps?: string[]; status: string; missing?: string[]; result?: string | null; inputs?: Record<string, string | null>; reason?: string }
 export type FactChange = { fact_key: string; value: string | null; source: string; caliber?: string; as_of?: string; reason: string }
 export type Change = { key: string; label: string; unit: string; before: Record<string, string | null>; after: Record<string, string | null> }
