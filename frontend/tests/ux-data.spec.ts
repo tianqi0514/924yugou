@@ -6,12 +6,15 @@ test('one-step fact entry preserves zero; later edits preview and cancel without
   let previews = 0
   let commits = 0
   let ruleCreated = false
+  let rulePreviews = 0
+  let ruleCommits = 0
   await page.route('**/api/**', async (route) => {
     const request = route.request()
     const path = new URL(request.url()).pathname.replace(/^\/api/, '')
     const reply = (body: unknown, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) })
     if (path === '/projects') return reply([project])
     if (path === '/projects/ux-project/facts' && request.method() === 'GET') return reply({ project_version: project.version, facts })
+    if (path === '/projects/ux-project/analysis/configs') return reply([])
     if (path === '/projects/ux-project/facts' && request.method() === 'POST') {
       const body = request.postDataJSON()
       const fact = { id: `f${facts.length + 1}`, ...body, value: body.value, status: body.value === null ? 'UNDEFINED' : 'PROVIDED', revision: body.value === null ? 0 : 1, updated_at: null }
@@ -20,10 +23,20 @@ test('one-step fact entry preserves zero; later edits preview and cancel without
     }
     if (path === '/projects/ux-project/rules' && request.method() === 'GET') return reply({
       rules: ruleCreated ? [{ id: 'rule-1', name: '计划销售量', target_key: 'planned_sales', expression: 'min(first_year_demand, first_year_demand)', deps: ['first_year_demand'] }] : [],
-      trace: ruleCreated ? [{ rule_id: 'rule-1', status: 'COMPUTED', result: '0', missing: [] }] : [],
+      trace: ruleCreated ? [{ rule_id: 'rule-1', status: 'COMPUTED', result: '25', missing: [], inputs: { first_year_demand: '25' } }] : [],
     })
-    if (path === '/projects/ux-project/rules' && request.method() === 'POST') {
-      ruleCreated = true
+    if (path === '/projects/ux-project/rules/preview' && request.method() === 'POST') {
+      rulePreviews += 1
+      expect(request.postDataJSON().expression).toBe('min(first_year_demand, first_year_demand)')
+      return reply({ base_version: project.version, preview_token: 'preview-rule', expires_at: 9999999999,
+        target: { key: 'planned_sales', label: '计划销售量', unit: '套', before: { value: null, status: 'UNDEFINED' }, after: { value: '25', status: 'COMPUTED' } },
+        inputs: [{ key: 'first_year_demand', label: '首年需求', value: '25', unit: '套', status: 'PROVIDED' }],
+        result: { status: 'COMPUTED', result: '25', missing: [] }, changes: [], report_impacts: [] })
+    }
+    if (path === '/projects/ux-project/rules/commit' && request.method() === 'POST') {
+      ruleCommits += 1
+      expect(request.postDataJSON().preview_token).toBe('preview-rule')
+      ruleCreated = true; project.version += 1
       return reply({ id: 'rule-1' }, 201)
     }
     if (path === '/projects/ux-project/changes/preview' && request.method() === 'POST') {
@@ -82,11 +95,26 @@ test('one-step fact entry preserves zero; later edits preview and cancel without
   expect(previews).toBe(previewsBeforeResultFact)
   expect(commits).toBe(1)
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '规则计算' }).click()
-  await page.getByRole('button', { name: '新增规则' }).click()
+  await page.getByRole('button', { name: '新增事实规则' }).click()
   await page.getByRole('textbox', { name: '名称', exact: true }).fill('计划销售量')
   await page.getByRole('combobox', { name: '结果事实' }).selectOption('planned_sales')
-  await page.getByRole('textbox', { name: '表达式' }).fill('min(first_year_demand, first_year_demand)')
-  await page.getByRole('button', { name: '保存规则' }).click()
+  await page.getByRole('textbox', { name: '计算式' }).fill('min(first_year_demand, first_year_demand)')
+  await page.getByRole('button', { name: '预览计算' }).click()
+  await expect(page.locator('.rule-preview')).toContainText('25 套')
+  expect(rulePreviews).toBe(1)
+  expect(ruleCommits).toBe(0)
+  await page.getByRole('button', { name: '取消' }).click()
+  expect(ruleCreated).toBe(false)
+  await page.getByRole('button', { name: '新增事实规则' }).click()
+  await page.getByRole('textbox', { name: '名称', exact: true }).fill('计划销售量')
+  await page.getByRole('combobox', { name: '结果事实' }).selectOption('planned_sales')
+  await page.getByRole('textbox', { name: '计算式' }).fill('min(first_year_demand, first_year_demand)')
+  await page.getByRole('button', { name: '预览计算' }).click()
+  await page.getByRole('button', { name: '确认保存' }).click()
+  expect(ruleCommits).toBe(1)
+  await page.locator('.rule-card').click()
+  await expect(page.getByRole('dialog', { name: '计划销售量' })).toContainText('首年需求')
+  await page.getByRole('button', { name: '关闭' }).click()
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '项目事实' }).click()
   const resultRow = page.getByRole('row', { name: /计划销售量/ })
   await expect(resultRow.getByRole('button', { name: '修改' })).toHaveCount(0)

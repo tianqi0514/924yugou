@@ -52,7 +52,8 @@ export default function AnalysisConfigView({ projectId, scenarios, onClose, onPu
   const load = useCallback(async (preferred?: string) => {
     const rows = await api<AnalysisConfig[]>(base)
     setConfigs(rows)
-    const id = preferred || rows.find((item) => item.status === 'DRAFT')?.id || rows[0]?.id || ''
+    const requested = preferred || new URLSearchParams(location.search).get('config_id')
+    const id = rows.find((item) => item.id === requested)?.id || rows.find((item) => item.status === 'DRAFT')?.id || rows[0]?.id || ''
     setSelectedId(id)
     setEditing(rows.find((item) => item.id === id) || null)
   }, [base])

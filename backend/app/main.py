@@ -144,6 +144,11 @@ class RuleCreate(BaseModel):
     expression: str = Field(min_length=1, max_length=1000)
 
 
+class RuleCommit(RuleCreate):
+    base_version: int = Field(ge=0)
+    preview_token: str
+
+
 class FactChange(BaseModel):
     fact_key: str
     value: str | int | bool | None = None
@@ -469,6 +474,13 @@ def differences(facts: list[ProjectFact], state: dict[str, dict]) -> list[dict]:
 
 def _signature(project_id: str, version: int, change: FactChange, expires: int) -> str:
     payload = json.dumps({"project_id": project_id, "version": version, "change": change.model_dump(), "expires": expires}, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hmac.new(preview_secret, payload.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def _rule_signature(project_id: str, version: int, rule: RuleCreate, expires: int) -> str:
+    payload = json.dumps({"kind": "rule_create", "project_id": project_id, "version": version,
+                          "rule": rule.model_dump(), "expires": expires},
+                         sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     return hmac.new(preview_secret, payload.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
@@ -2430,37 +2442,108 @@ def rules_list(project_id: str):
         return {"rules": [{"id": rule.id, "name": rule.name, "target_key": rule.target_key, "expression": rule.expression, "deps": rule.deps} for rule in rules], "trace": trace}
 
 
-@app.post("/api/projects/{project_id}/rules", status_code=201)
-def rules_create(project_id: str, body: RuleCreate):
+def _prepare_new_rule(project_id: str, body: RuleCreate, facts: list[ProjectFact], rules: list[RuleRecord]):
     try:
         _, deps = parse_expression(body.expression)
     except RuleError as exc:
         fail(str(exc))
+    fact_by_key = {fact.key: fact for fact in facts}
+    target = fact_by_key.get(body.target_key)
+    if target is None:
+        fail("规则目标事实不存在")
+    if target.data_type not in {"decimal", "integer", "boolean"}:
+        fail("规则目标只能是数值或布尔事实")
+    if any(rule.target_key == body.target_key for rule in rules):
+        fail("目标事实已有规则", 409)
+    rule = RuleRecord(project_id=project_id, name=body.name.strip(), target_key=body.target_key,
+                      expression=body.expression.strip(), deps=deps)
+    try:
+        state, trace = simulate(facts, [*rules, rule])
+    except RuleError as exc:
+        fail(str(exc))
+    return rule, state, trace, differences(facts, state)
+
+
+def _save_new_rule(session, project: Project, facts: list[ProjectFact], rule: RuleRecord, state: dict):
+    project.version += 1
+    session.add(rule)
+    for fact in facts:
+        new = state[fact.key]
+        if fact.value_text != new["value"] or fact.value_status != new["status"]:
+            before = {"value": fact.value_text, "status": fact.value_status}
+            fact.value_text, fact.value_status = new["value"], new["status"]
+            fact.revision += 1
+            session.add(FactRevision(project_id=project.id, fact_key=fact.key,
+                                     project_version=project.version, before=before,
+                                     after={"value": fact.value_text, "status": fact.value_status},
+                                     reason="新增规则后重算"))
+    session.flush()
+    return {"id": rule.id, "name": rule.name, "target_key": rule.target_key,
+            "expression": rule.expression, "deps": rule.deps, "project_version": project.version}
+
+
+@app.post("/api/projects/{project_id}/rules/preview")
+def rules_preview(project_id: str, body: RuleCreate):
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        require_writable_project(project)
+        facts = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id)).all()
+        rules = session.scalars(select(RuleRecord).where(RuleRecord.project_id == project_id)).all()
+        rule, state, trace, changes = _prepare_new_rule(project_id, body, facts, rules)
+        by_key = {fact.key: fact for fact in facts}
+        target = by_key[body.target_key]
+        result = next(item for item in trace if item["target"] == body.target_key)
+        changed = {item["key"] for item in changes}
+        report_impacts = []
+        if changed:
+            reports = session.scalars(select(ReportDraft).where(ReportDraft.project_id == project_id)).all()
+            for report in reports:
+                for position, node in enumerate(report.content, 1):
+                    if changed.intersection(node.get("fact_keys", [])):
+                        report_impacts.append({"report_id": report.id, "report_title": report.title,
+                                               "position": position, "text": plain(node)})
+        expires = int(time.time()) + 600
+        return {"base_version": project.version, "expires_at": expires,
+                "preview_token": f"{expires}.{_rule_signature(project_id, project.version, body, expires)}",
+                "target": {"key": target.key, "label": target.label, "unit": target.unit,
+                           "before": {"value": target.value_text, "status": target.value_status},
+                           "after": {"value": state[target.key]["value"], "status": state[target.key]["status"]}},
+                "inputs": [{"key": key, "label": by_key[key].label, "value": state[key]["value"],
+                            "unit": by_key[key].unit, "status": state[key]["status"]} for key in rule.deps],
+                "result": result, "changes": changes, "report_impacts": report_impacts}
+
+
+@app.post("/api/projects/{project_id}/rules/commit", status_code=201)
+def rules_commit(project_id: str, body: RuleCommit):
+    rule_body = RuleCreate(**body.model_dump(include={"name", "target_key", "expression"}))
+    try:
+        expires_text, signature = body.preview_token.split(".", 1)
+        expires = int(expires_text)
+    except (ValueError, AttributeError):
+        fail("预览凭证无效", 409)
+    if expires < time.time() or not hmac.compare_digest(signature, _rule_signature(project_id, body.base_version, rule_body, expires)):
+        fail("预览凭证无效或已过期", 409)
+    with SessionLocal.begin() as session:
+        project = get_project(session, project_id, lock=True)
+        require_writable_project(project)
+        if project.version != body.base_version:
+            fail("项目已有新版本，请重新预览", 409)
+        facts = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id)).all()
+        rules = session.scalars(select(RuleRecord).where(RuleRecord.project_id == project_id)).all()
+        rule, state, _, _ = _prepare_new_rule(project_id, rule_body, facts, rules)
+        return _save_new_rule(session, project, facts, rule, state)
+
+
+@app.post("/api/projects/{project_id}/rules", status_code=201)
+def rules_create(project_id: str, body: RuleCreate):
+    """Keep the existing API for clients; the interactive UI uses preview/commit."""
     with SessionLocal.begin() as session:
         project = get_project(session, project_id, lock=True)
         require_writable_project(project)
         facts = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id)).all()
         rules = session.scalars(select(RuleRecord).where(RuleRecord.project_id == project_id)).all()
-        if body.target_key not in {fact.key for fact in facts}:
-            fail("规则目标事实不存在")
-        if any(rule.target_key == body.target_key for rule in rules):
-            fail("目标事实已有规则", 409)
-        rule = RuleRecord(project_id=project_id, name=body.name.strip(), target_key=body.target_key, expression=body.expression.strip(), deps=deps)
-        try:
-            state, _ = simulate(facts, [*rules, rule])
-        except RuleError as exc:
-            fail(str(exc))
-        project.version += 1
-        session.add(rule)
-        for fact in facts:
-            new = state[fact.key]
-            if fact.value_text != new["value"] or fact.value_status != new["status"]:
-                before = {"value": fact.value_text, "status": fact.value_status}
-                fact.value_text, fact.value_status = new["value"], new["status"]
-                fact.revision += 1
-                session.add(FactRevision(project_id=project_id, fact_key=fact.key, project_version=project.version, before=before, after={"value": fact.value_text, "status": fact.value_status}, reason="新增规则后重算"))
-        session.flush()
-        return {"id": rule.id, "name": rule.name, "target_key": rule.target_key, "expression": rule.expression, "deps": rule.deps}
+        rule, state, _, _ = _prepare_new_rule(project_id, body, facts, rules)
+        return _save_new_rule(session, project, facts, rule, state)
 
 
 def _proposal_dict(row: ReportFactProposal) -> dict:

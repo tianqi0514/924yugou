@@ -118,6 +118,15 @@ export default function App() {
     window.history.pushState({}, '', url)
     if (projectId && projectSections.includes(next)) window.localStorage.setItem(`report-platform-section:${projectId}`, next)
   }
+  const openAnalysisConfig = (configId?: string) => {
+    navigate('reports')
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('section') !== 'reports') return
+    url.searchParams.set('config', '1')
+    if (configId) url.searchParams.set('config_id', configId)
+    else url.searchParams.delete('config_id')
+    window.history.replaceState({}, '', url)
+  }
   const onProjectChange = useCallback((project: Project) => setProjects((items) => items.map((item) => item.id === project.id ? project : item)), [])
   const closeCreate = () => { setCreateOpen(false); setFormError('') }
   const createProject = async () => {
@@ -181,7 +190,7 @@ export default function App() {
             : <ProjectMaterialsView key={selected.id} project={selected} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} onOpenFacts={() => navigate('facts')} />
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
               : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} />
-                : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenRules={() => navigate('rules')} />}
+                : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenFacts={() => navigate('facts')} onOpenRules={() => navigate('rules')} onOpenAnalysisConfig={openAnalysisConfig} />}
       </Suspense>
     </div>
     {notice && <div className="toast" role="status">{notice}</div>}

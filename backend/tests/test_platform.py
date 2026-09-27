@@ -175,6 +175,75 @@ def test_preview_cancel_commit_zero_and_missing(client: TestClient):
     assert facts["planned_sales"]["status"] == "UNEVALUABLE"
 
 
+def test_rule_preview_is_read_only_and_commit_is_version_bound(client: TestClient):
+    project_id = create_project(client)
+    endpoint = f"/api/projects/{project_id}/rules"
+    for key, value in (("demand", "300000"), ("capacity", "254016"), ("sales", None)):
+        created = client.post(f"/api/projects/{project_id}/facts", json={
+            "key": key, "label": key, "data_type": "integer", "unit": "套", "value": value})
+        assert created.status_code == 201, created.text
+    proposal = {"name": "计划销售", "target_key": "sales", "expression": "min(demand, capacity)"}
+    before = client.get(f"/api/projects/{project_id}/facts").json()
+    revisions = client.get(f"/api/projects/{project_id}/revisions").json()
+    preview_result = client.post(f"{endpoint}/preview", json=proposal)
+    assert preview_result.status_code == 200, preview_result.text
+    shown = preview_result.json()
+    assert shown["result"]["result"] == "254016"
+    assert shown["target"]["after"] == {"value": "254016", "status": "COMPUTED"}
+    assert [(item["key"], item["value"]) for item in shown["inputs"]] == [("demand", "300000"), ("capacity", "254016")]
+    assert client.get(f"/api/projects/{project_id}/facts").json() == before
+    assert client.get(f"/api/projects/{project_id}/revisions").json() == revisions
+    assert client.get(endpoint).json()["rules"] == []
+
+    # A later fact edit makes the earlier preview stale, even if the formula is unchanged.
+    change, change_preview = preview(client, project_id, "demand", "0")
+    commit(client, project_id, change, change_preview)
+    stale = client.post(f"{endpoint}/commit", json={**proposal, "base_version": shown["base_version"],
+                                                    "preview_token": shown["preview_token"]})
+    assert stale.status_code == 409
+    assert client.get(endpoint).json()["rules"] == []
+    fresh = client.post(f"{endpoint}/preview", json=proposal).json()
+    assert fresh["result"]["result"] == "0"
+    tampered = client.post(f"{endpoint}/commit", json={**proposal, "expression": "max(demand, capacity)",
+                                                       "base_version": fresh["base_version"],
+                                                       "preview_token": fresh["preview_token"]})
+    assert tampered.status_code == 409
+    saved = client.post(f"{endpoint}/commit", json={**proposal, "base_version": fresh["base_version"],
+                                                    "preview_token": fresh["preview_token"]})
+    assert saved.status_code == 201, saved.text
+    assert {item["key"]: item for item in client.get(f"/api/projects/{project_id}/facts").json()["facts"]}["sales"]["value"] == "0"
+    assert client.post(f"{endpoint}/preview", json=proposal).status_code == 409
+
+
+def test_rule_preview_shows_missing_and_rejects_invalid_rules_without_writes(client: TestClient):
+    project_id = create_project(client)
+    endpoint = f"/api/projects/{project_id}/rules"
+    for key, unit, value in (("demand", "套", None), ("capacity", "套", "254016"),
+                             ("wrong", "kW", "650"), ("sales", "套", None)):
+        assert client.post(f"/api/projects/{project_id}/facts", json={
+            "key": key, "label": key, "data_type": "integer", "unit": unit, "value": value}).status_code == 201
+    before = client.get(f"/api/projects/{project_id}/facts").json()
+    missing = client.post(f"{endpoint}/preview", json={"name": "计划销售", "target_key": "sales",
+                                                        "expression": "min(demand, capacity)"})
+    assert missing.status_code == 200, missing.text
+    assert missing.json()["result"]["status"] == "UNEVALUABLE"
+    assert missing.json()["result"]["missing"] == ["demand"]
+    for expression in ("capacity + wrong", "capacity / (capacity - capacity)",
+                       "__import__('os').system('echo unsafe')"):
+        response = client.post(f"{endpoint}/preview", json={"name": "无效规则", "target_key": "sales",
+                                                         "expression": expression})
+        assert response.status_code == 400, response.text
+    assert client.get(f"/api/projects/{project_id}/facts").json() == before
+    assert client.get(endpoint).json()["rules"] == []
+    first = client.post(endpoint, json={"name": "需求取能力", "target_key": "demand", "expression": "capacity"})
+    assert first.status_code == 201, first.text
+    cycle = client.post(f"{endpoint}/preview", json={"name": "能力取需求", "target_key": "capacity",
+                                                    "expression": "demand"})
+    assert cycle.status_code == 400
+    assert "循环" in cycle.json()["detail"]
+    assert len(client.get(endpoint).json()["rules"]) == 1
+
+
 def test_rule_validation_and_atomic_failures(client: TestClient):
     project_id = create_project(client)
     for key, unit in (("a", "套"), ("b", "套"), ("wrong_unit", "kW"), ("result", "套")):

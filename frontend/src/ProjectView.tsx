@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, Calculator, Check, ChevronRight, Clock3, FilePlus2, Plus, Search, X } from 'lucide-react'
 import { api, post, type Fact, type FactChange, type Preview, type Project, type Rule, type Trace } from './api'
 import './project-view.css'
@@ -7,13 +7,23 @@ type FactForm = { key: string; label: string; data_type: string; value: string; 
 type EvidenceStatus = { fact_key: string; fact_revision: number; status: 'UNVERIFIED' | 'SOURCE_LOCATOR_REVIEWED'; document_id: string | null; source_refs: string[] }
 type EvidenceDocument = { id: string; filename: string; pages: number }
 type EvidenceSegment = { ref: string; page: number; text: string; locator?: string }
+type RulePreview = {
+  base_version: number; preview_token: string; expires_at: number;
+  target: { key: string; label: string; unit: string; before: { value: string | null; status: string }; after: { value: string | null; status: string } };
+  inputs: { key: string; label: string; value: string | null; unit: string; status: string }[];
+  result: Trace; changes: { key: string }[]; report_impacts: { report_title: string; position: number }[]
+}
+type WritingConfig = { id: string; name: string; version: number; status: string;
+  definitions: { key: string; label: string; unit: string }[];
+  rules: { id: string; name: string; target_key: string; expression: string; deps: string[] }[];
+  sections: { id: string; title: string }[] }
 const emptyFact: FactForm = { key: '', label: '', data_type: 'decimal', value: '', unit: '', caliber: '', as_of: '', source: '' }
 const newFact = (): FactForm => ({ ...emptyFact, key: `fact_${window.crypto.randomUUID().replaceAll('-', '').slice(0, 12)}` })
-const statusText: Record<string, string> = { UNDEFINED: '未定义', UNEVALUABLE: '不可评估', PROVIDED: '已提供', COMPUTED: '已计算' }
+const statusText: Record<string, string> = { UNDEFINED: '未定义', UNEVALUABLE: '不可评估', PROVIDED: '已提供', COMPUTED: '已计算', ERROR: '计算错误' }
 const displayValue = (value: string | null, status?: string | null) => value ?? (statusText[status || ''] || '—')
 
 function FactStatus({ status }: { status: string }) {
-  return <span className={`status status-${status === 'COMPUTED' || status === 'PROVIDED' ? 'success' : 'warn'}`}>{statusText[status] || status}</span>
+  return <span className={`status status-${status === 'COMPUTED' || status === 'PROVIDED' ? 'success' : status === 'ERROR' ? 'danger' : 'warn'}`}>{statusText[status] || (status === 'ERROR' ? '计算错误' : status)}</span>
 }
 
 function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
@@ -35,16 +45,22 @@ function FactValueInput({ dataType, value, onChange, unit }: { dataType: string;
     : <input aria-label="值" value={value} onChange={(event) => onChange(event.target.value)} type={dataType === 'date' ? 'date' : 'text'} inputMode={dataType === 'integer' || dataType === 'decimal' ? 'decimal' : undefined} placeholder="留空表示未定义" />}</label>
 }
 
-export default function ProjectView({ project, section, onProjectChange, notify, onOpenDocuments, onOpenRules }: { project: Project | null; section: 'facts' | 'rules'; onProjectChange: (project: Project) => void; notify: (message: string) => void; onOpenDocuments: () => void; onOpenRules: () => void }) {
+export default function ProjectView({ project, section, onProjectChange, notify, onOpenDocuments, onOpenFacts, onOpenRules, onOpenAnalysisConfig }: { project: Project | null; section: 'facts' | 'rules'; onProjectChange: (project: Project) => void; notify: (message: string) => void; onOpenDocuments: () => void; onOpenFacts: () => void; onOpenRules: () => void; onOpenAnalysisConfig: (configId?: string) => void }) {
   const [facts, setFacts] = useState<Fact[]>([])
   const [rules, setRules] = useState<Rule[]>([])
+  const [configs, setConfigs] = useState<WritingConfig[]>([])
+  const [configError, setConfigError] = useState('')
   const [trace, setTrace] = useState<Trace[]>([])
   const [version, setVersion] = useState(0)
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [dialog, setDialog] = useState<'fact' | 'rule' | 'detail' | 'edit' | 'history' | 'evidence' | null>(null)
+  const [dialog, setDialog] = useState<'fact' | 'rule' | 'rule-detail' | 'config-detail' | 'detail' | 'edit' | 'history' | 'evidence' | null>(null)
   const [factForm, setFactForm] = useState<FactForm>(emptyFact)
   const [ruleForm, setRuleForm] = useState({ name: '', target_key: '', expression: '' })
+  const [rulePreview, setRulePreview] = useState<RulePreview | null>(null)
+  const [currentRule, setCurrentRule] = useState<Rule | null>(null)
+  const [currentConfig, setCurrentConfig] = useState<WritingConfig | null>(null)
+  const ruleExpressionInput = useRef<HTMLInputElement>(null)
   const [current, setCurrent] = useState<Fact | null>(null)
   const [change, setChange] = useState<FactChange>({ fact_key: '', value: null, source: '', caliber: '', as_of: '', reason: '人工修改' })
   const [preview, setPreview] = useState<Preview | null>(null)
@@ -71,9 +87,19 @@ export default function ProjectView({ project, section, onProjectChange, notify,
   }, [project, onProjectChange])
 
   useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    if (!project || section !== 'rules') return
+    let active = true
+    setConfigs([]); setConfigError('')
+    api<WritingConfig[]>(`/projects/${project.id}/analysis/configs`)
+      .then((rows) => { if (active) setConfigs(rows) })
+      .catch((cause: Error) => { if (active) setConfigError(cause.message) })
+    return () => { active = false }
+  }, [project?.id, section])
   const filtered = useMemo(() => facts.filter((fact) =>
     `${fact.key} ${fact.label} ${fact.unit} ${fact.status}`.toLowerCase().includes(query.toLowerCase()) &&
     (statusFilter === 'all' || (statusFilter === 'needs-source' ? fact.status === 'PROVIDED' && fact.evidence_status !== 'SOURCE_LOCATOR_REVIEWED' : fact.status === statusFilter))), [facts, query, statusFilter])
+  const availableRuleTargets = useMemo(() => facts.filter((fact) => !rules.some((rule) => rule.target_key === fact.key) && ['decimal', 'integer', 'boolean'].includes(fact.data_type)), [facts, rules])
 
   const createFact = async () => {
     if (!project) return
@@ -83,13 +109,28 @@ export default function ProjectView({ project, section, onProjectChange, notify,
       setFactForm(emptyFact); setDialog(null); await load(); notify('事实已录入')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
-  const createRule = async () => {
+  const previewRule = async () => {
     if (!project) return
     setBusy(true); setError('')
     try {
-      await post(`/projects/${project.id}/rules`, ruleForm)
-      setDialog(null); setRuleForm({ name: '', target_key: '', expression: '' }); await load(); notify('规则已保存并重新计算')
+      setRulePreview(await post<RulePreview>(`/projects/${project.id}/rules/preview`, ruleForm))
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
+  }
+  const createRule = async () => {
+    if (!project || !rulePreview) return
+    setBusy(true); setError('')
+    try {
+      await post(`/projects/${project.id}/rules/commit`, { ...ruleForm, base_version: rulePreview.base_version, preview_token: rulePreview.preview_token })
+      setDialog(null); setRulePreview(null); setRuleForm({ name: '', target_key: '', expression: '' }); await load(); notify('规则已保存并重新计算')
+    } catch (cause) { setError((cause as Error).message); setRulePreview(null) } finally { setBusy(false) }
+  }
+  const insertRuleFact = (key: string) => {
+    const input = ruleExpressionInput.current
+    const start = input?.selectionStart ?? ruleForm.expression.length
+    const end = input?.selectionEnd ?? start
+    const expression = ruleForm.expression.slice(0, start) + key + ruleForm.expression.slice(end)
+    setRuleForm({ ...ruleForm, expression }); setRulePreview(null)
+    window.requestAnimationFrame(() => { input?.focus(); input?.setSelectionRange(start + key.length, start + key.length) })
   }
   const editFact = (fact: Fact) => {
     setCurrent(fact); setChange({ fact_key: fact.key, value: fact.value, source: fact.source, caliber: fact.caliber, as_of: fact.as_of, reason: '人工修改' }); setPreview(null); setError(''); setDialog('edit')
@@ -154,7 +195,7 @@ export default function ProjectView({ project, section, onProjectChange, notify,
 
   return <main className="page">
     <div className="breadcrumb">项目 / {project.name} / {section === 'facts' ? '事实台账' : '规则计算'}</div>
-    <div className="page-header"><h1>{section === 'facts' ? '项目事实' : '规则计算'}</h1>{project.has_corpus ? <span className="status status-neutral">只读</span> : <button className="primary-button" onClick={() => { setError(''); if (section === 'facts') { setFactForm(newFact()); setDialog('fact') } else { setRuleForm({ name: '', target_key: '', expression: '' }); setDialog('rule') } }}><Plus size={16} />{section === 'facts' ? '新增事实' : '新增规则'}</button>}</div>
+    <div className="page-header"><h1>{section === 'facts' ? '项目事实' : '规则计算'}</h1>{project.has_corpus ? <span className="status status-neutral">只读</span> : section === 'rules' && !availableRuleTargets.length ? <button className="primary-button" onClick={onOpenFacts}><Plus size={16} />新增结果事实</button> : <button className="primary-button" onClick={() => { setError(''); if (section === 'facts') { setFactForm(newFact()); setDialog('fact') } else { setRuleForm({ name: '', target_key: '', expression: '' }); setRulePreview(null); setDialog('rule') } }}><Plus size={16} />{section === 'facts' ? '新增事实' : '新增事实规则'}</button>}</div>
     {error && !dialog && <div className="notice error">{error}</div>}
     <div className="project-summary"><span>{facts.length} 项事实</span><span>{facts.filter((fact) => fact.status === 'UNDEFINED' || fact.status === 'UNEVALUABLE').length} 项待补</span><span>v{version}</span></div>
     {section === 'facts' ? <section className="workspace-card fact-ledger">
@@ -174,7 +215,23 @@ export default function ProjectView({ project, section, onProjectChange, notify,
         })}</tbody></table>
         {filtered.length === 0 && <div className="empty">{facts.length === 0 ? '暂无事实' : '没有匹配事实'}</div>}
       </div>
-    </section> : <section className="workspace-card"><div className="workspace-toolbar"><h2>规则与结果</h2></div>{rules.length === 0 ? <div className="empty">暂无规则</div> : <div className="rule-list">{rules.map((rule) => { const item = trace.find((entry) => entry.rule_id === rule.id); return <div className="rule-card" key={rule.id}><div className="rule-card-head"><span className="rule-symbol"><Calculator size={18} /></span><div><strong>{rule.name}</strong><small>{rule.target_key} ← {rule.deps.join('、')}</small></div><FactStatus status={item?.status || 'UNDEFINED'} /></div><div className="expression">{rule.expression}</div><div className="rule-result">{item?.status === 'UNEVALUABLE' ? <>缺少输入：{item.missing?.join('、')}</> : <>当前结果：<b>{item?.result ?? '—'}</b></>}</div></div> })}</div>}</section>}
+    </section> : <>
+      <section className="workspace-card rule-ledger">
+        <div className="workspace-toolbar"><h2>项目事实规则</h2></div>
+        {trace.some((step) => step.status === 'ERROR') && <div className="notice error">{trace.find((step) => step.status === 'ERROR')?.reason || '规则计算失败'}</div>}
+        {rules.length === 0 ? <div className="empty">暂无项目事实规则{!project.has_corpus && !availableRuleTargets.length && <button type="button" className="text-button" onClick={onOpenFacts}>去录入事实</button>}</div> : <div className="rule-list">{rules.map((rule) => {
+          const item = trace.find((entry) => entry.rule_id === rule.id)
+          const target = facts.find((fact) => fact.key === rule.target_key)
+          const missing = (item?.missing || []).map((key) => facts.find((fact) => fact.key === key)?.label || key)
+          return <button type="button" className="rule-card" key={rule.id} onClick={() => { setCurrentRule(rule); setDialog('rule-detail') }}><div className="rule-card-head"><span className="rule-symbol"><Calculator size={18} /></span><div><strong>{rule.name}</strong><small>{target?.label || rule.target_key}</small></div><FactStatus status={item?.status || (trace.some((step) => step.status === 'ERROR') ? 'ERROR' : 'UNDEFINED')} /></div><div className="rule-card-result"><strong>{item?.status === 'COMPUTED' ? `${item.result}${target?.unit ? ` ${target.unit}` : ''}` : item?.status === 'UNEVALUABLE' ? '不可评估' : '—'}</strong><span>{missing.length ? `待补：${missing.join('、')}` : '查看计算依据'} <ChevronRight size={14} /></span></div></button>
+        })}</div>}
+      </section>
+      {(configs.length > 0 || configError) && <section className="workspace-card rule-ledger">
+        <div className="workspace-toolbar"><h2>写作推演配置</h2>{!project.has_corpus && <button type="button" className="fact-row-action" onClick={() => onOpenAnalysisConfig()}>管理配置</button>}</div>
+        {configError && <div className="notice error">推演配置加载失败：{configError}</div>}
+        {configs.length > 0 && <div className="rule-list">{configs.map((config) => <button type="button" className="rule-card" key={config.id} onClick={() => { setCurrentConfig(config); setDialog('config-detail') }}><div className="rule-card-head"><span className="rule-symbol"><Calculator size={18} /></span><div><strong>{config.name}</strong><small>v{config.version} · {config.rules.length} 条规则 · {config.sections.length} 章</small></div><span className={`status status-${config.status === 'PUBLISHED' ? 'success' : 'neutral'}`}>{config.status === 'PUBLISHED' ? '已发布' : '草稿'}</span></div><div className="rule-card-result"><span>查看规则定义 <ChevronRight size={14} /></span></div></button>)}</div>}
+      </section>}
+    </>}
 
     {dialog === 'fact' && <Modal title="新增事实" onClose={() => setDialog(null)}><div className="form-stack">
       <FieldInput label="名称" value={factForm.label} onChange={(value) => setFactForm({ ...factForm, label: value })} placeholder="首年需求" />
@@ -185,12 +242,16 @@ export default function ProjectView({ project, section, onProjectChange, notify,
       <details className="project-more"><summary>更多属性</summary><FieldInput label="字段 key" value={factForm.key} onChange={(value) => setFactForm({ ...factForm, key: value })} /><FieldInput label="口径" value={factForm.caliber} onChange={(value) => setFactForm({ ...factForm, caliber: value })} /><FieldInput label="时点" value={factForm.as_of} onChange={(value) => setFactForm({ ...factForm, as_of: value })} placeholder="YYYY-MM-DD" /></details>
       {error && <div className="notice error">{error}</div>}<div className="form-actions"><button onClick={() => setDialog(null)}>取消</button><button className="primary-button" disabled={!factForm.key || !factForm.label.trim() || busy} onClick={() => void createFact()}>{busy ? '保存中…' : '保存事实'}</button></div>
     </div></Modal>}
-    {dialog === 'rule' && <Modal title="新增规则" onClose={() => setDialog(null)}><div className="form-stack">
-      <FieldInput label="名称" value={ruleForm.name} onChange={(value) => setRuleForm({ ...ruleForm, name: value })} placeholder="首年计划销售量" />
-      <label className="form-field"><span>结果事实</span><select value={ruleForm.target_key} onChange={(event) => setRuleForm({ ...ruleForm, target_key: event.target.value })}><option value="">选择事实</option>{facts.filter((fact) => !rules.some((rule) => rule.target_key === fact.key) && ['decimal', 'integer', 'boolean'].includes(fact.data_type)).map((fact) => <option key={fact.key} value={fact.key}>{fact.label} · {fact.key}</option>)}</select></label>
-      <FieldInput label="表达式" value={ruleForm.expression} onChange={(value) => setRuleForm({ ...ruleForm, expression: value })} placeholder="min(first_year_demand, qualified_capacity)" />
-      {error && <div className="notice error">{error}</div>}<div className="form-actions"><button onClick={() => setDialog(null)}>取消</button><button className="primary-button" disabled={!ruleForm.name || !ruleForm.target_key || !ruleForm.expression || busy} onClick={createRule}>保存规则</button></div>
+    {dialog === 'rule' && <Modal title="新增事实规则" onClose={() => setDialog(null)}><div className="form-stack">
+      <FieldInput label="名称" value={ruleForm.name} onChange={(value) => { setRuleForm({ ...ruleForm, name: value }); setRulePreview(null) }} placeholder="首年计划销售量" />
+      <label className="form-field"><span>结果事实</span><select value={ruleForm.target_key} onChange={(event) => { setRuleForm({ ...ruleForm, target_key: event.target.value }); setRulePreview(null) }}><option value="">选择事实</option>{availableRuleTargets.map((fact) => <option key={fact.key} value={fact.key}>{fact.label}{fact.unit ? ` · ${fact.unit}` : ''}</option>)}</select></label>
+      <label className="form-field"><span>计算式</span><input ref={ruleExpressionInput} aria-label="计算式" value={ruleForm.expression} onChange={(event) => { setRuleForm({ ...ruleForm, expression: event.target.value }); setRulePreview(null) }} placeholder="例如 min(demand, capacity)" /></label>
+      <details className="rule-fact-picker"><summary>插入输入</summary><div>{facts.filter((fact) => fact.key !== ruleForm.target_key && ['decimal', 'integer', 'boolean'].includes(fact.data_type)).map((fact) => <button type="button" key={fact.key} onClick={() => insertRuleFact(fact.key)} title={`${fact.key} · ${displayValue(fact.value, fact.status)}${fact.unit}`}>{fact.label}</button>)}</div></details>
+      {rulePreview && <div className="rule-preview preview-box"><div className="rule-preview-result"><span>{rulePreview.target.label}</span><strong>{displayValue(rulePreview.target.after.value, rulePreview.target.after.status)}{rulePreview.target.after.value !== null && rulePreview.target.unit ? ` ${rulePreview.target.unit}` : ''}</strong><FactStatus status={rulePreview.target.after.status} /></div>{rulePreview.target.before.value !== null && <small>原值：{rulePreview.target.before.value}{rulePreview.target.unit ? ` ${rulePreview.target.unit}` : ''}</small>}<div className="rule-preview-inputs">{rulePreview.inputs.map((item) => <div key={item.key}><span>{item.label}</span><b>{displayValue(item.value, item.status)}{item.value !== null && item.unit ? ` ${item.unit}` : ''}</b></div>)}</div>{rulePreview.result.status === 'UNEVALUABLE' && <small>待补：{(rulePreview.result.missing || []).map((key) => rulePreview.inputs.find((item) => item.key === key)?.label || key).join('、')}。单位与除零待输入后验证。</small>}{rulePreview.report_impacts.length > 0 && <small>{rulePreview.report_impacts.length} 处正文引用需重新核对</small>}</div>}
+      {error && <div className="notice error">{error}</div>}<div className="form-actions"><button type="button" onClick={() => setDialog(null)}>取消</button>{rulePreview ? <button type="button" className="primary-button" disabled={busy} onClick={() => void createRule()}>{busy ? '保存中…' : '确认保存'}</button> : <button type="button" className="primary-button" disabled={!ruleForm.name.trim() || !ruleForm.target_key || !ruleForm.expression.trim() || busy} onClick={() => void previewRule()}>{busy ? '计算中…' : '预览计算'}</button>}</div>
     </div></Modal>}
+    {dialog === 'rule-detail' && currentRule && <Modal title={currentRule.name} onClose={() => setDialog(null)}><div className="rule-detail">{(() => { const item = trace.find((entry) => entry.rule_id === currentRule.id); const calculationError = trace.find((entry) => entry.status === 'ERROR'); const target = facts.find((fact) => fact.key === currentRule.target_key); const status = item?.status || (calculationError ? 'ERROR' : target?.status || 'UNDEFINED'); return <><div className="rule-detail-result"><span>{target?.label || currentRule.target_key}</span><strong>{displayValue(item?.result ?? null, status)}{item?.result != null && target?.unit ? ` ${target.unit}` : ''}</strong><FactStatus status={status} /></div><div className="rule-detail-inputs"><h3>输入依据</h3>{currentRule.deps.map((key) => { const fact = facts.find((entry) => entry.key === key); return <button type="button" key={key} onClick={() => fact && showDetail(fact)}><span>{fact?.label || key}</span><b>{fact ? displayValue(fact.value, fact.status) : '未找到'}{fact?.value != null && fact.unit ? ` ${fact.unit}` : ''}</b><ChevronRight size={14} /></button> })}</div>{item?.status === 'UNEVALUABLE' && <div className="notice warn">待补：{(item.missing || []).map((key) => facts.find((fact) => fact.key === key)?.label || key).join('、')}</div>}{calculationError && <div className="notice error">{calculationError.reason || '规则计算失败'}</div>}<details className="project-more"><summary>查看公式</summary><div className="expression">{currentRule.expression}</div></details></> })()}</div></Modal>}
+    {dialog === 'config-detail' && currentConfig && <Modal title={currentConfig.name} onClose={() => setDialog(null)}><div className="rule-detail"><div className="rule-config-meta"><span>v{currentConfig.version}</span><span>{currentConfig.status === 'PUBLISHED' ? '已发布' : '草稿'}</span><span>{currentConfig.sections.length} 章</span></div><div className="rule-detail-inputs"><h3>规则定义</h3>{currentConfig.rules.length ? currentConfig.rules.map((rule) => { const target = currentConfig.definitions.find((item) => item.key === rule.target_key); return <details className="rule-config-row" key={rule.id}><summary><span>{rule.name}</span><b>{target?.label || rule.target_key}</b></summary><div className="expression">{rule.expression}</div><small>输入：{(rule.deps || []).map((key) => currentConfig.definitions.find((item) => item.key === key)?.label || key).join('、')}</small></details> }) : <div className="empty">暂无规则定义</div>}</div>{!project.has_corpus && <button type="button" className="primary-button" onClick={() => { setDialog(null); onOpenAnalysisConfig(currentConfig.id) }}>管理配置</button>}</div></Modal>}
     {dialog === 'detail' && current && <Modal title={current.label} onClose={() => setDialog(null)}><div className="fact-detail">
       <div className="fact-detail-value"><strong>{displayValue(current.value, current.status)}{current.value !== null && current.unit ? ` ${current.unit}` : ''}</strong><FactStatus status={current.status} /></div>
       <dl><div><dt>来源</dt><dd>{current.source || '待补充'}</dd></div><div><dt>口径</dt><dd>{current.caliber || '—'}</dd></div><div><dt>时点</dt><dd>{current.as_of || '—'}</dd></div><div><dt>修订</dt><dd>r{current.revision}</dd></div></dl>

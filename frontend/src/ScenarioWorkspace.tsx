@@ -396,6 +396,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   const closeConfig = () => {
     const url = new URL(window.location.href)
     url.searchParams.delete('config')
+    url.searchParams.delete('config_id')
     window.history.pushState({}, '', url)
     setConfigOpen(false)
     void loadLists().catch((cause: Error) => setError(cause.message))
