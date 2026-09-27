@@ -11,7 +11,7 @@ export type AnalysisConfig = {
 type ConfigField = { key: string; label: string; data_type: 'integer' | 'decimal' | 'text' | 'boolean'; unit: string; group: string; computed: boolean; input_format?: string }
 type ConfigRule = { id: string; name: string; target_key: string; expression: string }
 type ConfigCondition = { id: string; expression: string; when_true: string; when_false: string }
-type ConfigSection = { id: string; title: string; kind?: 'narrative' | 'calculation' | 'mixed'; result_keys: string[]; evidence_keys?: string[]; conditions?: ConfigCondition[]; forbidden_terms?: string[] }
+type ConfigSection = { id: string; title: string; report_type?: string; kind?: 'narrative' | 'calculation' | 'mixed'; result_keys: string[]; evidence_keys?: string[]; conditions?: ConfigCondition[]; forbidden_terms?: string[] }
 type TestResult = { status: string; snapshot: { results: Record<string, { label: string; value: string | null; unit: string }>; trace: { rule_id: string; expression: string; result: string | null; status: string }[] }; test_token: string | null }
 type ScenarioOption = { id: string; name: string }
 

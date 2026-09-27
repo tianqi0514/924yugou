@@ -44,7 +44,8 @@ def chapter_pack(session, project_id: str, report: ReportDraft, section_id: str)
         AnalysisConfig.project_id == project_id, AnalysisConfig.status == "PUBLISHED"
     ).order_by(AnalysisConfig.version.desc())).all()
     configured = next(((config, section) for config in configs for section in config.sections
-                       if section["id"] == section_id), None)
+                       if section["id"] == section_id and
+                       section.get("report_type", report.report_type) == report.report_type), None)
     blocks = [block for block in report.content if block.get("section_id") == section_id]
     if not configured and not blocks and section_id not in GUIDED_SECTIONS:
         raise HTTPException(404, "本报告没有此章节")

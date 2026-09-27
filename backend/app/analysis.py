@@ -680,6 +680,7 @@ def run_compare(project_id: str, run_ids: list[str] = Body(..., min_length=2, ma
 def report_run_impact(project_id: str, report_id: str, run_id: str):
     with SessionLocal() as session:
         report, run = _report(session, project_id, report_id), _run(session, project_id, run_id)
+        _check_run_report_type(report, run)
         previous = _run(session, project_id, report.analysis_run_id) if report.analysis_run_id else None
         content, rebound = _safe_rebind_content(report, previous, run)
         return {"report_version": report.version, "current_run_id": report.analysis_run_id,
@@ -692,6 +693,7 @@ def report_run_select(project_id: str, report_id: str, body: RunSelection):
     with SessionLocal.begin() as session:
         report = _report(session, project_id, report_id, lock=True)
         run = _run(session, project_id, body.run_id)
+        _check_run_report_type(report, run)
         if report.version != body.base_version:
             raise HTTPException(409, "报告已有新版本，请刷新后选择")
         if run.status != "COMPUTED":
@@ -713,3 +715,13 @@ def report_run_select(project_id: str, report_id: str, body: RunSelection):
         return {"report_id": report_id, "report_version": report.version,
                 "analysis_run_id": report.analysis_run_id, "impacts": impacts,
                 "unchanged_references": len(rebound)}
+
+
+def _check_run_report_type(report, run) -> None:
+    configuration = (run.snapshot or {}).get("configuration")
+    if not configuration:
+        return
+    sections = configuration.get("sections") or []
+    if sections and not any(section.get("report_type", report.report_type) == report.report_type
+                            for section in sections):
+        raise HTTPException(409, "本次推演的章节配置不适用于当前报告类型")

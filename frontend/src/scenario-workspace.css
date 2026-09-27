@@ -94,6 +94,7 @@
 .scenario-preparation-action:hover{border-color:#94b8ed;background:#f7faff}
 .scenario-preparation-action small{color:#718097}
 .scenario-preparation-issues{display:grid;gap:8px;padding-top:8px;border-top:1px solid #e9eef5}
+.chapter-mapping{display:grid;gap:11px}.chapter-mapping>input{width:100%;min-height:34px;padding:7px 10px;border:1px solid #dbe4ef;border-radius:7px;background:#fff}.chapter-mapping-facts{display:grid;gap:5px;max-height:48vh;overflow:auto}.chapter-mapping-fact{display:flex;align-items:center;gap:8px;padding:8px 9px;border:1px solid #e6ebf2;border-radius:7px;background:#fff}.chapter-mapping-fact>label:first-child{display:flex;align-items:center;gap:8px;flex:1;min-width:0}.chapter-mapping-fact>label:first-child span{display:grid;gap:2px;min-width:0}.chapter-mapping-fact strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chapter-mapping-fact small{font-size:11px;color:#738198;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chapter-mapping-fact button{border:0;background:transparent;color:#275fbd;font-size:11px;cursor:pointer}.chapter-mapping-result{white-space:nowrap;font-size:11px;color:#536783}.chapter-mapping-result input{margin-right:3px}
 .scenario-material-summary{display:flex;gap:12px;color:#65758e;font-size:11px;padding:8px 0;border-bottom:1px solid #edf1f6}
 .scenario-material-group{border-bottom:1px solid #edf1f6;padding:7px 0}
 .scenario-material-group>summary{cursor:pointer;font-weight:600;color:#3c4f6c;font-size:12px}

@@ -43,6 +43,7 @@ from .analysis_refresh import router as analysis_refresh_router
 from .project_evidence import router as project_evidence_router
 from .report_types import report_type, report_types
 from .chapter_materials import router as chapter_materials_router
+from .chapter_mapping import router as chapter_mapping_router
 from .project_issues import router as project_issues_router
 from .work_tasks import router as work_tasks_router
 
@@ -73,6 +74,7 @@ app.include_router(analysis_writing_router)
 app.include_router(analysis_refresh_router)
 app.include_router(project_evidence_router)
 app.include_router(chapter_materials_router)
+app.include_router(chapter_mapping_router)
 app.include_router(project_issues_router)
 app.include_router(work_tasks_router)
 corpus = CorpusRepository()
@@ -1711,7 +1713,8 @@ def report_chapter_status(project_id: str, report_id: str):
             source = next((section for section in report.template_snapshot.get("sections", [])
                            if section["id"] == section_id), None)
             configured = next(((config, section) for config in configs for section in config.sections
-                               if section["id"] == section_id), None)
+                               if section["id"] == section_id and
+                               section.get("report_type", report.report_type) == report.report_type), None)
             body = [block for block in report.content if block.get("section_id") == section_id
                     and block.get("id") != heading.get("id")]
             substantive = any(plain(block).strip() for block in body)

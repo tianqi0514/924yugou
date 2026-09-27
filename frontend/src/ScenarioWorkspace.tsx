@@ -5,6 +5,7 @@ import { EditorPane, type AnalysisRef, type Block, type EditorActions } from './
 import AnalysisConfigView, { type AnalysisConfig } from './AnalysisConfigView'
 import IssuePanel from './IssuePanel'
 import SensitivityPanel from './SensitivityPanel'
+import ChapterMappingPanel from './ChapterMappingPanel'
 import './scenario-workspace.css'
 
 type SourceRef = { category_id: string; artifact_id: string; record_id: string; semantic_id?: string | null }
@@ -12,7 +13,7 @@ type Definition = { key: string; label: string; data_type: string; unit: string;
 type Input = { value: string | null; origin: string; source_ref: SourceRef | Record<string, unknown> | null; review_status: string }
 type Scenario = { id: string; name: string; revision: number; blueprint_version: string; corpus_id: string | null; corpus_version: string | null; definitions: Definition[]; rules: { id: string; target_key: string; expression: string; version: string; source_ref?: SourceRef }[]; inputs: Record<string, Input> }
 type Result = { key: string; label: string; unit: string; value: string | null; status: string; origin: string; source_ref?: SourceRef | null }
-type Snapshot = { definitions: Definition[]; inputs: Record<string, Input>; results: Record<string, Result>; trace: { rule_id: string; rule_version: string; expression: string; target: string; inputs: Record<string, string | null>; result: string | null; status: string; missing: string[]; source_ref?: SourceRef }[]; condition: string; issues: { code: string; severity: string; message: string }[]; status: string; corpus_id: string | null; corpus_version: string | null; configuration?: { id: string; version: number; sections: { id: string; title: string; kind?: 'narrative' | 'calculation' | 'mixed'; result_keys: string[]; evidence_keys?: string[]; conditions?: { id: string }[] }[] } }
+type Snapshot = { definitions: Definition[]; inputs: Record<string, Input>; results: Record<string, Result>; trace: { rule_id: string; rule_version: string; expression: string; target: string; inputs: Record<string, string | null>; result: string | null; status: string; missing: string[]; source_ref?: SourceRef }[]; condition: string; issues: { code: string; severity: string; message: string }[]; status: string; corpus_id: string | null; corpus_version: string | null; configuration?: { id: string; version: number; sections: { id: string; title: string; report_type?: string; kind?: 'narrative' | 'calculation' | 'mixed'; result_keys: string[]; evidence_keys?: string[]; conditions?: { id: string }[] }[] } }
 type Run = { id: string; scenario_id: string; scenario_revision: number; status: string; input_sha256: string; snapshot: Snapshot; created_at: string }
 type Issue = { code: string; severity: string; message: string; position?: number }
 type Report = { id: string; title: string; version: number; content: Block[]; reviewed: boolean; analysis_run_id: string | null; report_type: string; template_version: string; template_snapshot: { label?: string; sections?: { id: string; title: string; kind: string }[] }; issues: Issue[]; updated_at: string }
@@ -36,7 +37,7 @@ type ChapterPack = { report_version: number; section_id: string; config_id: stri
 type Preview = { candidate_id?: string; run_id?: string; config_id?: string; section_id: string; mode: string; base_version: number; content: Block[]; model_audit: Record<string, unknown> & { evidence?: CandidateEvidence[] }; expires_at: number; preview_token: string; issues: Issue[]; preserved_blocks?: Block[] }
 type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'config_condition' | 'judgement' | 'manual_review' | 'rebind' | 'detach' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[]; reference_changes?: { key: string; before: string; after: string | null }[] }
 type RefreshPreview = { report_version: number; run_id: string; actions: RefreshAction[] }
-type Panel = 'inputs' | 'results' | 'draft' | 'sources' | 'check' | 'versions' | 'materials' | 'preparation' | null
+type Panel = 'inputs' | 'results' | 'draft' | 'sources' | 'check' | 'versions' | 'materials' | 'preparation' | 'mapping' | null
 type ScenarioCreateSource = 'project' | 'historical' | 'copy' | 'config_facts' | 'config' | 'config_copy'
 
 const sections = [{ id: 'S4', label: '产能与交付' }, { id: 'S7.1', label: '设备购置与报价' }, { id: 'S5.2', label: '配电资料分歧' }]
@@ -166,17 +167,27 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   const [selectedHeadingId, setSelectedHeadingId] = useState<string | null>(null)
   const [chapterDialog, setChapterDialog] = useState<ChapterDialog | null>(null)
   const activeRun = runs.find((row) => row.id === report?.analysis_run_id) || null
-  const writingConfig = configs.find((item) => item.id === activeRun?.snapshot.configuration?.id) || configs.find((item) => item.id === configId && item.status === 'PUBLISHED')
-  const availableSections = writingConfig?.sections.map((item) => ({ id: item.id, label: item.title })) || activeRun?.snapshot.configuration?.sections.map((item) => ({ id: item.id, label: item.title })) || sections
+  const reportSectionIds = report?.content.filter((block) => block.type === 'h2').map((block) => block.section_id || '') || []
+  const availableSections = [...(report?.template_snapshot.sections || []).map((item) => ({ id: item.id, label: item.title })),
+    ...configs.filter((item) => item.status === 'PUBLISHED').flatMap((item) => item.sections
+      .filter((row) => !row.report_type || row.report_type === report?.report_type)
+      .map((row) => ({ id: row.id, label: row.title }))),
+    ...sections].filter((item, index, all) => all.findIndex((other) => other.id === item.id) === index)
   const selectedHeading = selectedHeadingId ? report?.content.find((block) => block.id === selectedHeadingId && block.type === 'h2') : null
   const effectiveSection = selectedHeadingId
     ? selectedHeading && availableSections.some((item) => item.id === selectedHeading.section_id) ? selectedHeading.section_id || '' : ''
-    : availableSections.some((item) => item.id === selectedSection) ? selectedSection : availableSections[0]?.id || ''
+    : reportSectionIds.includes(selectedSection) ? selectedSection : reportSectionIds[0] || availableSections[0]?.id || ''
+  const activeConfig = configs.find((item) => item.id === activeRun?.snapshot.configuration?.id)
+  const activeSection = activeRun?.snapshot.configuration?.sections.find((item) => item.id === effectiveSection &&
+    (!item.report_type || item.report_type === report?.report_type))
+  const mappedConfig = configs.find((item) => item.status === 'PUBLISHED' && item.sections.some((row) =>
+    row.id === effectiveSection && (!row.report_type || row.report_type === report?.report_type)))
+  const writingConfig = activeSection && activeConfig ? activeConfig : mappedConfig
   const selectedChapterStatus = chapterStatuses.find((item) => item.heading_id === selectedHeadingId)
     || chapterStatuses.find((item) => item.section_id === effectiveSection)
-  const selectedConfigSection = writingConfig?.sections.find((item) => item.id === effectiveSection) || activeRun?.snapshot.configuration?.sections.find((item) => item.id === effectiveSection)
+  const selectedConfigSection = activeSection || writingConfig?.sections.find((item) => item.id === effectiveSection)
   const narrativeSection = selectedConfigSection?.kind === 'narrative'
-  const draftReady = narrativeSection ? !!writingConfig?.id : !!report?.analysis_run_id
+  const draftReady = narrativeSection ? !!writingConfig?.id : !!report?.analysis_run_id && (!!activeSection || !activeRun?.snapshot.configuration && sections.some((item) => item.id === effectiveSection))
   const modelAvailable = narrativeSection || !activeRun?.snapshot.configuration || !!(selectedConfigSection?.conditions?.length && selectedConfigSection?.evidence_keys?.length)
   const [selectedPosition, setSelectedPosition] = useState(0)
   const [draftMode, setDraftMode] = useState<'computed' | 'model'>('computed')
@@ -962,7 +973,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
       {activeTask && ['PENDING', 'RUNNING', 'FAILED', 'UNCERTAIN', 'COMPLETED'].includes(activeTask.status) && <button className="scenario-task-shortcut" onClick={() => setPanel(activeTask.kind === 'model_draft' ? 'draft' : 'check')}>{activeTask.kind === 'model_draft' ? '模型起草' : '导出'} · {activeTask.status === 'COMPLETED' ? '已完成' : activeTask.status === 'RUNNING' ? '处理中' : activeTask.status === 'PENDING' ? '排队中' : '待处理'}</button>}
       <div className={`scenario-workspace ${panel ? 'with-panel' : ''}`}><aside className="scenario-outline"><div className="scenario-outline-header">章节</div>{reportHeadings.map(({ block, index }, chapterIndex) => { const state = chapterStatuses.find((item) => item.heading_id === block.id); return <div key={block.id || index} className={`scenario-outline-row ${selectedHeadingId === block.id ? 'active' : ''}`}><button className="scenario-outline-title" onClick={() => locateBlock(index + 1, block.id)} title={state?.missing_fact_keys.length ? `缺少：${state.missing_fact_keys.join('、')}` : textOf(block)}>{textOf(block) || '未命名章节'}</button>{state && <button type="button" className="scenario-chapter-status" aria-label={`${textOf(block)} · ${state.status} · 查看准备情况`} onClick={() => { setSelectedHeadingId(block.id || null); setSelectedSection(block.section_id || ''); setPanel('preparation') }}>{state.status}{state.open_issues?.length ? ` · ${state.open_issues.length} 项问题` : ''}</button>}<div className="scenario-outline-controls"><button aria-label={`重命名章节 ${textOf(block)}`} title="重命名" onClick={() => setChapterDialog({ action: 'rename', headingId: block.id, title: textOf(block) })}><Pencil size={12} /></button><button aria-label={`上移章节 ${textOf(block)}`} title="上移" disabled={chapterIndex === 0 || busy} onClick={() => void changeChapter('move', block.id, undefined, 'up')}><ArrowUp size={12} /></button><button aria-label={`下移章节 ${textOf(block)}`} title="下移" disabled={chapterIndex === reportHeadings.length - 1 || busy} onClick={() => void changeChapter('move', block.id, undefined, 'down')}><ArrowDown size={12} /></button></div></div> })}<button className="scenario-outline-add" onClick={() => setChapterDialog({ action: 'add', title: '' })}><Plus size={13} /> 添加章节</button></aside>
         <section className="scenario-canvas"><div className="scenario-canvas-tools"><span>{selectedBlock?.section_id ? availableSections.find((item) => item.id === selectedBlock.section_id)?.label || '报告正文' : '报告正文'}</span><button onClick={() => void persistBody()} disabled={!dirty || saveState === '保存中…'}><Save size={13} /> 保存</button><button onClick={() => setPanel('sources')} disabled={!selectedBlock}>查看依据</button><button onClick={() => setPanel('check')}>检查 {blocking.length > 0 ? `· ${blocking.length}` : ''}</button></div><div className="scenario-paper"><EditorPane key={`${report.id}-${editorKey}`} initial={content} facts={editorFacts} actionsRef={editorActions} staleFactKeys={noStaleFactKeys} onOpenFact={openEditorFact} onSelectPosition={selectPosition} onChange={changeBody} /></div></section>
-        {panel && <aside className="scenario-panel" role="complementary"><div className="scenario-panel-head"><h2>{({ inputs: '输入数据', results: '推演结果', draft: '生成本章', sources: '资料与来源', check: '检查与导出', versions: '版本', materials: '资料应用', preparation: '本章准备' })[panel]}</h2><button onClick={closePanel} aria-label="关闭面板"><X size={18} /></button></div><div className="scenario-panel-body">
+        {panel && <aside className="scenario-panel" role="complementary"><div className="scenario-panel-head"><h2>{({ inputs: '输入数据', results: '推演结果', draft: '生成本章', sources: '资料与来源', check: '检查与导出', versions: '版本', materials: '资料应用', preparation: '本章准备', mapping: '本章资料映射' })[panel]}</h2><button onClick={closePanel} aria-label="关闭面板"><X size={18} /></button></div><div className="scenario-panel-body">
           {panel === 'preparation' && selectedChapterStatus && <div className="scenario-preparation">
             <div className="scenario-preparation-heading"><strong>{selectedChapterStatus.title}</strong><span className="status status-neutral">{selectedChapterStatus.status}</span></div>
             {(selectedChapterStatus.next_actions || []).map((item, index) => <button className="scenario-preparation-action" key={`${item.kind}-${item.key}-${index}`} onClick={() => {
@@ -970,12 +981,23 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
               else if (item.action === 'edit_fact') onOpenFacts(item.key || undefined, 'edit')
               else if (item.action === 'review_source') onOpenFacts(item.key || undefined, 'source')
               else if (item.action === 'inputs') setPanel('inputs')
+              else if (!project.has_corpus && ['government_feasibility', 'enterprise_feasibility'].includes(report.report_type)) setPanel('mapping')
               else openConfig()
             }}><span>{item.action === 'new_fact' ? `录入 ${item.label}` : item.action === 'edit_fact' ? `填写 ${item.label}` : item.action === 'review_source' ? `核对 ${item.label} 来源` : item.action === 'inputs' ? '填写输入并推演' : '配置本章'}</span><ChevronDown size={13} /></button>)}
+            {!project.has_corpus && ['government_feasibility', 'enterprise_feasibility'].includes(report.report_type) && selectedChapterStatus.config_id &&
+              <button type="button" className="scenario-preparation-action" onClick={() => setPanel('mapping')}><span>调整本章资料</span><ChevronDown size={13} /></button>}
             {(selectedChapterStatus.open_issues || []).length > 0 && <div className="scenario-preparation-issues"><strong>待处理问题 · {selectedChapterStatus.open_issues.length}</strong>{selectedChapterStatus.open_issues.map((issue) => <button className="scenario-preparation-action" key={issue.id} onClick={() => { setFocusedIssueId(issue.id); setPanel('check') }}><span>{issue.title}</span><small>{issue.kind === 'conflict' ? '冲突' : issue.kind === 'claim' ? '论断' : '缺口'}</small></button>)}</div>}
             {selectedChapterStatus.status === '可起草' && <button className="primary-button" onClick={() => setPanel('draft')}>生成本章</button>}
             {selectedChapterStatus.status === '待核对' && <button className="primary-button" onClick={() => setPanel('check')}>检查本章</button>}
           </div>}
+          {panel === 'mapping' && effectiveSection && !project.has_corpus &&
+            <ChapterMappingPanel key={`${report.id}:${effectiveSection}`} projectId={project.id} reportId={report.id}
+              sectionId={effectiveSection} onOpenDocument={onOpenDocument} onOpenFacts={onOpenFacts}
+              onConfigured={async (config) => {
+                await loadLists(); await loadReport(report.id); setConfigId(config.id)
+                setPanel(config.sections[0]?.kind === 'narrative' ? 'draft' : 'inputs')
+                notify(`本章要求 v${config.version} 已保存`)
+              }} />}
           {panel === 'inputs' && <>
             <div className="scenario-panel-line"><select aria-label="选择方案" value={scenarioId} onChange={(event) => switchScenario(event.target.value)}><option value="">选择方案</option>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><button type="button" onClick={openScenarioCreate}><Plus size={14} /> 新建</button></div>
             {scenarioCreateOpen && <div className="scenario-create-card">

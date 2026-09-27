@@ -325,7 +325,7 @@ def _candidate(session, run, section_id: str, mode: str) -> tuple[list[dict], di
 
 
 def _narrative_candidate(session, project_id: str, config_id: str, section_id: str,
-                         mode: str, evidence_ids: list[str]) -> tuple[list[dict], dict]:
+                         mode: str, evidence_ids: list[str], report_type: str) -> tuple[list[dict], dict]:
     from .main import _reviewed_fact_binding
     from .report_pipeline import numeric_tokens
 
@@ -336,6 +336,8 @@ def _narrative_candidate(session, project_id: str, config_id: str, section_id: s
     section = next((item for item in config.sections if item["id"] == section_id), None)
     if section is None or section.get("kind", "calculation") != "narrative":
         raise HTTPException(409, "该章节不是独立文字章节")
+    if section.get("report_type", report_type) != report_type:
+        raise HTTPException(409, "该章节配置不适用于当前报告类型")
     if mode not in {"model", "excerpt"}:
         raise HTTPException(400, "文字章节请选择摘录或模型起草")
     evidence = []
@@ -554,11 +556,18 @@ def _draft_preview(project_id: str, report_id: str, body: DraftRequest,
             run = _run(session, project_id, body.run_id)
             if report.analysis_run_id != run.id:
                 raise HTTPException(409, "请先选择本次推演作为报告依据")
+            configuration = run.snapshot.get("configuration")
+            if configuration:
+                section = next((row for row in configuration["sections"]
+                                if row["id"] == body.section_id), None)
+                if section and section.get("report_type", report.report_type) != report.report_type:
+                    raise HTTPException(409, "本次运行的章节配置不适用于当前报告类型")
             content, model_audit = _candidate(session, run, body.section_id, body.mode)
         elif body.config_id:
             run = None
             content, model_audit = _narrative_candidate(session, project_id, body.config_id,
-                                                         body.section_id, body.mode, body.evidence_ids)
+                                                         body.section_id, body.mode, body.evidence_ids,
+                                                         report.report_type)
         else:
             raise HTTPException(400, "请选择文字章节配置或推演运行")
         pack = chapter_pack(session, project_id, report, body.section_id)
