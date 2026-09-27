@@ -49,21 +49,17 @@ async function createFact(page: Page, label: string, key: string, value: string 
   await drawer.getByLabel('字段 key').fill(key)
   await drawer.getByLabel('类型').selectOption('integer')
   await drawer.getByLabel('单位').fill(unit)
-  if (value === null) {
-    await drawer.getByRole('button', { name: '仅创建' }).click()
-  } else {
-    await drawer.getByRole('button', { name: '创建并录入值' }).click()
+  if (value !== null) {
     await drawer.getByLabel('值', { exact: true }).fill(value)
     await drawer.getByLabel('来源').fill('QA 合成原件')
-    await drawer.getByRole('button', { name: /预览影响/ }).click()
-    await expect(drawer.locator('.preview-box')).toContainText(value)
-    await drawer.getByRole('button', { name: '确认提交' }).click()
   }
+  await drawer.getByRole('button', { name: '保存事实' }).click()
   await expect(page.getByRole('row', { name: new RegExp(label) })).toBeVisible()
 }
 
 async function bindDocumentEvidence(page: Page, label: string, ref: string) {
-  await page.getByRole('row', { name: new RegExp(label) }).getByRole('button', { name: '证据' }).click()
+  await page.getByRole('row', { name: new RegExp(label) }).getByRole('button', { name: label }).click()
+  await page.getByRole('button', { name: '核对来源' }).click()
   const drawer = page.locator('.drawer')
   await drawer.getByRole('checkbox', { name: new RegExp(ref) }).check()
   await drawer.getByRole('button', { name: '核对片段并绑定' }).click()
@@ -89,6 +85,7 @@ test('真实用户写作闭环：空项目、原件、事实、规则、章节�
   await page.getByRole('button', { name: '新建项目' }).click()
   await page.getByRole('dialog', { name: '新建项目' }).getByLabel('项目名称').fill(runName)
   await page.getByRole('button', { name: '创建项目' }).click()
+  await expect(page.getByLabel('切换项目').locator('option:checked')).toHaveText(runName)
   await expect(page.getByRole('heading', { name: '项目文件' })).toBeVisible()
   const projectId = await page.getByLabel('切换项目').inputValue()
   expect(projectId).toMatch(/^[a-f\d-]{36}$/)
@@ -228,7 +225,7 @@ test('真实用户写作闭环：空项目、原件、事实、规则、章节�
 
   await checkpoint('6/9 事实改为 0，预览取消与提交')
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '项目事实' }).click()
-  await page.getByRole('row', { name: /首年客户需求/ }).getByRole('button', { name: '编辑' }).click()
+  await page.getByRole('row', { name: /首年客户需求/ }).getByRole('button', { name: '修改' }).click()
   let edit = page.locator('.drawer')
   await edit.getByLabel('值', { exact: true }).fill('0')
   await edit.getByRole('button', { name: /预览影响/ }).click()
@@ -237,7 +234,7 @@ test('真实用户写作闭环：空项目、原件、事实、规则、章节�
   await edit.getByRole('button', { name: '取消' }).click()
   let facts = await getJson<{ facts: Fact[] }>(request, `/api/projects/${projectId}/facts`)
   expect(facts.facts.find((fact) => fact.key === 'first_year_demand')?.value).toBe('300000')
-  await page.getByRole('row', { name: /首年客户需求/ }).getByRole('button', { name: '编辑' }).click()
+  await page.getByRole('row', { name: /首年客户需求/ }).getByRole('button', { name: '修改' }).click()
   edit = page.locator('.drawer')
   await edit.getByLabel('值', { exact: true }).fill('0')
   await edit.getByRole('button', { name: /预览影响/ }).click()

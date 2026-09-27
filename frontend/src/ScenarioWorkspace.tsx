@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowDown, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, Download, FilePlus2, GitCompareArrows, MoreHorizontal, Pencil, Play, Plus, Save, Sparkles, X } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowUp, BookOpen, Check, ChevronDown, Download, GitCompareArrows, MoreHorizontal, Pencil, Play, Plus, Save, Sparkles, X } from 'lucide-react'
 import { api, post, type Fact, type Project } from './api'
 import { EditorPane, type AnalysisRef, type Block, type EditorActions } from './ReportsView'
 import AnalysisConfigView, { type AnalysisConfig } from './AnalysisConfigView'
@@ -35,6 +35,7 @@ type Preview = { candidate_id?: string; run_id?: string; config_id?: string; sec
 type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'config_condition' | 'judgement' | 'manual_review' | 'rebind' | 'detach' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[]; reference_changes?: { key: string; before: string; after: string | null }[] }
 type RefreshPreview = { report_version: number; run_id: string; actions: RefreshAction[] }
 type Panel = 'inputs' | 'results' | 'draft' | 'sources' | 'check' | 'versions' | 'materials' | null
+type ScenarioCreateSource = 'project' | 'historical' | 'copy' | 'config_facts' | 'config' | 'config_copy'
 
 const sections = [{ id: 'S4', label: '产能与交付' }, { id: 'S7.1', label: '设备购置与报价' }, { id: 'S5.2', label: '配电资料分歧' }]
 const groups: Record<string, string> = { demand: '需求', capacity: '产能参数', sales: '销售', supplier: '设备与供应商', project: '项目输入' }
@@ -145,6 +146,8 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   const [scenarioId, setScenarioId] = useState('')
   const scenario = scenarios.find((item) => item.id === scenarioId) || null
   const [scenarioName, setScenarioName] = useState('')
+  const [scenarioCreateOpen, setScenarioCreateOpen] = useState(false)
+  const [scenarioCreateSource, setScenarioCreateSource] = useState<ScenarioCreateSource>('project')
   const [edits, setEdits] = useState<Record<string, string | null>>({})
   const [simulation, setSimulation] = useState<Snapshot | null>(null)
   const [runs, setRuns] = useState<Run[]>([])
@@ -363,11 +366,23 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
         ...(source === 'config_facts' ? { use_project_facts: true } : {}),
       })
       setScenarios((old) => [created, ...old]); setScenarioId(created.id)
-      setScenarioName(''); setEdits({}); setSimulation(null); setRuns([]); setRunId('')
+      setScenarioName(''); setScenarioCreateOpen(false); setEdits({}); setSimulation(null); setRuns([]); setRunId('')
       setPanel('inputs'); notify(source === 'config_facts'
         ? `方案已创建，填入 ${Object.values(created.inputs).filter((row) => row.origin === 'project_fact').length} 项项目事实`
         : '方案已创建')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
+  }
+
+  const openScenarioCreate = () => {
+    setScenarioName('')
+    setScenarioCreateSource(configs.some((item) => item.status === 'PUBLISHED') ? 'config_facts' : scenario ? 'copy' : project.has_corpus ? 'historical' : 'project')
+    setScenarioCreateOpen(true)
+    setError('')
+  }
+
+  const createSelectedScenario = () => {
+    if (scenarioCreateSource === 'config_copy') void createScenario('config', true)
+    else void createScenario(scenarioCreateSource)
   }
 
   const openConfig = () => {
@@ -388,6 +403,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
 
   const switchScenario = (id: string) => {
     if (Object.keys(edits).length) { setError('请先保存或放弃当前输入修改'); return }
+    setScenarioCreateOpen(false)
     setScenarioId(id); setSimulation(null); setSelectedResult('')
   }
 
@@ -485,6 +501,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   }, [base, reportId, report, project.id])
 
   const closePanel = useCallback(() => {
+    setScenarioCreateOpen(false)
     setPanel(null)
     window.requestAnimationFrame(() => editorActions.current?.focus())
   }, [])
@@ -938,9 +955,16 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
         <section className="scenario-canvas"><div className="scenario-canvas-tools"><span>{selectedBlock?.section_id ? availableSections.find((item) => item.id === selectedBlock.section_id)?.label || '报告正文' : '报告正文'}</span><button onClick={() => void persistBody()} disabled={!dirty || saveState === '保存中…'}><Save size={13} /> 保存</button><button onClick={() => setPanel('sources')} disabled={!selectedBlock}>查看依据</button><button onClick={() => setPanel('check')}>检查 {blocking.length > 0 ? `· ${blocking.length}` : ''}</button></div><div className="scenario-paper"><EditorPane key={`${report.id}-${editorKey}`} initial={content} facts={facts.filter((item) => item.value != null)} actionsRef={editorActions} staleFactKeys={[]} onOpenFact={() => { setPanel('sources') }} onSelectPosition={selectPosition} onChange={changeBody} /></div></section>
         {panel && <aside className="scenario-panel" role="complementary"><div className="scenario-panel-head"><h2>{({ inputs: '输入数据', results: '推演结果', draft: '生成本章', sources: '资料与来源', check: '检查与导出', versions: '版本', materials: '资料应用' })[panel]}</h2><button onClick={closePanel} aria-label="关闭面板"><X size={18} /></button></div><div className="scenario-panel-body">
           {panel === 'inputs' && <>
-            <div className="scenario-panel-line"><select aria-label="选择方案" value={scenarioId} onChange={(event) => switchScenario(event.target.value)}><option value="">选择方案</option>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>{scenario && <button onClick={() => void createScenario('copy')} title="复制当前方案"><FilePlus2 size={15} /></button>}</div>
-            <details className="scenario-create"><summary>新建方案</summary><input aria-label="方案名称" value={scenarioName} onChange={(event) => setScenarioName(event.target.value)} placeholder="如：工期调整方案" /><div className="scenario-inline">{project.has_corpus && <button onClick={() => void createScenario('historical')} disabled={busy}>采用澄岳历史输入</button>}<button onClick={() => void createScenario('project')} disabled={busy}>从项目事实创建</button></div></details>
-            <details className="scenario-create"><summary>按已发布配置创建方案</summary>{configs.some((item) => item.status === 'PUBLISHED') ? <><input aria-label="配置方案名称" value={scenarioName} onChange={(event) => setScenarioName(event.target.value)} placeholder="方案名称" /><select aria-label="选择写作配置" value={configId} onChange={(event) => setConfigId(event.target.value)}>{configs.filter((item) => item.status === 'PUBLISHED').map((item) => <option key={item.id} value={item.id}>v{item.version} · {item.name}</option>)}</select><div className="scenario-inline"><button disabled={!configId || busy} onClick={() => void createScenario('config_facts')}>填入项目事实</button><button disabled={!configId || busy} onClick={() => void createScenario('config')}>创建空输入方案</button><button disabled={!configId || !scenarioId || busy} onClick={() => void createScenario('config', true)}>沿用当前输入</button></div></> : <button onClick={openConfig}>创建配置</button>}</details>
+            <div className="scenario-panel-line"><select aria-label="选择方案" value={scenarioId} onChange={(event) => switchScenario(event.target.value)}><option value="">选择方案</option>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><button type="button" onClick={openScenarioCreate}><Plus size={14} /> 新建</button></div>
+            {scenarioCreateOpen && <div className="scenario-create-card">
+              <label className="scenario-field">方案名称<input aria-label="方案名称" value={scenarioName} onChange={(event) => setScenarioName(event.target.value)} placeholder={scenarioCreateSource === 'copy' ? `${scenario?.name || '方案'} · 副本` : '基准方案'} /></label>
+              <label className="scenario-field">输入来源<select aria-label="方案输入来源" value={scenarioCreateSource} onChange={(event) => setScenarioCreateSource(event.target.value as ScenarioCreateSource)}>
+                <option value="project">本项目事实</option>{scenario && <option value="copy">复制当前方案</option>}{project.has_corpus && <option value="historical">澄岳历史输入副本</option>}
+                {configs.some((item) => item.status === 'PUBLISHED') && <><option value="config_facts">已发布配置 · 填入项目事实</option><option value="config">已发布配置 · 空输入</option>{scenario && <option value="config_copy">已发布配置 · 沿用当前输入</option>}</>}
+              </select></label>
+              {scenarioCreateSource.startsWith('config') && <label className="scenario-field">写作配置<select aria-label="选择写作配置" value={configId} onChange={(event) => setConfigId(event.target.value)}>{configs.filter((item) => item.status === 'PUBLISHED').map((item) => <option key={item.id} value={item.id}>v{item.version} · {item.name}</option>)}</select></label>}
+              <div className="scenario-panel-actions"><button type="button" onClick={() => setScenarioCreateOpen(false)}>取消</button><button type="button" className="primary-button" disabled={busy || scenarioCreateSource.startsWith('config') && !configId} onClick={createSelectedScenario}>{busy ? '创建中…' : '创建方案'}</button></div>
+            </div>}
             {scenario && <>{inputFields.length ? inputGroups.map((group) => { const fields = inputFields.filter((field) => (field.group || 'project') === group); return <section className="scenario-input-group" key={group}><h3>{groups[group] || group}</h3>{fields.map((field) => { const entry = scenario.inputs[field.key]; const value = Object.prototype.hasOwnProperty.call(edits, field.key) ? edits[field.key] : entry?.value; const pending = Object.prototype.hasOwnProperty.call(edits, field.key) && value !== entry?.value; const origin = pending ? (value == null ? "missing" : "scenario_assumption") : entry?.origin || "missing"; return <label key={field.key} className="scenario-input"><span>{field.label}<small>{sourceLabel(origin)}{percentageInput(field, scenario) ? ' · %' : field.unit ? ` · ${field.unit}` : ''}</small></span><input aria-label={field.label} value={inputDisplay(field, scenario, value)} type={field.data_type === 'text' ? 'text' : 'number'} step={field.data_type === 'integer' ? '1' : 'any'} onChange={(event) => changeInput(field, event.target.value)} /></label> })}</section> }) : <div className="empty">本项目尚无输入字段。请先录入项目事实与规则。<button onClick={onOpenFacts}>打开项目事实</button></div>}
               <div className="scenario-panel-actions"><button onClick={discardInputs} disabled={!changeCount}>放弃修改</button><button onClick={() => void persistScenario()} disabled={!changeCount || busy}>保存方案</button><button className="primary-button" onClick={() => void previewInputs()} disabled={busy || !inputFields.length}><Play size={14} /> 预览推演</button></div>
               {simulation && <div className="scenario-preview"><h3>预览结果</h3>{Object.values(simulation.results).filter((result) => scenario.definitions.some((field) => field.key === result.key && field.computed) || result.origin === 'calculated').map((result) => <div key={result.key}><span>{result.label}</span><strong>{shown(result.value, result.unit)}</strong></div>)}<small>{simulation.condition}</small><div className="scenario-panel-actions"><button onClick={() => setSimulation(null)}>取消预览</button><button className="primary-button" onClick={() => void persistRun()} disabled={busy}>保存方案并运行</button></div></div>}

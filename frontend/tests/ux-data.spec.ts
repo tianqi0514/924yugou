@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('a new fact opens value entry, previews zero without writing, then commits', async ({ page }) => {
+test('one-step fact entry preserves zero; later edits preview and cancel without writing', async ({ page }) => {
   const project = { id: 'ux-project', name: '交互验收', version: 0, has_corpus: false, is_builtin: false }
   const facts: Record<string, unknown>[] = []
   let previews = 0
@@ -14,7 +14,7 @@ test('a new fact opens value entry, previews zero without writing, then commits'
     if (path === '/projects/ux-project/facts' && request.method() === 'GET') return reply({ project_version: project.version, facts })
     if (path === '/projects/ux-project/facts' && request.method() === 'POST') {
       const body = request.postDataJSON()
-      const fact = { id: `f${facts.length + 1}`, ...body, value: null, status: 'UNDEFINED', revision: 0, updated_at: null }
+      const fact = { id: `f${facts.length + 1}`, ...body, value: body.value, status: body.value === null ? 'UNDEFINED' : 'PROVIDED', revision: body.value === null ? 0 : 1, updated_at: null }
       facts.push(fact); project.version += 1
       return reply(fact, 201)
     }
@@ -28,15 +28,15 @@ test('a new fact opens value entry, previews zero without writing, then commits'
     }
     if (path === '/projects/ux-project/changes/preview' && request.method() === 'POST') {
       previews += 1
-      expect(request.postDataJSON().value).toBe('0')
+      expect(request.postDataJSON().value).toBe('25')
       return reply({ base_version: project.version, preview_token: 'preview-0', expires_at: 9999999999,
-        changes: [{ key: 'first_year_demand', label: '首年需求', before: { value: null, status: 'UNDEFINED' },
-          after: { value: '0', status: 'PROVIDED' } }], trace: [], report_impacts: [] })
+        changes: [{ key: 'first_year_demand', label: '首年需求', before: { value: '0', status: 'PROVIDED' },
+          after: { value: '25', status: 'PROVIDED' } }], trace: [], report_impacts: [] })
     }
     if (path === '/projects/ux-project/changes/commit' && request.method() === 'POST') {
       commits += 1
       expect(request.postDataJSON().preview_token).toBe('preview-0')
-      Object.assign(facts[0], { value: '0', status: 'PROVIDED', revision: 1 })
+      Object.assign(facts[0], { value: '25', status: 'PROVIDED', revision: 2 })
       project.version += 1
       return reply({ project_version: project.version })
     }
@@ -50,22 +50,25 @@ test('a new fact opens value entry, previews zero without writing, then commits'
   await page.getByRole('textbox', { name: '字段 key' }).fill('first_year_demand')
   await page.getByRole('combobox', { name: '类型' }).selectOption('integer')
   await page.getByRole('textbox', { name: '单位' }).fill('套')
-  await page.getByRole('button', { name: '创建并录入值' }).click()
-  await expect(page.getByRole('heading', { name: '录入 · 首年需求' })).toBeVisible()
   await page.getByRole('textbox', { name: '值', exact: true }).fill('0')
   await page.getByRole('textbox', { name: '来源' }).fill('本项目需求说明')
+  await page.getByRole('button', { name: '保存事实' }).click()
+  await expect(page.getByRole('row', { name: /首年需求/ })).toContainText('0 套')
+  await page.getByRole('row', { name: /首年需求/ }).getByRole('button', { name: '首年需求' }).click()
+  await expect(page.getByRole('dialog', { name: '首年需求' })).toContainText('本项目需求说明')
+  await page.getByRole('button', { name: '修改数值' }).click()
+  await page.getByRole('textbox', { name: '值', exact: true }).fill('25')
   await page.getByRole('button', { name: '预览影响' }).click()
-  await expect(page.locator('.diff-row')).toContainText('0')
+  await expect(page.locator('.diff-row')).toContainText('25')
   expect(previews).toBe(1)
   expect(commits).toBe(0)
   await page.getByRole('button', { name: '取消' }).click()
-  await expect(page.getByRole('row', { name: /首年需求/ })).toContainText('未定义')
-  await page.getByRole('row', { name: /首年需求/ }).getByRole('button', { name: '编辑' }).click()
-  await page.getByRole('textbox', { name: '值', exact: true }).fill('0')
-  await page.getByRole('textbox', { name: '来源' }).fill('本项目需求说明')
+  await expect(page.getByRole('row', { name: /首年需求/ })).toContainText('0 套')
+  await page.getByRole('row', { name: /首年需求/ }).getByRole('button', { name: '修改' }).click()
+  await page.getByRole('textbox', { name: '值', exact: true }).fill('25')
   await page.getByRole('button', { name: '预览影响' }).click()
   await page.getByRole('button', { name: '确认提交' }).click()
-  await expect(page.getByRole('row', { name: /首年需求/ })).toContainText('0 套')
+  await expect(page.getByRole('row', { name: /首年需求/ })).toContainText('25 套')
   expect(commits).toBe(1)
   const previewsBeforeResultFact = previews
   await page.getByRole('button', { name: '新增事实' }).click()
@@ -73,7 +76,7 @@ test('a new fact opens value entry, previews zero without writing, then commits'
   await page.locator('details.project-more > summary').click()
   await page.getByRole('textbox', { name: '字段 key' }).fill('planned_sales')
   await page.getByRole('textbox', { name: '单位' }).fill('套')
-  await page.getByRole('button', { name: '仅创建' }).click()
+  await page.getByRole('button', { name: '保存事实' }).click()
   await expect(page.getByRole('row', { name: /计划销售量/ })).toContainText('未定义')
   await expect(page.getByRole('heading', { name: '录入 · 计划销售量' })).toHaveCount(0)
   expect(previews).toBe(previewsBeforeResultFact)
@@ -86,8 +89,8 @@ test('a new fact opens value entry, previews zero without writing, then commits'
   await page.getByRole('button', { name: '保存规则' }).click()
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '项目事实' }).click()
   const resultRow = page.getByRole('row', { name: /计划销售量/ })
-  await expect(resultRow.getByRole('button', { name: '编辑' })).toHaveCount(0)
-  await resultRow.getByRole('button', { name: '规则' }).click()
+  await expect(resultRow.getByRole('button', { name: '修改' })).toHaveCount(0)
+  await resultRow.getByRole('button', { name: '查看计算' }).click()
   await expect(page.getByRole('heading', { name: '规则计算' })).toBeVisible()
 })
 

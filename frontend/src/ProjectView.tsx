@@ -3,11 +3,11 @@ import { ArrowRight, Calculator, Check, ChevronRight, Clock3, FilePlus2, Plus, S
 import { api, post, type Fact, type FactChange, type Preview, type Project, type Rule, type Trace } from './api'
 import './project-view.css'
 
-type FactForm = { key: string; label: string; data_type: string; unit: string; caliber: string; as_of: string; source: string }
+type FactForm = { key: string; label: string; data_type: string; value: string; unit: string; caliber: string; as_of: string; source: string }
 type EvidenceStatus = { fact_key: string; fact_revision: number; status: 'UNVERIFIED' | 'SOURCE_LOCATOR_REVIEWED'; document_id: string | null; source_refs: string[] }
 type EvidenceDocument = { id: string; filename: string; pages: number }
 type EvidenceSegment = { ref: string; page: number; text: string; locator?: string }
-const emptyFact: FactForm = { key: '', label: '', data_type: 'decimal', unit: '', caliber: '', as_of: '', source: '' }
+const emptyFact: FactForm = { key: '', label: '', data_type: 'decimal', value: '', unit: '', caliber: '', as_of: '', source: '' }
 const newFact = (): FactForm => ({ ...emptyFact, key: `fact_${window.crypto.randomUUID().replaceAll('-', '').slice(0, 12)}` })
 const statusText: Record<string, string> = { UNDEFINED: '未定义', UNEVALUABLE: '不可评估', PROVIDED: '已提供', COMPUTED: '已计算' }
 const displayValue = (value: string | null, status?: string | null) => value ?? (statusText[status || ''] || '—')
@@ -29,6 +29,12 @@ function FieldInput({ label, value, onChange, placeholder, type = 'text' }: { la
   return <label className="form-field"><span>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} type={type} /></label>
 }
 
+function FactValueInput({ dataType, value, onChange, unit }: { dataType: string; value: string; onChange: (value: string) => void; unit: string }) {
+  return <label className="form-field"><span>值{unit && <small> · {unit}</small>}</span>{dataType === 'boolean'
+    ? <select aria-label="值" value={value} onChange={(event) => onChange(event.target.value)}><option value="">未定义</option><option value="true">是</option><option value="false">否</option></select>
+    : <input aria-label="值" value={value} onChange={(event) => onChange(event.target.value)} type={dataType === 'date' ? 'date' : 'text'} inputMode={dataType === 'integer' || dataType === 'decimal' ? 'decimal' : undefined} placeholder="留空表示未定义" />}</label>
+}
+
 export default function ProjectView({ project, section, onProjectChange, notify, onOpenDocuments, onOpenRules }: { project: Project | null; section: 'facts' | 'rules'; onProjectChange: (project: Project) => void; notify: (message: string) => void; onOpenDocuments: () => void; onOpenRules: () => void }) {
   const [facts, setFacts] = useState<Fact[]>([])
   const [rules, setRules] = useState<Rule[]>([])
@@ -36,12 +42,11 @@ export default function ProjectView({ project, section, onProjectChange, notify,
   const [version, setVersion] = useState(0)
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [dialog, setDialog] = useState<'fact' | 'rule' | 'edit' | 'history' | 'evidence' | null>(null)
+  const [dialog, setDialog] = useState<'fact' | 'rule' | 'detail' | 'edit' | 'history' | 'evidence' | null>(null)
   const [factForm, setFactForm] = useState<FactForm>(emptyFact)
   const [ruleForm, setRuleForm] = useState({ name: '', target_key: '', expression: '' })
   const [current, setCurrent] = useState<Fact | null>(null)
   const [change, setChange] = useState<FactChange>({ fact_key: '', value: null, source: '', caliber: '', as_of: '', reason: '人工修改' })
-  const [undefinedValue, setUndefinedValue] = useState(false)
   const [preview, setPreview] = useState<Preview | null>(null)
   const [history, setHistory] = useState<Record<string, any>[]>([])
   const [evidenceStatus, setEvidenceStatus] = useState<EvidenceStatus | null>(null)
@@ -70,12 +75,12 @@ export default function ProjectView({ project, section, onProjectChange, notify,
     `${fact.key} ${fact.label} ${fact.unit} ${fact.status}`.toLowerCase().includes(query.toLowerCase()) &&
     (statusFilter === 'all' || (statusFilter === 'needs-source' ? fact.status === 'PROVIDED' && fact.evidence_status !== 'SOURCE_LOCATOR_REVIEWED' : fact.status === statusFilter))), [facts, query, statusFilter])
 
-  const createFact = async (openEditor: boolean) => {
+  const createFact = async () => {
     if (!project) return
     setBusy(true); setError('')
     try {
-      const created = await post<Fact>(`/projects/${project.id}/facts`, factForm)
-      setFactForm(emptyFact); await load(); if (openEditor) editFact(created); else setDialog(null); notify('事实已创建')
+      await post<Fact>(`/projects/${project.id}/facts`, { ...factForm, value: factForm.value.trim() === '' ? null : factForm.value })
+      setFactForm(emptyFact); setDialog(null); await load(); notify('事实已录入')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
   const createRule = async () => {
@@ -87,8 +92,9 @@ export default function ProjectView({ project, section, onProjectChange, notify,
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
   const editFact = (fact: Fact) => {
-    setCurrent(fact); setChange({ fact_key: fact.key, value: fact.value, source: fact.source, caliber: fact.caliber, as_of: fact.as_of, reason: '人工修改' }); setUndefinedValue(false); setPreview(null); setError(''); setDialog('edit')
+    setCurrent(fact); setChange({ fact_key: fact.key, value: fact.value, source: fact.source, caliber: fact.caliber, as_of: fact.as_of, reason: '人工修改' }); setPreview(null); setError(''); setDialog('edit')
   }
+  const showDetail = (fact: Fact) => { setCurrent(fact); setError(''); setDialog('detail') }
   const showHistory = async (fact: Fact) => {
     if (!project) return
     setCurrent(fact); setDialog('history'); setError('')
@@ -131,14 +137,14 @@ export default function ProjectView({ project, section, onProjectChange, notify,
   const previewChange = async () => {
     if (!project) return
     setBusy(true); setError('')
-    try { setPreview(await post<Preview>(`/projects/${project.id}/changes/preview`, { ...change, value: undefinedValue ? null : change.value })) }
+    try { setPreview(await post<Preview>(`/projects/${project.id}/changes/preview`, change)) }
     catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
   const commitChange = async () => {
     if (!project || !preview) return
     setBusy(true); setError('')
     try {
-      await post(`/projects/${project.id}/changes/commit`, { ...change, value: undefinedValue ? null : change.value, base_version: preview.base_version, preview_token: preview.preview_token })
+      await post(`/projects/${project.id}/changes/commit`, { ...change, base_version: preview.base_version, preview_token: preview.preview_token })
       const affected = preview.report_impacts.length
       setDialog(null); setPreview(null); await load(); notify(affected ? `变更已提交；${affected} 处报告段落需重新核对` : '变更已提交，修订记录已保存')
     } catch (cause) { setError((cause as Error).message); setPreview(null) } finally { setBusy(false) }
@@ -151,14 +157,33 @@ export default function ProjectView({ project, section, onProjectChange, notify,
     <div className="page-header"><h1>{section === 'facts' ? '项目事实' : '规则计算'}</h1>{project.has_corpus ? <span className="status status-neutral">只读</span> : <button className="primary-button" onClick={() => { setError(''); if (section === 'facts') { setFactForm(newFact()); setDialog('fact') } else { setRuleForm({ name: '', target_key: '', expression: '' }); setDialog('rule') } }}><Plus size={16} />{section === 'facts' ? '新增事实' : '新增规则'}</button>}</div>
     {error && !dialog && <div className="notice error">{error}</div>}
     <div className="project-summary"><span>{facts.length} 项事实</span><span>{facts.filter((fact) => fact.status === 'UNDEFINED' || fact.status === 'UNEVALUABLE').length} 项待补</span><span>v{version}</span></div>
-    {section === 'facts' ? <section className="workspace-card"><div className="workspace-toolbar"><h2>事实台账</h2><div className="fact-list-tools"><select aria-label="筛选事实状态" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">全部状态</option><option value="UNDEFINED">未定义</option><option value="UNEVALUABLE">不可评估</option><option value="PROVIDED">已提供</option><option value="COMPUTED">已计算</option><option value="needs-source">来源待核对</option></select><div className="search-input"><Search size={16} /><input aria-label="搜索事实" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索名称或单位" /></div></div></div><div className="table-wrap"><table><thead><tr><th>事实</th><th>值</th><th>状态</th><th>操作</th></tr></thead><tbody>{filtered.map((fact) => { const computed = rules.some((rule) => rule.target_key === fact.key); return <tr key={fact.id}><td><strong>{fact.label}</strong></td><td className="fact-value">{fact.value === null ? '—' : fact.value}{fact.value !== null && fact.unit ? ` ${fact.unit}` : ''}</td><td><FactStatus status={fact.status} />{fact.status === 'PROVIDED' && <small className="fact-source-state">{fact.evidence_status === 'SOURCE_LOCATOR_REVIEWED' ? '原文位置已核对' : '来源待核对'}</small>}</td><td><div className="inline-actions">{computed ? <button onClick={onOpenRules}>规则</button> : !project.has_corpus && <><button onClick={() => editFact(fact)}>编辑</button>{fact.status === 'PROVIDED' && <button onClick={() => void openEvidence(fact)}>证据</button>}</>}<button onClick={() => showHistory(fact)}>历史</button></div></td></tr> })}</tbody></table>{filtered.length === 0 && <div className="empty">{facts.length === 0 ? '暂无事实，点击右上角新增' : '没有匹配事实'}</div>}</div></section> : <section className="workspace-card"><div className="workspace-toolbar"><h2>规则与结果</h2></div>{rules.length === 0 ? <div className="empty">暂无规则</div> : <div className="rule-list">{rules.map((rule) => { const item = trace.find((entry) => entry.rule_id === rule.id); return <div className="rule-card" key={rule.id}><div className="rule-card-head"><span className="rule-symbol"><Calculator size={18} /></span><div><strong>{rule.name}</strong><small>{rule.target_key} ← {rule.deps.join('、')}</small></div><FactStatus status={item?.status || 'UNDEFINED'} /></div><div className="expression">{rule.expression}</div><div className="rule-result">{item?.status === 'UNEVALUABLE' ? <>缺少输入：{item.missing?.join('、')}</> : <>当前结果：<b>{item?.result ?? '—'}</b></>}</div></div> })}</div>}</section>}
+    {section === 'facts' ? <section className="workspace-card fact-ledger">
+      <div className="workspace-toolbar"><h2>事实台账</h2><div className="fact-list-tools">
+        <select aria-label="筛选事实状态" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">全部状态</option><option value="UNDEFINED">未定义</option><option value="UNEVALUABLE">不可评估</option><option value="PROVIDED">已提供</option><option value="COMPUTED">已计算</option><option value="needs-source">来源待核对</option></select>
+        <div className="search-input"><Search size={16} /><input aria-label="搜索事实" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索名称或单位" /></div>
+      </div></div>
+      <div className="table-wrap"><table><thead><tr><th>事实</th><th>值</th><th>状态</th><th>操作</th></tr></thead><tbody>
+        {filtered.map((fact) => {
+          const computed = rules.some((rule) => rule.target_key === fact.key)
+          return <tr key={fact.id}>
+            <td><button type="button" className="fact-name-button" onClick={() => showDetail(fact)}>{fact.label}</button></td>
+            <td className="fact-value">{fact.value === null ? '—' : fact.value}{fact.value !== null && fact.unit ? ` ${fact.unit}` : ''}</td>
+            <td><FactStatus status={fact.status} />{fact.status === 'PROVIDED' && <small className="fact-source-state">{fact.evidence_status === 'SOURCE_LOCATOR_REVIEWED' ? '原文位置已核对' : '来源待核对'}</small>}</td>
+            <td><button type="button" className="fact-row-action" onClick={() => computed ? onOpenRules() : project.has_corpus ? showDetail(fact) : editFact(fact)}>{computed ? '查看计算' : project.has_corpus ? '查看' : fact.value === null ? '录入' : '修改'}</button></td>
+          </tr>
+        })}</tbody></table>
+        {filtered.length === 0 && <div className="empty">{facts.length === 0 ? '暂无事实' : '没有匹配事实'}</div>}
+      </div>
+    </section> : <section className="workspace-card"><div className="workspace-toolbar"><h2>规则与结果</h2></div>{rules.length === 0 ? <div className="empty">暂无规则</div> : <div className="rule-list">{rules.map((rule) => { const item = trace.find((entry) => entry.rule_id === rule.id); return <div className="rule-card" key={rule.id}><div className="rule-card-head"><span className="rule-symbol"><Calculator size={18} /></span><div><strong>{rule.name}</strong><small>{rule.target_key} ← {rule.deps.join('、')}</small></div><FactStatus status={item?.status || 'UNDEFINED'} /></div><div className="expression">{rule.expression}</div><div className="rule-result">{item?.status === 'UNEVALUABLE' ? <>缺少输入：{item.missing?.join('、')}</> : <>当前结果：<b>{item?.result ?? '—'}</b></>}</div></div> })}</div>}</section>}
 
     {dialog === 'fact' && <Modal title="新增事实" onClose={() => setDialog(null)}><div className="form-stack">
       <FieldInput label="名称" value={factForm.label} onChange={(value) => setFactForm({ ...factForm, label: value })} placeholder="首年需求" />
       <label className="form-field"><span>类型</span><select value={factForm.data_type} onChange={(event) => setFactForm({ ...factForm, data_type: event.target.value })}>{[['decimal', '小数'], ['integer', '整数'], ['boolean', '布尔'], ['date', '日期'], ['text', '文本'], ['enum', '选项']].map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <FieldInput label="单位" value={factForm.unit} onChange={(value) => setFactForm({ ...factForm, unit: value })} placeholder="套" />
-      <details className="project-more"><summary>更多属性</summary><FieldInput label="字段 key" value={factForm.key} onChange={(value) => setFactForm({ ...factForm, key: value })} /><FieldInput label="口径" value={factForm.caliber} onChange={(value) => setFactForm({ ...factForm, caliber: value })} /><FieldInput label="时点" value={factForm.as_of} onChange={(value) => setFactForm({ ...factForm, as_of: value })} placeholder="YYYY-MM-DD" /><FieldInput label="来源" value={factForm.source} onChange={(value) => setFactForm({ ...factForm, source: value })} /></details>
-      {error && <div className="notice error">{error}</div>}<div className="form-actions"><button onClick={() => setDialog(null)}>取消</button><button disabled={!factForm.key || !factForm.label || busy} onClick={() => void createFact(false)}>仅创建</button><button className="primary-button" disabled={!factForm.key || !factForm.label || busy} onClick={() => void createFact(true)}>创建并录入值</button></div>
+      <FactValueInput dataType={factForm.data_type} value={factForm.value} unit={factForm.unit} onChange={(value) => setFactForm({ ...factForm, value })} />
+      <FieldInput label="来源" value={factForm.source} onChange={(value) => setFactForm({ ...factForm, source: value })} placeholder="文件、页码或人工录入" />
+      <details className="project-more"><summary>更多属性</summary><FieldInput label="字段 key" value={factForm.key} onChange={(value) => setFactForm({ ...factForm, key: value })} /><FieldInput label="口径" value={factForm.caliber} onChange={(value) => setFactForm({ ...factForm, caliber: value })} /><FieldInput label="时点" value={factForm.as_of} onChange={(value) => setFactForm({ ...factForm, as_of: value })} placeholder="YYYY-MM-DD" /></details>
+      {error && <div className="notice error">{error}</div>}<div className="form-actions"><button onClick={() => setDialog(null)}>取消</button><button className="primary-button" disabled={!factForm.key || !factForm.label.trim() || busy} onClick={() => void createFact()}>{busy ? '保存中…' : '保存事实'}</button></div>
     </div></Modal>}
     {dialog === 'rule' && <Modal title="新增规则" onClose={() => setDialog(null)}><div className="form-stack">
       <FieldInput label="名称" value={ruleForm.name} onChange={(value) => setRuleForm({ ...ruleForm, name: value })} placeholder="首年计划销售量" />
@@ -166,15 +191,19 @@ export default function ProjectView({ project, section, onProjectChange, notify,
       <FieldInput label="表达式" value={ruleForm.expression} onChange={(value) => setRuleForm({ ...ruleForm, expression: value })} placeholder="min(first_year_demand, qualified_capacity)" />
       {error && <div className="notice error">{error}</div>}<div className="form-actions"><button onClick={() => setDialog(null)}>取消</button><button className="primary-button" disabled={!ruleForm.name || !ruleForm.target_key || !ruleForm.expression || busy} onClick={createRule}>保存规则</button></div>
     </div></Modal>}
-    {dialog === 'edit' && current && <Modal title={`录入 · ${current.label}`} onClose={() => setDialog(null)}><div className="form-stack">
-      <div className="project-fact-meta">{current.key} · {current.unit || '无单位'} · r{current.revision} · {statusText[current.status] || current.status}</div>
-      <label className="check-line"><input type="checkbox" checked={undefinedValue} onChange={(event) => { setUndefinedValue(event.target.checked); setPreview(null) }} />设为未定义</label>
-      {!undefinedValue && <FieldInput label="值" value={change.value === null ? '' : String(change.value)} onChange={(value) => { setChange({ ...change, value }); setPreview(null) }} placeholder={current.data_type === 'boolean' ? 'true / false' : '输入数值或文字'} type={current.data_type === 'date' ? 'date' : 'text'} />}
+    {dialog === 'detail' && current && <Modal title={current.label} onClose={() => setDialog(null)}><div className="fact-detail">
+      <div className="fact-detail-value"><strong>{displayValue(current.value, current.status)}{current.value !== null && current.unit ? ` ${current.unit}` : ''}</strong><FactStatus status={current.status} /></div>
+      <dl><div><dt>来源</dt><dd>{current.source || '待补充'}</dd></div><div><dt>口径</dt><dd>{current.caliber || '—'}</dd></div><div><dt>时点</dt><dd>{current.as_of || '—'}</dd></div><div><dt>修订</dt><dd>r{current.revision}</dd></div></dl>
+      <div className="fact-detail-actions">{rules.some((rule) => rule.target_key === current.key) ? <button type="button" className="primary-button" onClick={() => { setDialog(null); onOpenRules() }}>查看计算</button> : !project.has_corpus && <button type="button" className="primary-button" onClick={() => editFact(current)}>{current.value === null ? '录入数值' : '修改数值'}</button>}{current.status === 'PROVIDED' && <button type="button" onClick={() => void openEvidence(current)}>{current.evidence_status === 'SOURCE_LOCATOR_REVIEWED' ? '查看原文' : '核对来源'}</button>}<button type="button" onClick={() => void showHistory(current)}>修订记录</button></div>
+      <details className="project-more"><summary>字段信息</summary><div className="project-fact-meta">{current.key} · {current.data_type}</div></details>
+    </div></Modal>}
+    {dialog === 'edit' && current && <Modal title={`${current.value === null ? '录入' : '修改'} · ${current.label}`} onClose={() => setDialog(null)}><div className="form-stack">
+      <FactValueInput dataType={current.data_type} value={change.value ?? ''} unit={current.unit} onChange={(value) => { setChange({ ...change, value: value === '' ? null : value }); setPreview(null) }} />
       <FieldInput label="来源" value={change.source} onChange={(value) => { setChange({ ...change, source: value }); setPreview(null) }} placeholder="本项目资料" />
       <details className="project-more"><summary>更多属性</summary><FieldInput label="口径" value={change.caliber || ''} onChange={(value) => { setChange({ ...change, caliber: value }); setPreview(null) }} /><FieldInput label="时点" value={change.as_of || ''} onChange={(value) => { setChange({ ...change, as_of: value }); setPreview(null) }} placeholder="YYYY-MM-DD" /><FieldInput label="修改原因" value={change.reason} onChange={(value) => { setChange({ ...change, reason: value }); setPreview(null) }} /></details>
       {error && <div className="notice error">{error}</div>}
       {preview && <div className="preview-box"><div className="surface-heading"><strong>影响预览</strong><span>v{preview.base_version}</span></div>{preview.changes.length === 0 ? <div className="empty">没有变更</div> : preview.changes.map((item) => <div className="diff-row" key={item.key}><div><strong>{item.label}</strong></div><span>{displayValue(item.before.value, item.before.status)}</span><ArrowRight size={16} /><b>{displayValue(item.after.value, item.after.status)}</b></div>)}{preview.report_impacts.length > 0 && <div className="report-impact-preview"><strong>{preview.report_impacts.length} 处报告引用需更新</strong>{preview.report_impacts.map((impact, index) => <div key={`${impact.report_id}-${impact.position}-${impact.fact_key}-${index}`}><small>{impact.report_title} · v{impact.report_version} · 第 {impact.position} 段</small><p>{impact.text}</p><span>{displayValue(impact.before.value, impact.before.status)} → {displayValue(impact.after.value, impact.after.status)}</span></div>)}</div>}{preview.trace.length > 0 && <details><summary>计算过程 · {preview.trace.length} 步</summary>{preview.trace.map((step, i) => <div className="trace-step" key={i}>{step.expression} → {step.status === 'UNEVALUABLE' ? `缺少 ${step.missing?.join('、')}` : step.result}</div>)}</details>}</div>}
-      <div className="form-actions"><button onClick={() => setDialog(null)}>取消</button>{preview ? <button className="primary-button" disabled={busy || preview.changes.length === 0} onClick={commitChange}><Check size={16} />确认提交</button> : <button className="primary-button" disabled={busy || (!undefinedValue && String(change.value ?? '').trim() === '')} onClick={previewChange}>预览影响 <ArrowRight size={16} /></button>}</div>
+      <div className="form-actions"><button onClick={() => setDialog(null)}>取消</button>{preview ? <button className="primary-button" disabled={busy || preview.changes.length === 0} onClick={commitChange}><Check size={16} />确认提交</button> : <button className="primary-button" disabled={busy} onClick={previewChange}>预览影响 <ArrowRight size={16} /></button>}</div>
     </div></Modal>}
     {dialog === 'evidence' && current && <Modal title={`核对原文 · ${current.label}`} onClose={() => setDialog(null)}>
       <div className="form-stack evidence-bind">

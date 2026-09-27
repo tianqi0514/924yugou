@@ -506,8 +506,13 @@ def init_db() -> None:
         connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS accepted_report_version integer"))
         connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS issues JSON NOT NULL DEFAULT '[]'::json"))
         connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS preserved_blocks JSON NOT NULL DEFAULT '[]'::json"))
+        connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS evidence_ids JSON NOT NULL DEFAULT '[]'::json"))
+        connection.execute(text("ALTER TABLE report_fact_proposals ADD COLUMN IF NOT EXISTS proposed_source text NOT NULL DEFAULT ''"))
+        connection.execute(text("ALTER TABLE work_tasks ADD COLUMN IF NOT EXISTS stage varchar(24) NOT NULL DEFAULT 'QUEUED'"))
+        connection.execute(text("UPDATE work_tasks SET stage = CASE status WHEN 'COMPLETED' THEN 'DONE' WHEN 'FAILED' THEN 'FAILED' WHEN 'CANCELLED' THEN 'CANCELLED' WHEN 'UNCERTAIN' THEN 'RETRY_REQUIRED' WHEN 'RUNNING' THEN CASE kind WHEN 'model_draft' THEN 'CALLING_MODEL' ELSE 'RENDERING' END ELSE stage END WHERE stage = 'QUEUED' AND status <> 'PENDING'"))
         connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_next28_40') ON CONFLICT DO NOTHING"))
         connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_next35_proposal') ON CONFLICT DO NOTHING"))
+        connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_fact_entry_ux') ON CONFLICT DO NOTHING"))
     # Older parser output can be pinned from the current snapshot. Existing evidence
     # with no parse_revision_id remains legacy; do not claim its historical parse
     # revision has been reconstructed from later OCR output.

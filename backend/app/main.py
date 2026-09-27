@@ -135,6 +135,7 @@ class FactCreate(BaseModel):
     caliber: str = ""
     as_of: str = ""
     source: str = ""
+    value: str | int | bool | None = None
 
 
 class RuleCreate(BaseModel):
@@ -2389,14 +2390,29 @@ def fact_evidence_bind(project_id: str, fact_key: str, body: EvidenceBindRequest
 def facts_create(project_id: str, body: FactCreate):
     if body.data_type not in ("decimal", "integer", "boolean", "date", "text", "enum"):
         fail("不支持的事实类型")
+    try:
+        initial_value = canonical_value(body.value, body.data_type)
+    except RuleError as exc:
+        fail(str(exc))
     with SessionLocal.begin() as session:
         project = get_project(session, project_id, lock=True)
         require_writable_project(project)
         if session.scalar(select(ProjectFact).where(ProjectFact.project_id == project_id, ProjectFact.key == body.key)):
             fail("该事实 key 已存在", 409)
-        fact = ProjectFact(project_id=project_id, **body.model_dump())
+        fact = ProjectFact(project_id=project_id, **body.model_dump(exclude={"value"}))
+        if initial_value is not None:
+            fact.value_text = initial_value
+            fact.value_status = "PROVIDED"
+            fact.revision = 1
         session.add(fact)
         project.version += 1
+        if initial_value is not None:
+            session.add(FactRevision(
+                project_id=project_id, fact_key=body.key, project_version=project.version,
+                before={"value": None, "status": "UNDEFINED", "source": "", "caliber": body.caliber, "as_of": body.as_of},
+                after={"value": initial_value, "status": "PROVIDED", "source": body.source, "caliber": body.caliber, "as_of": body.as_of},
+                reason="录入事实",
+            ))
         session.flush()
         return fact_dict(fact)
 

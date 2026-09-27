@@ -66,7 +66,7 @@ test('a changed project fact leaves an old reference blocked until token refresh
 
   await page.goto('/')
   await page.getByRole('navigation', { name: '主导航' }).getByRole('button', { name: '项目事实' }).click()
-  await page.getByRole('row', { name: /测试数量/ }).getByRole('button', { name: '编辑' }).click()
+  await page.getByRole('row', { name: /测试数量/ }).getByRole('button', { name: '修改' }).click()
   await page.getByLabel('值', { exact: true }).fill('12')
   await page.getByRole('button', { name: /预览影响/ }).click()
   await expect(page.getByText('1 处报告引用需更新')).toBeVisible()

@@ -98,3 +98,8 @@
 .scenario-material-dialog>small{color:#748399}
 .scenario-task-status{display:grid;gap:6px;padding:9px;border:1px solid #cbdcf5;border-radius:7px;background:#f6f9ff;color:#365782;font-size:11px}.scenario-task-status small{color:#9b5546;line-height:1.5}.scenario-task-status>div{display:flex;gap:6px}.scenario-task-status button{border:1px solid #cbdcf5;border-radius:5px;background:#fff;color:#2f61af;padding:5px 9px;font-size:11px}
 .scenario-task-shortcut{display:block;margin:-5px 0 9px auto;border:1px solid #cbdcf5;border-radius:6px;background:#f6f9ff;color:#2f61af;padding:6px 10px;font-size:11px}
+.scenario-create-card{display:grid;gap:11px;padding:12px;border:1px solid #dbe6f5;border-radius:9px;background:#f8fbff}
+.scenario-create-card .scenario-field{gap:5px;font-size:11px;font-weight:600;color:#617592}
+.scenario-create-card .scenario-field input,.scenario-create-card .scenario-field select{background:#fff;font-weight:400}
+.scenario-create-card .scenario-panel-actions{padding-top:2px}
+.scenario-create-card .scenario-panel-actions button{min-width:66px}

@@ -47,6 +47,30 @@ def create_project(client: TestClient) -> str:
     return project_id
 
 
+def test_fact_entry_saves_value_and_revision_atomically(client: TestClient):
+    project_id = create_project(client)
+    endpoint = f"/api/projects/{project_id}/facts"
+    invalid = client.post(endpoint, json={"key": "demand", "label": "首年需求", "data_type": "integer", "unit": "套", "value": "1.5"})
+    assert invalid.status_code == 400
+    assert client.get(endpoint).json() == {"project_version": 0, "facts": []}
+
+    created = client.post(endpoint, json={"key": "demand", "label": "首年需求", "data_type": "integer", "unit": "套", "value": "0", "source": "本项目需求说明"})
+    assert created.status_code == 201, created.text
+    assert created.json()["value"] == "0"
+    assert created.json()["status"] == "PROVIDED"
+    assert created.json()["revision"] == 1
+    revisions = client.get(f"/api/projects/{project_id}/revisions?fact_key=demand").json()
+    assert len(revisions) == 1
+    assert revisions[0]["before"]["status"] == "UNDEFINED"
+    assert revisions[0]["after"]["value"] == "0"
+
+    blank = client.post(endpoint, json={"key": "sales", "label": "计划销售量", "data_type": "integer", "unit": "套", "value": None})
+    assert blank.status_code == 201, blank.text
+    assert blank.json()["value"] is None
+    assert blank.json()["status"] == "UNDEFINED"
+    assert blank.json()["revision"] == 0
+
+
 def test_demo_documents_are_seeded_once_without_facts(client: TestClient, tmp_path):
     from app.db import SessionLocal
     from app.demo_seed import DEMO_DOCUMENTS, seed_demo_documents

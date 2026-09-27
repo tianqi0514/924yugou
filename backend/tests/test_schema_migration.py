@@ -28,3 +28,17 @@ def test_schema_marker_and_failed_ddl_rollback(monkeypatch):
         db.init_db()
     with db.engine.connect() as connection:
         assert connection.scalar(text("SELECT to_regclass('migration_failure_probe')")) is None
+
+
+def test_legacy_tables_get_required_columns():
+    assert db.engine.url.database == "report_platform_test"
+    db.init_db()
+    with db.engine.begin() as connection:
+        connection.execute(text("ALTER TABLE report_fact_proposals DROP COLUMN proposed_source"))
+        connection.execute(text("ALTER TABLE analysis_candidates DROP COLUMN evidence_ids"))
+        connection.execute(text("ALTER TABLE work_tasks DROP COLUMN stage"))
+    db.init_db()
+    with db.engine.connect() as connection:
+        assert connection.scalar(text("SELECT count(*) FROM information_schema.columns WHERE table_name='report_fact_proposals' AND column_name='proposed_source'")) == 1
+        assert connection.scalar(text("SELECT count(*) FROM information_schema.columns WHERE table_name='analysis_candidates' AND column_name='evidence_ids'")) == 1
+        assert connection.scalar(text("SELECT count(*) FROM information_schema.columns WHERE table_name='work_tasks' AND column_name='stage'")) == 1
