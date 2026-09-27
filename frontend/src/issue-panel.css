@@ -1,0 +1,14 @@
+.issue-panel{border-top:1px solid #e7edf5;margin-top:14px;padding-top:12px}
+.issue-panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px}
+.issue-panel-head button{border:0;background:transparent;color:#2760bc;font-size:12px}
+.issue-row,.issue-source{width:100%;display:flex;justify-content:space-between;gap:8px;text-align:left;border:1px solid #e5ebf3;background:#fff;border-radius:6px;margin-top:6px;padding:7px 8px;font-size:12px}
+.issue-row small{color:#75849a;white-space:nowrap}
+.issue-source{display:grid;line-height:1.5}
+.issue-source small{color:#65758e}
+.issue-form,.issue-detail{display:grid;gap:9px;border:1px solid #e5ebf3;border-radius:7px;background:#f9fbfe;padding:10px;margin-top:8px;font-size:12px}
+.issue-form label{display:grid;gap:4px}
+.issue-form input,.issue-form select,.issue-form textarea,.issue-detail select,.issue-detail textarea{width:100%;border:1px solid #d8e1ed;border-radius:5px;padding:6px 8px;background:#fff;font:inherit}
+.issue-detail p{margin:0;line-height:1.55}
+.issue-detail>small{font-size:11px;color:#718198}
+.issue-detail details{display:grid;gap:8px}
+.issue-detail details>*{margin-top:8px}

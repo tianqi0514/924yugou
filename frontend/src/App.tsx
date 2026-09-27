@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { BookOpenCheck, ChevronDown, Database, FilePenLine, FileSearch, GitBranch, Layers3, Plus, Settings2, X, type LucideIcon } from 'lucide-react'
-import CorpusView from './CorpusView'
-import DocumentsView from './DocumentsView'
-import ProjectMaterialsView from './ProjectMaterialsView'
-import ProjectView from './ProjectView'
-import WritingWorkspaceGateway from './WritingWorkspaceGateway'
-import ModelSettingsView from './ModelSettingsView'
 import { api, post, type Project } from './api'
+
+const CorpusView = lazy(() => import('./CorpusView'))
+const DocumentsView = lazy(() => import('./DocumentsView'))
+const ProjectMaterialsView = lazy(() => import('./ProjectMaterialsView'))
+const ProjectView = lazy(() => import('./ProjectView'))
+const WritingWorkspaceGateway = lazy(() => import('./WritingWorkspaceGateway'))
+const ModelSettingsView = lazy(() => import('./ModelSettingsView'))
 
 type Section = 'facts' | 'rules' | 'corpus' | 'documents' | 'reports' | 'model'
 type NavItem = { id: Section; label: string; icon: LucideIcon }
@@ -172,6 +173,7 @@ export default function App() {
     </aside>
     <div className="main-area">
       {loadError && <div className="app-error notice error" role="alert"><span>{loadError}</span><button className="text-button" type="button" onClick={() => void loadProjects()}>重试</button></div>}
+      <Suspense fallback={<main className="page"><div className="app-loading" role="status">加载中…</div></main>}>
       {loading ? <main className="page"><div className="app-loading" role="status">加载中…</div></main>
         : section === 'model' ? <ModelSettingsView />
           : section === 'corpus' && selected ? selected.has_corpus
@@ -180,6 +182,7 @@ export default function App() {
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
               : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} />
                 : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenRules={() => navigate('rules')} />}
+      </Suspense>
     </div>
     {notice && <div className="toast" role="status">{notice}</div>}
     {createOpen && <div className="dialog-backdrop" onClick={closeCreate}><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="create-project-title" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === 'Escape') closeCreate() }}><div className="dialog-head"><h2 id="create-project-title">新建项目</h2><button type="button" className="icon-button" onClick={closeCreate} aria-label="关闭"><X size={19} /></button></div><label className="form-field"><span>项目名称</span><input autoFocus value={projectName} onChange={(event) => setProjectName(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') void createProject() }} placeholder="输入项目名称" /></label>{formError && <div className="notice error" role="alert">{formError}</div>}<div className="form-actions"><button type="button" onClick={closeCreate}>取消</button><button type="button" className="primary-button" disabled={!projectName.trim() || creating} onClick={createProject}>{creating ? '创建中…' : '创建项目'}</button></div></div></div>}

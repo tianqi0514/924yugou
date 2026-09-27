@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Integer, JSON, LargeBinary, String, Text, UniqueConstraint, create_engine, text
+from sqlalchemy import DateTime, ForeignKey, Integer, JSON, LargeBinary, String, Text, UniqueConstraint, create_engine, select, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 
@@ -60,10 +60,25 @@ class SourceDocument(Base):
     storage_name: Mapped[str] = mapped_column(String(80), nullable=False)
     pages: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     segments: Mapped[list[dict]] = mapped_column(JSON, nullable=False, default=list)
+    parse_revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     status: Mapped[str] = mapped_column(String(24), nullable=False, default="READY")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     project: Mapped[Project] = relationship(back_populates="documents")
     candidates: Mapped[list[ExtractionCandidate]] = relationship(back_populates="document", cascade="all, delete-orphan")
+
+
+class SourceParseRevision(Base):
+    """Immutable parser output for one unchanged original byte stream."""
+
+    __tablename__ = "source_parse_revisions"
+    __table_args__ = (UniqueConstraint("document_id", "revision", name="uq_source_parse_revision"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    document_id: Mapped[str] = mapped_column(ForeignKey("source_documents.id", ondelete="CASCADE"), nullable=False, index=True)
+    document_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False)
+    segments: Mapped[list[dict]] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class ExtractionCandidate(Base):
@@ -116,6 +131,9 @@ class ReportDraft(Base):
     bound_facts: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     reviewed_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     analysis_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    report_type: Mapped[str] = mapped_column(String(60), nullable=False, default="custom")
+    template_version: Mapped[str] = mapped_column(String(40), nullable=False, default="legacy")
+    template_snapshot: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
     project: Mapped[Project] = relationship(back_populates="reports")
@@ -222,6 +240,48 @@ class FactEvidenceBinding(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class ProjectEvidence(Base):
+    """Immutable, project-owned excerpt at a particular original and parse revision."""
+
+    __tablename__ = "project_evidence"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    document_id: Mapped[str] = mapped_column(ForeignKey("source_documents.id", ondelete="RESTRICT"), nullable=False, index=True)
+    document_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    parse_revision_id: Mapped[str | None] = mapped_column(ForeignKey("source_parse_revisions.id", ondelete="RESTRICT"), nullable=True)
+    source_refs: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    excerpt: Mapped[str] = mapped_column(Text, nullable=False)
+    statement: Mapped[str] = mapped_column(Text, nullable=False)
+    label: Mapped[str] = mapped_column(String(160), nullable=False)
+    subject: Mapped[str] = mapped_column(String(160), nullable=False, default="")
+    asserted_at: Mapped[str] = mapped_column(String(40), nullable=False, default="")
+    source_type: Mapped[str] = mapped_column(String(20), nullable=False, default="original")
+    fact_key: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
+    fact_revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    supersedes_id: Mapped[str | None] = mapped_column(ForeignKey("project_evidence.id", ondelete="RESTRICT"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class ProjectIssue(Base):
+    """A project-owned claim, unresolved contradiction, or scoped information gap."""
+
+    __tablename__ = "project_issues"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    title: Mapped[str] = mapped_column(String(160), nullable=False)
+    statement: Mapped[str] = mapped_column(Text, nullable=False)
+    section_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    support_evidence_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    opposing_evidence_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="OPEN")
+    decision: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    resolution_evidence_id: Mapped[str | None] = mapped_column(ForeignKey("project_evidence.id", ondelete="RESTRICT"), nullable=True)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
 class ProjectFact(Base):
     """本项目事实；历史语料不写入此表。"""
 
@@ -271,6 +331,28 @@ class FactRevision(Base):
     after: Mapped[dict] = mapped_column(JSON, nullable=False)
     reason: Mapped[str] = mapped_column(String(240), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class ReportFactProposal(Base):
+    """A report paragraph's proposed fact change; never changes the fact by itself."""
+
+    __tablename__ = "report_fact_proposals"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_id: Mapped[str] = mapped_column(ForeignKey("report_drafts.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    block_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    block_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    fact_key: Mapped[str] = mapped_column(String(100), nullable=False)
+    fact_revision: Mapped[int] = mapped_column(Integer, nullable=False)
+    project_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    proposed_value: Mapped[str] = mapped_column(Text, nullable=False)
+    proposed_source: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    reason: Mapped[str] = mapped_column(String(240), nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default="PENDING")
+    applied_project_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class AnalysisScenario(Base):
@@ -333,7 +415,7 @@ class AnalysisWritingEvent(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
     report_id: Mapped[str] = mapped_column(ForeignKey("report_drafts.id", ondelete="CASCADE"), nullable=False, index=True)
-    run_id: Mapped[str] = mapped_column(ForeignKey("analysis_runs.id", ondelete="CASCADE"), nullable=False)
+    run_id: Mapped[str | None] = mapped_column(ForeignKey("analysis_runs.id", ondelete="CASCADE"), nullable=True)
     report_version: Mapped[int] = mapped_column(Integer, nullable=False)
     action: Mapped[str] = mapped_column(String(30), nullable=False)
     section_id: Mapped[str] = mapped_column(String(80), nullable=False, default="")
@@ -341,17 +423,77 @@ class AnalysisWritingEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class AnalysisCandidate(Base):
+    """A reviewable, server-persisted chapter candidate separate from report text."""
+
+    __tablename__ = "analysis_candidates"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_id: Mapped[str] = mapped_column(ForeignKey("report_drafts.id", ondelete="CASCADE"), nullable=False, index=True)
+    section_id: Mapped[str] = mapped_column(String(80), nullable=False)
+    mode: Mapped[str] = mapped_column(String(20), nullable=False)
+    run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    config_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    evidence_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    base_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    content: Mapped[list[dict]] = mapped_column(JSON, nullable=False)
+    model_audit: Mapped[dict] = mapped_column(JSON, nullable=False)
+    issues: Mapped[list[dict]] = mapped_column(JSON, nullable=False, default=list)
+    preserved_blocks: Mapped[list[dict]] = mapped_column(JSON, nullable=False, default=list)
+    digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="PENDING")
+    accepted_block_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    adoption_request_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    accepted_report_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    expires_at: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class WorkTask(Base):
+    """Durable local job record; the worker never edits report text directly."""
+
+    __tablename__ = "work_tasks"
+    __table_args__ = (UniqueConstraint("project_id", "kind", "request_key", name="uq_work_task_request"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_id: Mapped[str] = mapped_column(ForeignKey("report_drafts.id", ondelete="CASCADE"), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(24), nullable=False)
+    request_key: Mapped[str] = mapped_column(String(80), nullable=False)
+    input_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False)
+    result: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="PENDING")
+    stage: Mapped[str] = mapped_column(String(24), nullable=False, default="QUEUED")
+    attempt: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    generation: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    cancel_requested: Mapped[bool] = mapped_column(nullable=False, default=False)
+    error: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
 def init_db() -> None:
-    """为首版新数据库创建数据表。
+    """Install or upgrade the local schema in one PostgreSQL DDL transaction.
 
     Raises:
         SQLAlchemyError: 数据库不可用或建表失败。
     """
-    Base.metadata.create_all(engine)
+    # PostgreSQL rolls CREATE TABLE/ALTER TABLE back together. Never write a
+    # success marker before the last DDL statement has completed.
     # Existing local installations predate candidate-level provenance. Old candidates
     # remain explicitly unattributed; new candidates always link to their run.
     with engine.begin() as connection:
+        Base.metadata.create_all(connection)
+        connection.execute(text("CREATE TABLE IF NOT EXISTS schema_migrations (version varchar(64) PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())"))
         connection.execute(text("ALTER TABLE report_drafts ADD COLUMN IF NOT EXISTS analysis_run_id varchar(36)"))
+        connection.execute(text("ALTER TABLE report_drafts ADD COLUMN IF NOT EXISTS report_type varchar(60) NOT NULL DEFAULT 'custom'"))
+        connection.execute(text("ALTER TABLE report_drafts ADD COLUMN IF NOT EXISTS template_version varchar(40) NOT NULL DEFAULT 'legacy'"))
+        connection.execute(text("ALTER TABLE report_drafts ADD COLUMN IF NOT EXISTS template_snapshot JSON NOT NULL DEFAULT '{}'::json"))
+        connection.execute(text("ALTER TABLE source_documents ADD COLUMN IF NOT EXISTS parse_revision integer NOT NULL DEFAULT 1"))
+        connection.execute(text("ALTER TABLE project_evidence ADD COLUMN IF NOT EXISTS parse_revision_id varchar(36)"))
+        connection.execute(text("CREATE INDEX IF NOT EXISTS ix_project_evidence_parse_revision_id ON project_evidence (parse_revision_id)"))
+        connection.execute(text("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_project_evidence_parse_revision') THEN ALTER TABLE project_evidence ADD CONSTRAINT fk_project_evidence_parse_revision FOREIGN KEY (parse_revision_id) REFERENCES source_parse_revisions(id) ON DELETE RESTRICT; END IF; END $$"))
         connection.execute(text("ALTER TABLE report_versions ADD COLUMN IF NOT EXISTS analysis_run_id varchar(36)"))
         connection.execute(text("CREATE INDEX IF NOT EXISTS ix_report_drafts_analysis_run_id ON report_drafts (analysis_run_id)"))
         connection.execute(text("ALTER TABLE writing_commit_events ADD COLUMN IF NOT EXISTS model_audit JSON NOT NULL DEFAULT '{}'::json"))
@@ -359,3 +501,22 @@ def init_db() -> None:
         connection.execute(text("ALTER TABLE extraction_candidates ADD COLUMN IF NOT EXISTS extraction_run_id varchar(36) REFERENCES extraction_runs(id) ON DELETE SET NULL"))
         connection.execute(text("ALTER TABLE extraction_candidates ADD COLUMN IF NOT EXISTS extraction_origin varchar(20) NOT NULL DEFAULT 'UNKNOWN'"))
         connection.execute(text("CREATE INDEX IF NOT EXISTS ix_extraction_candidates_extraction_run_id ON extraction_candidates (extraction_run_id)"))
+        connection.execute(text("ALTER TABLE analysis_writing_events ALTER COLUMN run_id DROP NOT NULL"))
+        connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS adoption_request_sha256 varchar(64)"))
+        connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS accepted_report_version integer"))
+        connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS issues JSON NOT NULL DEFAULT '[]'::json"))
+        connection.execute(text("ALTER TABLE analysis_candidates ADD COLUMN IF NOT EXISTS preserved_blocks JSON NOT NULL DEFAULT '[]'::json"))
+        connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_next28_40') ON CONFLICT DO NOTHING"))
+        connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_next35_proposal') ON CONFLICT DO NOTHING"))
+    # Older parser output can be pinned from the current snapshot. Existing evidence
+    # with no parse_revision_id remains legacy; do not claim its historical parse
+    # revision has been reconstructed from later OCR output.
+    with SessionLocal.begin() as session:
+        for document in session.scalars(select(SourceDocument)).all():
+            exists = session.scalar(select(SourceParseRevision.id).where(
+                SourceParseRevision.document_id == document.id,
+                SourceParseRevision.revision == document.parse_revision))
+            if exists is None:
+                session.add(SourceParseRevision(document_id=document.id,
+                    document_sha256=document.sha256, revision=document.parse_revision,
+                    segments=document.segments, status=document.status))

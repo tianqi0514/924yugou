@@ -56,12 +56,14 @@ def test_preview_cancel_commit_and_plate_save(client, monkeypatch):
     assert source.status_code == 200 and "180,000" in source.json()["summary"]
     assert source.json()["impacts"][0]["report_id"] == report["id"]
     unsupported = [*report["content"]]
-    unsupported[2] = {**unsupported[2], "children": [{"text": "新增999套已证实。"}]}
+    unsupported[2] = {**unsupported[2], "children": [{"text": "新增999套已证实。"}],
+                      "source_review_required": True}
     url = base + f"/reports/{report['id']}"
     rejected = client.post(url + "/preview", json={"content": unsupported, "base_version": 0})
     assert rejected.status_code == 409 and "999" in rejected.json()["detail"]
     edited = [*report["content"]]
-    edited[2] = {**edited[2], "children": [{"text": "设备可用时长变化后，需要重新核对计划销量。"}], "origin": "manual"}
+    edited[2] = {**edited[2], "children": [{"text": "设备可用时长变化后，需要重新核对计划销量。"}],
+                 "origin": "manual", "source_review_required": True}
     preview = client.post(url + "/preview", json={"content": edited, "base_version": 0})
     assert preview.status_code == 200, preview.text
     saved = client.put(url, json={"content": edited, "base_version": 0,
@@ -69,6 +71,7 @@ def test_preview_cancel_commit_and_plate_save(client, monkeypatch):
     assert saved.status_code == 200, saved.text
     refreshed = client.get(url).json()
     assert refreshed["version"] == 1 and "重新核对" in refreshed["content"][2]["children"][0]["text"]
+    assert any(issue["code"] == "SOURCE_REVIEW_REQUIRED" for issue in refreshed["issues"])
     assert len(client.get(url + "/versions").json()) == 2
     assert client.get(base + "/facts").json()["facts"] == []
 

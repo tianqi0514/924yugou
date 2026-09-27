@@ -36,3 +36,6 @@ playwright-report/
 *.pid
 
 # Keep demo-data and audited test fixtures: they are part of the source release.
+# This external public report is a local held-out test input; the source and hash
+# are recorded in test-fixtures/public-reports/README.md for reproducibility.
+/test-fixtures/public-reports/05_fengxian_feasibility.pdf

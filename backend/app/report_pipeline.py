@@ -18,7 +18,7 @@ from docx.oxml.ns import qn
 from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.shared import Cm, Pt
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
@@ -29,7 +29,7 @@ from .model_settings import chat_json
 
 ALLOWED_BLOCKS = {"p", "h1", "h2", "h3", "blockquote", "table"}
 TEXT_MARKS = {"bold", "italic", "underline", "strikethrough"}
-EXPORT_RENDER_VERSION = "analysis-basis-v2"
+EXPORT_RENDER_VERSION = "chapter-layout-v3"
 
 
 def _valid_url(url: str) -> bool:
@@ -82,6 +82,8 @@ def _validate_metadata(node: dict) -> set[str]:
         raise ValueError("事实引用结构不正确")
     if "origin" in node and node["origin"] not in {"model", "manual", "guided"}:
         raise ValueError("正文来源类型不正确")
+    if "source_review_required" in node and node["source_review_required"] is not True:
+        raise ValueError("来源复核状态不正确")
     section_id = node.get("section_id")
     if section_id is not None and (not isinstance(section_id, str) or not section_id or len(section_id) > 80):
         raise ValueError("章节 ID 不正确")
@@ -122,11 +124,22 @@ def _validate_metadata(node: dict) -> set[str]:
             raise ValueError("推演引用结构不正确")
     if analysis_refs and (section_id is None or node_id is None):
         raise ValueError("推演引用必须属于稳定的章节和段落")
+    project_evidence_refs = node.get("project_evidence_refs", [])
+    if not isinstance(project_evidence_refs, list) or len(project_evidence_refs) > 20:
+        raise ValueError("项目证据引用结构不正确")
+    for ref in project_evidence_refs:
+        if (not isinstance(ref, dict) or not {"evidence_id", "document_sha256"}.issubset(ref)
+                or set(ref) - {"evidence_id", "document_sha256", "parse_revision_id"}
+                or any(not isinstance(ref[key], str) or not ref[key] or len(ref[key]) > 80
+                       for key in ref)):
+            raise ValueError("项目证据引用结构不正确")
+    if project_evidence_refs and (section_id is None or node_id is None):
+        raise ValueError("项目证据引用必须属于稳定的章节和段落")
     return set(keys)
 
 
 def _validate_text_block(node: dict, *, cell: bool = False) -> set[str]:
-    allowed = {"type", "children", "id", "fact_keys", "origin", "section_id", "source_refs", "project_rule_refs", "analysis_refs"}
+    allowed = {"type", "children", "id", "fact_keys", "origin", "section_id", "source_refs", "project_rule_refs", "analysis_refs", "project_evidence_refs", "source_review_required"}
     if node.get("type") == "p":
         allowed |= {"listStyleType", "indent", "listStart"}
         if node.get("listStyleType") not in (None, "disc", "decimal"):
@@ -147,7 +160,7 @@ def _validate_text_block(node: dict, *, cell: bool = False) -> set[str]:
 
 
 def _validate_table(node: dict) -> set[str]:
-    if set(node) - {"type", "children", "id", "fact_keys", "origin", "section_id", "source_refs", "project_rule_refs", "analysis_refs"}:
+    if set(node) - {"type", "children", "id", "fact_keys", "origin", "section_id", "source_refs", "project_rule_refs", "analysis_refs", "project_evidence_refs", "source_review_required"}:
         raise ValueError("表格包含不支持的属性")
     keys = _validate_metadata(node)
     rows = node.get("children")
@@ -364,7 +377,7 @@ def gate(content: list[dict], reviewed_hash: str | None, bound_facts: dict, curr
     if current_hash != reviewed_hash:
         issues.append({"code": "UNREVIEWED", "message": "正文保存后尚未人工核对", "severity": "block"})
     used = {key for node in content for key in node.get("fact_keys", [])}
-    if not used and not any(node.get("analysis_refs") or node.get("source_refs") for node in content):
+    if not used and not any(node.get("analysis_refs") or node.get("source_refs") or node.get("project_evidence_refs") for node in content):
         issues.append({"code": "NO_FACT_LINK", "message": "正文没有绑定项目事实；请插入已确认事实并核对", "severity": "block"})
     for key in sorted(used):
         fact = current_facts.get(key)
@@ -376,6 +389,8 @@ def gate(content: list[dict], reviewed_hash: str | None, bound_facts: dict, curr
         elif snapshot is not None and snapshot != {"value": fact.value_text, "revision": fact.revision}:
             issues.append({"code": "FACT_CHANGED", "message": f"引用事实 {key} 已变化，请核对并更新正文", "severity": "block", "fact_key": key})
     for position, node in enumerate(content, 1):
+        if node.get("source_review_required"):
+            issues.append({"code": "SOURCE_REVIEW_REQUIRED", "message": f"第 {position} 段修改过来源正文，请重新核对本段依据", "severity": "block", "position": position})
         displayed_numbers, display_issues = _reference_display_numbers(node, current_facts, position)
         issues.extend(display_issues)
         for key in dict.fromkeys(node.get("fact_keys", [])):
@@ -582,18 +597,40 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
     word = Document()
     section = word.sections[0]
     section.top_margin = section.bottom_margin = Cm(2.3)
+    body = content[1:] if content and content[0].get("type") == "h1" and plain(content[0]).strip() == title.strip() else content
+    landscape_tables = any(node.get("type") == "table" and
+        len(node.get("children", [{}])[0].get("children", [])) >= 6 for node in body)
+    if landscape_tables:
+        section.page_width, section.page_height = section.page_height, section.page_width
+    footer = section.footer.paragraphs[0]
+    footer.alignment = 2
+    footer.add_run("第 ")
+    page_field = OxmlElement("w:fldSimple")
+    page_field.set(qn("w:instr"), "PAGE")
+    footer._p.append(page_field)
+    footer.add_run(" 页")
     word.styles["Normal"].font.name = "宋体"
     word.styles["Normal"].font.size = Pt(11)
     if preview_label:
         marker = word.add_paragraph(preview_label)
         marker.style = word.styles["Subtitle"]
     word.add_heading(title, 0)
-    body = content[1:] if content and content[0].get("type") == "h1" and plain(content[0]).strip() == title.strip() else content
+    chapter_titles = [plain(node).strip() for node in body if node.get("type") in {"h1", "h2"}
+                      and plain(node).strip()]
+    if len(chapter_titles) >= 2:
+        word.add_heading("章节目录", level=1)
+        for chapter in chapter_titles:
+            word.add_paragraph(chapter, style="Normal")
     for node in body:
         if node["type"] == "table":
             rows = node["children"]
             table = word.add_table(rows=len(rows), cols=len(rows[0]["children"]))
             table.style = "Table Grid"
+            if all(cell["type"] == "th" for cell in rows[0]["children"]):
+                tr_pr = table.rows[0]._tr.get_or_add_trPr()
+                repeat_header = OxmlElement("w:tblHeader")
+                repeat_header.set(qn("w:val"), "true")
+                tr_pr.append(repeat_header)
             for row_index, row in enumerate(rows):
                 for column_index, cell in enumerate(row["children"]):
                     target = table.cell(row_index, column_index)
@@ -641,11 +678,16 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
     styles["basis"] = ParagraphStyle("basis", parent=styles["p"], fontSize=9.5, leading=14, spaceAfter=5)
     styles["table_cell"] = ParagraphStyle("table_cell", parent=styles["p"], fontSize=8, leading=12, spaceAfter=0)
     pdf_buffer = io.BytesIO()
+    pdf_page_size = landscape(A4) if landscape_tables else A4
     # STSong-Light renders the middle dot in the DOCX preview marker as a
     # missing-glyph box. Use a supported Chinese separator in the PDF header.
     pdf_preview_label = preview_label.replace(" · ", "，") if preview_label else None
     story = ([Paragraph(escape(pdf_preview_label), styles["h2"]), Spacer(1, 7)] if pdf_preview_label else [])
     story.extend([Paragraph(escape(title.replace(" · ", "，").replace("·", "，")), styles["title"]), Spacer(1, 10)])
+    if len(chapter_titles) >= 2:
+        story.append(Paragraph("章节目录", styles["h1"]))
+        story.extend(Paragraph(escape(chapter), styles["p"]) for chapter in chapter_titles)
+        story.append(Spacer(1, 10))
     list_number = 0
     for node in body:
         if node["type"] == "table":
@@ -667,7 +709,7 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
                 return "<br/>".join(parts) or " "
             grid = [[Paragraph(cell_markup(cell), styles["table_cell"])
                      for cell in row["children"]] for row in rows]
-            table = Table(grid, colWidths=(A4[0] - 104) / len(grid[0]), repeatRows=1 if all(cell["type"] == "th" for cell in rows[0]["children"]) else 0)
+            table = Table(grid, colWidths=(pdf_page_size[0] - 104) / len(grid[0]), repeatRows=1 if all(cell["type"] == "th" for cell in rows[0]["children"]) else 0)
             table.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#CDD7E5")),
                                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
                                        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F3F6FB"))]))
@@ -697,14 +739,14 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
                                      for fact in audit["facts"][:2])]))
         for fact in audit["facts"][2:]:
             story.append(Paragraph(escape(fact_line(fact)), styles["basis"]))
-    def footer(canvas, doc):
+    def pdf_footer(canvas, doc):
         canvas.saveState()
         canvas.setFont("STSong-Light", 9)
         canvas.setFillColor(colors.HexColor("#8190A4"))
-        canvas.drawRightString(A4[0] - 52, 32, f"第 {doc.page} 页")
+        canvas.drawRightString(pdf_page_size[0] - 52, 32, f"第 {doc.page} 页")
         canvas.restoreState()
-    SimpleDocTemplate(pdf_buffer, pagesize=A4, leftMargin=52, rightMargin=52, topMargin=56, bottomMargin=56).build(
-        story, onFirstPage=footer, onLaterPages=footer)
+    SimpleDocTemplate(pdf_buffer, pagesize=pdf_page_size, leftMargin=52, rightMargin=52, topMargin=56, bottomMargin=56).build(
+        story, onFirstPage=pdf_footer, onLaterPages=pdf_footer)
 
     docx_bytes, pdf_bytes = docx_buffer.getvalue(), pdf_buffer.getvalue()
     audit = {**audit, "docx_sha256": hashlib.sha256(docx_bytes).hexdigest(),

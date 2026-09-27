@@ -86,6 +86,33 @@ def test_historical_copy_preview_cancel_and_decimal_chain(client):
         assert project is not None and len(project.facts) == 0
 
 
+def test_bounded_sensitivity_runs_are_immutable_idempotent_and_do_not_edit_inputs(client):
+    base, scenario = create_history(client)
+    endpoint = base + f"/analysis/scenarios/{scenario['id']}/sensitivity"
+    body = {"base_revision": scenario["revision"], "input_key": "N017",
+            "values": ["300000", "200000", "0", None],
+            "result_keys": ["N034", "N035"]}
+    first = client.post(endpoint, json=body)
+    assert first.status_code == 200, first.text
+    rows = first.json()["runs"]
+    assert [row["results"]["N035"]["value"] for row in rows] == ["254016", "200000", "0", None]
+    assert rows[-1]["status"] == "UNEVALUABLE"
+    assert client.get(base + f"/analysis/scenarios/{scenario['id']}").json()["inputs"] == scenario["inputs"]
+    repeated = client.post(endpoint, json=body)
+    assert repeated.status_code == 200
+    assert [row["id"] for row in repeated.json()["runs"]] == [row["id"] for row in rows]
+    comparable = client.post(base + "/analysis/runs/compare", json=[rows[0]["id"], rows[1]["id"]]).json()
+    assert next(row for row in comparable["rows"] if row["key"] == "N035")["comparable"] is True
+    incomplete = client.post(base + "/analysis/runs/compare", json=[rows[0]["id"], rows[3]["id"]]).json()
+    assert next(row for row in incomplete["rows"] if row["key"] == "N035")["reason"] == "指标缺失或不可评估"
+    assert client.post(endpoint, json={**body, "values": ["0", "0.0"]}).status_code == 400
+    assert client.post(endpoint, json={**body, "input_key": "N034"}).status_code == 400
+    assert client.post(endpoint, json={**body, "values": ["-1", "200000"]}).status_code == 400
+    assert client.post(endpoint, json={**body, "base_revision": 99}).status_code == 409
+    with SessionLocal() as session:
+        assert session.query(AnalysisRun).filter_by(scenario_id=scenario["id"]).count() == 4
+
+
 def test_zero_missing_supplier_clear_and_invalid_units(client):
     base, scenario = create_history(client)
     scenario = update(client, base, scenario, {"N017": "0"})
@@ -136,7 +163,8 @@ def test_report_candidate_editor_review_and_export(client):
     payload = {key: value for key, value in preview.json().items() if key != "issues"}
     committed = client.post(base + f"/analysis/reports/{report_id}/draft/commit", json=payload)
     assert committed.status_code == 200, committed.text
-    assert client.post(base + f"/analysis/reports/{report_id}/draft/commit", json=payload).status_code == 409
+    repeated = client.post(base + f"/analysis/reports/{report_id}/draft/commit", json=payload)
+    assert repeated.status_code == 200 and repeated.json()["idempotent"] is True
     report = committed.json()["report"]
     assert report["version"] == 2 and report["analysis_run_id"] == first["id"]
     assert any(block.get("type") == "table" for block in report["content"])

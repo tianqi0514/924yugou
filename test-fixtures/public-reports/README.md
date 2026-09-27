@@ -8,6 +8,7 @@
 | `02_jiangmen_eia.pdf` | [金属废料分选与筛分项目环境影响报告表](https://www.jiangmen.gov.cn/bmpd/jmssthjj/pcfj/kpfj/bmwj/content/post_3418168.html)，[原始 PDF](https://www.jiangmen.gov.cn/attachment/0/364/364499/3418168.pdf) | 65 | 检查报告表、污染因子、数值单位、限值与结论之间的关系；属于另一个报告领域 | 64 页有文字层；第 2 页是扫描封面，须 OCR |
 | `03_taizhou_audit.pdf` | [泰州市金融支持小微企业发展政策执行情况专项审计调查报告](https://hbj.taizhou.gov.cn/cms_files/filemanager/1960401028/attach/202411/5b66adf47d064043a3698fe665842e67.pdf) | 8 | 扫描件压力样本；先验证扫描件识别与页码回链，再验证“问题—依据—建议”的抽取 | `pdftotext` 仅得到分页符，须 OCR |
 | `04_jinjiang_accident.pdf` | [晋江英林“8·2”一般高坠事故调查报告](https://www.jinjiang.gov.cn/xxgk/jdjc/aqsc/202512/t20251223_3245234.htm)，[原始 PDF](https://www.jinjiang.gov.cn/xxgk/jdjc/aqsc/202512/P020251223620916289766.pdf) | 15 | 检查事件时间线、原因、责任认定和整改措施的有向关系；属于另一个报告领域 | `pdftotext` 可读，约 8,488 字符 |
+| `05_fengxian_feasibility.pdf` | [奉贤区24小时开放管理改造项目建议书暨可行性研究报告](https://xxgk.fengxian.gov.cn/html/static/f/editor/attach/2024/07/02/20240702184316487_32105239.pdf) | 56 | 与北京交通枢纽不同项目和编制单位的写作留出样本；本轮先核验第7页投资与资金来源的引用和模型转述 | PDF有可提取文字层；整份专业写作未评估 |
 
 ## 固定文件信息
 
@@ -17,6 +18,9 @@
 | `02_jiangmen_eia.pdf` | 1,505,672 | `2649027d0995f4de3ca8dd8f822ba3e9535322abfb46589fce371da161fa8846` |
 | `03_taizhou_audit.pdf` | 596,028 | `9e56c7676016096282283718ffccd358f0b4bfde461ad17f77c9259a2c1688a8` |
 | `04_jinjiang_accident.pdf` | 756,100 | `eb6655da71f0d11b8a41c3bc5320a53fd4307fec370018150a037978927d69c4` |
+| `05_fengxian_feasibility.pdf` | 2,941,947 | `cfb317867097ea053f6c56baa5fd5a634f4711968700f1e232aef299fb4d103f` |
+
+`05_fengxian_feasibility.pdf` 是本机留出验证输入，仓库不再分发其字节。复现时从上表的奉贤区原 PDF 链接下载到本目录，并核对上述 SHA-256；应用正常运行不依赖该文件。
 
 基本校验：4/4 文件可由 `pdfinfo` 打开；北京与晋江全文有文字层，江门只有第 2 页无文字层，泰州 8 页均无文字层。对泰州报告第 2 页使用 Tesseract `chi_sim+eng` 做了单页试验，得到约 657 个字符，但存在明显的字词和标点识别错误，需要人工校对。当前应用已有项目内 PDF/DOCX 上传、可定位片段和按页候选抽取；北京、江门、晋江三份已在演示项目中做指定页验证，泰州扫描件仍未在应用中完成 OCR 抽取。文档层可读不代表事实、关系、证据或写作质量已通过。
 

@@ -25,10 +25,11 @@ type Inline = TextLeaf | FactRef | Link
 type ProjectRuleRef = { rule_id: string; expression: string; target_key: string; deps: string[];
   input_fact_revisions: { fact_key: string; revision: number; value: string | null }[]; target_fact_revision: number }
 export type AnalysisRef = { run_id: string; result_key: string; value: string; unit: string }
-type TextBlock = { type: 'p' | 'h1' | 'h2' | 'h3' | 'blockquote'; children: Inline[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[]; project_rule_refs?: ProjectRuleRef[]; analysis_refs?: AnalysisRef[]; listStyleType?: 'disc' | 'decimal'; indent?: number; listStart?: number }
+export type ProjectEvidenceRef = { evidence_id: string; document_sha256: string; parse_revision_id?: string }
+type TextBlock = { type: 'p' | 'h1' | 'h2' | 'h3' | 'blockquote'; children: Inline[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[]; project_evidence_refs?: ProjectEvidenceRef[]; project_rule_refs?: ProjectRuleRef[]; analysis_refs?: AnalysisRef[]; source_review_required?: true; listStyleType?: 'disc' | 'decimal'; indent?: number; listStart?: number }
 type TableCell = { type: 'td' | 'th'; children: TextBlock[]; id?: string }
 type TableRow = { type: 'tr'; children: TableCell[]; id?: string }
-type TableBlock = { type: 'table'; children: TableRow[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[]; analysis_refs?: AnalysisRef[] }
+type TableBlock = { type: 'table'; children: TableRow[]; id?: string; fact_keys?: string[]; origin?: string; section_id?: string; source_refs?: CorpusSourceRef[]; project_evidence_refs?: ProjectEvidenceRef[]; analysis_refs?: AnalysisRef[]; source_review_required?: true }
 export type Block = TextBlock | TableBlock
 export type EditorActions = { insertFact: (fact: Fact) => void; insertResult: (result: { key: string; label: string; value: string; unit: string }, runId: string) => void; focus: () => void; focusBlock: (blockId: string) => void }
 type Issue = { code: string; message: string; severity: string; fact_key?: string }
@@ -176,8 +177,10 @@ function normalizedTextBlock(block: TextBlock): TextBlock {
   return { type: block.type, children: normalizedInline(block.children), ...(block.id ? { id: block.id } : {}),
     ...(block.fact_keys?.length ? { fact_keys: block.fact_keys } : {}), ...(block.origin ? { origin: block.origin } : {}),
     ...(block.section_id ? { section_id: block.section_id } : {}), ...(block.source_refs?.length ? { source_refs: block.source_refs } : {}),
+    ...(block.project_evidence_refs?.length ? { project_evidence_refs: block.project_evidence_refs } : {}),
     ...(block.analysis_refs?.length ? { analysis_refs: block.analysis_refs } : {}),
     ...(block.project_rule_refs?.length ? { project_rule_refs: block.project_rule_refs } : {}),
+    ...(block.source_review_required ? { source_review_required: true as const } : {}),
     ...(block.listStyleType ? { listStyleType: block.listStyleType } : {}), ...(block.indent ? { indent: block.indent } : {}),
     ...(block.listStart ? { listStart: block.listStart } : {}) }
 }
@@ -187,7 +190,9 @@ function normalizedBlocks(value: Block[]): Block[] {
     type: 'table', ...(block.id ? { id: block.id } : {}), ...(block.fact_keys?.length ? { fact_keys: block.fact_keys } : {}),
     ...(block.origin ? { origin: block.origin } : {}), ...(block.section_id ? { section_id: block.section_id } : {}),
     ...(block.source_refs?.length ? { source_refs: block.source_refs } : {}),
+    ...(block.project_evidence_refs?.length ? { project_evidence_refs: block.project_evidence_refs } : {}),
     ...(block.analysis_refs?.length ? { analysis_refs: block.analysis_refs } : {}),
+    ...(block.source_review_required ? { source_review_required: true as const } : {}),
     children: block.children.map((row) => ({ type: 'tr', ...(row.id ? { id: row.id } : {}), children: row.children.map((cell) => ({
       type: cell.type, ...(cell.id ? { id: cell.id } : {}), children: cell.children.map(normalizedTextBlock),
     })) })),
@@ -278,18 +283,26 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
       else if (activeSection) block.section_id = activeSection
       if (!block.id) continue
       const former = beforeById.get(block.id)
+      if (former?.source_review_required) block.source_review_required = true
       if (former?.origin === 'model' && blockText(former) !== blockText(block)) manuallyEditedModelBlocks.current.add(block.id)
+      if (former && blockText(former) !== blockText(block) &&
+          (block.project_evidence_refs?.length ||
+           (block.source_refs?.length && !block.analysis_refs?.length))) {
+        block.source_review_required = true
+      }
       if (manuallyEditedModelBlocks.current.has(block.id) && block.origin === 'model') block.origin = 'manual'
       if (!knownBlockIds.current.has(block.id)) {
         // A split or pasted paragraph must not silently inherit its source or model review status.
-        if (block.source_refs?.length || block.analysis_refs?.length || (block.type !== 'table' && block.project_rule_refs?.length) || block.origin === 'model' || block.origin === 'guided') clearedInheritedSources.current.add(block.id)
+        if (block.source_refs?.length || block.project_evidence_refs?.length || block.analysis_refs?.length || (block.type !== 'table' && block.project_rule_refs?.length) || block.origin === 'model' || block.origin === 'guided') clearedInheritedSources.current.add(block.id)
         if (block.fact_keys?.length && !block.fact_keys.some((key) => hasFactToken(block, key))) clearedInheritedKeys.current.add(block.id)
       }
       if (clearedInheritedSources.current.has(block.id)) {
         delete block.source_refs
+        delete block.project_evidence_refs
         delete block.analysis_refs
         if (block.type !== 'table') delete block.project_rule_refs
         if (block.origin === 'model' || block.origin === 'guided') block.origin = 'manual'
+        delete block.source_review_required
       }
       if (clearedInheritedKeys.current.has(block.id)) delete block.fact_keys
       knownBlockIds.current.add(block.id)
@@ -306,9 +319,9 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
       const newId = moved.id
       repairingSplitIds.current = true
       try {
-        editor.tf.setNodes({ id: newId, fact_keys: undefined, source_refs: undefined, analysis_refs: undefined,
+        editor.tf.setNodes({ id: newId, fact_keys: undefined, source_refs: undefined, project_evidence_refs: undefined, analysis_refs: undefined,
           project_rule_refs: undefined, origin: undefined }, { at: [emptyIndex] })
-        editor.tf.setNodes({ id: old.id, fact_keys: old.fact_keys, source_refs: old.source_refs, analysis_refs: old.analysis_refs,
+        editor.tf.setNodes({ id: old.id, fact_keys: old.fact_keys, source_refs: old.source_refs, project_evidence_refs: old.project_evidence_refs, analysis_refs: old.analysis_refs,
           project_rule_refs: old.type === 'table' ? undefined : old.project_rule_refs,
           origin: old.origin, section_id: old.section_id }, { at: [emptyIndex + 1] })
       } finally { repairingSplitIds.current = false }
@@ -316,6 +329,7 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
       moved.id = old.id
       if (old.fact_keys?.length) moved.fact_keys = [...old.fact_keys]
       if (old.source_refs?.length) moved.source_refs = [...old.source_refs]
+      if (old.project_evidence_refs?.length) moved.project_evidence_refs = [...old.project_evidence_refs]
       if (old.analysis_refs?.length) moved.analysis_refs = [...old.analysis_refs]
       if (old.origin) moved.origin = old.origin
       if (old.section_id) moved.section_id = old.section_id
@@ -327,8 +341,10 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
       if (blockText(block).trim()) continue
       delete block.fact_keys
       delete block.source_refs
+      delete block.project_evidence_refs
       delete block.analysis_refs
       delete block.origin
+      delete block.source_review_required
       if (block.type !== 'table') delete block.project_rule_refs
     }
     for (const block of next) {
@@ -389,13 +405,36 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
     } }
     return () => { actionsRef.current = null }
   }, [actionsRef, editor])
-  const selectedBlock = (event?: { target: EventTarget | null }) => {
+  const selectedBlock = (event?: { target: EventTarget | null }, phase: 'down' | 'click' | 'keyboard' = 'keyboard'): void => {
     const target = event?.target
     const blockId = target instanceof HTMLElement ? target.closest('[data-block-id]')?.getAttribute('data-block-id') : null
     if (blockId) {
       const index = (editor.children as Block[]).findIndex((block) => block.id === blockId)
-      if (index >= 0) { onSelectPosition(index + 1); return }
+      if (index >= 0) {
+        const block = (editor.children as Block[])[index]
+        const directBinding = !!(block.project_evidence_refs?.length || block.source_refs?.length || block.fact_keys?.length) && !block.analysis_refs?.length
+        if (phase === 'down' && directBinding || phase === 'keyboard') onSelectPosition(index + 1)
+        else if (phase === 'click' && !directBinding) window.setTimeout(() => selectedBlock(), 0)
+        return
+      }
     }
+    if (target instanceof HTMLElement) {
+      const root = target.closest('.plate-content')
+      let top: HTMLElement | null = target
+      while (top && top.parentElement !== root) top = top.parentElement
+      if (root && top) {
+        const index = Array.from(root.children).indexOf(top)
+        if (index >= 0 && index < editor.children.length) {
+          const block = (editor.children as Block[])[index]
+          const directBinding = !!(block.project_evidence_refs?.length || block.source_refs?.length || block.fact_keys?.length) && !block.analysis_refs?.length
+          if (phase === 'down' && directBinding || phase === 'keyboard') onSelectPosition(index + 1)
+          else if (phase === 'click' && !directBinding) window.setTimeout(() => selectedBlock(), 0)
+          return
+        }
+      }
+    }
+    if (phase === 'click') { window.setTimeout(() => selectedBlock(), 0); return }
+    if (phase !== 'keyboard') return
     const path = editor.selection?.anchor.path
     if (!path) return
     onSelectPosition(path[0] + 1)
@@ -424,7 +463,7 @@ export function EditorPane({ initial, onChange, onSelectPosition, actionsRef, on
         {linkError && <small role="alert">{linkError}</small>}
       </form>}
     </div>
-    <PlateContent className="plate-content" placeholder="开始撰写报告正文…" onKeyUp={selectedBlock} onClick={selectedBlock} />
+    <PlateContent className="plate-content" placeholder="开始撰写报告正文…" onKeyUp={(event) => selectedBlock(event)} onMouseDown={(event) => selectedBlock(event, 'down')} onClick={(event) => selectedBlock(event, 'click')} />
   </Plate></LinkEditorContext.Provider></FactReferenceContext.Provider>
 }
 

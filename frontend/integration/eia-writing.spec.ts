@@ -191,6 +191,9 @@ test('环评样本两章引用同一原件，预算变化后条件与正文待�
   const revisedCondition = page.locator('[contenteditable="true"] .slate-p')
     .filter({ hasText: /本方案环保投资超过预算上限。.*人工补充：用途另行核对。/ }).first()
   await revisedCondition.click()
+  // The editor resolves the clicked block after Plate has placed the caret.
+  await expect.poll(async () => page.evaluate(() => window.getSelection()?.anchorNode?.parentElement?.textContent || ''))
+    .toContain('本方案环保投资超过预算上限')
   await revisedCondition.evaluate((element) => {
     const range = document.createRange()
     range.selectNodeContents(element)

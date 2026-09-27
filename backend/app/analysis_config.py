@@ -138,10 +138,14 @@ def _normalize(definitions: list[dict], rules: list[dict], sections: list[dict],
     for raw in sections:
         section_id = str(raw.get("id", "")).strip()
         title = str(raw.get("title", "")).strip()
+        kind = raw.get("kind", "calculation")
         result_keys = raw.get("result_keys")
         if not _section_id.fullmatch(section_id) or section_id in section_ids or not title or len(title) > 100:
             raise HTTPException(400, "章节标识需唯一，且标题不能为空")
-        if (not isinstance(result_keys, list) or not result_keys
+        if kind not in {"narrative", "calculation", "mixed"}:
+            raise HTTPException(400, f"章节 {section_id} 的类型无效")
+        if (not isinstance(result_keys, list) or (kind != "narrative" and not result_keys)
+                or (kind == "narrative" and result_keys)
                 or any(not isinstance(key, str) for key in result_keys)
                 or len(set(result_keys)) != len(result_keys)
                 or any(key not in by_key or by_key[key]["data_type"] not in {"integer", "decimal"}
@@ -150,7 +154,8 @@ def _normalize(definitions: list[dict], rules: list[dict], sections: list[dict],
         evidence_keys = raw.get("evidence_keys", [])
         if (not isinstance(evidence_keys, list) or any(not isinstance(key, str) for key in evidence_keys)
                 or len(set(evidence_keys)) != len(evidence_keys)
-                or any(key not in by_key or by_key[key]["computed"] for key in evidence_keys)):
+                or any(key not in by_key or by_key[key]["computed"] for key in evidence_keys)
+                or (kind == "narrative" and not evidence_keys)):
             raise HTTPException(400, f"章节 {section_id} 的证据字段无效")
         conditions = raw.get("conditions", [])
         if not isinstance(conditions, list) or len(conditions) > 12:
@@ -185,11 +190,11 @@ def _normalize(definitions: list[dict], rules: list[dict], sections: list[dict],
                        for term in forbidden_terms)):
             raise HTTPException(400, f"章节 {section_id} 的禁用表述无效")
         section_ids.add(section_id)
-        normalized_sections.append({"id": section_id, "title": title,
+        normalized_sections.append({"id": section_id, "title": title, "kind": kind,
                                     "result_keys": result_keys, "evidence_keys": evidence_keys,
                                     "conditions": checked_conditions,
                                     "forbidden_terms": [term.strip() for term in forbidden_terms]})
-    if complete and (not fields or not normalized_rules or not normalized_sections
+    if complete and (not fields or not normalized_sections
                      or {field["key"] for field in fields if field["computed"]} != targets):
         raise HTTPException(400, "发布前须配置输入、每个计算字段的规则及至少一个章节")
     return fields, normalized_rules, normalized_sections

@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import delete, select
 
 from .corpus import CorpusRepository
-from .db import AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectFact, ReportDraft, ReportExport, ReportVersion, RuleRecord, SessionLocal, SourceDocument, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
+from .db import AnalysisConfig, AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectEvidence, ProjectFact, ProjectIssue, ReportDraft, ReportExport, ReportFactProposal, ReportVersion, RuleRecord, SessionLocal, SourceDocument, SourceParseRevision, WorkTask, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
 from .report_pipeline import EXPORT_RENDER_VERSION, change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
@@ -40,6 +40,11 @@ from .analysis import router as analysis_router
 from .analysis_config import router as analysis_config_router
 from .analysis_writing import router as analysis_writing_router
 from .analysis_refresh import router as analysis_refresh_router
+from .project_evidence import router as project_evidence_router
+from .report_types import report_type, report_types
+from .chapter_materials import router as chapter_materials_router
+from .project_issues import router as project_issues_router
+from .work_tasks import router as work_tasks_router
 
 
 @asynccontextmanager
@@ -66,6 +71,10 @@ app.include_router(analysis_router)
 app.include_router(analysis_config_router)
 app.include_router(analysis_writing_router)
 app.include_router(analysis_refresh_router)
+app.include_router(project_evidence_router)
+app.include_router(chapter_materials_router)
+app.include_router(project_issues_router)
+app.include_router(work_tasks_router)
 corpus = CorpusRepository()
 preview_secret = secrets.token_bytes(32)
 BUILTIN_PROJECT_ID = "92b09c9d-801c-5fcb-90e6-67bbcd5179a6"
@@ -146,6 +155,15 @@ class FactChange(BaseModel):
 class CommitRequest(FactChange):
     base_version: int
     preview_token: str
+    proposal_id: str | None = None
+
+
+class ReportFactProposalCreate(BaseModel):
+    block_id: str = Field(min_length=1, max_length=100)
+    fact_key: str = Field(min_length=1, max_length=100)
+    proposed_value: str = Field(min_length=1, max_length=300)
+    source: str = Field(default="", max_length=1000)
+    reason: str = Field(min_length=1, max_length=240)
 
 
 class BindingUpdate(BaseModel):
@@ -165,12 +183,17 @@ class CandidateDecision(BaseModel):
 
 class ReportCreate(BaseModel):
     title: NonBlankLabel
+    report_type: str = "custom"
 
 
 class ReportSave(BaseModel):
     content: list[dict]
     base_version: int
     preview_token: str | None = None
+
+
+class BlockSourceReview(BaseModel):
+    base_version: int = Field(ge=0)
 
 
 class ReportSectionChange(BaseModel):
@@ -701,7 +724,8 @@ def _document(session, project_id: str, document_id: str) -> SourceDocument:
 def _document_dict(item: SourceDocument) -> dict:
     return {"id": item.id, "filename": item.filename, "file_kind": item.file_kind,
             "sha256": item.sha256, "pages": item.pages, "segments": len(item.segments),
-            "status": item.status, "created_at": item.created_at.isoformat()}
+            "status": item.status, "parse_revision": item.parse_revision,
+            "created_at": item.created_at.isoformat()}
 
 
 @app.get("/api/projects/{project_id}/documents")
@@ -743,7 +767,33 @@ async def documents_upload(project_id: str, file: UploadFile = File(...)):
                               segments=segments, status=status)
         session.add(item)
         session.flush()
+        session.add(SourceParseRevision(document_id=item.id, document_sha256=item.sha256,
+                                        revision=1, segments=segments, status=status))
         return _document_dict(item)
+
+
+@app.get("/api/projects/{project_id}/documents/{document_id}/parse-revisions")
+def document_parse_revisions(project_id: str, document_id: str):
+    with SessionLocal() as session:
+        _document(session, project_id, document_id)
+        rows = session.scalars(select(SourceParseRevision).where(
+            SourceParseRevision.document_id == document_id).order_by(SourceParseRevision.revision)).all()
+        return [{"id": row.id, "revision": row.revision, "document_sha256": row.document_sha256,
+                 "status": row.status, "segments": len(row.segments),
+                 "created_at": row.created_at.isoformat()} for row in rows]
+
+
+@app.get("/api/projects/{project_id}/documents/{document_id}/parse-revisions/{revision_id}")
+def document_parse_revision_get(project_id: str, document_id: str, revision_id: str):
+    with SessionLocal() as session:
+        _document(session, project_id, document_id)
+        row = session.scalar(select(SourceParseRevision).where(
+            SourceParseRevision.id == revision_id, SourceParseRevision.document_id == document_id))
+        if row is None:
+            fail("解析版本不存在", 404)
+        return {"id": row.id, "revision": row.revision, "document_sha256": row.document_sha256,
+                "status": row.status, "segments": row.segments,
+                "created_at": row.created_at.isoformat()}
 
 
 @app.get("/api/projects/{project_id}/documents/{document_id}")
@@ -973,6 +1023,10 @@ def document_extract(project_id: str, document_id: str, page: int = Query(1, ge=
         if item.segments != original_segments:
             fail("抽取期间原文片段已变化，请重新抽取", 409)
         if prepared_segments != original_segments:
+            item.parse_revision += 1
+            session.add(SourceParseRevision(document_id=item.id,
+                document_sha256=item.sha256, revision=item.parse_revision,
+                segments=prepared_segments, status=item.status))
             item.segments = prepared_segments
         old_candidates = session.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == document_id)).all()
         existing = {(c.label, c.value_text, c.source_ref): c for c in old_candidates}
@@ -1324,7 +1378,12 @@ def _fact_has_project_evidence(session, project_id: str, fact: ProjectFact, chec
                                                                  ProjectFact.key == key)) for key in rule.deps]
         return all(dependency is not None and _fact_has_project_evidence(session, project_id, dependency, set(checked))
                    for dependency in dependencies)
-    return _reviewed_fact_binding(session, project_id, fact) is not None
+    if _reviewed_fact_binding(session, project_id, fact) is not None:
+        return True
+    return session.scalar(select(ProjectEvidence.id).where(
+        ProjectEvidence.project_id == project_id, ProjectEvidence.fact_key == fact.key,
+        ProjectEvidence.fact_revision == fact.revision,
+        ProjectEvidence.source_type == "original")) is not None
 
 
 def _project_evidence_issues(session, item: ReportDraft) -> list[dict]:
@@ -1394,6 +1453,33 @@ def _analysis_report_state(session, item: ReportDraft, content: list[dict] | Non
             row = session.get(CorpusRecord, (ref["corpus_id"], 9, ref["record_id"]))
             if row is not None:
                 numbers |= numeric_tokens(str(row.payload.get("text") or ""))
+        for ref in block.get("project_evidence_refs", []):
+            evidence = session.scalar(select(ProjectEvidence).where(
+                ProjectEvidence.id == ref["evidence_id"], ProjectEvidence.project_id == item.project_id))
+            if evidence is None or evidence.document_sha256 != ref["document_sha256"]:
+                fail("正文引用的项目证据不存在或修订不一致", 409)
+            if ref.get("parse_revision_id") != evidence.parse_revision_id:
+                fail("正文引用的项目证据解析版本不一致", 409)
+            document = session.scalar(select(SourceDocument).where(
+                SourceDocument.id == evidence.document_id, SourceDocument.project_id == item.project_id))
+            if document is None or document.sha256 != evidence.document_sha256:
+                fail("项目证据原件已失效", 409)
+            numbers |= numeric_tokens(evidence.excerpt)
+            if evidence.source_type == "secondary":
+                issues.append({"code": "SECONDARY_SOURCE_ONLY", "severity": "block", "position": position,
+                               "message": f"第 {position} 段仅有二手材料，尚无可核对的完整原件"})
+            if session.scalar(select(ProjectEvidence.id).where(
+                    ProjectEvidence.project_id == item.project_id,
+                    ProjectEvidence.supersedes_id == evidence.id)):
+                issues.append({"code": "PROJECT_EVIDENCE_SUPERSEDED", "severity": "block", "position": position,
+                               "message": f"第 {position} 段使用的项目证据已有新版本，请核对"})
+            parsed = session.get(SourceParseRevision, evidence.parse_revision_id) if evidence.parse_revision_id else None
+            if parsed and (parsed.document_id != document.id or parsed.document_sha256 != document.sha256):
+                fail("项目证据的解析版本与原件不一致", 409)
+            if any(source_ref not in {part.get("ref") for part in (parsed.segments if parsed else document.segments)}
+                   for source_ref in evidence.source_refs):
+                issues.append({"code": "PROJECT_EVIDENCE_LOCATION_CHANGED", "severity": "block",
+                               "position": position, "message": f"第 {position} 段的原文位置需要重新定位"})
         if numbers:
             allowed[position] = numbers
     if item.analysis_run_id:
@@ -1447,15 +1533,45 @@ def _analysis_report_state(session, item: ReportDraft, content: list[dict] | Non
     return issues, allowed
 
 
+def _project_issue_report_issues(session, report: ReportDraft) -> list[dict]:
+    if session is None:
+        return []
+    items = session.scalars(select(ProjectIssue).where(ProjectIssue.project_id == report.project_id)).all()
+    result = []
+    for item in items:
+        positions = [position for position, block in enumerate(report.content, 1)
+                     if block.get("section_id") in item.section_ids and
+                     block.get("type") not in {"h1", "h2", "h3"} and plain(block).strip()]
+        if not positions:
+            continue
+        if item.kind in {"conflict", "gap"} and item.status != "RESOLVED":
+            result.append({"code": "PROJECT_CONFLICT_OPEN" if item.kind == "conflict" else "PROJECT_GAP_OPEN",
+                           "severity": "block", "position": positions[0], "issue_id": item.id,
+                           "message": f"{item.title}：需处理后核对本章判断"})
+        elif item.kind == "claim" and item.status != "RESOLVED":
+            result.append({"code": "PROJECT_CLAIM_UNVERIFIED", "severity": "note",
+                           "position": positions[0], "issue_id": item.id,
+                           "message": f"{item.title}：来源陈述尚未独立核实"})
+        elif item.kind == "conflict":
+            result.append({"code": "PROJECT_CONFLICT_MANUAL_DECISION", "severity": "note",
+                           "position": positions[0], "issue_id": item.id,
+                           "message": f"{item.title}：人工裁决已记录，尚未独立核实"})
+    return result
+
+
 def _report_dict(item: ReportDraft, facts: dict[str, ProjectFact], session=None) -> dict:
     used = {key for node in item.content for key in node.get("fact_keys", [])}
     writing_issues = [*_writing_report_issues(session, item), *_project_evidence_issues(session, item)] if session is not None else []
     analysis_issues, source_numbers = _analysis_report_state(session, item) if session is not None else ([], {})
+    issues = [*gate(item.content, item.reviewed_hash, item.bound_facts, facts, source_numbers),
+              *writing_issues, *analysis_issues, *_project_issue_report_issues(session, item)]
     return {"id": item.id, "project_id": item.project_id, "title": item.title, "version": item.version,
+            "report_type": item.report_type, "template_version": item.template_version,
+            "template_snapshot": item.template_snapshot,
             "content": item.content, "bound_facts": item.bound_facts, "analysis_run_id": item.analysis_run_id,
-            "reviewed": item.reviewed_hash == content_hash(item.content),
-            "issues": [*gate(item.content, item.reviewed_hash, item.bound_facts, facts, source_numbers),
-                       *writing_issues, *analysis_issues],
+            "reviewed": item.reviewed_hash == content_hash(item.content) and
+                        not any(issue["severity"] == "block" for issue in issues),
+            "issues": issues,
             "fact_impacts": report_fact_impacts(item.content, item.bound_facts, facts),
             "facts": [fact_dict(facts[key]) for key in sorted(used) if key in facts],
             "updated_at": item.updated_at.isoformat()}
@@ -1476,6 +1592,7 @@ def reports_list(project_id: str):
             status = ("已核对" if state["reviewed"] and not any(issue["severity"] == "block" for issue in state["issues"]) else
                       "待核对" if substantive else "工作稿")
             rows.append({"id": item.id, "title": item.title, "version": item.version,
+                         "report_type": item.report_type,
                          "analysis_run_id": item.analysis_run_id, "status": status,
                          "has_scenario_assumption": any(issue["code"] == "CHAPTER_SCENARIO_ASSUMPTION"
                                                         for issue in state["issues"]),
@@ -1483,13 +1600,27 @@ def reports_list(project_id: str):
         return rows
 
 
+@app.get("/api/report-types")
+def report_type_list():
+    return report_types()
+
+
 @app.post("/api/projects/{project_id}/reports", status_code=201)
 def report_create(project_id: str, body: ReportCreate):
+    template = report_type(body.report_type)
+    content = [{"type": "h1", "id": str(uuid4()), "children": [{"text": body.title.strip()}]}]
+    for section in template["sections"]:
+        content.append({"type": "h2", "id": str(uuid4()), "section_id": section["id"],
+                        "children": [{"text": section["title"]}]})
+        content.append({"type": "p", "id": str(uuid4()), "section_id": section["id"],
+                        "children": [{"text": ""}]})
+    if not template["sections"]:
+        content.append({"type": "p", "id": str(uuid4()), "children": [{"text": ""}]})
     with SessionLocal.begin() as session:
         get_project(session, project_id)
         item = ReportDraft(project_id=project_id, title=body.title.strip(),
-                           content=[{"type": "h1", "children": [{"text": body.title.strip()}]},
-                                    {"type": "p", "children": [{"text": ""}]}], bound_facts={})
+                           report_type=template["id"], template_version=template["version"],
+                           template_snapshot=template, content=content, bound_facts={})
         session.add(item)
         session.flush()
         session.add(ReportVersion(report_id=item.id, version=0, content=item.content, bound_facts={}))
@@ -1501,6 +1632,64 @@ def report_get(project_id: str, report_id: str):
     with SessionLocal() as session:
         item = _report(session, project_id, report_id)
         return _report_dict(item, _current_facts(session, project_id), session)
+
+
+@app.get("/api/projects/{project_id}/reports/{report_id}/chapters")
+def report_chapter_status(project_id: str, report_id: str):
+    """Conservative chapter readiness based on current inputs, not template presence."""
+    with SessionLocal() as session:
+        report = _report(session, project_id, report_id)
+        configs = session.scalars(select(AnalysisConfig).where(
+            AnalysisConfig.project_id == project_id,
+            AnalysisConfig.status == "PUBLISHED").order_by(AnalysisConfig.version.desc())).all()
+        run = session.scalar(select(AnalysisRun).where(
+            AnalysisRun.id == report.analysis_run_id,
+            AnalysisRun.project_id == project_id)) if report.analysis_run_id else None
+        facts = _current_facts(session, project_id)
+        report_is_reviewed = _report_dict(report, facts, session)["reviewed"]
+        headings = [block for block in report.content if block.get("type") == "h2"]
+        rows = []
+        for heading in headings:
+            section_id = heading.get("section_id") or ""
+            source = next((section for section in report.template_snapshot.get("sections", [])
+                           if section["id"] == section_id), None)
+            configured = next(((config, section) for config in configs for section in config.sections
+                               if section["id"] == section_id), None)
+            body = [block for block in report.content if block.get("section_id") == section_id
+                    and block.get("id") != heading.get("id")]
+            substantive = any(plain(block).strip() for block in body)
+            missing = []
+            status = "待配置"
+            if substantive:
+                status = "已核对" if report_is_reviewed else "待核对"
+            elif configured:
+                config, definition = configured
+                for key in definition.get("evidence_keys", []):
+                    fact = facts.get(key)
+                    if fact is None or not _fact_has_project_evidence(session, project_id, fact, set()):
+                        missing.append(key)
+                if missing:
+                    status = "缺资料"
+                elif definition.get("kind") != "narrative":
+                    run_config = run.snapshot.get("configuration") if run else None
+                    if (run is None or run.status != "COMPUTED" or run_config is None
+                            or run_config.get("id") != config.id
+                            or any(run.snapshot["results"].get(key, {}).get("value") is None
+                                   for key in definition.get("result_keys", []))):
+                        status = "待推演"
+                    else:
+                        status = "可起草"
+                else:
+                    status = "可起草"
+            rows.append({"section_id": section_id, "heading_id": heading.get("id"),
+                         "title": plain(heading), "kind": source.get("kind") if source else
+                         configured[1].get("kind", "custom") if configured else "custom",
+                         "status": status, "missing_fact_keys": missing,
+                         "config_id": configured[0].id if configured else None,
+                         "config_version": configured[0].version if configured else None})
+        return {"report_id": report.id, "report_version": report.version,
+                "report_type": report.report_type, "template_version": report.template_version,
+                "chapters": rows}
 
 
 @app.get("/api/projects/{project_id}/reports/{report_id}/versions")
@@ -1535,6 +1724,7 @@ def report_preview(project_id: str, report_id: str, body: ReportSave):
         item = _report(session, project_id, report_id)
         if item.version != body.base_version:
             fail("报告已有新版本，请刷新后重试", 409)
+        _validate_edit_provenance(item.content, body.content)
         facts = _current_facts(session, project_id)
         _validate_writing_refs(session, project_id, body.content)
         _validate_corpus_article_content(session, project_id, report_id, body.content)
@@ -1547,6 +1737,24 @@ def report_preview(project_id: str, report_id: str, body: ReportSave):
                 "preview_token": f"{expires}.{_report_signature(project_id, report_id, item.version, body.content, expires)}",
                 "changes": change_impact(item.content, body.content),
                 "fact_keys_affected": sorted({key for change in change_impact(item.content, body.content) for key in change["fact_keys"]})}
+
+
+def _validate_edit_provenance(before: list[dict], after: list[dict]) -> None:
+    """A changed sentence cannot silently retain a previously checked source."""
+    previous = {block.get("id"): block for block in before if block.get("id")}
+    for block in after:
+        original = previous.get(block.get("id"))
+        refs = bool(block.get("project_evidence_refs") or
+                    (block.get("source_refs") and not block.get("analysis_refs")))
+        if original is None:
+            if block.get("source_refs") or block.get("project_evidence_refs"):
+                fail("新段落不能继承旧段落的来源，请重新选择依据", 409)
+            continue
+        if (original.get("source_review_required") and not block.get("source_review_required")
+                and refs):
+            fail("请从来源面板核对修改过的段落", 409)
+        if plain(original) != plain(block) and refs and not block.get("source_review_required"):
+            fail("正文已修改，请先标记来源待复核", 409)
 
 
 def _current_fact_snapshots_for_saved_content(session, item: ReportDraft, content: list[dict],
@@ -1614,6 +1822,7 @@ def report_save(project_id: str, report_id: str, body: ReportSave):
         item = _report(session, project_id, report_id, lock=True)
         if item.version != body.base_version:
             fail("报告已有新版本，请刷新后重试", 409)
+        _validate_edit_provenance(item.content, body.content)
         facts = _current_facts(session, project_id)
         _validate_writing_refs(session, project_id, body.content)
         _validate_corpus_article_content(session, project_id, report_id, body.content)
@@ -1755,6 +1964,41 @@ def report_generate_commit(project_id: str, report_id: str, body: SectionCommit)
         return _report_dict(item, facts, session)
 
 
+@app.post("/api/projects/{project_id}/reports/{report_id}/blocks/{block_id}/source-review")
+def report_block_source_review(project_id: str, report_id: str, block_id: str,
+                               body: BlockSourceReview):
+    with SessionLocal.begin() as session:
+        item = _report(session, project_id, report_id, lock=True)
+        if item.version != body.base_version:
+            fail("报告版本已变化，请刷新后核对", 409)
+        current = next((block for block in item.content if block.get("id") == block_id), None)
+        if current is None:
+            fail("段落不存在", 404)
+        if not current.get("source_review_required"):
+            fail("本段没有待复核的来源修改", 409)
+        if not any(current.get(key) for key in ("source_refs", "project_evidence_refs",
+                                                    "analysis_refs", "project_rule_refs")):
+            fail("本段尚未关联可核对的依据", 409)
+        _validate_writing_refs(session, project_id, item.content)
+        _analysis_report_state(session, item)
+        content = [dict(block) for block in item.content]
+        for block in content:
+            if block.get("id") == block_id:
+                block.pop("source_review_required", None)
+        validate_content(content)
+        item.content = content
+        item.reviewed_hash = None
+        item.version += 1
+        session.add(ReportVersion(report_id=item.id, version=item.version, content=content,
+                                  bound_facts=item.bound_facts, analysis_run_id=item.analysis_run_id))
+        session.add(AnalysisWritingEvent(project_id=project_id, report_id=report_id,
+            report_version=item.version, run_id=item.analysis_run_id,
+            action="review_modified_source", section_id=current.get("section_id") or "",
+            payload={"block_id": block_id, "text_sha256": hashlib.sha256(
+                plain(current).encode()).hexdigest()}))
+        return {"report": _report_dict(item, _current_facts(session, project_id), session)}
+
+
 @app.post("/api/projects/{project_id}/reports/{report_id}/review")
 def report_review(project_id: str, report_id: str):
     with SessionLocal.begin() as session:
@@ -1770,7 +2014,8 @@ def report_review(project_id: str, report_id: str):
             fact = facts.get(key)
             if fact is None or fact.value_text is None or fact.value_status not in ("PROVIDED", "COMPUTED"):
                 fail(f"事实 {key} 尚不可用于正式报告")
-        if (not used and not any(block.get("analysis_refs") for block in item.content)) or not any(
+        if (not used and not any(block.get("analysis_refs") or block.get("project_evidence_refs")
+                                 for block in item.content)) or not any(
                 plain(node).strip() for node in item.content):
             fail("报告缺少正文或事实引用")
         proposed = {key: {"value": facts[key].value_text, "revision": facts[key].revision} for key in used}
@@ -1778,7 +2023,8 @@ def report_review(project_id: str, report_id: str):
         analysis_issues, source_numbers = _analysis_report_state(session, item)
         blockers = [issue for issue in [*gate(item.content, content_hash(item.content), proposed, facts, source_numbers),
                                        *_writing_report_issues(session, item),
-                                       *_project_evidence_issues(session, item), *analysis_issues] if issue["severity"] == "block"]
+                                       *_project_evidence_issues(session, item), *analysis_issues,
+                                       *_project_issue_report_issues(session, item)] if issue["severity"] == "block"]
         if blockers:
             fail("请先修正正文：" + "；".join(issue["message"] for issue in blockers))
         item.bound_facts = proposed
@@ -1820,6 +2066,11 @@ def report_export_saved(project_id: str, report_id: str, export_id: str):
 
 @app.get("/api/projects/{project_id}/reports/{report_id}/export")
 def report_export(project_id: str, report_id: str, level: str = Query("formal", pattern="^(formal|preview|scenario)$")):
+    return _report_export(project_id, report_id, level)
+
+
+def _report_export(project_id: str, report_id: str, level: str,
+                   task_guard: tuple[str, str] | None = None):
     with SessionLocal.begin() as session:
         item = _report(session, project_id, report_id, lock=True)
         if level == "preview" and not any(block.get("type") not in {"h1", "h2", "h3"} and plain(block).strip()
@@ -1830,12 +2081,15 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
         _validate_corpus_article_content(session, project_id, report_id, item.content)
         analysis_issues, source_numbers = _analysis_report_state(session, item)
         issues = [*gate(item.content, item.reviewed_hash, item.bound_facts, facts, source_numbers),
-                  *_writing_report_issues(session, item), *_project_evidence_issues(session, item), *analysis_issues]
+                  *_writing_report_issues(session, item), *_project_evidence_issues(session, item),
+                  *analysis_issues, *_project_issue_report_issues(session, item)]
         selected_run = session.get(AnalysisRun, item.analysis_run_id) if item.analysis_run_id else None
         assumptions = bool(selected_run and any(x.get("origin") in {"historical_reference", "scenario_assumption"}
                       for x in selected_run.snapshot["inputs"].values()))
         if level == "formal" and assumptions:
             fail("当前报告包含方案假设，请使用情景分析交付或补充本项目事实和证据", 409)
+        if level == "formal" and any(issue["code"] == "PROJECT_CONFLICT_MANUAL_DECISION" for issue in issues):
+            fail("当前报告含尚未独立核实的人工冲突裁决，请使用预审或情景分析交付", 409)
         if level == "scenario" and (selected_run is None or item.reviewed_hash != content_hash(item.content)):
             fail("请先选择推演结果并核对当前报告", 409)
         always_block = {"SOURCE_LINK_CHANGED", "SOURCE_LINK_UNCONFIRMED", "SOURCE_VERSION_CHANGED",
@@ -1921,6 +2175,9 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
                                   "refs": block.get("source_refs", []),
                                   "project_rule_refs": block.get("project_rule_refs", [])}
                                  for block in item.content if block.get("source_refs")],
+                 "project_evidence_refs": [{"block_id": block.get("id"), "section_id": block.get("section_id"),
+                                            "refs": block.get("project_evidence_refs", [])}
+                                           for block in item.content if block.get("project_evidence_refs")],
                  "writing_issues": issues,
                  "writing_model_audits": _model_audits(session, project_id, report_id),
                  "analysis_refreshes": [{"event_id": row.id, "report_version": row.report_version,
@@ -1949,6 +2206,20 @@ def report_export(project_id: str, report_id: str, level: str = Query("formal", 
                 archive_sha256=hashlib.sha256(data).hexdigest(),
                 filename=f'report-{item.id[:8]}-v{item.version}{"-preview" if level == "preview" else "-scenario" if level == "scenario" else ""}.zip',
                 archive=data, created_at=created_at)
+        if task_guard:
+            task = session.scalar(select(WorkTask).where(
+                WorkTask.id == task_guard[0], WorkTask.project_id == project_id,
+                WorkTask.report_id == report_id).with_for_update())
+            if (task is None or task.generation != task_guard[1] or
+                    task.status != "RUNNING" or task.cancel_requested):
+                fail("导出任务已取消或被新尝试替代", 409)
+            if item.version != task.payload.get("report_version"):
+                fail("报告版本已变化，请重新创建导出任务", 409)
+            task.status = "COMPLETED"
+            task.stage = "DONE"
+            task.result = {"export_id": saved.id, "report_version": item.version,
+                           "sha256": saved.archive_sha256}
+        if saved not in session:
             session.add(saved)
         return Response(content=saved.archive, media_type="application/zip",
                         headers={"Content-Disposition": f'attachment; filename="{saved.filename}"',
@@ -2176,6 +2447,109 @@ def rules_create(project_id: str, body: RuleCreate):
         return {"id": rule.id, "name": rule.name, "target_key": rule.target_key, "expression": rule.expression, "deps": rule.deps}
 
 
+def _proposal_dict(row: ReportFactProposal) -> dict:
+    return {"id": row.id, "report_id": row.report_id, "report_version": row.report_version,
+            "block_id": row.block_id, "fact_key": row.fact_key, "fact_revision": row.fact_revision,
+            "project_version": row.project_version, "proposed_value": row.proposed_value,
+            "source": row.proposed_source, "reason": row.reason, "status": row.status,
+            "applied_project_version": row.applied_project_version,
+            "created_at": row.created_at.isoformat()}
+
+
+@app.get("/api/projects/{project_id}/reports/{report_id}/fact-proposals")
+def report_fact_proposals(project_id: str, report_id: str):
+    with SessionLocal() as session:
+        get_project(session, project_id)
+        report = session.get(ReportDraft, report_id)
+        if report is None or report.project_id != project_id:
+            fail("报告不存在", 404)
+        rows = session.scalars(select(ReportFactProposal).where(
+            ReportFactProposal.project_id == project_id, ReportFactProposal.report_id == report_id
+        ).order_by(ReportFactProposal.created_at.desc()).limit(100)).all()
+        return [_proposal_dict(row) for row in rows]
+
+
+@app.post("/api/projects/{project_id}/reports/{report_id}/fact-proposals", status_code=201)
+def report_fact_proposal_create(project_id: str, report_id: str, body: ReportFactProposalCreate):
+    """A bound paragraph may suggest a value; only the usual preview/commit changes facts."""
+    with SessionLocal.begin() as session:
+        project = get_project(session, project_id, lock=True)
+        require_writable_project(project)
+        report = session.get(ReportDraft, report_id)
+        if report is None or report.project_id != project_id:
+            fail("报告不存在", 404)
+        block = next((item for item in report.content if item.get("id") == body.block_id), None)
+        if block is None or body.fact_key not in block.get("fact_keys", []):
+            fail("该段没有绑定所选项目事实", 409)
+        fact = session.scalar(select(ProjectFact).where(
+            ProjectFact.project_id == project_id, ProjectFact.key == body.fact_key))
+        if fact is None or fact.data_type not in {"integer", "decimal"}:
+            fail("仅支持已绑定的数值事实修订提案", 409)
+        if session.scalar(select(ReportFactProposal.id).where(
+                ReportFactProposal.project_id == project_id,
+                ReportFactProposal.report_id == report_id,
+                ReportFactProposal.block_id == body.block_id,
+                ReportFactProposal.fact_key == body.fact_key,
+                ReportFactProposal.status == "PENDING").limit(1)):
+            fail("该段已有待处理提案，请先处理", 409)
+        rules = session.scalars(select(RuleRecord).where(RuleRecord.project_id == project_id)).all()
+        if any(rule.target_key == body.fact_key for rule in rules):
+            fail("计算结果应修改上游输入，不能直接修订", 409)
+        proposed = body.proposed_value.strip()
+        change = FactChange(fact_key=body.fact_key, value=proposed,
+                            source=body.source.strip(), reason=body.reason.strip())
+        try:
+            state, _ = simulate(session.scalars(select(ProjectFact).where(
+                ProjectFact.project_id == project_id)).all(), rules, change)
+        except RuleError as exc:
+            fail(str(exc))
+        if state[body.fact_key]["value"] == fact.value_text:
+            fail("提案值与当前事实相同")
+        block_hash = hashlib.sha256(json.dumps(block, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        row = ReportFactProposal(project_id=project_id, report_id=report_id,
+                                 report_version=report.version, block_id=body.block_id,
+                                 block_sha256=block_hash, fact_key=body.fact_key,
+                                 fact_revision=fact.revision, project_version=project.version,
+                                 proposed_value=proposed, proposed_source=body.source.strip(),
+                                 reason=body.reason.strip())
+        session.add(row)
+        session.flush()
+        return _proposal_dict(row)
+
+
+@app.post("/api/projects/{project_id}/reports/{report_id}/fact-proposals/{proposal_id}/reject")
+def report_fact_proposal_reject(project_id: str, report_id: str, proposal_id: str):
+    with SessionLocal.begin() as session:
+        get_project(session, project_id)
+        row = session.scalar(select(ReportFactProposal).where(
+            ReportFactProposal.id == proposal_id, ReportFactProposal.project_id == project_id,
+            ReportFactProposal.report_id == report_id).with_for_update())
+        if row is None:
+            fail("提案不存在", 404)
+        if row.status == "PENDING":
+            row.status = "REJECTED"
+            row.decided_at = utcnow()
+        return _proposal_dict(row)
+
+
+@app.post("/api/projects/{project_id}/reports/{report_id}/fact-proposals/{proposal_id}/preview")
+def report_fact_proposal_preview(project_id: str, report_id: str, proposal_id: str):
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        row = session.get(ReportFactProposal, proposal_id)
+        report = session.get(ReportDraft, report_id)
+        if row is None or row.project_id != project_id or row.report_id != report_id:
+            fail("提案不存在", 404)
+        if row.status != "PENDING":
+            fail("提案已处理", 409)
+        if (report is None or report.project_id != project_id or report.version != row.report_version
+                or project.version != row.project_version):
+            fail("正文或项目数据已变化，请重新提出", 409)
+        change = FactChange(fact_key=row.fact_key, value=row.proposed_value,
+                            source=row.proposed_source, reason=row.reason)
+    return changes_preview(project_id, change)
+
+
 @app.post("/api/projects/{project_id}/changes/preview")
 def changes_preview(project_id: str, body: FactChange):
     with SessionLocal() as session:
@@ -2206,7 +2580,7 @@ def changes_preview(project_id: str, body: FactChange):
 
 @app.post("/api/projects/{project_id}/changes/commit")
 def changes_commit(project_id: str, body: CommitRequest):
-    change = FactChange(**body.model_dump(exclude={"base_version", "preview_token"}))
+    change = FactChange(**body.model_dump(exclude={"base_version", "preview_token", "proposal_id"}))
     # 有效期作为预览票据的一部分由客户端带回，不从不可信值推断有效性。
     # 票据格式为 expires.signature；避免服务器保留预览状态或落库。
     try:
@@ -2221,6 +2595,27 @@ def changes_commit(project_id: str, body: CommitRequest):
         require_writable_project(project)
         if project.version != body.base_version:
             fail("项目已有新版本，请重新预览", 409)
+        proposal = None
+        if body.proposal_id:
+            proposal = session.scalar(select(ReportFactProposal).where(
+                ReportFactProposal.id == body.proposal_id,
+                ReportFactProposal.project_id == project_id).with_for_update())
+            if proposal is None:
+                fail("提案不存在", 404)
+            report = session.get(ReportDraft, proposal.report_id)
+            fact = session.scalar(select(ProjectFact).where(
+                ProjectFact.project_id == project_id, ProjectFact.key == proposal.fact_key))
+            block = next((item for item in report.content if item.get("id") == proposal.block_id), None) if report else None
+            block_hash = hashlib.sha256(json.dumps(block, ensure_ascii=False, sort_keys=True).encode()).hexdigest() if block else None
+            if (proposal.status != "PENDING" or report is None or report.project_id != project_id
+                    or report.version != proposal.report_version or block_hash != proposal.block_sha256
+                    or fact is None or fact.revision != proposal.fact_revision
+                    or project.version != proposal.project_version):
+                fail("提案依据已变化，请重新提出", 409)
+            if (change.fact_key != proposal.fact_key or str(change.value) != proposal.proposed_value
+                    or change.source != proposal.proposed_source or change.reason != proposal.reason
+                    or change.caliber is not None or change.as_of is not None):
+                fail("提交内容与提案不一致", 409)
         facts = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id)).all()
         rules = session.scalars(select(RuleRecord).where(RuleRecord.project_id == project_id)).all()
         try:
@@ -2229,6 +2624,8 @@ def changes_commit(project_id: str, body: CommitRequest):
             fail(str(exc))
         changes = differences(facts, state)
         if not changes:
+            if proposal is not None:
+                fail("事实已是提案值，请重新提出", 409)
             return {"project_version": project.version, "changes": [], "trace": trace}
         project.version += 1
         by_key = {fact.key: fact for fact in facts}
@@ -2242,6 +2639,10 @@ def changes_commit(project_id: str, body: CommitRequest):
             fact.as_of = after["as_of"]
             fact.revision += 1
             session.add(FactRevision(project_id=project_id, fact_key=fact.key, project_version=project.version, before=item["before"], after=after, reason=change.reason))
+        if proposal is not None:
+            proposal.status = "APPLIED"
+            proposal.applied_project_version = project.version
+            proposal.decided_at = utcnow()
         return {"project_version": project.version, "changes": changes, "trace": trace}
 
 

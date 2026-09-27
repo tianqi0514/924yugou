@@ -62,6 +62,13 @@ class RunSelection(BaseModel):
     base_version: int = Field(ge=0)
 
 
+class SensitivityRequest(BaseModel):
+    base_revision: int = Field(ge=1)
+    input_key: str = Field(min_length=1, max_length=100)
+    values: list[str | None] = Field(min_length=2, max_length=8)
+    result_keys: list[str] = Field(default_factory=list, max_length=8)
+
+
 def _project(session, project_id: str) -> Project:
     project = session.get(Project, project_id)
     if project is None:
@@ -577,6 +584,62 @@ def scenario_runs(project_id: str, scenario_id: str):
         return [_run_dict(row) for row in rows]
 
 
+@router.post("/scenarios/{scenario_id}/sensitivity")
+def scenario_sensitivity(project_id: str, scenario_id: str, body: SensitivityRequest):
+    """Persist a bounded, deterministic set of one-factor runs without editing the scenario."""
+    with SessionLocal.begin() as session:
+        item = _scenario(session, project_id, scenario_id, lock=True)
+        if item.revision != body.base_revision:
+            raise HTTPException(409, "方案已变化，请重新试算")
+        fields = {field["key"]: field for field in item.definitions}
+        field = fields.get(body.input_key)
+        if not field or field["computed"] or field["data_type"] not in {"integer", "decimal"}:
+            raise HTTPException(400, "请选择可修改的数值输入")
+        if len(set(body.values)) != len(body.values):
+            raise HTTPException(400, "试算值不能重复")
+        if body.result_keys and (len(set(body.result_keys)) != len(body.result_keys)
+                                 or any(key not in fields or not fields[key]["computed"]
+                                        for key in body.result_keys)):
+            raise HTTPException(400, "结果指标不属于当前配置")
+        snapshots = []
+        canonical_values: set[str | None] = set()
+        for value in body.values:
+            inputs = _changed_inputs(item, {body.input_key: value})
+            canonical = inputs[body.input_key]["value"]
+            if canonical in canonical_values:
+                raise HTTPException(400, "试算值换算后重复")
+            canonical_values.add(canonical)
+            snapshot = _calculate(item, inputs)
+            snapshot["sensitivity"] = {"input_key": body.input_key,
+                                       "input_value": inputs[body.input_key]["value"],
+                                       "base_revision": item.revision}
+            snapshots.append(snapshot)
+        rows = []
+        for snapshot in snapshots:
+            canonical = snapshot["sensitivity"]["input_value"]
+            key_payload = json.dumps([item.id, item.revision, body.input_key, canonical],
+                                     ensure_ascii=False, separators=(",", ":"))
+            request_key = "sens-" + hashlib.sha256(key_payload.encode()).hexdigest()[:54]
+            row = session.scalar(select(AnalysisRun).where(AnalysisRun.scenario_id == scenario_id,
+                                                            AnalysisRun.request_key == request_key))
+            if row is None:
+                raw = json.dumps(snapshot, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+                row = AnalysisRun(project_id=project_id, scenario_id=scenario_id,
+                                  scenario_revision=item.revision, request_key=request_key,
+                                  input_sha256=hashlib.sha256(raw.encode()).hexdigest(),
+                                  snapshot=snapshot, status=snapshot["status"])
+                session.add(row); session.flush()
+            rows.append(row)
+        keys = body.result_keys or [field["key"] for field in item.definitions if field["computed"]][:8]
+        return {"scenario_id": item.id, "scenario_revision": item.revision,
+                "input": {"key": field["key"], "label": field["label"], "unit": field["unit"]},
+                "result_keys": keys,
+                "runs": [{"id": row.id, "input_value": row.snapshot["sensitivity"]["input_value"],
+                          "status": row.status, "condition": row.snapshot["condition"],
+                          "results": {key: row.snapshot["results"].get(key) for key in keys}}
+                         for row in rows]}
+
+
 @router.get("/runs/{run_id}")
 def run_get(project_id: str, run_id: str):
     with SessionLocal() as session:
@@ -590,8 +653,24 @@ def run_compare(project_id: str, run_ids: list[str] = Body(..., min_length=2, ma
     with SessionLocal() as session:
         rows = [_run(session, project_id, run_id) for run_id in run_ids]
         keys = sorted(set().union(*(row.snapshot["results"].keys() for row in rows)))
-        return {"runs": [_run_dict(row) for row in rows], "rows": [{"key": key,
-                 "values": [row.snapshot["results"].get(key) for row in rows]} for key in keys]}
+        comparisons = []
+        for key in keys:
+            definitions = [next((field for field in row.snapshot["definitions"]
+                                 if field["key"] == key), None) for row in rows]
+            values = [row.snapshot["results"].get(key) for row in rows]
+            reason = None
+            if any(value is None or value.get("value") is None for value in values):
+                reason = "指标缺失或不可评估"
+            elif any(field is None for field in definitions):
+                reason = "指标定义不一致"
+            elif len({row.snapshot["blueprint_version"] for row in rows}) != 1:
+                reason = "采用了不同的规则配置"
+            elif len({(field.get("unit"), field.get("data_type"), field.get("period"), field.get("caliber"))
+                      for field in definitions}) != 1:
+                reason = "单位、时点或口径不一致"
+            comparisons.append({"key": key, "values": values,
+                                "comparable": reason is None, "reason": reason})
+        return {"runs": [_run_dict(row) for row in rows], "rows": comparisons}
 
 
 @router.get("/reports/{report_id}/impact/{run_id}")

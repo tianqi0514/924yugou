@@ -289,6 +289,7 @@ def test_stale_project_rule_provenance_cannot_rebind_updated_fact(client):
     for child in calculated["children"]:
         if child.get("fact_key") in {"first_year_demand", "planned_sales"}:
             child["display"] = "200,000"
+    calculated["source_review_required"] = True
     proposed = ok(client.post(f"/api/projects/{pid}/reports/{rid}/preview", json={
         "content": edited, "base_version": original["version"]}))
     saved = ok(client.put(f"/api/projects/{pid}/reports/{rid}", json={
@@ -297,6 +298,7 @@ def test_stale_project_rule_provenance_cannot_rebind_updated_fact(client):
     codes = {issue["code"] for issue in saved["issues"]}
     assert "PROJECT_RULE_INPUT_CHANGED" in codes
     assert "FACT_CHANGED" in codes
+    assert "SOURCE_REVIEW_REQUIRED" in codes
     assert saved["bound_facts"]["first_year_demand"] == original["bound_facts"]["first_year_demand"]
     assert saved["bound_facts"]["planned_sales"] == original["bound_facts"]["planned_sales"]
     assert client.post(f"/api/projects/{pid}/reports/{rid}/review", json={}).status_code == 400
