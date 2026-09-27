@@ -11,6 +11,18 @@ type Item = {
   configured_mode: Mode; effective_role: Role; purpose: string; chapter_role: string;
   limitations: string | string[]; record_ids: string[]
 }
+type ActualUse = { report_id: string; report_version: number; block_id: string; record_id: string;
+  artifact_id: string; use?: string; location?: unknown; commit_event_id?: string | null; committed_report_version?: number | null }
+type Usage = { status: 'in_current_report' | 'package_only' | 'not_in_package';
+  current_uses: ActualUse[]; model_sent?: { record_id: string; artifact_id: string; commit_event_id: string }[];
+  package_records: { record_id: string; artifact_id: string; decision: string; reason: string }[] }
+type EvaluationCategory = { category_id: string; name: string; database_record_count: number;
+  package_records: { record_id: string; artifact_id: string; location?: unknown }[];
+  candidate_record_ids: string[]; removal: { status: string; reason: string; text_changed?: boolean; source_refs_changed?: boolean; issue_codes_changed?: boolean };
+  equivalent: { status: string; reason: string; checks?: Record<string, boolean> | null } }
+type EvaluationRun = { id: string; case_id: string; corpus_version: string; input_sha256: string;
+  created_at: string; result: { category_count: number; categories: EvaluationCategory[];
+    configured: Outcome; case_inputs: Fact[]; simulation_only: boolean } }
 type Slot = { slot_id: string; label: string; unit: string; value: string | null }
 type Data = { project_id: string; section_id: string; config_version: number; groups: Group[]; items: Item[]; slots: Slot[] }
 type Issue = string | { code?: string; message?: string }
@@ -54,6 +66,13 @@ const defaults: Record<string, string> = { N017: '300000', N034: '254016', suppl
 const inputIds: Record<string, string[]> = { S4: ['N017', 'N034'], 'S7.1': ['supplier_name', 'N080'], 'S5.2': [] }
 const inputLabels: Record<string, string> = { N017: '首年需求', N034: '合格能力', supplier_name: '供应商', N080: '设备单价' }
 const validated = new Set(['S4', 'S7.1', 'S5.2'])
+const fixedCases: Record<string, { id: string; label: string }[]> = {
+  S4: [{ id: 'S4-base', label: '需求 300000' }, { id: 'S4-zero', label: '需求为 0' },
+    { id: 'S4-missing', label: '需求缺失' }, { id: 'S4-lower', label: '需求 200000' },
+    { id: 'S4-equal', label: '需求等于能力' }],
+  'S7.1': [{ id: 'S7.1-supplier', label: '新供应商' }],
+  'S5.2': [{ id: 'S5.2-conflict', label: '配电双来源冲突' }],
+}
 
 function settingsFor(data: Data, draft: Record<string, Mode>) {
   return data.items.map((item) => ({ category_id: item.category_id, mode: draft[item.category_id] || item.configured_mode }))
@@ -113,8 +132,8 @@ function ResultCard({ title, result }: { title: string; result: Outcome }) {
   </section>
 }
 
-export default function MaterialApplicationPanel({ projectId, sectionId, onConfigurationChanged, onRecordClick }: {
-  projectId: string; sectionId: string; onConfigurationChanged: () => Promise<void>;
+export default function MaterialApplicationPanel({ projectId, reportId, sectionId, onConfigurationChanged, onRecordClick }: {
+  projectId: string; reportId?: string; sectionId: string; onConfigurationChanged: () => Promise<void>;
   onRecordClick?: (categoryId: string, recordId: string) => void
 }) {
   const [open, setOpen] = useState(false)
@@ -123,17 +142,23 @@ export default function MaterialApplicationPanel({ projectId, sectionId, onConfi
   const [group, setGroup] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [detail, setDetail] = useState<Item | null>(null)
+  const [usage, setUsage] = useState<Usage | null>(null)
+  const [usageLoading, setUsageLoading] = useState(false)
+  const [usageError, setUsageError] = useState('')
+  const [evaluation, setEvaluation] = useState<EvaluationRun | null>(null)
+  const [caseId, setCaseId] = useState('')
   const [inputMode, setInputMode] = useState<'project' | 'example'>('project')
   const [experimentMode, setExperimentMode] = useState<'remove' | 'equivalent'>('remove')
   const [exampleValues, setExampleValues] = useState<Record<string, string>>(defaults)
   const [simulation, setSimulation] = useState<Simulation | null>(null)
   const [loading, setLoading] = useState(true)
-  const [busy, setBusy] = useState<'save' | 'simulate' | ''>('')
+  const [busy, setBusy] = useState<'save' | 'simulate' | 'evaluate' | ''>('')
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const detailRef = useRef<HTMLDivElement>(null)
   const actionRef = useRef<HTMLButtonElement | null>(null)
   const contextVersion = useRef(0)
+  const detailVersion = useRef(0)
   const path = '/projects/' + encodeURIComponent(projectId) + '/writing/materials'
   const readPath = path + '?section_id=' + encodeURIComponent(sectionId)
 
@@ -149,13 +174,25 @@ export default function MaterialApplicationPanel({ projectId, sectionId, onConfi
     ++contextVersion.current
     setLoading(true); setData(null); setError(''); setNotice(''); setGroup(''); setSelected([]); setSimulation(null)
     setInputMode('project'); setExperimentMode('remove'); setExampleValues(defaults); setBusy('')
+    setEvaluation(null); setCaseId(fixedCases[sectionId]?.[0]?.id || ''); setDetail(null); setUsage(null); setUsageError('')
     api<Data>(readPath).then((result) => { if (active) applyData(result) })
       .catch((cause: Error) => { if (active) setError(cause.message) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false; ++contextVersion.current }
   }, [readPath])
   useEffect(() => { if (detail) detailRef.current?.focus() }, [detail])
-  const closeDetail = () => { setDetail(null); actionRef.current?.focus() }
+  const closeDetail = () => { ++detailVersion.current; setDetail(null); setUsage(null); setUsageError(''); actionRef.current?.focus() }
+  const openDetail = (item: Item, button: HTMLButtonElement) => {
+    actionRef.current = button; setDetail(item); setUsage(null); setUsageError(''); setUsageLoading(Boolean(reportId))
+    const version = ++detailVersion.current
+    if (reportId) {
+      api<Usage>(path + '/' + encodeURIComponent(sectionId) + '/categories/' + item.category_id +
+        '/usage?report_id=' + encodeURIComponent(reportId))
+        .then((result) => { if (version === detailVersion.current) setUsage(result) })
+        .catch((cause: Error) => { if (version === detailVersion.current) setUsageError(cause.message) })
+        .finally(() => { if (version === detailVersion.current) setUsageLoading(false) })
+    }
+  }
 
   const groups = useMemo(() => data ? [...new Set([
     ...data.groups.map((item) => typeof item === 'string' ? item : item.name),
@@ -203,6 +240,29 @@ export default function MaterialApplicationPanel({ projectId, sectionId, onConfi
     } catch (cause) { if (context === contextVersion.current) setError((cause as Error).message) }
     finally { if (context === contextVersion.current) setBusy('') }
   }
+  const evaluate = async () => {
+    if (!caseId || busy) return
+    const context = contextVersion.current
+    setBusy('evaluate'); setError('')
+    try {
+      const result = await post<EvaluationRun>(path + '/' + encodeURIComponent(sectionId) + '/evaluate', { case_id: caseId })
+      if (context === contextVersion.current) setEvaluation(result)
+    } catch (cause) { if (context === contextVersion.current) setError((cause as Error).message) }
+    finally { if (context === contextVersion.current) setBusy('') }
+  }
+  const latestEvaluation = async () => {
+    if (busy) return
+    const context = contextVersion.current
+    setBusy('evaluate'); setError('')
+    try {
+      const result = await api<{ runs: EvaluationRun[] }>(path + '/' + encodeURIComponent(sectionId) + '/experiments')
+      if (context === contextVersion.current) {
+        setEvaluation(result.runs[0] || null)
+        if (!result.runs.length) setNotice('暂无评估记录')
+      }
+    } catch (cause) { if (context === contextVersion.current) setError((cause as Error).message) }
+    finally { if (context === contextVersion.current) setBusy('') }
+  }
 
   return <section className="workspace-card material-panel">
     <div className="material-top"><div><h3>资料应用 <span>{data?.items.length ?? 30} 类</span></h3>{dirty && <small>配置未保存</small>}</div>
@@ -220,7 +280,7 @@ export default function MaterialApplicationPanel({ projectId, sectionId, onConfi
           <select aria-label={item.name + '使用方式'} value={draft[item.category_id] || item.configured_mode} disabled={!!busy} onChange={(event) => { setDraft((current) => ({ ...current, [item.category_id]: event.target.value as Mode })); setSimulation(null); setNotice('') }}>
             {(Object.keys(modeLabel) as Mode[]).map((mode) => <option value={mode} key={mode}>{modeLabel[mode]}</option>)}
           </select>
-          <button type="button" className="text-button" onClick={(event) => { actionRef.current = event.currentTarget; setDetail(item) }}><Info size={13} />作用</button>
+          <button type="button" className="text-button" onClick={(event) => openDetail(item, event.currentTarget)}><Info size={13} />作用</button>
         </div>)}</div>
         <div className="material-actions"><span>{selected.length ? '已选 ' + selected.length + '/6 类' : '选择资料进行模拟'}</span><button type="button" className="subtle-button" disabled={!dirty || !!busy} onClick={() => void save()}>{busy === 'save' ? '保存中…' : '保存配置'}</button></div>
         <div className="material-simulate"><div className="material-simulate-head"><strong>模拟对比</strong>{canSimulate && <div className="material-simulate-switches"><div className="segmented" role="group" aria-label="试验方式"><button type="button" disabled={!!busy} className={experimentMode === 'remove' ? 'active' : ''} onClick={() => { setExperimentMode('remove'); setSimulation(null) }}>移除类别</button><button type="button" disabled={!!busy} className={experimentMode === 'equivalent' ? 'active' : ''} onClick={() => { setExperimentMode('equivalent'); setSimulation(null) }}>等价信息</button></div><div className="segmented" role="group" aria-label="模拟输入"><button type="button" disabled={!!busy} className={inputMode === 'project' ? 'active' : ''} onClick={() => { setInputMode('project'); setSimulation(null) }}>本项目事实</button><button type="button" disabled={!!busy} className={inputMode === 'example' ? 'active' : ''} onClick={() => { setInputMode('example'); setSimulation(null) }}>示例输入</button></div></div>}</div>
@@ -230,6 +290,19 @@ export default function MaterialApplicationPanel({ projectId, sectionId, onConfi
             <button type="button" className="primary-button" disabled={!selected.length || !!busy} onClick={() => void simulate()}>{busy === 'simulate' ? '模拟中…' : '模拟对比'}</button>
           </>}
         </div>
+        {canSimulate && <div className="material-evaluate">
+          <div className="material-evaluate-controls"><strong>30 类评估 <small>固定示例 · 不改项目</small></strong>
+            <select aria-label="固定评估案例" value={caseId} disabled={!!busy} onChange={(event) => setCaseId(event.target.value)}>{(fixedCases[sectionId] || []).map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>
+            <button type="button" className="subtle-button" disabled={!!busy} onClick={() => void evaluate()}>{busy === 'evaluate' ? '评估中…' : '运行评估'}</button>
+            <button type="button" className="text-button" disabled={!!busy} onClick={() => void latestEvaluation()}>上次结果</button>
+          </div>
+          {evaluation && <details className="material-evaluate-result"><summary>{evaluation.case_id} · {evaluation.result.category_count} 类 · {evaluation.result.configured.status === 'ready' ? '候选已形成' : '候选受阻'}</summary>
+            <div className="material-evaluate-rows">{evaluation.result.categories.map((row) => <div key={row.category_id}>
+              <span>{row.category_id} · {row.name}</span><span>{row.candidate_record_ids.length ? `候选引用 ${row.candidate_record_ids.length}` : row.package_records.length ? '仅在本章包内' : '本章未消费'}</span>
+              <span>{row.removal.status === 'implementation_coupling' ? '构造器依赖' : row.removal.status === 'not_in_package' ? '未做空遮蔽' : row.removal.status === 'not_tested' ? '未测' : row.removal.status === 'source_or_issue_changed' ? '来源或问题变化' : row.removal.status === 'same' ? '本章未变' : row.removal.status}</span>
+              <span>{row.equivalent.status === 'equivalent' ? '等价通过' : row.equivalent.status === 'not_tested' ? '等价未测' : row.equivalent.status}</span>
+            </div>)}</div></details>}
+        </div>}
         {simulation && <div className="material-results">
           <div className="material-results-head"><strong>模拟结果</strong><span>未写入项目或报告</span><button type="button" className="text-button" onClick={() => setSimulation(null)}>清除</button></div>
           <div className="material-outcomes"><ResultCard title="默认适用" result={simulation.baseline} /><ResultCard title="当前设置" result={simulation.configured} /></div>
@@ -239,6 +312,6 @@ export default function MaterialApplicationPanel({ projectId, sectionId, onConfi
         </div>}
       </>}
     </>}
-    {detail && <div className="dialog-backdrop" onClick={closeDetail}><div ref={detailRef} tabIndex={-1} className="dialog material-purpose" role="dialog" aria-modal="true" aria-label={detail.name + '作用'} onClick={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === 'Escape') closeDetail() }}><div className="dialog-head"><h2>{String(detail.number).padStart(2, '0')} · {detail.name}</h2><button type="button" className="icon-button" aria-label="关闭作用" onClick={closeDetail}><X size={18} /></button></div><dl><div><dt>本章作用</dt><dd>{detail.chapter_role || detail.purpose || '暂无关联'}</dd></div><div><dt>资料用途</dt><dd>{detail.purpose || '暂无记录'}</dd></div><div><dt>限制</dt><dd>{Array.isArray(detail.limitations) ? detail.limitations.join('；') : detail.limitations || '无'}</dd></div><div><dt>关联记录</dt><dd>{detail.record_ids?.length ? <div className="material-records">{detail.record_ids.map((id) => onRecordClick ? <button type="button" key={id} onClick={() => { closeDetail(); onRecordClick(detail.category_id, id) }}>{id}</button> : <span key={id}>{id}</span>)}</div> : '本章无关联记录'}</dd></div></dl></div></div>}
+    {detail && <div className="dialog-backdrop" onClick={closeDetail}><div ref={detailRef} tabIndex={-1} className="dialog material-purpose" role="dialog" aria-modal="true" aria-label={detail.name + '作用'} onClick={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === 'Escape') closeDetail() }}><div className="dialog-head"><h2>{String(detail.number).padStart(2, '0')} · {detail.name}</h2><button type="button" className="icon-button" aria-label="关闭作用" onClick={closeDetail}><X size={18} /></button></div><dl><div><dt>实际入稿</dt><dd>{usageLoading ? '读取中…' : usageError ? `读取失败：${usageError}` : usage?.current_uses.length ? <div className="material-records">{usage.current_uses.map((item, index) => onRecordClick ? <button type="button" key={`${item.block_id}-${item.record_id}-${index}`} onClick={() => { closeDetail(); onRecordClick(detail.category_id, item.record_id) }}>{item.record_id} · 第 {item.report_version} 版段落 {item.block_id.slice(0, 8)}</button> : <span key={`${item.block_id}-${item.record_id}-${index}`}>{item.record_id} · 第 {item.report_version} 版段落 {item.block_id.slice(0, 8)}</span>)}</div> : reportId ? '当前报告本章未引用' : '未选择报告'}</dd></div><div><dt>模型输入</dt><dd>{usageLoading ? '读取中…' : usageError ? '读取失败' : usage?.model_sent?.length ? `${usage.model_sent.length} 条 · ${usage.model_sent.map((item) => item.record_id).join('、')}` : '当前段落无模型输入记录'}</dd></div><div><dt>本章作用</dt><dd>{detail.chapter_role || detail.purpose || '暂无关联'}</dd></div><div><dt>资料用途</dt><dd>{detail.purpose || '暂无记录'}</dd></div><div><dt>限制</dt><dd>{Array.isArray(detail.limitations) ? detail.limitations.join('；') : detail.limitations || '无'}</dd></div><div><dt>关联记录</dt><dd>{detail.record_ids?.length ? <div className="material-records">{detail.record_ids.map((id) => onRecordClick ? <button type="button" key={id} onClick={() => { closeDetail(); onRecordClick(detail.category_id, id) }}>{id}</button> : <span key={id}>{id}</span>)}</div> : '本章无关联记录'}</dd></div>{evaluation && <div><dt>本次评估</dt><dd>{(() => { const row = evaluation.result.categories.find((entry) => entry.category_id === detail.category_id); return row ? <>{row.candidate_record_ids.length ? `候选引用 ${row.candidate_record_ids.join('、')}` : '候选未引用'}；移除：{row.removal.reason}；等价：{row.equivalent.reason}</> : '未测' })()}</dd></div>}</dl></div></div>}
   </section>
 }

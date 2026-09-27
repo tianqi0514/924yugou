@@ -10,16 +10,20 @@ from __future__ import annotations
 from collections import Counter
 from copy import deepcopy
 from datetime import datetime
+from hashlib import sha256
+import json
 from typing import Any, Literal
+from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
-from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, select
+from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, UniqueConstraint, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from .corpus import CATEGORY_NAMES, GROUPS
 from .corpus_storage import CorpusArtifact, CorpusCategoryRow, CorpusRecord
-from .db import Base, Project, ProjectFact, RuleRecord, SessionLocal, utcnow
+from .db import Base, Project, ProjectFact, ReportDraft, RuleRecord, SessionLocal, WritingCommitEvent, utcnow
 from .writing import SLOTS
 from .writing_support import GUIDED_SECTIONS, accepted_reference, build_candidate, package
 
@@ -44,6 +48,25 @@ class WritingMaterialSetting(Base):
                                                   onupdate=utcnow, nullable=False)
 
 
+class MaterialExperimentRun(Base):
+    """Immutable observation of one preregistered, deterministic 30-category QA case."""
+
+    __tablename__ = "material_experiment_runs"
+    __table_args__ = (UniqueConstraint("project_id", "section_id", "input_sha256",
+                                       name="uq_material_experiment_input"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    section_id: Mapped[str] = mapped_column(String(80), nullable=False)
+    case_id: Mapped[str] = mapped_column(String(40), nullable=False)
+    corpus_id: Mapped[str] = mapped_column(String(160), nullable=False)
+    corpus_version: Mapped[str] = mapped_column(String(60), nullable=False)
+    config_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    input_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    result: Mapped[dict] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
 class MaterialChoice(BaseModel):
     category_id: str = Field(pattern=r"^CAT-(0[1-9]|[12][0-9]|30)$")
     mode: Literal["auto", "review", "exclude"]
@@ -60,6 +83,22 @@ class MaterialSimulate(BaseModel):
     input_mode: Literal["project", "example"] = "project"
     slot_values: dict[str, Any] = Field(default_factory=dict)
     experiment_mode: Literal["remove", "equivalent"] = "remove"
+
+
+class MaterialEvaluate(BaseModel):
+    case_id: Literal["S4-base", "S4-zero", "S4-missing", "S4-lower", "S4-equal",
+                     "S7.1-supplier", "S5.2-conflict"]
+
+
+_FIXED_CASES: dict[str, tuple[str, dict[str, Any]]] = {
+    "S4-base": ("S4", {"N017": 300000, "N034": 254016}),
+    "S4-zero": ("S4", {"N017": 0, "N034": 254016}),
+    "S4-missing": ("S4", {"N017": None, "N034": 254016}),
+    "S4-lower": ("S4", {"N017": 200000, "N034": 254016}),
+    "S4-equal": ("S4", {"N017": 254016, "N034": 254016}),
+    "S7.1-supplier": ("S7.1", {"supplier_name": "新供应商甲", "N080": "1200.00"}),
+    "S5.2-conflict": ("S5.2", {}),
+}
 
 
 def _project(session: Session, project_id: str, *, lock: bool = False) -> Project:
@@ -420,3 +459,215 @@ def simulate_materials(project_id: str, section_id: str, body: MaterialSimulate)
                 "experiments": experiments, "trace": trace,
                 "facts": _facts_for_display(raw, state, bindings), "simulation_only": True,
                 "experiment_mode": body.experiment_mode}
+
+
+def _digest(value: dict) -> str:
+    return sha256(json.dumps(value, sort_keys=True, ensure_ascii=False, default=str,
+                             separators=(",", ":")).encode()).hexdigest()
+
+
+def _issue_codes(snapshot: dict) -> list[str]:
+    return sorted({str(issue.get("code") or issue.get("message") or "")
+                   for issue in snapshot.get("issues", [])})
+
+
+def _experiment_result(session: Session, raw: dict, settings: dict[str, str],
+                       state: dict[str, dict], rules: list[RuleRecord], bindings: dict[str, str]) -> dict:
+    """Observe all categories without treating an empty ablation as proof of no value."""
+    from .writing_contract import SUPPORTED, compare_equivalent
+
+    section_id = raw["section"]["id"]
+    baseline = _candidate_snapshot(session, raw, {}, state, rules, bindings)
+    configured = _candidate_snapshot(session, raw, settings, state, rules, bindings)
+    by_category: dict[int, list[dict]] = {}
+    for item in raw["items"]:
+        by_category.setdefault(item["category_number"], []).append(item)
+    categories = []
+    for number in range(1, 31):
+        category_id = f"CAT-{number:02d}"
+        items = by_category.get(number, [])
+        record_ids = {item["record_id"] for item in items}
+        used_ids = record_ids.intersection(configured["used_records"])
+        record_refs = [{"record_id": item["record_id"], "artifact_id": item["artifact_id"],
+                        "location": item.get("location"), "decision": item["decision"]}
+                       for item in items]
+        if configured["status"] != "ready":
+            removal = {"status": "not_tested", "reason": "当前输入未形成候选，无法检验移除影响"}
+        elif not items:
+            removal = {"status": "not_in_package", "reason": "本章没有该类记录，未执行空遮蔽"}
+        else:
+            without = dict(settings)
+            without[category_id] = "exclude"
+            after = _candidate_snapshot(session, raw, without, state, rules, bindings)
+            removal = {
+                "status": ("implementation_coupling" if after["status"] == "blocked" and used_ids
+                           else "blocked_without_consumption" if after["status"] == "blocked"
+                           else "changed" if after["text"] != configured["text"]
+                           else "source_or_issue_changed" if (
+                               after["used_records"] != configured["used_records"]
+                               or _issue_codes(after) != _issue_codes(configured)) else "same"),
+                "reason": ("构造器依赖，不能证明信息内容或独立文件必需" if after["status"] == "blocked"
+                           else "仅观察本章确定性候选；其他用户任务未检验"),
+                "text_changed": after["text"] != configured["text"],
+                "source_refs_changed": after["used_records"] != configured["used_records"],
+                "issue_codes_changed": _issue_codes(after) != _issue_codes(configured),
+                "after_status": after["status"],
+            }
+        equivalent = {"status": "not_tested", "reason": "本章未消费该类记录或尚无等价适配"}
+        if configured["status"] == "ready" and used_ids and number in SUPPORTED.get(section_id, set()):
+            payloads = []
+            for record_id in sorted(used_ids):
+                record = session.get(CorpusRecord, (raw["corpus_id"], number, record_id))
+                if record is not None:
+                    payloads.append(record.payload)
+            comparison = compare_equivalent(section_id, number, configured, state, rules,
+                                            bindings, sorted(used_ids), payloads)
+            equivalent = {"status": comparison["status"], "reason": comparison["reason"],
+                          "checks": comparison.get("checks"),
+                          "information_origin": (comparison.get("contract") or {}).get("information_origin")}
+        categories.append({
+            "category_id": category_id, "name": CATEGORY_NAMES[number - 1],
+            "database_record_count": session.get(CorpusCategoryRow, (raw["corpus_id"], number)).record_count,
+            "package_records": record_refs, "candidate_record_ids": sorted(used_ids),
+            "stages": {"database_present": True, "chapter_package": bool(items),
+                       "builder_passed": bool(items) and settings.get(category_id) != "exclude",
+                       "candidate_referenced": bool(used_ids),
+                       "report_adopted": None, "human_reviewed": None,
+                       "export_audited": None},
+            "removal": removal, "equivalent": equivalent,
+            "limitation": "此记录仅为确定性模拟；用户入稿、人工核对、模型效果与导出须另查实际事件",
+        })
+    return {"schema_version": "material-contribution/v2", "section_id": section_id,
+            "baseline": baseline, "configured": configured, "categories": categories,
+            "category_count": len(categories), "method": "deterministic_guided_synthetic_QA",
+            "simulation_only": True}
+
+
+def _experiment_dict(row: MaterialExperimentRun) -> dict:
+    return {"id": row.id, "project_id": row.project_id, "section_id": row.section_id,
+            "case_id": row.case_id, "corpus_id": row.corpus_id,
+            "corpus_version": row.corpus_version, "config_version": row.config_version,
+            "input_sha256": row.input_sha256, "created_at": row.created_at.isoformat(),
+            "result": row.result}
+
+
+@router.post("/{section_id}/evaluate")
+def evaluate_materials(project_id: str, section_id: str, body: MaterialEvaluate) -> dict:
+    case = _FIXED_CASES[body.case_id]
+    if case[0] != section_id:
+        raise HTTPException(422, "案例与章节不一致")
+    with SessionLocal.begin() as session:
+        _project(session, project_id)
+        raw = _raw_package(session, project_id, section_id)
+        row = _setting(session, project_id, section_id)
+        settings = dict(row.settings or {}) if row else {}
+        state, rules, bindings, trace = _simulation_inputs(session, project_id, "example", case[1])
+        input_sha256 = _digest({"method": "material-contribution/v2", "case_id": body.case_id,
+                                "project_id": project_id, "corpus_id": raw["corpus_id"],
+                                "corpus_version": raw["corpus_version"], "config_version": row.revision if row else 0,
+                                "settings": settings, "slot_values": case[1],
+                                "rules": [{"id": rule.id, "revision": rule.revision,
+                                           "expression": rule.expression, "deps": rule.deps} for rule in rules]})
+        existing = session.scalar(select(MaterialExperimentRun).where(
+            MaterialExperimentRun.project_id == project_id,
+            MaterialExperimentRun.section_id == section_id,
+            MaterialExperimentRun.input_sha256 == input_sha256))
+        if existing is not None:
+            return _experiment_dict(existing)
+        result = _experiment_result(session, raw, settings, state, rules, bindings)
+        result["case_inputs"] = _facts_for_display(raw, state, bindings)
+        result["trace"] = trace
+        stmt = pg_insert(MaterialExperimentRun).values(
+            id=str(uuid4()), project_id=project_id, section_id=section_id,
+            case_id=body.case_id, corpus_id=raw["corpus_id"], corpus_version=raw["corpus_version"],
+            config_version=row.revision if row else 0, input_sha256=input_sha256,
+            result=json.loads(json.dumps(result, ensure_ascii=False, default=str)), created_at=utcnow(),
+        ).on_conflict_do_nothing(constraint="uq_material_experiment_input")
+        session.execute(stmt)
+        saved = session.scalar(select(MaterialExperimentRun).where(
+            MaterialExperimentRun.project_id == project_id,
+            MaterialExperimentRun.section_id == section_id,
+            MaterialExperimentRun.input_sha256 == input_sha256))
+        return _experiment_dict(saved)
+
+
+@router.get("/{section_id}/experiments")
+def list_material_experiments(project_id: str, section_id: str) -> dict:
+    with SessionLocal() as session:
+        _project(session, project_id)
+        rows = session.scalars(select(MaterialExperimentRun).where(
+            MaterialExperimentRun.project_id == project_id,
+            MaterialExperimentRun.section_id == section_id).order_by(
+                MaterialExperimentRun.created_at.desc()).limit(1)).all()
+        return {"runs": [_experiment_dict(row) for row in rows]}
+
+
+@router.get("/{section_id}/categories/{category_id}/usage")
+def material_usage(project_id: str, section_id: str, category_id: str,
+                   report_id: str = Query(..., min_length=1)) -> dict:
+    if not (len(category_id) == 6 and category_id.startswith("CAT-") and category_id[4:].isdigit()
+            and 1 <= int(category_id[4:]) <= 30):
+        raise HTTPException(422, "类别编号无效")
+    with SessionLocal() as session:
+        _project(session, project_id)
+        report = session.get(ReportDraft, report_id)
+        if report is None or report.project_id != project_id:
+            raise HTTPException(404, "报告不存在")
+        raw = _raw_package(session, project_id, section_id)
+        package_items = [item for item in raw["items"] if item["category_id"] == category_id]
+        events = session.scalars(select(WritingCommitEvent).where(
+            WritingCommitEvent.project_id == project_id,
+            WritingCommitEvent.report_id == report_id,
+            WritingCommitEvent.section_id == section_id).order_by(
+                WritingCommitEvent.report_version.desc())).all()
+        by_block: dict[str, WritingCommitEvent] = {}
+        for event in events:
+            for block_id in event.block_ids:
+                by_block.setdefault(block_id, event)
+        uses = []
+        current_block_ids = {block.get("id") for block in report.content if block.get("section_id") == section_id}
+        model_sent = []
+        for event in events:
+            if event.mode != "model" or not current_block_ids.intersection(event.block_ids):
+                continue
+            audit = event.model_audit or {}
+            if not audit.get("model_call"):
+                continue
+            for material in (audit.get("model_input") or {}).get("materials", []):
+                source = material.get("source_ref") or {}
+                if (source.get("category_id") == category_id and source.get("corpus_id") == raw["corpus_id"]
+                        and source.get("corpus_version") == raw["corpus_version"]):
+                    model_sent.append({"record_id": source.get("record_id"),
+                                       "artifact_id": source.get("artifact_id"),
+                                       "commit_event_id": event.id,
+                                       "committed_report_version": event.report_version})
+        for block in report.content:
+            if block.get("section_id") != section_id:
+                continue
+            for ref in block.get("source_refs", []):
+                if (ref.get("category_id") != category_id or ref.get("corpus_id") != raw["corpus_id"]
+                        or ref.get("corpus_version") != raw["corpus_version"]):
+                    continue
+                record = session.get(CorpusRecord, (raw["corpus_id"], int(category_id[4:]),
+                                                    ref.get("record_id", "")))
+                event = by_block.get(block.get("id"))
+                if event and not any(
+                    binding.get("block_id") == block.get("id") and ref in binding.get("refs", [])
+                    for binding in event.source_refs
+                ):
+                    event = None
+                uses.append({"report_id": report.id, "report_version": report.version,
+                             "section_id": section_id, "block_id": block.get("id"),
+                             "record_id": ref.get("record_id"), "artifact_id": ref.get("artifact_id"),
+                             "corpus_id": raw["corpus_id"], "corpus_version": raw["corpus_version"],
+                             "location": record.location if record else None,
+                             "use": ref.get("use"), "commit_event_id": event.id if event else None,
+                             "committed_report_version": event.report_version if event else None})
+        return {"project_id": project_id, "report_id": report_id, "report_version": report.version,
+                "section_id": section_id, "category_id": category_id, "current_uses": uses,
+                "model_sent": model_sent,
+                "package_records": [{"record_id": item["record_id"],
+                                     "artifact_id": item["artifact_id"],
+                                     "decision": item["decision"], "reason": item["reason"]}
+                                    for item in package_items],
+                "status": "in_current_report" if uses else "package_only" if package_items else "not_in_package"}

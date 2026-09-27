@@ -9,9 +9,9 @@ os.environ["DATABASE_URL"] = "postgresql+psycopg://report:local_development_only
 import pytest
 from fastapi.testclient import TestClient
 
-from app.db import Base, SessionLocal, engine, ProjectFact, ReportDraft
+from app.db import Base, SessionLocal, engine, ProjectFact, ReportDraft, WritingCommitEvent
 from app.main import app
-from app.writing_materials import WritingMaterialSetting
+from app.writing_materials import MaterialExperimentRun, WritingMaterialSetting
 
 
 @pytest.fixture(autouse=True)
@@ -231,3 +231,112 @@ def test_project_input_can_try_values_without_persisting_them(client):
     persisted = {fact["key"]: fact for fact in ok(client.get(f"/api/projects/{project_id}/facts"))["facts"]}
     assert persisted["first_year_demand"]["value"] is None
     assert persisted["qualified_capacity"]["value"] is None
+
+
+@pytest.mark.parametrize("case_id,section_id,expected", [
+    ("S4-base", "S4", "254,016"), ("S4-zero", "S4", "0"),
+    ("S4-missing", "S4", None), ("S4-lower", "S4", "200,000"),
+    ("S4-equal", "S4", "254,016"), ("S7.1-supplier", "S7.1", "新供应商甲"),
+    ("S5.2-conflict", "S5.2", "未解决分歧"),
+])
+def test_preregistered_experiment_is_immutable_idempotent_and_thirty_rows(client, case_id, section_id, expected):
+    project_id = project(client)
+    report_id = ok(client.post(f"/api/projects/{project_id}/reports", json={"title": "未改报告"}))["id"]
+    before = ok(client.get(f"/api/projects/{project_id}"))["version"]
+    target = url(project_id, section_id) + "/evaluate"
+    first = ok(client.post(target, json={"case_id": case_id}))
+    again = ok(client.post(target, json={"case_id": case_id}))
+    assert first == again
+    assert first["result"]["category_count"] == 30
+    assert len(first["result"]["categories"]) == 30
+    assert first["result"]["simulation_only"] is True
+    assert first["input_sha256"] and first["corpus_version"] == "v2"
+    text = first["result"]["configured"]["text"]
+    if expected is None:
+        assert first["result"]["configured"]["status"] == "blocked"
+        assert next(f for f in first["result"]["case_inputs"] if f["slot_id"] == "N035")["status"] == "UNEVALUABLE"
+    else:
+        assert expected in text
+    if case_id == "S4-base":
+        rows = {row["category_id"]: row for row in first["result"]["categories"]}
+        assert rows["CAT-10"]["candidate_record_ids"]
+        assert rows["CAT-10"]["removal"]["status"] == "implementation_coupling"
+        assert rows["CAT-10"]["equivalent"]["status"] == "equivalent"
+        assert rows["CAT-01"]["removal"]["status"] == "not_in_package"
+        assert rows["CAT-01"]["candidate_record_ids"] == []
+        assert rows["CAT-11"]["candidate_record_ids"] == []
+        assert all(not row["stages"]["report_adopted"] for row in rows.values())
+        assert "禾进装备" not in text and "需求低于能力" not in text
+    if case_id == "S7.1-supplier":
+        assert "禾进装备" not in text
+    if case_id == "S5.2-conflict":
+        rows = {row["category_id"]: row for row in first["result"]["categories"]}
+        assert rows["CAT-23"]["candidate_record_ids"]
+        assert rows["CAT-18"]["candidate_record_ids"]
+        assert "配电适配结论" in text
+    assert len(ok(client.get(url(project_id, section_id) + "/experiments"))["runs"]) == 1
+    assert ok(client.get(f"/api/projects/{project_id}"))["version"] == before
+    assert ok(client.get(f"/api/projects/{project_id}/reports/{report_id}"))["version"] == 0
+    assert ok(client.get(f"/api/projects/{project_id}/facts"))["facts"] == []
+    with SessionLocal() as session:
+        assert session.query(MaterialExperimentRun).filter_by(project_id=project_id).count() == 1
+
+
+def test_material_usage_distinguishes_package_from_current_report_and_is_project_scoped(client):
+    project_id = project(client)
+    other_project = project(client)
+    report_id = ok(client.post(f"/api/projects/{project_id}/reports", json={"title": "引用核对"}))["id"]
+    detail = f"/api/projects/{project_id}/writing/materials/S4/categories/CAT-15/usage?report_id={report_id}"
+    before = ok(client.get(detail))
+    assert before["status"] == "package_only" and not before["current_uses"]
+    assert before["package_records"][0]["record_id"] == "15:000001"
+    assert client.get(f"/api/projects/{other_project}/writing/materials/S4/categories/CAT-15/usage?report_id={report_id}").status_code == 404
+    ref = {"corpus_id": "cy_tray_20260918", "corpus_version": "v2",
+           "category_id": "CAT-15", "artifact_id": before["package_records"][0]["artifact_id"],
+           "record_id": "15:000001", "use": "historical_claim_pattern_only"}
+    with SessionLocal.begin() as session:
+        report = session.get(ReportDraft, report_id)
+        report.content = [{"type": "p", "id": "test-block", "section_id": "S4",
+                           "children": [{"text": "需求不是订单"}], "source_refs": [ref]}]
+        report.version = 1
+        session.add(WritingCommitEvent(project_id=project_id, report_id=report_id,
+            report_version=1, section_id="S4", corpus_id=ref["corpus_id"],
+            corpus_version=ref["corpus_version"], mode="guided", block_ids=["test-block"],
+            source_refs=[{"block_id": "test-block", "section_id": "S4", "refs": [ref]}],
+            issues=[], approved_item_ids=["15:000001"]))
+    after = ok(client.get(detail))
+    assert after["status"] == "in_current_report"
+    assert len(after["current_uses"]) == 1
+    use = after["current_uses"][0]
+    assert use["block_id"] == "test-block" and use["record_id"] == "15:000001"
+    assert use["commit_event_id"] and use["location"] is not None
+    assert after["model_sent"] == []
+    with SessionLocal.begin() as session:
+        report = session.get(ReportDraft, report_id)
+        report.content = [*report.content, {"type": "p", "id": "model-block", "section_id": "S4",
+                                            "children": [{"text": "待核句"}], "source_refs": []}]
+        session.add(WritingCommitEvent(project_id=project_id, report_id=report_id,
+            report_version=1, section_id="S4", corpus_id=ref["corpus_id"],
+            corpus_version=ref["corpus_version"], mode="model", block_ids=["model-block"],
+            source_refs=[], issues=[], approved_item_ids=[], model_audit={
+                "model_call": {"provider": "synthetic-unit-test"},
+                "model_input": {"materials": [{"source_ref": {
+                    "corpus_id": ref["corpus_id"], "corpus_version": ref["corpus_version"],
+                    "category_id": "CAT-26", "artifact_id": "ART-STYLE", "record_id": "26:000000",
+                }}]},
+            }))
+    style = ok(client.get(f"/api/projects/{project_id}/writing/materials/S4/categories/CAT-26/usage?report_id={report_id}"))
+    assert style["current_uses"] == []
+    assert style["model_sent"][0]["record_id"] == "26:000000"
+    with SessionLocal.begin() as session:
+        session.get(ReportDraft, report_id).content = []
+    assert ok(client.get(detail))["current_uses"] == []
+
+
+def test_experiment_rejects_mismatched_section_and_cross_project_history(client):
+    first = project(client)
+    second = project(client)
+    assert client.post(url(first, "S4") + "/evaluate", json={"case_id": "S5.2-conflict"}).status_code == 422
+    run = ok(client.post(url(first, "S4") + "/evaluate", json={"case_id": "S4-base"}))
+    assert ok(client.get(url(second, "S4") + "/experiments"))["runs"] == []
+    assert run["id"] not in str(ok(client.get(url(second, "S4") + "/experiments")))

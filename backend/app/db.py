@@ -532,6 +532,7 @@ def init_db() -> None:
         connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_next35_proposal') ON CONFLICT DO NOTHING"))
         connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_fact_entry_ux') ON CONFLICT DO NOTHING"))
         connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_rule_revision') ON CONFLICT DO NOTHING"))
+        connection.execute(text("INSERT INTO schema_migrations(version) VALUES ('20260927_material_experiments') ON CONFLICT DO NOTHING"))
     # Older parser output can be pinned from the current snapshot. Existing evidence
     # with no parse_revision_id remains legacy; do not claim its historical parse
     # revision has been reconstructed from later OCR output.

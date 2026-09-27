@@ -8,6 +8,7 @@ import pytest
 from sqlalchemy import text
 
 from app import db
+from app import writing_materials  # noqa: F401 - register the new table before init_db
 
 
 def test_schema_marker_and_failed_ddl_rollback(monkeypatch):
@@ -15,6 +16,8 @@ def test_schema_marker_and_failed_ddl_rollback(monkeypatch):
     db.init_db()
     with db.engine.connect() as connection:
         assert connection.scalar(text("SELECT count(*) FROM schema_migrations WHERE version='20260927_next28_40'")) == 1
+        assert connection.scalar(text("SELECT count(*) FROM schema_migrations WHERE version='20260927_material_experiments'")) == 1
+        assert connection.scalar(text("SELECT to_regclass('material_experiment_runs')")) == 'material_experiment_runs'
 
     original = db.Base.metadata.create_all
 

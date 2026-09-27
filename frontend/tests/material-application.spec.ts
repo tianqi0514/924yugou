@@ -16,7 +16,17 @@ test('30 类可逐项配置、查看作用并模拟移除；示例 0 与空值�
   let saveCalls = 0
   let packageCalls = 0
   let sourceCalls = 0
+  let evaluationCalls = 0
   const simulations: Record<string, unknown>[] = []
+  const evaluationRun = { id: 'eval-1', case_id: 'S4-base', corpus_version: 'v2', input_sha256: 'fixed-hash',
+    created_at: '2026-09-27T00:00:00Z', result: { category_count: 30, simulation_only: true,
+      configured: { status: 'ready', text: '计划销售量 254016 套。' }, case_inputs: [],
+      categories: Array.from({ length: 30 }, (_, index) => ({ category_id: `CAT-${String(index + 1).padStart(2, '0')}`,
+        name: categoryName(index + 1), database_record_count: 1,
+        package_records: index === 12 ? [{ record_id: '13:000005', artifact_id: 'ART-13' }] : [],
+        candidate_record_ids: index === 12 ? ['13:000005'] : [],
+        removal: { status: index === 12 ? 'implementation_coupling' : 'not_in_package', reason: index === 12 ? '构造器依赖，不能证明独立文件必需' : '未做空遮蔽' },
+        equivalent: { status: index === 12 ? 'equivalent' : 'not_tested', reason: index === 12 ? '类型化契约可替代' : '尚无适配' } })) } }
   const items = (section: string) => Array.from({ length: 30 }, (_, index) => {
     const number = index + 1
     const categoryId = `CAT-${String(number).padStart(2, '0')}`
@@ -60,6 +70,19 @@ test('30 类可逐项配置、查看作用并模拟移除；示例 0 与空值�
         source_project_id: 'history', items: [], required_item_ids: [], slots: [], issues: [], facts: [] })
     }
     if (path === '/projects/material-project/writing/materials' && request.method() === 'GET') return reply(materialData(url.searchParams.get('section_id') || 'S4'))
+    if (path.match(/^\/projects\/material-project\/writing\/materials\/S4\/categories\/CAT-\d{2}\/usage$/)) {
+      const number = Number(path.match(/CAT-(\d{2})/)?.[1])
+      return reply({ status: number === 13 ? 'in_current_report' : 'package_only',
+        current_uses: number === 13 ? [{ report_id: 'r1', report_version: 1, block_id: 'block-13',
+          record_id: '13:000005', artifact_id: 'ART-13', use: 'rule_pattern_only' }] : [],
+        package_records: number === 13 ? [{ record_id: '13:000005', artifact_id: 'ART-13', decision: 'selectable', reason: '' }] : [] })
+    }
+    if (path === '/projects/material-project/writing/materials/S4/evaluate' && request.method() === 'POST') {
+      evaluationCalls += 1
+      expect(request.postDataJSON().case_id).toBe('S4-base')
+      return reply(evaluationRun)
+    }
+    if (path === '/projects/material-project/writing/materials/S4/experiments' && request.method() === 'GET') return reply({ runs: [evaluationRun] })
     if (path === '/projects/material-project/writing/materials/S4' && request.method() === 'PUT') {
       saveCalls += 1
       const body = request.postDataJSON()
@@ -117,6 +140,7 @@ test('30 类可逐项配置、查看作用并模拟移除；示例 0 与空值�
     await row.getByRole('button', { name: '作用' }).click()
     const detail = page.getByRole('dialog', { name: categoryName(number) + '作用' })
     await expect(detail).toContainText(`资料 ${number} 的用途`)
+    if (number === 13) await expect(detail).toContainText('13:000005 · 第 1 版段落')
     if (number === 1) { await detail.press('Escape'); await expect(detail).toBeHidden() }
     else if (number === 4) {
       await detail.getByRole('button', { name: '04:000004' }).click()
@@ -175,6 +199,14 @@ test('30 类可逐项配置、查看作用并模拟移除；示例 0 与空值�
   await expect(panel.locator('.material-contract')).toContainText('同一虚构历史语料')
   await expect(panel.locator('.material-contract')).toContainText('章节归属被改错')
   expect(simulations[2].experiment_mode).toBe('equivalent')
+  await panel.getByRole('button', { name: '运行评估' }).click()
+  await expect(panel.locator('.material-evaluate-result')).toContainText('S4-base · 30 类')
+  await panel.locator('.material-evaluate-result summary').click()
+  await expect(panel.locator('.material-evaluate-rows>div')).toHaveCount(30)
+  await expect(panel.locator('.material-evaluate-rows')).toContainText('构造器依赖')
+  expect(evaluationCalls).toBe(1)
+  await panel.getByRole('button', { name: '上次结果' }).click()
+  await expect(panel.locator('.material-evaluate-result')).toContainText('S4-base · 30 类')
   await page.getByLabel('选择语料章节').selectOption('S8')
   const unadapted = page.locator('.material-panel')
   await unadapted.getByRole('button', { name: /配置与模拟/ }).click()
