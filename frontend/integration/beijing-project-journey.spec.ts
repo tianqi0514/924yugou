@@ -14,7 +14,7 @@ async function send(request: APIRequestContext, method: 'post' | 'put', url: str
   return response.json()
 }
 
-test('新建北京报告项目：原文定位、面积核对、方案变化、两章写作与交付', async ({ page, request }) => {
+test('新建北京可研项目：原文定位、三章分项核对、方案变化与交付', async ({ page, request }) => {
   test.setTimeout(240_000)
   await page.goto('/')
   await page.getByRole('button', { name: '新建项目' }).click()
@@ -49,7 +49,15 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
     ['aboveground_area', '地上建筑面积', '15756.25', '㎡', 'p7-s3'],
     ['underground_area', '地下建筑面积', '1512', '㎡', 'p7-s3'],
     ['reported_total_area', '原文总建筑面积', '17268.25', '㎡', 'p7-s3'],
+    ['construction_land', '建设用地面积', '54088.771', '㎡', 'p7-s3'],
+    ['green_land', '代征绿地面积', '3105.104', '㎡', 'p7-s3'],
+    ['road_land', '代征道路面积', '16237.23', '㎡', 'p7-s3'],
+    ['reported_total_land', '原文总用地面积', '73431.105', '㎡', 'p7-s2'],
     ['total_investment', '原文总投资', '31255.57', '万元', 'p8-s5'],
+    ['construction_cost', '工程费', '22122.45', '万元', 'p8-s5'],
+    ['other_cost', '工程建设其他费', '2701.55', '万元', 'p8-s5'],
+    ['reserve_cost', '预备费', '1241.20', '万元', 'p8-s5'],
+    ['land_cost', '征地拆迁费', '5190.37', '万元', 'p8-s5'],
   ]) {
     await send(request, 'post', `${base}/facts`, { key, label, data_type: 'decimal', unit, source: '北京公开可研报告' })
     const change = { fact_key: key, value, source: '北京公开可研报告', reason: '原件位置核对' }
@@ -62,7 +70,7 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   await page.getByLabel('筛选事实状态').selectOption('needs-source')
   await expect(page.getByText('没有匹配事实')).toBeVisible()
   await page.getByLabel('筛选事实状态').selectOption('PROVIDED')
-  await expect(page.locator('tbody tr')).toHaveCount(4)
+  await expect(page.locator('tbody tr')).toHaveCount(12)
   await page.getByRole('row', { name: /地上建筑面积/ }).getByRole('button', { name: '证据' }).click()
   await expect(page.getByLabel('证据页码')).toHaveValue('7')
   await expect(page.locator('.evidence-segments')).toContainText('17268.25')
@@ -79,49 +87,96 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   await page.getByRole('dialog', { name: '地上建筑面积来源' }).getByRole('button', { name: '查看原文位置' }).click()
   await expect(page.locator('#segment-p7-s3')).toHaveClass(/document-segment-active/)
 
-  let config = await send(request, 'post', `${base}/analysis/configs`, { name: '建筑面积与投资核对' })
+  let config = await send(request, 'post', `${base}/analysis/configs`, { name: '建筑面积、用地与投资核对' })
   config = await send(request, 'put', `${base}/analysis/configs/${config.id}`, {
     revision: config.revision, name: config.name,
     definitions: [
       { key: 'aboveground_area', label: '地上建筑面积', data_type: 'decimal', unit: '㎡', group: '原文', computed: false },
       { key: 'underground_area', label: '地下建筑面积', data_type: 'decimal', unit: '㎡', group: '原文', computed: false },
       { key: 'reported_total_area', label: '原文总建筑面积', data_type: 'decimal', unit: '㎡', group: '原文', computed: false },
+      { key: 'construction_land', label: '建设用地面积', data_type: 'decimal', unit: '㎡', group: '原文', computed: false },
+      { key: 'green_land', label: '代征绿地面积', data_type: 'decimal', unit: '㎡', group: '原文', computed: false },
+      { key: 'road_land', label: '代征道路面积', data_type: 'decimal', unit: '㎡', group: '原文', computed: false },
+      { key: 'reported_total_land', label: '原文总用地面积', data_type: 'decimal', unit: '㎡', group: '原文', computed: false },
       { key: 'total_investment', label: '原文总投资', data_type: 'decimal', unit: '万元', group: '原文', computed: false },
+      { key: 'construction_cost', label: '工程费', data_type: 'decimal', unit: '万元', group: '原文', computed: false },
+      { key: 'other_cost', label: '工程建设其他费', data_type: 'decimal', unit: '万元', group: '原文', computed: false },
+      { key: 'reserve_cost', label: '预备费', data_type: 'decimal', unit: '万元', group: '原文', computed: false },
+      { key: 'land_cost', label: '征地拆迁费', data_type: 'decimal', unit: '万元', group: '原文', computed: false },
       { key: 'calculated_total_area', label: '分项计算建筑面积', data_type: 'decimal', unit: '㎡', group: '核对', computed: true },
       { key: 'area_difference', label: '原文与分项差额', data_type: 'decimal', unit: '㎡', group: '核对', computed: true },
+      { key: 'calculated_total_land', label: '分项计算用地面积', data_type: 'decimal', unit: '㎡', group: '核对', computed: true },
+      { key: 'land_difference', label: '用地原文与分项差额', data_type: 'decimal', unit: '㎡', group: '核对', computed: true },
+      { key: 'calculated_investment', label: '分项计算投资', data_type: 'decimal', unit: '万元', group: '核对', computed: true },
+      { key: 'investment_difference', label: '投资原文与分项差额', data_type: 'decimal', unit: '万元', group: '核对', computed: true },
     ],
     rules: [
       { id: 'area_total', name: '建筑面积分项合计', target_key: 'calculated_total_area', expression: 'aboveground_area + underground_area' },
       { id: 'area_check', name: '原文与分项差额', target_key: 'area_difference', expression: 'reported_total_area - calculated_total_area' },
+      { id: 'land_total', name: '用地分项合计', target_key: 'calculated_total_land', expression: 'construction_land + green_land + road_land' },
+      { id: 'land_check', name: '用地原文与分项差额', target_key: 'land_difference', expression: 'reported_total_land - calculated_total_land' },
+      { id: 'investment_total', name: '投资分项合计', target_key: 'calculated_investment', expression: 'construction_cost + other_cost + reserve_cost + land_cost' },
+      { id: 'investment_check', name: '投资原文与分项差额', target_key: 'investment_difference', expression: 'total_investment - calculated_investment' },
     ],
     sections: [
       { id: 'area', title: '建筑面积核对', result_keys: ['reported_total_area', 'calculated_total_area', 'area_difference'],
         evidence_keys: ['aboveground_area', 'underground_area', 'reported_total_area'],
         conditions: [{ id: 'area_equal', expression: 'calculated_total_area == reported_total_area',
           when_true: '本方案建筑面积分项与原文总量一致。', when_false: '本方案建筑面积分项与原文总量不一致，需核对口径。' }] },
-      { id: 'investment', title: '投资估算摘录', result_keys: ['total_investment'], evidence_keys: ['total_investment'] },
+      { id: 'land', title: '用地规模核对', result_keys: ['reported_total_land', 'calculated_total_land', 'land_difference'],
+        evidence_keys: ['construction_land', 'green_land', 'road_land', 'reported_total_land'],
+        conditions: [{ id: 'land_equal', expression: 'calculated_total_land == reported_total_land',
+          when_true: '本方案用地分项与原文总量一致。', when_false: '本方案用地分项与原文总量不一致，需核对口径。' }] },
+      { id: 'investment', title: '投资构成核对', result_keys: ['total_investment', 'calculated_investment', 'investment_difference'],
+        evidence_keys: ['total_investment', 'construction_cost', 'other_cost', 'reserve_cost', 'land_cost'],
+        conditions: [{ id: 'investment_equal', expression: 'calculated_investment == total_investment',
+          when_true: '本方案投资分项与原文总量一致。', when_false: '本方案投资分项与原文总量不一致，需核对口径。' }],
+        forbidden_terms: ['资金已落实', '资金已到位'] },
     ],
   })
+  const baselineInputs = { aboveground_area: '15756.25', underground_area: '1512',
+      reported_total_area: '17268.25', construction_land: '54088.771', green_land: '3105.104',
+      road_land: '16237.23', reported_total_land: '73431.105', total_investment: '31255.57',
+      construction_cost: '22122.45', other_cost: '2701.55', reserve_cost: '1241.20', land_cost: '5190.37' }
   const trial = await send(request, 'post', `${base}/analysis/configs/${config.id}/test`, {
-    revision: config.revision, sample_inputs: { aboveground_area: '15756.25', underground_area: '1512',
-      reported_total_area: '17268.25', total_investment: '31255.57' },
+    revision: config.revision, sample_inputs: baselineInputs,
   })
   expect(trial.snapshot.results.calculated_total_area.value).toBe('17268.25')
   expect(trial.snapshot.results.area_difference.value).toBe('0')
-  await send(request, 'post', `${base}/analysis/configs/${config.id}/publish`, { revision: config.revision, test_token: trial.test_token })
-  let scenario = await send(request, 'post', `${base}/analysis/scenarios`, { name: '原文复算', source: 'config', config_id: config.id })
-  scenario = await send(request, 'put', `${base}/analysis/scenarios/${scenario.id}`, {
-    base_revision: scenario.revision,
-    changes: { aboveground_area: '15756.25', underground_area: '1512', reported_total_area: '17268.25', total_investment: '31255.57' },
+  expect(trial.snapshot.results.calculated_total_land.value).toBe('73431.105')
+  expect(trial.snapshot.results.land_difference.value).toBe('0')
+  expect(trial.snapshot.results.calculated_investment.value).toBe('31255.57')
+  expect(trial.snapshot.results.investment_difference.value).toBe('0')
+  const investmentChanged = await send(request, 'post', `${base}/analysis/configs/${config.id}/test`, {
+    revision: config.revision, sample_inputs: { ...baselineInputs, construction_cost: '22022.45' },
   })
+  expect(investmentChanged.snapshot.results.calculated_investment.value).toBe('31155.57')
+  expect(investmentChanged.snapshot.results.investment_difference.value).toBe('100')
+  expect(investmentChanged.snapshot.condition_results['investment:investment_equal'].text).toContain('不一致')
+  const investmentMissing = await send(request, 'post', `${base}/analysis/configs/${config.id}/test`, {
+    revision: config.revision, sample_inputs: { ...baselineInputs, construction_cost: null },
+  })
+  expect(investmentMissing.snapshot.results.calculated_investment.value).toBeNull()
+  expect(investmentMissing.snapshot.results.calculated_total_land.value).toBe('73431.105')
+  await send(request, 'post', `${base}/analysis/configs/${config.id}/publish`, { revision: config.revision, test_token: trial.test_token })
+  const report = await send(request, 'post', `${base}/reports`, { title: '北京可研分项核对报告' })
+  await page.goto(`/?project=${projectId}&report=${report.id}`)
+  await page.getByRole('button', { name: '输入数据' }).click()
+  await page.getByText('按已发布配置创建方案').click()
+  await page.getByLabel('配置方案名称').fill('原文复算')
+  await page.getByRole('button', { name: '填入项目事实' }).click()
+  await expect(page.getByLabel('选择方案')).not.toHaveValue('')
+  const scenarioId = await page.getByLabel('选择方案').inputValue()
+  let scenario = await (await request.get(`${base}/analysis/scenarios/${scenarioId}`)).json()
+  expect(Object.values(scenario.inputs).every((entry) => (entry as { origin: string }).origin === 'project_fact')).toBeTruthy()
+  expect(scenario.inputs.construction_cost.value).toBe('22122.45')
   const firstRun = await send(request, 'post', `${base}/analysis/scenarios/${scenario.id}/runs`, {
     scenario_revision: scenario.revision, request_key: `beijing-${Date.now()}-1`,
   })
   expect(firstRun.snapshot.results.area_difference.value).toBe('0')
-  const report = await send(request, 'post', `${base}/reports`, { title: '建筑面积与投资核对报告' })
   await send(request, 'post', `${base}/analysis/reports/${report.id}/select`, { run_id: firstRun.id, base_version: report.version })
-  await page.goto(`/?project=${projectId}&report=${report.id}`)
-  await expect(page.locator('.scenario-title h1')).toHaveText('建筑面积与投资核对报告')
+  await page.reload()
+  await expect(page.locator('.scenario-title h1')).toHaveText('北京可研分项核对报告')
   await page.getByRole('button', { name: '生成本章', exact: true }).click()
   await expect(page.locator('.scenario-draft-run')).toContainText('原文复算')
   await page.getByRole('button', { name: '生成候选' }).click()
@@ -136,6 +191,29 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
     (block: { section_id?: string }) => block.section_id === 'area')).toBeFalsy()
   await page.getByRole('button', { name: '生成候选' }).click()
   await page.getByRole('button', { name: '加入报告' }).click()
+  await page.getByRole('button', { name: '生成本章', exact: true }).click()
+  await page.getByRole('combobox', { name: '生成章节' }).selectOption('land')
+  await page.getByRole('button', { name: '生成候选' }).click()
+  await expect(page.locator('.scenario-candidate')).toContainText('73431.105')
+  await expect(page.locator('.scenario-candidate')).toContainText('用地分项与原文总量一致')
+  await page.getByRole('button', { name: '加入报告' }).click()
+  await page.getByRole('button', { name: '生成本章', exact: true }).click()
+  await page.getByRole('combobox', { name: '生成章节' }).selectOption('investment')
+  await page.getByRole('button', { name: '生成候选' }).click()
+  await expect(page.locator('.scenario-candidate')).toContainText('31255.57')
+  await expect(page.locator('.scenario-candidate')).toContainText('投资分项与原文总量一致')
+  await expect(page.locator('.scenario-candidate')).not.toContainText('资金已落实')
+  await page.locator('.scenario-evidence-list summary').click()
+  await page.locator('.scenario-evidence-list button').filter({ hasText: '工程费' }).first().click()
+  await expect(page.locator('.scenario-evidence-preview')).toContainText('22122.45')
+  await expect(page.locator('.scenario-evidence-preview')).toContainText('p8-s5')
+  await page.getByRole('button', { name: '在项目文件中定位' }).click()
+  await expect(page.locator('#segment-p8-s5')).toHaveClass(/document-segment-active/)
+  expect(new URL(page.url()).searchParams.get('report')).toBe(report.id)
+  await page.goBack()
+  await expect(page.locator('.scenario-title h1')).toHaveText('北京可研分项核对报告')
+  expect((await (await request.get(`${base}/reports/${report.id}`)).json()).content.some(
+    (block: { section_id?: string }) => block.section_id === 'investment')).toBeFalsy()
   await page.getByRole('button', { name: '生成本章', exact: true }).click()
   await page.getByRole('combobox', { name: '生成章节' }).selectOption('investment')
   await page.getByRole('button', { name: '生成候选' }).click()
@@ -160,8 +238,12 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   await page.waitForTimeout(1500)
   const pendingAfterReload = await page.evaluate((id) => sessionStorage.getItem(`report-platform-report-draft:${id}`), `${projectId}:${report.id}`)
   expect(pendingAfterReload).toBeNull()
-  const reviewed = await request.post(`${base}/reports/${report.id}/review`)
-  expect(reviewed.ok(), await reviewed.text()).toBeTruthy()
+  await page.locator('.scenario-canvas-tools').getByRole('button', { name: /检查/ }).click()
+  await expect(page.locator('.scenario-check-state')).toContainText('待核对')
+  await expect(page.getByRole('button', { name: '我已核对' })).toBeEnabled()
+  await page.getByRole('button', { name: '我已核对' }).click()
+  await expect(page.locator('.scenario-title')).toContainText('已核对')
+  await page.getByRole('button', { name: '关闭面板' }).click()
   const exported = await request.get(`${base}/reports/${report.id}/export?level=scenario`)
   expect(exported.ok(), await exported.text()).toBeTruthy()
   const firstArchive = resolve(integrationRoot, 'exports', `beijing-${projectId}-first.zip`)
@@ -169,17 +251,19 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   await writeFile(firstArchive, await exported.body())
   const checked = execFileSync(resolve(root, '.venv/bin/python'), [resolve(root, 'backend/scripts/check_scenario_export.py'),
     firstArchive, '--project', projectId, '--report', report.id, '--run', firstRun.id,
-    '--text', '17268.25', '--text', '31255.57', '--text', '人工核对：面积口径来自公开原件。',
-    '--text', '推演依据', '--text', '地上建筑面积 15756.25㎡（方案假设）',
+    '--text', '17268.25', '--text', '73431.105', '--text', '31255.57', '--text', '人工核对：面积口径来自公开原件。',
+    '--text', '推演依据', '--text', '地上建筑面积 15756.25㎡（项目事实快照）',
     '--text', '规则：地上建筑面积 + 地下建筑面积',
     '--result', 'calculated_total_area=17268.25', '--result', 'area_difference=0',
+    '--result', 'calculated_total_land=73431.105', '--result', 'land_difference=0',
+    '--result', 'calculated_investment=31255.57', '--result', 'investment_difference=0',
   ], { cwd: root, env: { ...process.env, ...backendEnvironment }, encoding: 'utf8' })
   expect(JSON.parse(checked).docx_tables).toBeGreaterThan(0)
   await page.getByRole('button', { name: '返回报告列表' }).click()
-  await expect(page.locator('.scenario-report-row').filter({ hasText: '建筑面积与投资核对报告' })).toContainText('已核对')
+  await expect(page.locator('.scenario-report-row').filter({ hasText: '北京可研分项核对报告' })).toContainText('已核对')
   await page.getByLabel('搜索报告').fill('不存在的标题')
   await expect(page.getByText('没有匹配报告')).toBeVisible()
-  await page.getByLabel('搜索报告').fill('建筑面积')
+  await page.getByLabel('搜索报告').fill('可研分项')
   await page.getByLabel('筛选报告状态').selectOption('已核对')
   await expect(page.locator('.scenario-report-row')).toHaveCount(1)
   await page.locator('.scenario-report-row').click()
@@ -210,6 +294,8 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   await expect(page.locator('[contenteditable="true"]')).toContainText('16512')
   await expect(page.locator('[contenteditable="true"]')).toContainText('756.25')
   await expect(page.locator('[contenteditable="true"]')).toContainText('分项与原文总量不一致')
+  await expect(page.locator('[contenteditable="true"]')).toContainText('用地分项与原文总量一致')
+  await expect(page.locator('[contenteditable="true"]')).toContainText('投资分项与原文总量一致')
   await expect(page.locator('[contenteditable="true"]')).toContainText('人工核对：面积口径来自公开原件。')
   const afterRefresh = await (await request.get(`${base}/reports/${report.id}`)).json()
   expect(afterRefresh.issues.some((issue: { code: string }) => issue.code === 'ANALYSIS_RUN_STALE')).toBeTruthy()
@@ -252,16 +338,18 @@ test('新建北京报告项目：原文定位、面积核对、方案变化、�
   const checkedAgain = execFileSync(resolve(root, '.venv/bin/python'), [resolve(root, 'backend/scripts/check_scenario_export.py'),
     secondArchive, '--project', projectId, '--report', report.id, '--run', secondRun.id,
     '--text', '16512', '--text', '756.25', '--text', '分项与原文总量不一致',
+    '--text', '73431.105', '--text', '31255.57',
     '--text', '地上建筑面积 15000㎡（方案假设）', '--text', '计算：原文与分项差额 756.25㎡',
     '--text', '人工核对：面积口径来自公开原件。',
     '--result', 'calculated_total_area=16512', '--result', 'area_difference=756.25',
+    '--result', 'calculated_total_land=73431.105', '--result', 'calculated_investment=31255.57',
   ], { cwd: root, env: { ...process.env, ...backendEnvironment }, encoding: 'utf8' })
   expect(JSON.parse(checkedAgain).docx_tables).toBeGreaterThan(0)
-  expect(JSON.parse(checkedAgain).pdf_pages).toBe(1)
+  expect(JSON.parse(checkedAgain).pdf_pages).toBeGreaterThanOrEqual(1)
   expect((await request.get(`${base}/reports/${report.id}/export?level=formal`)).status()).toBe(409)
   await page.getByRole('button', { name: '返回报告列表' }).click()
-  await expect(page.locator('.scenario-report-row').filter({ hasText: '建筑面积与投资核对报告' })).toContainText('已核对')
-  await expect(page.locator('.scenario-report-row').filter({ hasText: '建筑面积与投资核对报告' })).toContainText('方案假设')
+  await expect(page.locator('.scenario-report-row').filter({ hasText: '北京可研分项核对报告' })).toContainText('已核对')
+  await expect(page.locator('.scenario-report-row').filter({ hasText: '北京可研分项核对报告' })).toContainText('方案假设')
   const deliveries = await (await request.get(`${base}/reports/${report.id}/exports`)).json()
   expect(deliveries).toHaveLength(2)
   const firstSaved = await request.get(`${base}/reports/${report.id}/exports/${exported.headers()['x-export-id']}`)

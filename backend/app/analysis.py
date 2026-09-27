@@ -43,6 +43,7 @@ class ScenarioCreate(BaseModel):
     source: str = Field(pattern="^(historical|project|copy|config)$")
     copy_from: str | None = None
     config_id: str | None = None
+    use_project_facts: bool = False
 
 
 class ScenarioChange(BaseModel):
@@ -335,15 +336,74 @@ def _report(session, project_id: str, report_id: str, *, lock: bool = False) -> 
     return row
 
 
-def _run_impacts(report: ReportDraft, run: AnalysisRun) -> list[dict]:
+def _block_refs(block: dict) -> list[dict]:
+    refs = list(block.get("analysis_refs", []))
+    if block.get("type") == "table":
+        for row in block.get("children", []):
+            for cell in row.get("children", []):
+                for paragraph in cell.get("children", []):
+                    refs.extend(paragraph.get("analysis_refs", []))
+    return refs
+
+
+def _same_result_lineage(previous: AnalysisRun, current: AnalysisRun, key: str,
+                         visited: set[str] | None = None) -> bool:
+    visited = visited or set()
+    if key in visited:
+        return True
+    visited.add(key)
+    old, new = previous.snapshot, current.snapshot
+    if old.get("results", {}).get(key) != new.get("results", {}).get(key):
+        return False
+    old_field = next((row for row in old.get("definitions", []) if row["key"] == key), None)
+    new_field = next((row for row in new.get("definitions", []) if row["key"] == key), None)
+    if old_field is None or old_field != new_field:
+        return False
+    old_step = next((row for row in old.get("trace", []) if row["target"] == key), None)
+    new_step = next((row for row in new.get("trace", []) if row["target"] == key), None)
+    if old_step or new_step:
+        return bool(old_step and old_step == new_step and all(
+            _same_result_lineage(previous, current, dep, visited) for dep in old_step["inputs"]))
+    return (key in old.get("inputs", {}) and old["inputs"][key] == new.get("inputs", {}).get(key)
+            and old.get("project_fact_baseline", {}).get(key)
+            == new.get("project_fact_baseline", {}).get(key))
+
+
+def _safe_rebind_content(report: ReportDraft, previous: AnalysisRun | None,
+                         current: AnalysisRun) -> tuple[list[dict], list[int]]:
+    content = deepcopy(report.content)
+    if previous is None or previous.id == current.id:
+        return content, []
+    old, new = previous.snapshot, current.snapshot
+    if (old.get("blueprint_version") != new.get("blueprint_version")
+            or old.get("corpus_id") != new.get("corpus_id")
+            or old.get("corpus_version") != new.get("corpus_version")
+            or old.get("configuration") != new.get("configuration")):
+        return content, []
+    rebound = []
+    for position, block in enumerate(content, 1):
+        refs = _block_refs(block)
+        if not refs or block.get("origin") != "guided" or any(ref["run_id"] != previous.id for ref in refs):
+            continue
+        section_id = block.get("section_id")
+        if section_id == "S4" and old.get("condition") != new.get("condition"):
+            continue
+        if any(value != new.get("condition_results", {}).get(key)
+               for key, value in old.get("condition_results", {}).items()
+               if key.startswith(f"{section_id}:")):
+            continue
+        if not all(_same_result_lineage(previous, current, ref["result_key"]) for ref in refs):
+            continue
+        for ref in refs:
+            ref["run_id"] = current.id
+        rebound.append(position)
+    return content, rebound
+
+
+def _run_impacts(report: ReportDraft, run: AnalysisRun, content: list[dict] | None = None) -> list[dict]:
     impacts = []
-    for index, block in enumerate(report.content, 1):
-        refs = list(block.get("analysis_refs", []))
-        if block.get("type") == "table":
-            for row in block.get("children", []):
-                for cell in row.get("children", []):
-                    for paragraph in cell.get("children", []):
-                        refs.extend(paragraph.get("analysis_refs", []))
+    for index, block in enumerate(report.content if content is None else content, 1):
+        refs = _block_refs(block)
         seen: set[tuple[str, str, str, str]] = set()
         for ref in refs:
             identity = (ref["run_id"], ref["result_key"], ref["value"], ref["unit"])
@@ -373,6 +433,8 @@ def scenario_list(project_id: str):
 def scenario_create(project_id: str, body: ScenarioCreate):
     with SessionLocal.begin() as session:
         project = _project(session, project_id)
+        if body.use_project_facts and (body.source != "config" or body.copy_from):
+            raise HTTPException(400, "只能在按配置创建方案时选择从项目事实填入")
         if body.source == "copy":
             if not body.copy_from:
                 raise HTTPException(400, "请选择要复制的方案")
@@ -401,6 +463,22 @@ def scenario_create(project_id: str, body: ScenarioCreate):
                     if value is not None:
                         inputs[key] = {"value": value, "origin": "scenario_assumption",
                                        "source_ref": None, "review_status": "unverified"}
+            elif body.use_project_facts:
+                fact_rows = session.scalars(select(ProjectFact).where(ProjectFact.project_id == project_id)).all()
+                computed_facts = set(session.scalars(select(RuleRecord.target_key).where(
+                    RuleRecord.project_id == project_id)).all())
+                facts_by_key = {fact.key: fact for fact in fact_rows if fact.key not in computed_facts}
+                for field in definitions:
+                    if field["computed"]:
+                        continue
+                    fact = facts_by_key.get(field["key"])
+                    if (fact is None or fact.value_text is None or fact.data_type != field["data_type"]
+                            or fact.unit != field["unit"]):
+                        continue
+                    inputs[field["key"]] = {"value": fact.value_text, "origin": "project_fact",
+                                            "source_ref": {"project_id": project_id, "fact_key": fact.key,
+                                                           "revision": fact.revision},
+                                            "review_status": "project_fact"}
             corpus_id, corpus_version, blueprint = None, None, f"config:{config.id}"
         elif body.source == "historical":
             definitions, rules, inputs, corpus_id, corpus_version = _historical_blueprint(session, project)
@@ -520,8 +598,11 @@ def run_compare(project_id: str, run_ids: list[str] = Body(..., min_length=2, ma
 def report_run_impact(project_id: str, report_id: str, run_id: str):
     with SessionLocal() as session:
         report, run = _report(session, project_id, report_id), _run(session, project_id, run_id)
+        previous = _run(session, project_id, report.analysis_run_id) if report.analysis_run_id else None
+        content, rebound = _safe_rebind_content(report, previous, run)
         return {"report_version": report.version, "current_run_id": report.analysis_run_id,
-                "proposed_run_id": run_id, "impacts": _run_impacts(report, run)}
+                "proposed_run_id": run_id, "impacts": _run_impacts(report, run, content),
+                "unchanged_references": len(rebound)}
 
 
 @router.post("/reports/{report_id}/select")
@@ -533,8 +614,11 @@ def report_run_select(project_id: str, report_id: str, body: RunSelection):
             raise HTTPException(409, "报告已有新版本，请刷新后选择")
         if run.status != "COMPUTED":
             raise HTTPException(409, "该推演仍有不可评估结果，请补充输入")
-        impacts = _run_impacts(report, run)
+        previous = _run(session, project_id, report.analysis_run_id) if report.analysis_run_id else None
+        content, rebound = _safe_rebind_content(report, previous, run)
+        impacts = _run_impacts(report, run, content)
         if report.analysis_run_id != run.id:
+            report.content = content
             report.analysis_run_id = run.id
             report.reviewed_hash = None
             report.version += 1
@@ -543,6 +627,7 @@ def report_run_select(project_id: str, report_id: str, body: RunSelection):
                                       analysis_run_id=run.id))
             session.add(AnalysisWritingEvent(project_id=project_id, report_id=report_id,
                       report_version=report.version, run_id=run.id, action="select_run",
-                      payload={"impacts": impacts}))
+                      payload={"impacts": impacts, "unchanged_references": rebound}))
         return {"report_id": report_id, "report_version": report.version,
-                "analysis_run_id": report.analysis_run_id, "impacts": impacts}
+                "analysis_run_id": report.analysis_run_id, "impacts": impacts,
+                "unchanged_references": len(rebound)}

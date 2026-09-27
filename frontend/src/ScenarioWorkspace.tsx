@@ -18,7 +18,8 @@ type ReportSummary = { id: string; title: string; version: number; updated_at: s
 type ExportEntry = { id: string; report_version: number; level: 'preview' | 'scenario' | 'formal'; analysis_run_id: string | null; sha256: string; created_at: string }
 type PendingReport = { baseVersion: number; content: Block[]; savedAt: number }
 type ChapterDialog = { action: 'add' | 'rename'; headingId?: string; title: string }
-type Preview = { run_id: string; section_id: string; mode: string; base_version: number; content: Block[]; model_audit: Record<string, unknown> & { evidence?: { key: string; label: string; status: string; reason: string | null }[] }; expires_at: number; preview_token: string; issues: Issue[]; preserved_blocks?: Block[] }
+type CandidateEvidence = { key: string; label: string; status: string; reason: string | null; document_id: string | null; source_refs: string[] }
+type Preview = { run_id: string; section_id: string; mode: string; base_version: number; content: Block[]; model_audit: Record<string, unknown> & { evidence?: CandidateEvidence[] }; expires_at: number; preview_token: string; issues: Issue[]; preserved_blocks?: Block[] }
 type RefreshAction = { id: string; kind: 'numbers' | 'table' | 'condition' | 'config_condition' | 'judgement' | 'manual_review' | 'rebind' | 'detach' | 'manual'; label: string; block_id: string; position: number; section_id: string | null; before: string; after: string | null; selectable: boolean; reason: string | null; result_keys?: string[]; reference_changes?: { key: string; before: string; after: string | null }[] }
 type RefreshPreview = { report_version: number; run_id: string; actions: RefreshAction[] }
 type Panel = 'inputs' | 'results' | 'draft' | 'sources' | 'check' | 'versions' | 'materials' | null
@@ -98,8 +99,8 @@ function writePending(projectId: string, scenarioId: string, changes: Record<str
   else window.sessionStorage.removeItem(key)
 }
 
-export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpenCorpus, onLegacy }: {
-  project: Project; notify: (message: string) => void; onOpenFacts: () => void; onOpenCorpus: () => void; onLegacy: () => void
+export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpenCorpus, onOpenDocument, onLegacy }: {
+  project: Project; notify: (message: string) => void; onOpenFacts: () => void; onOpenCorpus: () => void; onOpenDocument: (id: string, page: number, segment: string) => void; onLegacy: () => void
 }) {
   const base = `/projects/${project.id}`
   const analysis = `${base}/analysis`
@@ -153,7 +154,8 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   const [draftMode, setDraftMode] = useState<'computed' | 'model'>('computed')
   const [candidate, setCandidate] = useState<Preview | null>(null)
   const [candidateSelected, setCandidateSelected] = useState<string[]>([])
-  const [impact, setImpact] = useState<{ proposed_run_id: string; impacts: { position: number; result_key: string; before: string; after: string | null }[] } | null>(null)
+  const [evidencePreview, setEvidencePreview] = useState<{ key: string; documentId: string; ref: string; page: number; text: string } | null>(null)
+  const [impact, setImpact] = useState<{ proposed_run_id: string; unchanged_references: number; impacts: { position: number; result_key: string; before: string; after: string | null }[] } | null>(null)
   const [refreshPreview, setRefreshPreview] = useState<RefreshPreview | null>(null)
   const [refreshSelected, setRefreshSelected] = useState<string[]>([])
   const [versions, setVersions] = useState<{ version: number; reviewed: boolean; created_at: string; analysis_run_id: string | null }[]>([])
@@ -250,18 +252,22 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
 
-  const createScenario = async (source: 'historical' | 'project' | 'copy' | 'config', copyInputs = false) => {
+  const createScenario = async (source: 'historical' | 'project' | 'copy' | 'config' | 'config_facts', copyInputs = false) => {
     if (Object.keys(edits).length) { setError('请先保存或放弃当前输入修改'); return }
     setBusy(true); setError('')
     try {
       const created = await post<Scenario>(`${analysis}/scenarios`, {
         name: scenarioName.trim() || (source === 'copy' ? `${scenario?.name || '方案'} · 副本` : '基准方案'),
-        source, ...(source === 'copy' || source === 'config' && copyInputs ? { copy_from: scenarioId } : {}),
-        ...(source === 'config' ? { config_id: configId } : {}),
+        source: source === 'config_facts' ? 'config' : source,
+        ...(source === 'copy' || source === 'config' && copyInputs ? { copy_from: scenarioId } : {}),
+        ...(source === 'config' || source === 'config_facts' ? { config_id: configId } : {}),
+        ...(source === 'config_facts' ? { use_project_facts: true } : {}),
       })
       setScenarios((old) => [created, ...old]); setScenarioId(created.id)
       setScenarioName(''); setEdits({}); setSimulation(null); setRuns([]); setRunId('')
-      setPanel('inputs'); notify('方案已创建')
+      setPanel('inputs'); notify(source === 'config_facts'
+        ? `方案已创建，填入 ${Object.values(created.inputs).filter((row) => row.origin === 'project_fact').length} 项项目事实`
+        : '方案已创建')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
 
@@ -408,7 +414,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
     if (!report || dirtyRef.current) { setError('请先保存正文'); return }
     setBusy(true); setError('')
     try {
-      const result = await api<{ proposed_run_id: string; impacts: { position: number; result_key: string; before: string; after: string | null }[] }>(
+      const result = await api<{ proposed_run_id: string; unchanged_references: number; impacts: { position: number; result_key: string; before: string; after: string | null }[] }>(
         `${analysis}/reports/${report.id}/impact/${id}`)
       setImpact(result)
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
@@ -422,8 +428,8 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
         run_id: impact.proposed_run_id, base_version: report.version,
       })
       const active = impact.proposed_run_id
-      setImpact(null); setRunId(active); await loadReport(report.id); setPanel('check')
-      notify('报告已采用该次推演；受影响段落待更新')
+      setImpact(null); setRunId(active); await loadReport(report.id); setPanel(impact.impacts.length ? 'check' : null)
+      notify(impact.impacts.length ? '报告已采用该次推演；受影响段落待更新' : '报告已采用该次推演')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
 
@@ -509,13 +515,28 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
 
   const previewDraft = async () => {
     if (!report || !report.analysis_run_id || !effectiveSection || dirtyRef.current) return
-    setBusy(true); setError(''); setCandidate(null)
+    setBusy(true); setError(''); setCandidate(null); setEvidencePreview(null)
     try {
       const draft = await post<Preview>(`${analysis}/reports/${report.id}/draft/preview`, {
         run_id: report.analysis_run_id, section_id: effectiveSection, mode: modelAvailable ? draftMode : 'computed',
       })
       setCandidate(draft); setCandidateSelected(draft.content.filter((block) => block.type !== 'h2').map((block) => block.id || ''))
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
+  }
+
+  const inspectEvidence = async (row: CandidateEvidence) => {
+    const ref = row.source_refs[0]
+    if (!row.document_id || !ref) return
+    const page = Number(/^p(\d+)-/.exec(ref)?.[1] || 1)
+    setError(''); setEvidencePreview(null)
+    try {
+      const detail = await api<{ segments: { ref: string; text: string }[] }>(
+        `${base}/documents/${row.document_id}?page=${page}`)
+      const matching = detail.segments.filter((segment) => row.source_refs.includes(segment.ref))
+      if (!matching.length) throw new Error('原文位置已变化，请在项目事实中重新核对')
+      setEvidencePreview({ key: row.key, documentId: row.document_id, ref, page,
+        text: matching.map((segment) => segment.text).join('\n') })
+    } catch (cause) { setError((cause as Error).message) }
   }
 
   const acceptDraft = async () => {
@@ -527,7 +548,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
         ...(candidateSelected.length < candidate.content.filter((block) => block.type !== 'h2').length
           ? { selected_block_ids: candidateSelected } : {}),
       })
-      setCandidate(null); setCandidateSelected([]); await loadReport(report.id); await loadLists(); setPanel(null)
+      setCandidate(null); setCandidateSelected([]); setEvidencePreview(null); await loadReport(report.id); await loadLists(); setPanel(null)
       notify('章节已加入报告')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }
@@ -657,21 +678,23 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
           {panel === 'inputs' && <>
             <div className="scenario-panel-line"><select aria-label="选择方案" value={scenarioId} onChange={(event) => switchScenario(event.target.value)}><option value="">选择方案</option>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>{scenario && <button onClick={() => void createScenario('copy')} title="复制当前方案"><FilePlus2 size={15} /></button>}</div>
             <details className="scenario-create"><summary>新建方案</summary><input aria-label="方案名称" value={scenarioName} onChange={(event) => setScenarioName(event.target.value)} placeholder="如：工期调整方案" /><div className="scenario-inline">{project.has_corpus && <button onClick={() => void createScenario('historical')} disabled={busy}>采用澄岳历史输入</button>}<button onClick={() => void createScenario('project')} disabled={busy}>从项目事实创建</button></div></details>
-            <details className="scenario-create"><summary>按已发布配置创建方案</summary>{configs.some((item) => item.status === 'PUBLISHED') ? <><select aria-label="选择写作配置" value={configId} onChange={(event) => setConfigId(event.target.value)}>{configs.filter((item) => item.status === 'PUBLISHED').map((item) => <option key={item.id} value={item.id}>v{item.version} · {item.name}</option>)}</select><div className="scenario-inline"><button disabled={!configId || busy} onClick={() => void createScenario('config')}>创建空输入方案</button><button disabled={!configId || !scenarioId || busy} onClick={() => void createScenario('config', true)}>沿用当前输入</button></div></> : <button onClick={openConfig}>创建配置</button>}</details>
+            <details className="scenario-create"><summary>按已发布配置创建方案</summary>{configs.some((item) => item.status === 'PUBLISHED') ? <><input aria-label="配置方案名称" value={scenarioName} onChange={(event) => setScenarioName(event.target.value)} placeholder="方案名称" /><select aria-label="选择写作配置" value={configId} onChange={(event) => setConfigId(event.target.value)}>{configs.filter((item) => item.status === 'PUBLISHED').map((item) => <option key={item.id} value={item.id}>v{item.version} · {item.name}</option>)}</select><div className="scenario-inline"><button disabled={!configId || busy} onClick={() => void createScenario('config_facts')}>填入项目事实</button><button disabled={!configId || busy} onClick={() => void createScenario('config')}>创建空输入方案</button><button disabled={!configId || !scenarioId || busy} onClick={() => void createScenario('config', true)}>沿用当前输入</button></div></> : <button onClick={openConfig}>创建配置</button>}</details>
             {scenario && <>{inputFields.length ? inputGroups.map((group) => { const fields = inputFields.filter((field) => (field.group || 'project') === group); return <section className="scenario-input-group" key={group}><h3>{groups[group] || group}</h3>{fields.map((field) => { const entry = scenario.inputs[field.key]; const value = Object.prototype.hasOwnProperty.call(edits, field.key) ? edits[field.key] : entry?.value; const pending = Object.prototype.hasOwnProperty.call(edits, field.key) && value !== entry?.value; const origin = pending ? (value == null ? "missing" : "scenario_assumption") : entry?.origin || "missing"; return <label key={field.key} className="scenario-input"><span>{field.label}<small>{sourceLabel(origin)}{percentageInput(field, scenario) ? ' · %' : field.unit ? ` · ${field.unit}` : ''}</small></span><input aria-label={field.label} value={inputDisplay(field, scenario, value)} type={field.data_type === 'text' ? 'text' : 'number'} step={field.data_type === 'integer' ? '1' : 'any'} onChange={(event) => changeInput(field, event.target.value)} /></label> })}</section> }) : <div className="empty">本项目尚无输入字段。请先录入项目事实与规则。<button onClick={onOpenFacts}>打开项目事实</button></div>}
               <div className="scenario-panel-actions"><button onClick={discardInputs} disabled={!changeCount}>放弃修改</button><button onClick={() => void persistScenario()} disabled={!changeCount || busy}>保存方案</button><button className="primary-button" onClick={() => void previewInputs()} disabled={busy || !inputFields.length}><Play size={14} /> 预览推演</button></div>
               {simulation && <div className="scenario-preview"><h3>预览结果</h3>{Object.values(simulation.results).filter((result) => scenario.definitions.some((field) => field.key === result.key && field.computed) || result.origin === 'calculated').map((result) => <div key={result.key}><span>{result.label}</span><strong>{shown(result.value, result.unit)}</strong></div>)}<small>{simulation.condition}</small><div className="scenario-panel-actions"><button onClick={() => setSimulation(null)}>取消预览</button><button className="primary-button" onClick={() => void persistRun()} disabled={busy}>保存方案并运行</button></div></div>}
             </>}
           </>}
-          {panel === 'results' && <><div className="scenario-panel-line"><select aria-label="查看方案" value={scenarioId} onChange={(event) => switchScenario(event.target.value)}>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><button onClick={() => setPanel('inputs')}>修改输入</button></div>{scenarioRuns.length ? <><select aria-label="查看推演运行" value={runId} onChange={(event) => { setRunId(event.target.value); setSelectedResult('') }}>{scenarioRuns.map((item) => <option key={item.id} value={item.id}>第 {item.scenario_revision} 版 · {timeLabel(item.created_at)}</option>)}</select><div className="scenario-results-list">{resultList.map((result) => <button key={result.key} onClick={() => setSelectedResult(selectedResult === result.key ? '' : result.key)}><span>{result.label}</span><strong>{shown(result.value, result.unit)}</strong></button>)}</div><div className="scenario-condition">{currentRun?.snapshot.condition}</div>{currentRun?.snapshot.issues.map((issue) => <div key={issue.code} className="scenario-short-note">{issue.message}</div>)}{selectedResult && currentRun && <div className="scenario-result-detail"><h3>{currentRun.snapshot.results[selectedResult]?.label}</h3>{currentRun.snapshot.trace.filter((step) => step.target === selectedResult).map((step) => <div key={step.rule_id}><code>{step.expression}</code><p>{Object.entries(step.inputs).map(([key, value]) => `${currentRun.snapshot.results[key]?.label || key}=${value ?? '未定义'}`).join(' · ')}</p><small>{step.status === 'COMPUTED' ? `结果 ${step.result}` : `缺少 ${step.missing.join('、')}`}</small></div>)}</div>}<div className="scenario-panel-actions"><button onClick={() => setCompareIds((old) => old.includes(runId) ? old.filter((id) => id !== runId) : [...old, runId].slice(-3))}><GitCompareArrows size={14} /> {compareIds.includes(runId) ? '移出比较' : '加入比较'}</button><button className="primary-button" disabled={!currentRun || currentRun.status !== 'COMPUTED' || busy || dirty} onClick={() => void selectRun(runId)}><Check size={14} /> 用于报告</button></div>{comparisonRuns.length >= 2 && <div className="scenario-compare"><h3>方案对比</h3><div className="scenario-compare-header"><span>指标</span>{comparisonRuns.map((row) => <strong key={row.id}>{scenarios.find((item) => item.id === row.scenario_id)?.name || "方案"}</strong>)}</div>{comparisonKeys.map((key) => comparisonRuns.some((row) => row.snapshot.results[key]) ? <div key={key}><span>{comparisonRuns[0].snapshot.results[key]?.label || key}</span>{comparisonRuns.map((row) => <strong key={row.id}>{shown(row.snapshot.results[key]?.value, row.snapshot.results[key]?.unit)}</strong>)}</div> : null)}</div>}</> : <div className="empty">尚无推演结果。<button onClick={() => setPanel('inputs')}>打开输入数据</button></div>}{impact && <div className="scenario-confirm"><h3>采用这次推演</h3><p>{impact.impacts.length ? `将有 ${new Set(impact.impacts.map((row) => row.position)).size} 处正文位置待更新；正文不会自动覆盖。` : '报告将绑定这次推演。'}</p>{impact.impacts.filter((row, index, all) => row.before !== row.after && all.findIndex((other) => other.result_key === row.result_key && other.before === row.before && other.after === row.after) === index).map((row) => <div key={row.result_key}>{row.result_key} · {row.before} → {row.after ?? '不可评估'}</div>)}<div className="scenario-panel-actions"><button onClick={() => setImpact(null)}>取消</button><button className="primary-button" onClick={() => void confirmRun()} disabled={busy}>确认采用</button></div></div>}</>}
+          {panel === 'results' && <><div className="scenario-panel-line"><select aria-label="查看方案" value={scenarioId} onChange={(event) => switchScenario(event.target.value)}>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><button onClick={() => setPanel('inputs')}>修改输入</button></div>{scenarioRuns.length ? <><select aria-label="查看推演运行" value={runId} onChange={(event) => { setRunId(event.target.value); setSelectedResult('') }}>{scenarioRuns.map((item) => <option key={item.id} value={item.id}>第 {item.scenario_revision} 版 · {timeLabel(item.created_at)}</option>)}</select><div className="scenario-results-list">{resultList.map((result) => <button key={result.key} onClick={() => setSelectedResult(selectedResult === result.key ? '' : result.key)}><span>{result.label}</span><strong>{shown(result.value, result.unit)}</strong></button>)}</div><div className="scenario-condition">{currentRun?.snapshot.condition}</div>{currentRun?.snapshot.issues.map((issue) => <div key={issue.code} className="scenario-short-note">{issue.message}</div>)}{selectedResult && currentRun && <div className="scenario-result-detail"><h3>{currentRun.snapshot.results[selectedResult]?.label}</h3>{currentRun.snapshot.trace.filter((step) => step.target === selectedResult).map((step) => <div key={step.rule_id}><code>{step.expression}</code><p>{Object.entries(step.inputs).map(([key, value]) => `${currentRun.snapshot.results[key]?.label || key}=${value ?? '未定义'}`).join(' · ')}</p><small>{step.status === 'COMPUTED' ? `结果 ${step.result}` : `缺少 ${step.missing.join('、')}`}</small></div>)}</div>}<div className="scenario-panel-actions"><button onClick={() => setCompareIds((old) => old.includes(runId) ? old.filter((id) => id !== runId) : [...old, runId].slice(-3))}><GitCompareArrows size={14} /> {compareIds.includes(runId) ? '移出比较' : '加入比较'}</button><button className="primary-button" disabled={!currentRun || currentRun.status !== 'COMPUTED' || busy || dirty} onClick={() => void selectRun(runId)}><Check size={14} /> 用于报告</button></div>{comparisonRuns.length >= 2 && <div className="scenario-compare"><h3>方案对比</h3><div className="scenario-compare-header"><span>指标</span>{comparisonRuns.map((row) => <strong key={row.id}>{scenarios.find((item) => item.id === row.scenario_id)?.name || "方案"}</strong>)}</div>{comparisonKeys.map((key) => comparisonRuns.some((row) => row.snapshot.results[key]) ? <div key={key}><span>{comparisonRuns[0].snapshot.results[key]?.label || key}</span>{comparisonRuns.map((row) => <strong key={row.id}>{shown(row.snapshot.results[key]?.value, row.snapshot.results[key]?.unit)}</strong>)}</div> : null)}</div>}</> : <div className="empty">尚无推演结果。<button onClick={() => setPanel('inputs')}>打开输入数据</button></div>}{impact && <div className="scenario-confirm"><h3>采用这次推演</h3><p>{impact.impacts.length ? `将有 ${new Set(impact.impacts.map((row) => row.position)).size} 处正文位置待更新；正文不会自动覆盖。` : '报告将绑定这次推演。'}{impact.unchanged_references > 0 ? ` 另有 ${impact.unchanged_references} 处未变化引用直接沿用。` : ''}</p>{impact.impacts.filter((row, index, all) => row.before !== row.after && all.findIndex((other) => other.result_key === row.result_key && other.before === row.before && other.after === row.after) === index).map((row) => <div key={row.result_key}>{row.result_key} · {row.before} → {row.after ?? '不可评估'}</div>)}<div className="scenario-panel-actions"><button onClick={() => setImpact(null)}>取消</button><button className="primary-button" onClick={() => void confirmRun()} disabled={busy}>确认采用</button></div></div>}</>}
           {panel === 'draft' && <>
-            <label className="scenario-field">章节<select aria-label="生成章节" value={effectiveSection} onChange={(event) => { const chosen = event.target.value; setSelectedSection(chosen); setSelectedHeadingId(report.content.find((block) => block.type === 'h2' && block.section_id === chosen)?.id || null); setCandidate(null) }}>{!effectiveSection && <option value="">当前章节无生成配置</option>}{availableSections.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
+            <label className="scenario-field">章节<select aria-label="生成章节" value={effectiveSection} onChange={(event) => { const chosen = event.target.value; setSelectedSection(chosen); setSelectedHeadingId(report.content.find((block) => block.type === 'h2' && block.section_id === chosen)?.id || null); setCandidate(null); setEvidencePreview(null) }}>{!effectiveSection && <option value="">当前章节无生成配置</option>}{availableSections.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
             {activeRun && <div className="scenario-draft-run"><span>写作依据</span><strong>{scenarios.find((item) => item.id === activeRun.scenario_id)?.name || '当前方案'} · 运行 {activeRun.scenario_revision}</strong></div>}
             {!!selectedConfigSection?.result_keys.length && activeRun && <details className="scenario-draft-basis"><summary>查看本章数据 · {selectedConfigSection.result_keys.length} 项</summary>{selectedConfigSection.result_keys.map((key) => { const row = activeRun.snapshot.results[key]; return row && <div key={key}><span>{row.label}</span><strong>{shown(row.value, row.unit)}</strong></div> })}</details>}
             <div className="scenario-segment"><button className={draftMode === 'computed' ? 'active' : ''} onClick={() => { setDraftMode('computed'); setCandidate(null) }}>确定性内容</button>{modelAvailable && <button className={draftMode === 'model' ? 'active' : ''} onClick={() => { setDraftMode('model'); setCandidate(null) }}>模型起草</button>}</div>
             <div className="scenario-panel-actions"><button className="primary-button" onClick={() => void previewDraft()} disabled={!report.analysis_run_id || !effectiveSection || busy || dirty}><Sparkles size={14} /> {busy ? '生成中…' : '生成候选'}</button></div>
             {candidate && <div className="scenario-candidate"><h3>待确认候选</h3>
-              {candidate.model_audit.evidence?.length ? <div className={`scenario-short-note ${candidate.model_audit.evidence.every((row) => row.status === 'VERIFIED') ? 'scenario-evidence-ok' : ''}`}>证据 {candidate.model_audit.evidence.filter((row) => row.status === 'VERIFIED').length}/{candidate.model_audit.evidence.length}{candidate.model_audit.evidence.filter((row) => row.status !== 'VERIFIED').map((row) => <p key={row.key}>{row.label}：{row.reason}</p>)}</div> : null}
+              {candidate.model_audit.evidence?.length ? <div className={`scenario-short-note ${candidate.model_audit.evidence.every((row) => row.status === 'VERIFIED') ? 'scenario-evidence-ok' : ''}`}>原文位置 {candidate.model_audit.evidence.filter((row) => row.status === 'VERIFIED').length}/{candidate.model_audit.evidence.length}{candidate.model_audit.evidence.filter((row) => row.status !== 'VERIFIED').map((row) => <p key={row.key}>{row.label}：{row.reason}</p>)}</div> : null}
+              {!!candidate.model_audit.evidence?.length && <details className="scenario-evidence-list"><summary>查看原文位置</summary>{candidate.model_audit.evidence.map((row) => <button type="button" key={row.key} disabled={!row.document_id || !row.source_refs.length} onClick={() => void inspectEvidence(row)}><span>{row.label}</span><small>{row.status === 'VERIFIED' ? row.source_refs.join('、') : row.reason || '待核对'}</small></button>)}</details>}
+              {evidencePreview && <div className="scenario-evidence-preview"><div><strong>原文 · {evidencePreview.ref}</strong><button type="button" aria-label="关闭原文预览" onClick={() => setEvidencePreview(null)}><X size={14} /></button></div><p>{evidencePreview.text}</p><button type="button" onClick={() => onOpenDocument(evidencePreview.documentId, evidencePreview.page, evidencePreview.ref)}>在项目文件中定位</button></div>}
               {candidate.content.filter((block) => block.type !== 'h2').map((block, index) => { const keys = [...new Set(refsOf(block).map((ref) => ref.result_key))]; return <div className="scenario-candidate-choice" data-origin={block.origin || 'guided'} key={block.id || index}>
                 <label><input type="checkbox" aria-label={`采用候选 ${index + 1}`} checked={candidateSelected.includes(block.id || '')} onChange={(event) => setCandidateSelected((old) => event.target.checked ? [...old, block.id || ''] : old.filter((id) => id !== block.id))} /><span>{block.origin === 'model' ? '模型候选' : block.type === 'table' ? '结果表' : '计算内容'}</span></label>
                 {candidateBody(block)}
@@ -679,7 +702,7 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
                 {!keys.length && (block.source_refs?.length ? <small>历史资料 · 待核对</small> : <small>待人工核对</small>)}
               </div> })}
               {report.content.some((block) => block.section_id === effectiveSection) && <details className="scenario-short-note"><summary>查看本章更新范围{candidate.preserved_blocks?.length ? ` · 保留 ${candidate.preserved_blocks.length} 段人工内容` : ''}</summary>{report.content.filter((block) => block.section_id === effectiveSection).map((block, index) => <p key={block.id || index}>{textOf(block)}</p>)}</details>}
-              <div className="scenario-panel-actions"><button onClick={() => setCandidate(null)}>取消候选</button><button className="primary-button" onClick={() => void acceptDraft()} disabled={busy || !candidateSelected.length}>{report.content.some((block) => block.section_id === effectiveSection) ? '更新本章' : '加入报告'}</button></div>
+              <div className="scenario-panel-actions"><button onClick={() => { setCandidate(null); setEvidencePreview(null) }}>取消候选</button><button className="primary-button" onClick={() => void acceptDraft()} disabled={busy || !candidateSelected.length}>{report.content.some((block) => block.section_id === effectiveSection) ? '更新本章' : '加入报告'}</button></div>
             </div>}
           </>}
           {panel === 'sources' && <>{selectedBlock ? <><h3>第 {selectedPosition} 段依据</h3><p className="scenario-source-text">{textOf(selectedBlock)}</p>{refsOf(selectedBlock).map((ref, index) => <button className="scenario-source-row" key={`${ref.result_key}-${index}`} onClick={() => { setPanel('results'); setRunId(ref.run_id); setSelectedResult(ref.result_key) }}>推演 · {ref.result_key} = {ref.value}{ref.unit} <ChevronDown size={13} /></button>)}{(selectedBlock.source_refs || []).map((ref, index) => <button className="scenario-source-row" key={index} onClick={() => void source(ref)}>历史资料 · {ref.semantic_id || ref.record_id}</button>)}{activeRun && Object.values(activeRun.snapshot.results).filter((row) => row.value !== null && row.key !== 'demand_gap').slice(0, 12).map((row) => <button className="scenario-source-row" key={row.key} onClick={() => { if (row.value !== null) editorActions.current?.insertResult({ ...row, value: row.value }, activeRun.id) }}>插入 {row.label} · {row.value}{row.unit}</button>)}</> : <div className="empty">选中正文段落后查看依据和插入结果。</div>}{sourceDetail && <div className="scenario-source-detail"><h3>来源记录</h3><p>{sourceDetail.summary}</p>{sourceDetail.payload?.status === "source_asserted_not_independently_verified" && <small>来源陈述，尚未独立核实</small>}{sourceDetail.payload?.limitations?.map((item) => <small key={item}>{item}</small>)}</div>}</>}

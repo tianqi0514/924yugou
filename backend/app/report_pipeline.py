@@ -22,14 +22,14 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from .model_settings import chat_json
 
 
 ALLOWED_BLOCKS = {"p", "h1", "h2", "h3", "blockquote", "table"}
 TEXT_MARKS = {"bold", "italic", "underline", "strikethrough"}
-EXPORT_RENDER_VERSION = "analysis-basis-v1"
+EXPORT_RENDER_VERSION = "analysis-basis-v2"
 
 
 def _valid_url(url: str) -> bool:
@@ -358,9 +358,10 @@ def change_impact(before: list[dict], after: list[dict]) -> list[dict]:
 def gate(content: list[dict], reviewed_hash: str | None, bound_facts: dict, current_facts: dict,
          source_numbers: dict[int, set[str]] | None = None) -> list[dict]:
     issues = []
+    current_hash = content_hash(content)
     if not any(plain(node).strip() for node in content):
         issues.append({"code": "EMPTY", "message": "报告正文为空", "severity": "block"})
-    if content_hash(content) != reviewed_hash:
+    if current_hash != reviewed_hash:
         issues.append({"code": "UNREVIEWED", "message": "正文保存后尚未人工核对", "severity": "block"})
     used = {key for node in content for key in node.get("fact_keys", [])}
     if not used and not any(node.get("analysis_refs") or node.get("source_refs") for node in content):
@@ -370,7 +371,9 @@ def gate(content: list[dict], reviewed_hash: str | None, bound_facts: dict, curr
         snapshot = bound_facts.get(key)
         if fact is None or fact.value_text is None or fact.value_status not in ("PROVIDED", "COMPUTED"):
             issues.append({"code": "FACT_MISSING", "message": f"引用事实 {key} 不存在或尚未定义", "severity": "block", "fact_key": key})
-        elif snapshot is None or snapshot != {"value": fact.value_text, "revision": fact.revision}:
+        elif snapshot is None and reviewed_hash == current_hash:
+            issues.append({"code": "FACT_CHANGED", "message": f"引用事实 {key} 缺少核对水位，请重新核对", "severity": "block", "fact_key": key})
+        elif snapshot is not None and snapshot != {"value": fact.value_text, "revision": fact.revision}:
             issues.append({"code": "FACT_CHANGED", "message": f"引用事实 {key} 已变化，请核对并更新正文", "severity": "block", "fact_key": key})
     for position, node in enumerate(content, 1):
         displayed_numbers, display_issues = _reference_display_numbers(node, current_facts, position)
@@ -682,14 +685,18 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
             list_number = 0
         story.append(Paragraph(markup or " ", styles[node["type"] if node["type"] in styles else "p"]))
     if basis_lines:
-        story.extend([Spacer(1, 12), Paragraph("推演依据", styles["h2"])])
-        for line in basis_lines:
+        story.append(KeepTogether([Spacer(1, 12), Paragraph("推演依据", styles["h2"]),
+                                   *(Paragraph(escape(line), styles["basis"]) for line in basis_lines[:2])]))
+        for line in basis_lines[2:]:
             story.append(Paragraph(escape(line), styles["basis"]))
     if audit["facts"]:
-        story.extend([Spacer(1, 12), Paragraph("事实依据", styles["h2"])])
-        for fact in audit["facts"]:
-            citation = f"{fact.get('label') or fact['key']}：{fact['value']}{fact['unit']}。{_fact_basis(fact, audit)}"
-            story.append(Paragraph(escape(citation), styles["basis"]))
+        def fact_line(fact: dict) -> str:
+            return f"{fact.get('label') or fact['key']}：{fact['value']}{fact['unit']}。{_fact_basis(fact, audit)}"
+        story.append(KeepTogether([Spacer(1, 12), Paragraph("事实依据", styles["h2"]),
+                                   *(Paragraph(escape(fact_line(fact)), styles["basis"])
+                                     for fact in audit["facts"][:2])]))
+        for fact in audit["facts"][2:]:
+            story.append(Paragraph(escape(fact_line(fact)), styles["basis"]))
     def footer(canvas, doc):
         canvas.saveState()
         canvas.setFont("STSong-Light", 9)

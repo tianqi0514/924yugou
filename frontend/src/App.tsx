@@ -178,7 +178,7 @@ export default function App() {
             ? <CorpusView key={selected.id} project={selected} />
             : <ProjectMaterialsView key={selected.id} project={selected} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} onOpenFacts={() => navigate('facts')} />
             : section === 'documents' && selected ? <DocumentsView key={selected.id} project={selected} notify={setNotice} />
-              : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} />
+              : section === 'reports' && selected ? <WritingWorkspaceGateway key={selected.id} project={selected} notify={setNotice} onEditFacts={() => navigate('facts')} onOpenDocuments={() => navigate('documents')} onOpenProjectFacts={() => navigate('facts')} onOpenCorpus={() => navigate('corpus')} onOpenDocument={(id, page, segment) => navigate('documents', id, page, segment)} />
                 : <ProjectView project={selected} section={section === 'rules' ? 'rules' : 'facts'} onProjectChange={onProjectChange} notify={setNotice} onOpenDocuments={() => navigate('documents')} onOpenRules={() => navigate('rules')} />}
     </div>
     {notice && <div className="toast" role="status">{notice}</div>}

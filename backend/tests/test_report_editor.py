@@ -195,3 +195,14 @@ def test_changed_fact_requires_visible_token_update_before_review():
     assert "FACT_TEXT_STALE" not in {item["code"] for item in gate(updated, content_hash(updated), previous, current)}
     current_snapshot = {"demand": {"value": "320000", "revision": 2}}
     assert gate(updated, content_hash(updated), current_snapshot, current) == []
+
+
+def test_new_fact_reference_is_reviewable_before_first_binding():
+    content = [{"type": "p", "id": "new-fact", "fact_keys": ["demand"],
+                "children": [{"text": "首年需求300000套。"}]}]
+    current = {"demand": SimpleNamespace(value_text="300000", revision=1,
+                                           value_status="PROVIDED", data_type="integer")}
+    draft_codes = {item["code"] for item in gate(content, None, {}, current)}
+    assert "UNREVIEWED" in draft_codes and "FACT_CHANGED" not in draft_codes
+    broken_review_codes = {item["code"] for item in gate(content, content_hash(content), {}, current)}
+    assert "FACT_CHANGED" in broken_review_codes

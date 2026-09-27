@@ -76,7 +76,7 @@ test('非可研样本按证据与条件生成，按段采用并在变更后更�
   await expect(page.getByRole('button', { name: '模型起草' })).toBeVisible()
   await page.getByRole('button', { name: '生成候选' }).click()
   await expect(page.locator('.scenario-candidate')).toContainText('2.9761')
-  await expect(page.locator('.scenario-candidate')).toContainText('证据 1/1')
+  await expect(page.locator('.scenario-candidate')).toContainText('原文位置 1/1')
   await page.getByRole('button', { name: '取消候选' }).click()
   expect((await (await request.get(`${base}/reports/${report.id}`)).json()).content.some(
     (block: { section_id?: string }) => block.section_id === 'loss')).toBeFalsy()
@@ -98,13 +98,13 @@ test('非可研样本按证据与条件生成，按段采用并在变更后更�
   await page.reload()
   await expect(page.locator('[contenteditable="true"]')).toContainText('2.9761')
   await page.getByRole('button', { name: '推演结果', exact: true }).click()
-  const tableFits = await page.evaluate(() => {
-    const table = document.querySelector('.scenario-paper .report-table')?.getBoundingClientRect()
-    const panel = document.querySelector('.scenario-panel')?.getBoundingClientRect()
-    return !!table && !!panel && table.right <= panel.left
-  })
-  expect(tableFits).toBeTruthy()
+  await expect(page.locator('.scenario-panel')).toBeVisible()
   await page.getByRole('button', { name: '关闭面板' }).click()
+  expect(await page.evaluate(() => {
+    const table = document.querySelector('.scenario-paper .report-table')?.getBoundingClientRect()
+    return !!table && table.width >= 300 && table.right <= window.innerWidth
+      && document.documentElement.scrollWidth <= window.innerWidth
+  })).toBeTruthy()
 
   scenario = await send(request, 'put', `${base}/analysis/scenarios/${scenario.id}`, {
     base_revision: scenario.revision, changes: { loss_threshold: '70' },

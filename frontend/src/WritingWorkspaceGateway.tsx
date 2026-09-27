@@ -5,13 +5,14 @@ import ScenarioWorkspace from './ScenarioWorkspace'
 
 type Mode = 'analysis' | 'legacy'
 
-export default function WritingWorkspaceGateway({ project, notify, onEditFacts, onOpenDocuments, onOpenProjectFacts, onOpenCorpus }: {
+export default function WritingWorkspaceGateway({ project, notify, onEditFacts, onOpenDocuments, onOpenProjectFacts, onOpenCorpus, onOpenDocument }: {
   project: Project
   notify: (message: string) => void
   onEditFacts: () => void
   onOpenDocuments: () => void
   onOpenProjectFacts: () => void
   onOpenCorpus: () => void
+  onOpenDocument: (id: string, page: number, segment: string) => void
 }) {
   const [mode, setMode] = useState<Mode>(() => {
     const params = new URLSearchParams(window.location.search)
@@ -36,7 +37,7 @@ export default function WritingWorkspaceGateway({ project, notify, onEditFacts, 
   }
 
   if (mode === 'analysis') return <ScenarioWorkspace key={project.id} project={project} notify={notify}
-    onOpenFacts={onEditFacts} onOpenCorpus={onOpenCorpus} onLegacy={() => switchMode('legacy')} />
+    onOpenFacts={onEditFacts} onOpenCorpus={onOpenCorpus} onOpenDocument={onOpenDocument} onLegacy={() => switchMode('legacy')} />
   return <div className="writing-gateway"><div className="writing-gateway-switch">
     <button type="button" onClick={() => switchMode('analysis')}>方案推演写作</button>
   </div><ReportsView key={project.id} project={project} notify={notify} onEditFacts={onEditFacts}

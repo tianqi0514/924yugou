@@ -171,6 +171,45 @@ def test_config_version_run_and_chapter_are_immutable(client):
     assert client.get(base + f"/reports/{report['id']}").json()["analysis_run_id"] == old_run["id"]
 
 
+def test_config_scenario_explicitly_uses_matching_project_fact_snapshot(client):
+    base = project(client, "项目事实填入配置 QA")
+    _set_fact(client, base, "demand", "需求", "0", "套", "integer", "QA合成输入")
+    _set_fact(client, base, "capacity", "能力", "254016", "套", "integer", "QA合成输入")
+    created = client.post(base + "/analysis/configs", json={"name": "销售配置"}).json()
+    config = draft_update(client, base, created)
+    checked = trial(client, base, config, demand="0")
+    assert checked.json()["snapshot"]["results"]["sales"]["value"] == "0"
+    assert publish(client, base, config, checked).status_code == 200
+    empty = client.post(base + "/analysis/scenarios", json={
+        "name": "空白", "source": "config", "config_id": config["id"]})
+    assert empty.status_code == 201 and empty.json()["inputs"]["demand"]["value"] is None
+    seeded = client.post(base + "/analysis/scenarios", json={
+        "name": "从事实填入", "source": "config", "config_id": config["id"], "use_project_facts": True})
+    assert seeded.status_code == 201, seeded.text
+    snapshot = seeded.json()
+    assert snapshot["inputs"]["demand"]["value"] == "0"
+    assert snapshot["inputs"]["demand"]["origin"] == "project_fact"
+    assert snapshot["inputs"]["demand"]["source_ref"]["revision"] == 1
+    run = client.post(base + f"/analysis/scenarios/{snapshot['id']}/runs", json={
+        "scenario_revision": snapshot["revision"], "request_key": str(uuid4())})
+    assert run.status_code == 201, run.text
+    assert run.json()["snapshot"]["results"]["sales"]["value"] == "0"
+    change = {"fact_key": "demand", "value": "100", "source": "新项目原件", "reason": "修改需求"}
+    preview = client.post(base + "/changes/preview", json=change).json()
+    assert client.post(base + "/changes/commit", json={**change,
+        "base_version": preview["base_version"], "preview_token": preview["preview_token"]}).status_code == 200
+    assert client.get(base + f"/analysis/scenarios/{snapshot['id']}").json()["inputs"]["demand"]["value"] == "0"
+    renewed = client.post(base + "/analysis/scenarios", json={
+        "name": "最新事实", "source": "config", "config_id": config["id"], "use_project_facts": True})
+    assert renewed.json()["inputs"]["demand"]["value"] == "100"
+    assert renewed.json()["inputs"]["demand"]["source_ref"]["revision"] == 2
+    assert client.post(base + "/analysis/scenarios", json={
+        "name": "错误组合", "source": "config", "config_id": config["id"],
+        "copy_from": snapshot["id"], "use_project_facts": True}).status_code == 400
+    assert client.post(base + "/analysis/scenarios", json={
+        "name": "错误来源", "source": "project", "use_project_facts": True}).status_code == 400
+
+
 def test_config_zero_missing_cycle_division_unit_and_project_isolation(client):
     base = project(client)
     created = client.post(base + "/analysis/configs", json={"name": "边界配置"}).json()
@@ -209,11 +248,12 @@ def test_config_zero_missing_cycle_division_unit_and_project_isolation(client):
         "name": "跨项目", "source": "config", "config_id": created["id"]}).status_code == 404
 
 
-def _set_fact(client, base: str, key: str, label: str, value: str, unit: str, data_type="decimal"):
+def _set_fact(client, base: str, key: str, label: str, value: str, unit: str,
+              data_type="decimal", source="晋江事故调查公开原件"):
     created = client.post(base + "/facts", json={"key": key, "label": label,
-        "data_type": data_type, "unit": unit, "source": "晋江事故调查公开原件"})
+        "data_type": data_type, "unit": unit, "source": source})
     assert created.status_code == 201, created.text
-    change = {"fact_key": key, "value": value, "source": "晋江事故调查公开原件", "reason": "固定样本核对"}
+    change = {"fact_key": key, "value": value, "source": source, "reason": "固定样本核对"}
     preview = client.post(base + "/changes/preview", json=change)
     assert preview.status_code == 200, preview.text
     committed = client.post(base + "/changes/commit", json={**change,

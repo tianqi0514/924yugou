@@ -65,3 +65,18 @@
   .scenario-workspace.with-panel{grid-template-columns:minmax(0,1fr)}
   .scenario-workspace.with-panel .scenario-panel{position:fixed;z-index:30;right:0;top:0;bottom:0;width:min(430px,100vw);max-height:none;border-radius:0;box-shadow:-12px 0 34px #1c315433}
 }
+.scenario-evidence-list{border:1px solid #e2eaf4;border-radius:8px;background:#fbfdff;padding:9px 10px;color:#47638b;font-size:12px}
+.scenario-evidence-list summary{cursor:pointer;font-weight:600}
+.scenario-evidence-list button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:9px;padding:8px 2px;border:0;border-top:1px solid #edf1f6;background:transparent;text-align:left;color:#315a94;font:inherit}
+.scenario-evidence-list button:first-of-type{margin-top:8px}
+.scenario-evidence-list button:hover:not(:disabled){color:#174db1;background:#f5f9ff}
+.scenario-evidence-list button:disabled{color:#8190a5;cursor:default}
+.scenario-evidence-list small{color:#7d8fa7;text-align:right}
+.scenario-evidence-preview{border:1px solid #cbdcf2;border-radius:8px;background:#f8fbff;padding:10px;color:#2d4565}
+.scenario-evidence-preview>div{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.scenario-evidence-preview>div button{border:0;background:transparent;color:#657c9d;padding:2px}
+.scenario-evidence-preview p{max-height:180px;overflow:auto;margin:8px 0 10px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+.scenario-evidence-preview>button{border:1px solid #c5d8f2;border-radius:6px;background:#fff;color:#245aaa;padding:6px 9px;font-size:12px}
+.scenario-input span,.scenario-results-list button,.scenario-source-row,.scenario-issue{font-size:12px}
+.scenario-input small{font-size:11px}
+.scenario-candidate-basis button{font-size:12px}
