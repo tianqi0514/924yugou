@@ -985,6 +985,90 @@ def document_ocr(project_id: str, document_id: str, page: int = Query(1, ge=1)):
         return {"ref": ref, "created": True, "chars": len(content), "review_status": "PENDING_REVIEW"}
 
 
+@app.post("/api/projects/{project_id}/documents/{document_id}/tables")
+def document_tables(project_id: str, document_id: str, page: int = Query(1, ge=1)):
+    """识别 PDF 表格行并生成待审候选；不调用模型，也不修改项目事实。"""
+    with SessionLocal() as session:
+        project = get_project(session, project_id)
+        require_writable_project(project)
+        item = _document(session, project_id, document_id)
+        if item.file_kind != "pdf" or page > item.pages:
+            fail("只能识别 PDF 的有效页码")
+        original_segments = item.segments
+        source_path = STORAGE / item.storage_name
+        if not source_path.is_file():
+            fail("原件文件缺失", 404)
+        source_bytes = source_path.read_bytes()
+        if sha256(source_bytes) != item.sha256:
+            fail("原件内容与已登记版本不一致，请核对文件", 409)
+    try:
+        rows = table_segments(source_bytes, page)
+    except (ValueError, IndexError, RuntimeError) as exc:
+        fail(f"表格识别失败：{exc}")
+    if len(rows) > 400 or sum(len(row["text"]) for row in rows) > 100000:
+        fail("本页表格过大，请拆分原件后识别")
+    if not rows:
+        return {"page": page, "rows": 0, "table_returned": 0, "created": 0}
+    by_ref = {row["ref"]: row for row in rows}
+    proposals = [{**fact, "source_ref": row["ref"]} for row in rows for fact in row["facts"]]
+    input_sha256 = hashlib.sha256(json.dumps(
+        [{"ref": row["ref"], "text": row["text"]} for row in rows],
+        ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    with SessionLocal.begin() as session:
+        project = get_project(session, project_id)
+        require_writable_project(project)
+        item = session.scalar(select(SourceDocument).where(
+            SourceDocument.id == document_id, SourceDocument.project_id == project_id).with_for_update())
+        if item is None:
+            fail("项目文件不存在", 404)
+        if item.segments != original_segments:
+            fail("识别期间原文片段已变化，请重试", 409)
+        existing_refs = {segment["ref"] for segment in item.segments}
+        prepared = []
+        for segment in item.segments:
+            if segment["ref"] in by_ref and segment.get("kind") == "table_row":
+                updated = dict(segment)
+                for field in ("caption", "headers", "cells"):
+                    updated[field] = by_ref[segment["ref"]][field]
+                prepared.append(updated)
+            else:
+                prepared.append(segment)
+        prepared.extend(row for row in rows if row["ref"] not in existing_refs)
+        if prepared != original_segments:
+            item.parse_revision += 1
+            session.add(SourceParseRevision(document_id=item.id, document_sha256=item.sha256,
+                                            revision=item.parse_revision, segments=prepared, status=item.status))
+            item.segments = prepared
+        candidates = session.scalars(select(ExtractionCandidate).where(
+            ExtractionCandidate.document_id == document_id)).all()
+        seen = {(re.sub(r"\s+", "", candidate.label), candidate.value_text.replace(",", ""),
+                 candidate.unit.replace("平方米", "㎡").replace("m2", "㎡"))
+                for candidate in candidates if candidate.source_ref in by_ref}
+        new_proposals = []
+        for proposal in proposals:
+            signature = (re.sub(r"\s+", "", proposal["label"]), proposal["value_text"].replace(",", ""),
+                         proposal["unit"].replace("平方米", "㎡").replace("m2", "㎡"))
+            if signature not in seen:
+                seen.add(signature)
+                new_proposals.append(proposal)
+        if not new_proposals and prepared == original_segments:
+            return {"page": page, "rows": len(rows), "table_returned": len(proposals), "created": 0}
+        run = ExtractionRun(project_id=project_id, document_id=document_id, page=page,
+                            status="SUCCEEDED", model_call={"task": "table", "parser": "pymupdf.find_tables",
+                                                            "input_kind": "located_table_rows"},
+                            input_refs=[row["ref"] for row in rows], input_sha256=input_sha256,
+                            returned_count=len(proposals), accepted_count=len(new_proposals))
+        session.add(run)
+        session.flush()
+        for proposal in new_proposals:
+            segment = by_ref[proposal["source_ref"]]
+            session.add(ExtractionCandidate(document_id=document_id, extraction_run_id=run.id,
+                                            extraction_origin="TABLE", source_valid=source_supports(
+                                                proposal["value_text"], segment["text"]), **proposal))
+        return {"page": page, "rows": len(rows), "table_returned": len(proposals),
+                "created": len(new_proposals)}
+
+
 @app.post("/api/projects/{project_id}/documents/{document_id}/extract")
 def document_extract(project_id: str, document_id: str, page: int = Query(1, ge=1)):
     with SessionLocal() as session:
@@ -1183,6 +1267,14 @@ def candidate_approve(project_id: str, document_id: str, candidate_id: str, body
         if session.scalar(select(ProjectFact).where(ProjectFact.project_id == project_id, ProjectFact.key == key)):
             fail("事实 key 已存在，请选择其他 key", 409)
         source = f"document:{item.id}#{'+'.join(refs)} · {item.filename}"
+        parsed = session.scalar(select(SourceParseRevision).where(
+            SourceParseRevision.document_id == item.id,
+            SourceParseRevision.revision == item.parse_revision))
+        if parsed is None or parsed.document_sha256 != item.sha256:
+            fail("原件解析版本已变化，请刷新后重试", 409)
+        parsed_refs = {part["ref"]: part for part in parsed.segments}
+        if any(ref not in parsed_refs or parsed_refs[ref]["text"] != by_ref[ref]["text"] for ref in refs):
+            fail("原件位置与解析版本不一致，请刷新后重试", 409)
         fact = ProjectFact(project_id=project_id, key=key, label=body.label.strip(), data_type=body.data_type,
                            value_text=value, value_status="PROVIDED", unit=body.unit.strip(),
                            caliber=body.caliber.strip(), source=source, revision=1)
@@ -1191,6 +1283,15 @@ def candidate_approve(project_id: str, document_id: str, candidate_id: str, body
         session.add(FactRevision(project_id=project_id, fact_key=key, project_version=project.version,
                                  before={"value": None, "status": "UNDEFINED"},
                                  after={"value": value, "status": "PROVIDED", "source": source}, reason="审核文件抽取候选"))
+        session.add(FactEvidenceBinding(project_id=project_id, fact_key=key, fact_revision=1,
+                                        document_id=item.id, source_refs=refs, value_text=value))
+        session.add(ProjectEvidence(project_id=project_id, document_id=item.id,
+                                    document_sha256=item.sha256, parse_revision_id=parsed.id,
+                                    source_refs=refs,
+                                    excerpt="\n\n".join(f"【{ref}】{by_ref[ref]['text']}" for ref in refs),
+                                    statement=value, label=body.label.strip(),
+                                    asserted_at="", source_type="original",
+                                    fact_key=key, fact_revision=1))
         candidate.review_status = "APPROVED"
         candidate.fact_key = key
         session.flush()

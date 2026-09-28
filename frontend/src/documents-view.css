@@ -10,6 +10,12 @@
 .document-segment-active{background:#fff8e9;border-left:3px solid #e6aa4f;padding-left:9px}
 .document-source-scroll{max-height:46vh;min-height:125px;overflow:auto;overscroll-behavior:contain;padding:0 4px;border-top:1px solid #eef1f6}
 .document-source-scroll .document-segment:last-child{border-bottom:0}
+.document-table-cells{margin:7px 0 9px}
+.document-table-cells summary{width:max-content;cursor:pointer;color:#3567aa;font-size:11px}
+.document-table-cells-scroll{max-width:100%;overflow:auto;margin-top:7px;border:1px solid #e0e8f2;border-radius:7px}
+.document-table-cells table{width:100%;min-width:max-content;border-collapse:collapse;font-size:11px;background:#fff}
+.document-table-cells th,.document-table-cells td{padding:7px 10px;border-right:1px solid #e8edf5;text-align:left;white-space:pre-wrap;max-width:220px}
+.document-table-cells th{color:#5d718e;background:#f6f8fc;font-weight:600}
 .candidate-support{margin:10px 0;border-top:1px solid #edf1f6;padding-top:9px}
 .candidate-support summary{color:#5075b8;font-size:11px;cursor:pointer}
 .candidate-support label{display:grid;gap:5px;color:#8290a5;font-size:10px;margin-top:10px}

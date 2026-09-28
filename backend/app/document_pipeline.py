@@ -92,6 +92,7 @@ def table_segments(data: bytes, page_number: int) -> list[dict]:
                 bbox = table.rows[row_index].bbox
                 rows.append({"ref": f"p{page_number}-t{table_index}-r{row_index}", "page": page_number,
                              "text": text, "kind": "table_row", "table_id": f"p{page_number}-t{table_index}",
+                             "caption": caption, "headers": headers if matrix else [], "cells": values,
                              "locator": f"第 {page_number} 页 · 表 {table_index} · 行 {row_index}",
                              "bbox": [round(float(value), 2) for value in bbox], "facts": facts})
     return rows

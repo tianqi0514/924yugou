@@ -561,6 +561,87 @@ def test_docx_text_and_table_are_locatable(client: TestClient, monkeypatch, tmp_
     assert any(item["ref"].startswith("d-t") and "300000" in item["text"] for item in detail["segments"])
 
 
+def test_public_feasibility_tables_work_without_model_and_keep_cell_source(client: TestClient, monkeypatch, tmp_path):
+    """固定可研案例：识别表格不调用模型，审过的单元格值可回链且重试幂等。"""
+    import pymupdf
+    import app.main as main_module
+
+    monkeypatch.setattr(main_module, "STORAGE", tmp_path)
+    monkeypatch.setattr(main_module, "model_candidates", lambda _: pytest.fail("表格识别不应调用模型"))
+    project_id = create_project(client)
+    other_id = create_project(client)
+    with pymupdf.open(FIXTURES / "01_beijing_feasibility.pdf") as source:
+        pdf = pymupdf.open()
+        pdf.insert_pdf(source, from_page=6, to_page=6)
+        pdf.insert_pdf(source, from_page=176, to_page=176)
+        data = pdf.tobytes()
+    uploaded = client.post(f"/api/projects/{project_id}/documents", files={"file": (
+        "可研表格.pdf", data, "application/pdf")})
+    assert uploaded.status_code == 201, uploaded.text
+    document_id = uploaded.json()["id"]
+    endpoint = f"/api/projects/{project_id}/documents/{document_id}/tables"
+    assert client.post(f"/api/projects/{other_id}/documents/{document_id}/tables?page=1").status_code == 404
+    from app.db import SessionLocal, SourceDocument
+    with SessionLocal() as session:
+        stored_name = session.get(SourceDocument, document_id).storage_name
+    original_bytes = (tmp_path / stored_name).read_bytes()
+    (tmp_path / stored_name).write_bytes(b"changed original")
+    assert client.post(f"{endpoint}?page=1").status_code == 409
+    (tmp_path / stored_name).write_bytes(original_bytes)
+    first = client.post(f"{endpoint}?page=1")
+    assert first.status_code == 200, first.text
+    assert first.json()["rows"] == 19 and first.json()["created"] == 18
+    detail = client.get(f"/api/projects/{project_id}/documents/{document_id}?page=1").json()
+    area_row = next(row for row in detail["segments"] if row["ref"] == "p1-t1-r1")
+    assert area_row["headers"] == ["序号", "项目", "数量", "单位", "备注"]
+    assert area_row["cells"][1:4] == ["用地总面积", "73431.105", "㎡"]
+    assert area_row["locator"] == "第 1 页 · 表 1 · 行 1"
+    assert not any(row["label"] == "地下机动车位停车位" for row in detail["candidates"])
+    area = next(row for row in detail["candidates"] if row["label"] == "用地总面积")
+    assert (area["value"], area["unit"], area["extraction_origin"], area["review_status"]) == (
+        "73431.105", "㎡", "TABLE", "PENDING")
+    again = client.post(f"{endpoint}?page=1")
+    assert again.status_code == 200 and again.json()["created"] == 0
+    assert len(client.get(f"/api/projects/{project_id}/documents/{document_id}/extraction-runs?page=1").json()) == 1
+    second = client.post(f"{endpoint}?page=2")
+    assert second.status_code == 200 and second.json()["rows"] == 12
+    engineering = next(row for row in client.get(
+        f"/api/projects/{project_id}/documents/{document_id}?page=2").json()["candidates"]
+        if row["label"] == "工程费")
+    assert engineering["value"] == "22122.45" and engineering["unit"] == "万元"
+    with SessionLocal.begin() as session:
+        item = session.get(SourceDocument, document_id)
+        previous_segments = item.segments
+        item.segments = [{**row, "text": row["text"] + "（未记录的修改）"}
+                         if row["ref"] == "p1-t1-r1" else row for row in previous_segments]
+    decision = {"label": "用地总面积", "value": "73431.105", "unit": "㎡",
+                "data_type": "decimal", "source_ref": "p1-t1-r1", "key": "land_area"}
+    assert client.post(f"/api/projects/{project_id}/documents/{document_id}/candidates/{area['id']}/approve",
+                       json=decision).status_code == 409
+    with SessionLocal.begin() as session:
+        session.get(SourceDocument, document_id).segments = previous_segments
+    approved = client.post(f"/api/projects/{project_id}/documents/{document_id}/candidates/{area['id']}/approve",
+                           json=decision)
+    assert approved.status_code == 200, approved.text
+    source = client.get(f"/api/projects/{project_id}/facts/land_area/source").json()
+    assert source["source_ref"] == "p1-t1-r1" and source["original_url"].endswith("#page=1")
+    assert "73431.105" in source["excerpt"] and "用地总面积" in source["excerpt"]
+    assert source["review_status"] == "SOURCE_LOCATOR_REVIEWED"
+    fact = next(row for row in client.get(f"/api/projects/{project_id}/facts").json()["facts"]
+                if row["key"] == "land_area")
+    assert fact["evidence_status"] == "SOURCE_LOCATOR_REVIEWED"
+    evidence = client.get(f"/api/projects/{project_id}/evidence?fact_key=land_area").json()["items"]
+    assert len(evidence) == 1 and evidence[0]["source_refs"] == ["p1-t1-r1"]
+    assert evidence[0]["parse_revision_id"] and evidence[0]["source_type"] == "original"
+    report = client.post(f"/api/projects/{project_id}/reports", json={
+        "title": "表格事实写作核对", "report_type": "government_feasibility"})
+    assert report.status_code == 201, report.text
+    options = client.get(f"/api/projects/{project_id}/reports/{report.json()['id']}/chapter-mapping/necessity").json()
+    mapped = next(row for row in options["facts"] if row["key"] == "land_area")
+    assert mapped["source"]["verified"] is True
+    assert mapped["source"]["location"]["ref"] == "p1-t1-r1"
+
+
 def test_report_preview_plate_save_gate_and_export(client: TestClient, monkeypatch, tmp_path):
     import app.main as main_module
 
