@@ -101,14 +101,14 @@ def _p(section_id: str, text: str, *, refs: list[dict] | None = None,
             **({"source_refs": source_refs} if source_refs else {})}
 
 
-def _table(section_id: str, run_id: str, rows: list[dict]) -> dict:
+def _table(section_id: str, run_id: str, rows: list[dict], *, value_label: str = "本方案") -> dict:
     def cell(text: str, result: dict | None = None, header: bool = False) -> dict:
         return {"type": "th" if header else "td", "id": str(uuid4()),
                 "children": [_p(section_id, text, refs=[_ref(run_id, result)] if result else None)]}
     return {"type": "table", "id": str(uuid4()), "section_id": section_id,
             "origin": "guided", "analysis_refs": [_ref(run_id, row) for row in rows],
             "children": [
-                {"type": "tr", "id": str(uuid4()), "children": [cell("指标", header=True), cell("本方案", header=True)]},
+                {"type": "tr", "id": str(uuid4()), "children": [cell("指标", header=True), cell(value_label, header=True)]},
                 *[{"type": "tr", "id": str(uuid4()), "children": [cell(row["label"]),
                    cell(f"{row['value']}{row['unit']}", row)]} for row in rows],
             ]}
@@ -235,14 +235,17 @@ def _candidate(session, run, section_id: str, mode: str) -> tuple[list[dict], di
                     for item in section.get("conditions", [])]
         if any(item is None or item["outcome"] is None for item in outcomes):
             raise HTTPException(409, "本章条件因输入缺失而不可评估")
-        text = "本方案" + section["title"] + "采用：" + "；".join(
+        original_only = all(key in run.snapshot.get("inputs", {}) and
+                            run.snapshot["inputs"][key].get("origin") == "project_fact"
+                            for key in section["result_keys"])
+        text = ("所选原文列示：" if original_only else "本方案" + section["title"] + "采用：") + "；".join(
             f"{row['label']}{row['value']}{row['unit']}" for row in rows) + "。"
         blocks = [{"type": "h2", "id": str(uuid4()), "section_id": section_id,
                    "children": [{"text": section["title"]}]},
                   _p(section_id, text, refs=[_ref(run.id, row) for row in rows],
                      fact_keys=[key for key in section.get("evidence_keys", [])
                                 if key in section["result_keys"]]),
-                  _table(section_id, run.id, rows)]
+                  _table(section_id, run.id, rows, value_label="原文数值" if original_only else "本方案")]
         for item in outcomes:
             refs = [_ref(run.id, results[key]) for key in item["deps"]]
             blocks.append(_p(section_id, item["text"], refs=refs))

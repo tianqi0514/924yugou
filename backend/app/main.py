@@ -2441,7 +2441,8 @@ def _report_export(project_id: str, report_id: str, level: str,
                  "delivery_status": "preview_only" if level == "preview" else
                                     "scenario_assumptions_reviewed" if level == "scenario" else "source_locator_reviewed",
                  "delivery_note": "预审稿；项目证据或冲突仍待核，不构成正式结论" if level == "preview" else
-                                  "情景分析；方案假设及历史资料未独立核实，不构成现实项目事实结论" if level == "scenario" else
+                                  ("情景分析；方案假设及历史资料未独立核实，不构成现实项目事实结论" if assumptions else
+                                   "情景分析；原文位置由操作者核对，专业结论未独立核实") if level == "scenario" else
                                   "项目原文位置由操作者核对；不代表原件真实性经独立认证",
                  "analysis_run_id": item.analysis_run_id,
                  "analysis_run": selected_run.snapshot if selected_run else None,
@@ -2476,7 +2477,8 @@ def _report_export(project_id: str, report_id: str, level: str,
                           "export_level": level, "export_watermark_sha256": watermark})
             data = export_bundle(item.title, item.content, audit,
                                  preview_label="预审稿 · 来源待核 · 不构成正式结论" if level == "preview" else
-                                 "情景分析 · 假设待核 · 不构成现实项目事实结论" if level == "scenario" else None)
+                                 ("情景分析 · 假设待核 · 不构成现实项目事实结论" if assumptions else
+                                  "情景分析 · 原文位置已核 · 专业结论待核") if level == "scenario" else None)
             saved = ReportExport(
                 id=export_id, project_id=project_id, report_id=report_id, report_version=item.version,
                 level=level, analysis_run_id=item.analysis_run_id, watermark_sha256=watermark,

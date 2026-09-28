@@ -19,6 +19,7 @@ def main() -> None:
     parser.add_argument("--report", required=True)
     parser.add_argument("--run", required=True)
     parser.add_argument("--text", action="append", default=[])
+    parser.add_argument("--absent-text", action="append", default=[])
     parser.add_argument("--result", action="append", default=[])
     parser.add_argument("--input-source-ref", action="append", default=[])
     args = parser.parse_args()
@@ -46,6 +47,9 @@ def main() -> None:
         normalized = re.sub(r"\s+", "", expected)
         assert normalized in re.sub(r"\s+", "", docx_text), f"DOCX 缺少：{expected}"
         assert normalized in re.sub(r"\s+", "", pdf_text), f"PDF 缺少：{expected}"
+    for unexpected in args.absent_text:
+        assert unexpected not in docx_text, f"DOCX 含无依据表述：{unexpected}"
+        assert unexpected not in pdf_text, f"PDF 含无依据表述：{unexpected}"
     for entry in args.result:
         key, value = entry.split("=", 1)
         assert audit["analysis_run"]["results"][key]["value"] == value, entry

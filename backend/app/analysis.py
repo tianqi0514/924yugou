@@ -314,7 +314,7 @@ def _calculate(item: AnalysisScenario, inputs: dict) -> dict:
         issues.append({"code": "QUOTE_MISSING", "severity": "note", "message": "当前方案设备报价待补"})
     status = "UNEVALUABLE" if any(x["status"] == "UNEVALUABLE" for x in state.values()) else "COMPUTED"
     if not demand or not capacity:
-        comparison = "部分结果不可评估" if status == "UNEVALUABLE" else "已完成计算"
+        comparison = "部分结果不可评估" if status == "UNEVALUABLE" else "已完成计算" if ordered else "本次无计算规则"
     return {"scenario_id": item.id, "scenario_revision": item.revision,
             "blueprint_version": item.blueprint_version,
             "corpus_id": item.corpus_id, "corpus_version": item.corpus_version,
@@ -534,7 +534,20 @@ def scenario_preview(project_id: str, scenario_id: str, body: ScenarioChange):
         if item.revision != body.base_revision:
             raise HTTPException(409, "方案已有新修订，请刷新后重试")
         proposed = _changed_inputs(item, body.changes)
-        return {"preview_only": True, "run": _calculate(item, proposed)}
+        snapshot = _calculate(item, proposed)
+        _attach_configuration(session, project_id, item, snapshot)
+        return {"preview_only": True, "run": snapshot}
+
+
+def _attach_configuration(session, project_id: str, item: AnalysisScenario, snapshot: dict) -> None:
+    if not item.blueprint_version.startswith("config:"):
+        return
+    from .analysis_conditions import condition_results
+    config = _published_config(session, project_id, item.blueprint_version[7:])
+    snapshot["configuration"] = {"id": config.id, "version": config.version,
+                                  "checksum": config.checksum,
+                                  "sections": deepcopy(config.sections)}
+    snapshot["condition_results"] = condition_results(snapshot, config.sections)
 
 
 @router.post("/scenarios/{scenario_id}/runs", status_code=201)
@@ -561,13 +574,7 @@ def scenario_run(project_id: str, scenario_id: str, body: RunCreate):
             and _same_value(fact.value_text, item.inputs.get(fact.key, {}).get("value"))
             and fact.unit == input_fields[fact.key]["unit"]
         }
-        if item.blueprint_version.startswith("config:"):
-            from .analysis_conditions import condition_results
-            config = _published_config(session, project_id, item.blueprint_version[7:])
-            snapshot["configuration"] = {"id": config.id, "version": config.version,
-                                          "checksum": config.checksum,
-                                          "sections": deepcopy(config.sections)}
-            snapshot["condition_results"] = condition_results(snapshot, config.sections)
+        _attach_configuration(session, project_id, item, snapshot)
         raw = json.dumps(snapshot, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         run = AnalysisRun(project_id=project_id, scenario_id=scenario_id,
                           scenario_revision=item.revision, request_key=body.request_key,

@@ -29,7 +29,7 @@ from .model_settings import chat_json
 
 ALLOWED_BLOCKS = {"p", "h1", "h2", "h3", "blockquote", "table"}
 TEXT_MARKS = {"bold", "italic", "underline", "strikethrough"}
-EXPORT_RENDER_VERSION = "chapter-layout-v5"
+EXPORT_RENDER_VERSION = "chapter-layout-v6"
 
 
 def _valid_url(url: str) -> bool:
@@ -768,19 +768,21 @@ def export_bundle(title: str, content: list[dict], audit: dict, preview_label: s
         else:
             list_number = 0
         story.append(Paragraph(markup or " ", styles[node["type"] if node["type"] in styles else "p"]))
+    def pdf_basis(line: str) -> str:
+        return escape(line.replace(" · ", "，").replace("·", "，"))
     if basis_lines:
         story.append(KeepTogether([Spacer(1, 12), Paragraph("推演依据", styles["h2"]),
-                                   *(Paragraph(escape(line), styles["basis"]) for line in basis_lines[:2])]))
+                                   *(Paragraph(pdf_basis(line), styles["basis"]) for line in basis_lines[:2])]))
         for line in basis_lines[2:]:
-            story.append(Paragraph(escape(line), styles["basis"]))
+            story.append(Paragraph(pdf_basis(line), styles["basis"]))
     if audit["facts"]:
         def fact_line(fact: dict) -> str:
             return f"{fact.get('label') or fact['key']}：{fact['value']}{fact['unit']}。{_fact_basis(fact, audit)}"
         story.append(KeepTogether([Spacer(1, 12), Paragraph("事实依据", styles["h2"]),
-                                   *(Paragraph(escape(fact_line(fact)), styles["basis"])
+                                   *(Paragraph(pdf_basis(fact_line(fact)), styles["basis"])
                                      for fact in audit["facts"][:2])]))
         for fact in audit["facts"][2:]:
-            story.append(Paragraph(escape(fact_line(fact)), styles["basis"]))
+            story.append(Paragraph(pdf_basis(fact_line(fact)), styles["basis"]))
     def pdf_footer(canvas, doc):
         canvas.saveState()
         canvas.setFont("STSong-Light", 9)

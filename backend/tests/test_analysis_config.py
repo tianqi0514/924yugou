@@ -130,6 +130,12 @@ def test_config_version_run_and_chapter_are_immutable(client):
         "base_revision": 1, "changes": {"demand": "300000", "capacity": "254016"}})
     assert response.status_code == 200, response.text
     scenario = response.json()
+    preview = client.post(base + f"/analysis/scenarios/{scenario['id']}/preview", json={
+        "base_revision": scenario["revision"], "changes": {}})
+    assert preview.status_code == 200, preview.text
+    assert preview.json()["run"]["configuration"]["id"] == first_config["id"]
+    assert preview.json()["run"]["results"]["sales"]["value"] == "254016"
+    assert client.get(base + f"/analysis/scenarios/{scenario['id']}/runs").json() == []
     response = client.post(base + f"/analysis/scenarios/{scenario['id']}/runs", json={
         "scenario_revision": scenario["revision"], "request_key": str(uuid4())})
     assert response.status_code == 201, response.text
