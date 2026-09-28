@@ -114,6 +114,38 @@ def _table(section_id: str, run_id: str, rows: list[dict], *, value_label: str =
             ]}
 
 
+def _source_kind(snapshot: dict, result_keys: list[str]) -> str:
+    """Distinguish quoted facts from calculations over facts and scenario assumptions."""
+    inputs = snapshot.get("inputs", {})
+    rules = {row["target_key"]: row for row in snapshot.get("rules", [])}
+    leaves: set[str] = set()
+    visited: set[str] = set()
+    calculated = False
+
+    def visit(key: str) -> bool:
+        nonlocal calculated
+        if key in visited:
+            return True
+        visited.add(key)
+        if key in inputs:
+            leaves.add(key)
+            return True
+        rule = rules.get(key)
+        if not rule:
+            return False
+        deps = rule.get("deps", [])
+        if not deps:
+            return False
+        calculated = True
+        return all(visit(dep) for dep in deps)
+
+    if not all(visit(key) for key in result_keys) or not leaves:
+        return "scenario"
+    if not all(inputs[key].get("origin") == "project_fact" for key in leaves):
+        return "scenario"
+    return "calculated_from_facts" if calculated else "quoted_facts"
+
+
 def _model_paragraph(section_id: str, run, facts: list[dict], rule: str, old_supplier: str | None = None) -> tuple[dict, dict]:
     relevant_issues = {"S4": {"HISTORICAL_INPUT"},
                        "S7.1": {"HISTORICAL_INPUT", "QUOTE_MISSING"},
@@ -235,17 +267,18 @@ def _candidate(session, run, section_id: str, mode: str) -> tuple[list[dict], di
                     for item in section.get("conditions", [])]
         if any(item is None or item["outcome"] is None for item in outcomes):
             raise HTTPException(409, "本章条件因输入缺失而不可评估")
-        original_only = all(key in run.snapshot.get("inputs", {}) and
-                            run.snapshot["inputs"][key].get("origin") == "project_fact"
-                            for key in section["result_keys"])
-        text = ("所选原文列示：" if original_only else "本方案" + section["title"] + "采用：") + "；".join(
+        source_kind = _source_kind(run.snapshot, section["result_keys"])
+        prefix = {"quoted_facts": "所选原文列示：", "calculated_from_facts": "按本项目事实计算："}
+        text = prefix.get(source_kind, "本方案" + section["title"] + "采用：") + "；".join(
             f"{row['label']}{row['value']}{row['unit']}" for row in rows) + "。"
         blocks = [{"type": "h2", "id": str(uuid4()), "section_id": section_id,
                    "children": [{"text": section["title"]}]},
                   _p(section_id, text, refs=[_ref(run.id, row) for row in rows],
                      fact_keys=[key for key in section.get("evidence_keys", [])
                                 if key in section["result_keys"]]),
-                  _table(section_id, run.id, rows, value_label="原文数值" if original_only else "本方案")]
+                  _table(section_id, run.id, rows, value_label={
+                      "quoted_facts": "原文数值", "calculated_from_facts": "计算结果",
+                  }.get(source_kind, "本方案"))]
         for item in outcomes:
             refs = [_ref(run.id, results[key]) for key in item["deps"]]
             blocks.append(_p(section_id, item["text"], refs=refs))

@@ -533,10 +533,12 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
   }, [base, reportId, report, project.id])
 
   const closePanel = useCallback(() => {
+    const blockId = contentRef.current[selectedPosition - 1]?.id || selectedHeadingId
     setScenarioCreateOpen(false)
     setPanel(null)
-    window.requestAnimationFrame(() => editorActions.current?.focus())
-  }, [])
+    window.requestAnimationFrame(() => blockId
+      ? editorActions.current?.focusBlock(blockId) : editorActions.current?.focus())
+  }, [selectedPosition, selectedHeadingId])
 
   useEffect(() => {
     if (!dirty || saveState === '保存失败') return
@@ -576,7 +578,18 @@ export default function ScenarioWorkspace({ project, notify, onOpenFacts, onOpen
         run_id: impact.proposed_run_id, base_version: report.version,
       })
       const active = impact.proposed_run_id
+      const configuredSections = runs.find((item) => item.id === active)?.snapshot.configuration?.sections || []
+      const section = configuredSections.find((item) => item.id === selectedSection) || configuredSections[0]
+      const headingIndex = section ? report.content.findIndex((block) =>
+        block.type === 'h2' && block.section_id === section.id) : -1
       setImpact(null); setRunId(active); await loadReport(report.id); setPanel(impact.impacts.length ? 'check' : null)
+      if (section) {
+        setSelectedSection(section.id)
+        if (headingIndex >= 0) {
+          setSelectedHeadingId(report.content[headingIndex].id || null)
+          setSelectedPosition(headingIndex + 1)
+        }
+      }
       notify(impact.impacts.length ? '报告已采用该次推演；受影响段落待更新' : '报告已采用该次推演')
     } catch (cause) { setError((cause as Error).message) } finally { setBusy(false) }
   }

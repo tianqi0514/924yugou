@@ -74,6 +74,8 @@ test('表格确认、章节推演、Plate 与情景分析交付使用同一来�
   await page.getByRole('button', { name: '保存方案并运行' }).click()
   await page.getByRole('button', { name: '用于报告' }).click()
   await page.getByRole('button', { name: '确认采用' }).click()
+  await expect.poll(async () => (await (await request.get(`${base}/reports/${report.id}`)).json()).analysis_run_id)
+    .toBeTruthy()
   const adopted = await (await request.get(`${base}/reports/${report.id}`)).json()
   const runId = adopted.analysis_run_id as string
   expect(runId).toBeTruthy()
@@ -161,6 +163,8 @@ test('真实可研 PDF 工程费表格行进入投资章节及交付', async ({ 
   await expect(page.locator('.scenario-results-list')).toContainText('工程费')
   await page.getByRole('button', { name: '用于报告' }).click()
   await page.getByRole('button', { name: '确认采用' }).click()
+  await expect.poll(async () => (await (await request.get(`${base}/reports/${report.id}`)).json()).analysis_run_id)
+    .toBeTruthy()
   const runId = (await (await request.get(`${base}/reports/${report.id}`)).json()).analysis_run_id as string
   await page.getByRole('button', { name: '生成本章', exact: true }).click()
   await page.getByRole('button', { name: '生成候选' }).click()
@@ -192,4 +196,177 @@ test('真实可研 PDF 工程费表格行进入投资章节及交付', async ({ 
   expect(JSON.parse(checked).checked_source_refs).toEqual(['p177-t1-r1'])
   await page.setViewportSize({ width: 900, height: 760 })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+})
+
+test('真实可研投资表五行核对、分项复算与差额 0 进入交付', async ({ page, request }) => {
+  test.setTimeout(240_000)
+  const rows = [
+    { label: '工程费', value: '22122.45', ref: 'p177-t1-r1' },
+    { label: '工程建设其他费', value: '2701.55', ref: 'p177-t1-r9' },
+    { label: '预备费', value: '1241.20', ref: 'p177-t1-r10' },
+    { label: '征地拆迁费', value: '5190.37', ref: 'p177-t1-r11' },
+    { label: '总投资', value: '31255.57', ref: 'p177-t1-r12' },
+  ]
+  const project = await send(request, '/api/projects', { name: `北京投资表复算 QA ${Date.now()}` })
+  const base = `/api/projects/${project.id}`
+  const upload = await request.post(`${base}/documents`, { multipart: {
+    file: { name: '北京交通枢纽可研.pdf', mimeType: 'application/pdf',
+      buffer: await readFile(resolve(root, 'test-fixtures/public-reports/01_beijing_feasibility.pdf')) },
+  } })
+  expect(upload.ok(), await upload.text()).toBeTruthy()
+  const document = await upload.json()
+  await page.goto(`/?project=${project.id}&section=documents&document=${document.id}&page=177`)
+  await page.getByRole('button', { name: '识别本页表格' }).click()
+  for (const row of rows) {
+    const card = page.locator('.candidate-card').filter({
+      has: page.locator('.candidate-title strong').getByText(row.label, { exact: true }),
+    })
+    await expect(card).toContainText(`${row.value}万元`)
+    await expect(card).toContainText(row.ref)
+    await card.getByRole('button', { name: '核对' }).click()
+    await expect(card.locator('.candidate-excerpt').first()).toContainText(row.value)
+    await card.getByRole('button', { name: '确认入台账' }).click()
+    await expect(card).toContainText('已入事实台账')
+  }
+  const facts = (await (await request.get(`${base}/facts`)).json()).facts as {
+    key: string; label: string; value: string; unit: string; evidence_status: string
+  }[]
+  expect(facts).toHaveLength(5)
+  const byName = (label: string) => facts.find((fact) => fact.label === label)!
+  for (const row of rows) {
+    const fact = byName(row.label)
+    expect([fact.value, fact.unit, fact.evidence_status]).toEqual([
+      row.value, '万元', 'SOURCE_LOCATOR_REVIEWED',
+    ])
+    expect((await (await request.get(`${base}/facts/${fact.key}/source`)).json()).source_ref).toBe(row.ref)
+  }
+  await send(request, `${base}/facts`, {
+    key: 'component_sum', label: '投资分项合计', data_type: 'decimal', unit: '万元',
+  })
+  await send(request, `${base}/facts`, {
+    key: 'investment_gap', label: '原文总额与分项差额', data_type: 'decimal', unit: '万元',
+  })
+  await send(request, `${base}/rules`, {
+    name: '四项投资求和', target_key: 'component_sum',
+    expression: rows.slice(0, 4).map((row) => byName(row.label).key).join(' + '),
+  })
+  await send(request, `${base}/rules`, {
+    name: '原文总额减分项合计', target_key: 'investment_gap',
+    expression: `${byName('总投资').key} - component_sum`,
+  })
+  const calculated = (await (await request.get(`${base}/facts`)).json()).facts as {
+    key: string; value: string; status: string
+  }[]
+  expect(calculated.find((fact) => fact.key === 'component_sum')?.value).toBe('31255.57')
+  expect(calculated.find((fact) => fact.key === 'investment_gap')).toMatchObject({
+    value: '0.00', status: 'COMPUTED',
+  })
+  const report = await send(request, `${base}/reports`, {
+    title: '北京可研投资分项复算', report_type: 'government_feasibility',
+  })
+  await page.goto(`/?project=${project.id}&report=${report.id}`)
+  await page.getByRole('button', { name: /投资估算与资金筹措 · 待配置 · 查看准备情况/ }).click()
+  await page.getByRole('button', { name: '配置本章' }).click()
+  await page.getByLabel('用于本章 投资分项合计').check()
+  await page.getByLabel('展示指标 投资分项合计').check()
+  await page.getByLabel('用于本章 原文总额与分项差额').check()
+  await page.getByLabel('展示指标 原文总额与分项差额').check()
+  await page.getByRole('button', { name: '预览要求' }).click()
+  await expect(page.locator('.scenario-preview')).toContainText('31255.57')
+  await expect(page.locator('.scenario-preview')).toContainText('原文总额与分项差额0万元')
+  await page.getByRole('button', { name: '确认本章要求' }).click()
+  await page.locator('.scenario-panel').getByRole('button', { name: '新建' }).click()
+  await page.getByRole('button', { name: '创建方案' }).click()
+  await page.getByRole('button', { name: '预览推演' }).click()
+  await expect(page.locator('.scenario-preview')).toContainText('31255.57')
+  await expect(page.locator('.scenario-preview')).toContainText('0')
+  await page.getByRole('button', { name: '保存方案并运行' }).click()
+  await expect(page.locator('.scenario-results-list')).toContainText('原文总额与分项差额')
+  await page.getByRole('button', { name: '用于报告' }).click()
+  await page.getByRole('button', { name: '确认采用' }).click()
+  await expect.poll(async () => (await (await request.get(`${base}/reports/${report.id}`)).json()).analysis_run_id)
+    .toBeTruthy()
+  const runId = (await (await request.get(`${base}/reports/${report.id}`)).json()).analysis_run_id as string
+  await page.getByRole('button', { name: '生成本章', exact: true }).click()
+  await page.getByRole('button', { name: '生成候选' }).click()
+  await expect(page.locator('.scenario-candidate')).toContainText('31255.57')
+  await expect(page.locator('.scenario-candidate')).toContainText('按本项目事实计算')
+  await page.locator('.scenario-candidate').getByRole('button', { name: /加入报告|更新本章/ }).click()
+  await expect(page.locator('.plate-content')).toContainText('31255.57')
+  await page.reload()
+  await expect(page.locator('.plate-content')).toContainText('31255.57')
+  await page.locator('.scenario-canvas-tools').getByRole('button', { name: /检查/ }).click()
+  await page.getByRole('button', { name: '我已核对' }).click()
+  const exported = await request.get(`${base}/reports/${report.id}/export?level=scenario`)
+  expect(exported.ok(), await exported.text()).toBeTruthy()
+  const archive = resolve(integrationRoot, 'exports', `pdf-investment-reconcile-${project.id}.zip`)
+  await mkdir(resolve(integrationRoot, 'exports'), { recursive: true })
+  await writeFile(archive, await exported.body())
+  const checked = execFileSync(resolve(root, '.venv/bin/python'), [
+    resolve(root, 'backend/scripts/check_scenario_export.py'), archive,
+    '--project', project.id, '--report', report.id, '--run', runId,
+    '--text', '31255.57', '--text', '按本项目事实计算', '--text', '推演依据',
+    '--absent-text', '资金已落实', '--absent-text', '独立审定',
+    '--result', 'component_sum=31255.57', '--result', 'investment_gap=0',
+    ...rows.flatMap((row) => ['--input-source-ref', row.ref]),
+  ], { cwd: root, env: { ...process.env, ...backendEnvironment }, encoding: 'utf8' })
+  expect(JSON.parse(checked).checked_source_refs).toEqual(rows.map((row) => row.ref))
+
+  await page.getByRole('button', { name: '关闭面板' }).click()
+  await page.getByRole('button', { name: '输入数据', exact: true }).click()
+  await page.locator('.scenario-panel').getByRole('button', { name: '新建' }).click()
+  await page.getByLabel('方案输入来源').selectOption('copy')
+  await page.getByLabel('方案名称').fill('工程费调整方案')
+  await page.getByRole('button', { name: '创建方案' }).click()
+  await page.getByLabel('工程费', { exact: true }).fill('22022.45')
+  await page.getByRole('button', { name: '预览推演' }).click()
+  await expect(page.locator('.scenario-preview')).toContainText('31155.57')
+  await expect(page.locator('.scenario-preview')).toContainText('100万元')
+  const scenarioRows = (await (await request.get(`${base}/analysis/scenarios`)).json()) as {
+    id: string; name: string; inputs: Record<string, { value: string; origin: string }>
+  }[]
+  const changed = scenarioRows.find((item) => item.name === '工程费调整方案')!
+  const baseline = scenarioRows.find((item) => item.id !== changed.id)!
+  await page.getByRole('button', { name: '取消预览' }).click()
+  expect((await (await request.get(`${base}/analysis/scenarios/${changed.id}/runs`)).json())).toHaveLength(0)
+  expect((await (await request.get(`${base}/analysis/scenarios/${changed.id}`)).json()).inputs[byName('工程费').key].value)
+    .toBe('22122.45')
+  await page.getByRole('button', { name: '预览推演' }).click()
+  await page.getByRole('button', { name: '保存方案并运行' }).click()
+  await expect(page.locator('.scenario-results-list')).toContainText('31155.57')
+  await expect(page.locator('.scenario-results-list')).toContainText('100万元')
+  const changedRun = (await (await request.get(`${base}/analysis/scenarios/${changed.id}/runs`)).json())[0]
+  expect(changedRun.snapshot.inputs[byName('工程费').key].origin).toBe('scenario_assumption')
+  await page.getByRole('button', { name: '加入比较' }).click()
+  await page.getByLabel('查看方案').selectOption(baseline.id)
+  await page.getByRole('button', { name: '加入比较' }).click()
+  await expect(page.locator('.scenario-compare')).toContainText('31255.57')
+  await expect(page.locator('.scenario-compare')).toContainText('31155.57')
+  await expect(page.locator('.scenario-compare')).toContainText('100万元')
+  expect((await (await request.get(`${base}/reports/${report.id}`)).json()).analysis_run_id).toBe(runId)
+  expect((await (await request.get(`${base}/facts`)).json()).facts.find(
+    (fact: { key: string }) => fact.key === byName('工程费').key).value).toBe('22122.45')
+  await page.getByLabel('查看方案').selectOption(changed.id)
+  await page.getByRole('button', { name: '用于报告' }).click()
+  await expect(page.locator('.scenario-confirm')).toContainText('待更新')
+  await page.getByRole('button', { name: '确认采用' }).click()
+  await expect.poll(async () => (await (await request.get(`${base}/reports/${report.id}`)).json()).analysis_run_id)
+    .toBe(changedRun.id)
+  const stale = await (await request.get(`${base}/reports/${report.id}`)).json()
+  expect(stale.analysis_run_id).toBe(changedRun.id)
+  expect(stale.reviewed).toBeFalsy()
+  expect(stale.content.some((block: { analysis_refs?: { run_id: string }[] }) =>
+    block.analysis_refs?.some((ref) => ref.run_id === runId))).toBeTruthy()
+  expect((await request.get(`${base}/reports/${report.id}/export?level=scenario`)).status()).toBe(409)
+  await page.getByRole('button', { name: '关闭面板' }).click()
+  await page.getByRole('button', { name: '生成本章', exact: true }).click()
+  await page.getByRole('button', { name: '生成候选' }).click()
+  await expect(page.locator('.scenario-candidate')).toContainText('本方案投资估算与资金筹措采用')
+  await expect(page.locator('.scenario-candidate')).toContainText('31155.57')
+  await expect(page.locator('.scenario-candidate')).toContainText('100万元')
+  await page.getByRole('button', { name: '取消候选' }).click()
+  const afterCancel = await (await request.get(`${base}/reports/${report.id}`)).json()
+  expect(afterCancel.content).toEqual(stale.content)
+  expect((await (await request.get(`${base}/analysis/runs/${runId}`)).json()).snapshot.results.component_sum.value)
+    .toBe('31255.57')
 })
