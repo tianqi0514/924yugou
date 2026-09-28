@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
 import { attach, watch } from './diagnostics'
+import { tableFixturePath } from './environment'
 
 test.beforeEach(async ({ page }) => watch(page))
 test.afterEach(async ({ page }, info) => attach(page, info))
@@ -51,4 +52,37 @@ test('可研表格无需模型即可识别、核对单元格并入事实台账',
   await expect(page.locator('#segment-p7-t1-r1').getByText('查看单元格')).toBeVisible()
   await page.setViewportSize({ width: 900, height: 760 })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+})
+
+test('Word 表格按同一审核流程进入写作来源', async ({ page, request }) => {
+  const projectResponse = await request.post('/api/projects', { data: { name: `Word 表格 QA ${Date.now()}` } })
+  expect(projectResponse.ok(), await projectResponse.text()).toBeTruthy()
+  const project = await projectResponse.json()
+  const upload = await request.post(`/api/projects/${project.id}/documents`, { multipart: {
+    file: { name: '本项目表格.docx',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      buffer: readFileSync(tableFixturePath) },
+  } })
+  expect(upload.ok(), await upload.text()).toBeTruthy()
+  const document = await upload.json()
+  await page.goto(`/?project=${project.id}&section=documents&document=${document.id}`)
+  await expect(page.getByText('DOCX 文字与表格')).toBeVisible()
+  await page.getByRole('button', { name: '识别本页表格' }).click()
+  const row = page.locator('#segment-d-t1-r2')
+  await row.getByText('查看单元格').click()
+  await expect(row.getByRole('table')).toContainText('首年需求')
+  await expect(row.getByRole('table')).toContainText('300000')
+  const candidate = page.locator('.candidate-card').filter({ hasText: '首年需求' })
+  await candidate.getByRole('button', { name: '核对' }).click()
+  await expect(candidate.getByRole('link', { name: '打开原件', exact: true })).toHaveAttribute('href',
+    new RegExp(`/documents/${document.id}/original$`))
+  await candidate.getByRole('button', { name: '确认入台账' }).click()
+  await expect(candidate).toContainText('已入事实台账')
+  const facts = (await (await request.get(`/api/projects/${project.id}/facts`)).json()).facts
+  const fact = facts.find((item: { label: string }) => item.label === '首年需求')
+  expect(fact.value).toBe('300000')
+  expect(fact.evidence_status).toBe('SOURCE_LOCATOR_REVIEWED')
+  expect((await (await request.get(`/api/projects/${project.id}/evidence?fact_key=${fact.key}`)).json()).items).toHaveLength(1)
+  await page.reload()
+  await expect(page.locator('#segment-d-t1-r2').getByText('查看单元格')).toBeVisible()
 })

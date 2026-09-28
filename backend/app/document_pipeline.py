@@ -139,11 +139,50 @@ def parse_original(data: bytes, kind: str) -> tuple[int, list[dict], str]:
         for block in doc.iter_inner_content():
             if isinstance(block, Table):
                 table_index += 1
+                first = [cell.text.strip() for cell in block.rows[0].cells] if block.rows else []
+                merged_header = bool(block.rows and len({id(cell._tc) for cell in block.rows[0].cells}) < len(first))
+                headers = [re.sub(r"\s+", "", value) for value in first]
+                label_col = next((index for index, value in enumerate(headers)
+                                  if value in ("项目", "项目名称", "指标", "指标名称")), None)
+                value_col = next((index for index, value in enumerate(headers)
+                                  if re.search(r"数量|金额|合计|总计|指标值|取值|结果|数值|单价", value)), None)
+                unit_col = next((index for index, value in enumerate(headers) if value == "单位"), None)
                 for row_index, row in enumerate(block.rows, 1):
-                    text = " | ".join(cell.text.strip() for cell in row.cells)
+                    values = [cell.text.strip() for cell in row.cells]
+                    merged_row = len({id(cell._tc) for cell in row.cells}) < len(values)
+                    text = " | ".join(values)
                     if text.strip(" |"):
+                        facts = []
+                        if merged_header or merged_row:
+                            pass  # 合并单元格的列身份不确定，留给人工核对。
+                        elif label_col is not None:
+                            if (row_index > 1 and value_col is not None and
+                                    label_col < len(values) and value_col < len(values)):
+                                label, value = values[label_col], values[value_col].replace(" ", "")
+                                if label and NUMBER.fullmatch(value):
+                                    unit = values[unit_col] if unit_col is not None and unit_col < len(values) else ""
+                                    if not unit:
+                                        header_unit = re.search(r"[（(]([^（）()]+)[）)]$", headers[value_col])
+                                        unit = header_unit[1] if header_unit else ""
+                                    facts.append({"label": label, "value_text": value,
+                                                  "unit": "" if unit in ("-", "—", "/") else unit,
+                                                  "data_type": "decimal" if "." in value else "integer"})
+                        else:
+                            for index in range(0, len(values), 2):
+                                label = values[index]
+                                value = values[index + 1] if index + 1 < len(values) else ""
+                                parsed = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*([^\d\s]*)", value)
+                                if parsed and label:
+                                    explicit_unit = re.search(r"[（(]([^（）()]+)[）)]$", label)
+                                    field = label[:explicit_unit.start()].strip() if explicit_unit else label
+                                    facts.append({"label": field, "value_text": parsed[1],
+                                                  "unit": explicit_unit[1] if explicit_unit else parsed[2],
+                                                  "data_type": "decimal" if "." in parsed[1] else "integer"})
                         segments.append({"ref": f"d-t{table_index}-r{row_index}", "page": 1,
-                                         "text": text, "locator": f"表 {table_index} · 行 {row_index}"})
+                                         "text": text, "kind": "table_row", "table_id": f"d-t{table_index}",
+                                         "caption": "", "headers": headers if label_col is not None else [],
+                                         "cells": values, "facts": facts,
+                                         "locator": f"表 {table_index} · 行 {row_index}"})
             else:
                 text = block.text.strip()
                 if text:

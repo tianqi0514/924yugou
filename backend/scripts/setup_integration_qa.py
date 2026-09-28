@@ -62,12 +62,29 @@ def write_fixture(destination: Path) -> None:
     doc.save(destination)
 
 
+def write_table_fixture(destination: Path) -> None:
+    from docx import Document
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    doc = Document()
+    doc.add_heading("QA 合成表格 · 非真实业务资料", level=1)
+    table = doc.add_table(rows=1, cols=3)
+    for cell, value in zip(table.rows[0].cells, ["项目", "数量", "单位"]):
+        cell.text = value
+    for values in (["首年需求", "300000", "套"], ["合格能力", "254016", "套"],
+                   ["未提供报价", "—", "万元"]):
+        for cell, value in zip(table.add_row().cells, values):
+            cell.text = value
+    doc.save(destination)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fixture", type=Path, required=True)
     args = parser.parse_args()
     database_name = checked_environment(args.fixture)
     write_fixture(args.fixture)
+    write_table_fixture(args.fixture.with_name("表格_QA合成原件.docx"))
     print(json.dumps({"database": database_name, "fixture": str(args.fixture)}, ensure_ascii=False))
 
 

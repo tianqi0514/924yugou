@@ -1,7 +1,10 @@
 """Document-layer assertions against independently downloaded public PDFs."""
 
 from decimal import Decimal
+from io import BytesIO
 from pathlib import Path
+
+from docx import Document
 
 from app.pdf_extract import extract_pdf
 from app.document_pipeline import parse_original, source_supports, table_segments
@@ -89,3 +92,19 @@ def test_public_report_table_rows_keep_field_value_and_location():
     engineering = next(row for row in investment if row["ref"] == "p177-t1-r1")
     assert engineering["facts"] == [{"label": "工程费", "value_text": "22122.45", "unit": "万元", "data_type": "decimal"}]
     assert all(fact["label"] != "万元" for row in investment for fact in row["facts"])
+
+
+def test_docx_merged_row_keeps_source_but_not_automatic_numeric_candidate():
+    doc = Document()
+    table = doc.add_table(rows=2, cols=4)
+    for cell, value in zip(table.rows[0].cells, ["项目", "数量", "单位", "备注"]):
+        cell.text = value
+    table.cell(1, 0).text = "首年需求"
+    table.cell(1, 1).text = "300000"
+    table.cell(1, 2).merge(table.cell(1, 3)).text = "套"
+    stream = BytesIO()
+    doc.save(stream)
+    _, segments, _ = parse_original(stream.getvalue(), "docx")
+    row = next(item for item in segments if item["ref"] == "d-t1-r2")
+    assert "首年需求" in row["text"] and "300000" in row["text"]
+    assert row["facts"] == []

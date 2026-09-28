@@ -19,6 +19,7 @@ export const integrationRoot = path.join(root, 'tmp', 'integration')
 export const documentStorage = path.join(integrationRoot, 'documents')
 export const modelSettings = path.join(integrationRoot, 'model-settings')
 export const fixturePath = path.join(integrationRoot, 'fixtures', '本项目事实_QA合成原件.docx')
+export const tableFixturePath = path.join(integrationRoot, 'fixtures', '表格_QA合成原件.docx')
 export const backendEnvironment = {
   DATABASE_URL: databaseUrl,
   DOCUMENT_STORAGE_DIR: documentStorage,

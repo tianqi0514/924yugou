@@ -559,6 +559,56 @@ def test_docx_text_and_table_are_locatable(client: TestClient, monkeypatch, tmp_
     detail = client.get(f"/api/projects/{project_id}/documents/{uploaded.json()['id']}").json()
     assert any(item["ref"].startswith("d-p") for item in detail["segments"])
     assert any(item["ref"].startswith("d-t") and "300000" in item["text"] for item in detail["segments"])
+    recognized = client.post(f"/api/projects/{project_id}/documents/{uploaded.json()['id']}/tables?page=1")
+    assert recognized.status_code == 200 and recognized.json()["created"] == 1
+    candidate = client.get(f"/api/projects/{project_id}/documents/{uploaded.json()['id']}").json()["candidates"][0]
+    assert (candidate["label"], candidate["value"], candidate["source_ref"]) == ("需求", "300000", "d-t1-r1")
+
+
+def test_docx_matrix_table_candidates_are_reviewed_without_model(client: TestClient, monkeypatch, tmp_path):
+    from docx import Document
+    import app.main as main_module
+
+    monkeypatch.setattr(main_module, "STORAGE", tmp_path)
+    monkeypatch.setattr(main_module, "model_candidates", lambda _: pytest.fail("Word 表格识别不应调用模型"))
+    project_id = create_project(client)
+    doc = Document()
+    doc.add_paragraph("本项目业务原文")
+    table = doc.add_table(rows=1, cols=3)
+    for cell, value in zip(table.rows[0].cells, ["项目", "数量", "单位"]):
+        cell.text = value
+    for values in (["首年需求", "300000", "套"], ["合格能力", "254016", "套"],
+                   ["未提供报价", "—", "万元"]):
+        for cell, value in zip(table.add_row().cells, values):
+            cell.text = value
+    stream = BytesIO()
+    doc.save(stream)
+    upload = client.post(f"/api/projects/{project_id}/documents", files={"file": (
+        "本项目输入.docx", stream.getvalue(),
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document")})
+    assert upload.status_code == 201, upload.text
+    document_id = upload.json()["id"]
+    endpoint = f"/api/projects/{project_id}/documents/{document_id}/tables?page=1"
+    before = client.get(f"/api/projects/{project_id}/documents/{document_id}").json()
+    assert before["candidates"] == []
+    assert next(row for row in before["segments"] if row["ref"] == "d-t1-r2")["cells"] == [
+        "首年需求", "300000", "套"]
+    first = client.post(endpoint)
+    assert first.status_code == 200 and first.json()["rows"] == 4 and first.json()["created"] == 2
+    after = client.get(f"/api/projects/{project_id}/documents/{document_id}").json()
+    assert {row["label"] for row in after["candidates"]} == {"首年需求", "合格能力"}
+    demand = next(row for row in after["candidates"] if row["label"] == "首年需求")
+    assert demand["unit"] == "套" and demand["source_ref"] == "d-t1-r2"
+    assert client.post(endpoint).json()["created"] == 0
+    accepted = client.post(f"/api/projects/{project_id}/documents/{document_id}/candidates/{demand['id']}/approve",
+                           json={"label": "首年需求", "value": "300000", "unit": "套",
+                                 "data_type": "integer", "source_ref": "d-t1-r2", "key": "demand"})
+    assert accepted.status_code == 200, accepted.text
+    source = client.get(f"/api/projects/{project_id}/facts/demand/source").json()
+    assert source["review_status"] == "SOURCE_LOCATOR_REVIEWED" and source["source_ref"] == "d-t1-r2"
+    assert "#page=" not in source["original_url"]
+    evidence = client.get(f"/api/projects/{project_id}/evidence?fact_key=demand").json()["items"]
+    assert len(evidence) == 1 and evidence[0]["parse_revision_id"]
 
 
 def test_public_feasibility_tables_work_without_model_and_keep_cell_source(client: TestClient, monkeypatch, tmp_path):

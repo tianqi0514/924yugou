@@ -987,13 +987,14 @@ def document_ocr(project_id: str, document_id: str, page: int = Query(1, ge=1)):
 
 @app.post("/api/projects/{project_id}/documents/{document_id}/tables")
 def document_tables(project_id: str, document_id: str, page: int = Query(1, ge=1)):
-    """识别 PDF 表格行并生成待审候选；不调用模型，也不修改项目事实。"""
+    """识别 PDF/DOCX 表格行并生成待审候选；不调用模型，也不修改项目事实。"""
     with SessionLocal() as session:
         project = get_project(session, project_id)
         require_writable_project(project)
         item = _document(session, project_id, document_id)
-        if item.file_kind != "pdf" or page > item.pages:
-            fail("只能识别 PDF 的有效页码")
+        if item.file_kind not in ("pdf", "docx") or page > item.pages:
+            fail("只能识别 PDF 或 DOCX 的有效页码")
+        kind = item.file_kind
         original_segments = item.segments
         source_path = STORAGE / item.storage_name
         if not source_path.is_file():
@@ -1002,7 +1003,9 @@ def document_tables(project_id: str, document_id: str, page: int = Query(1, ge=1
         if sha256(source_bytes) != item.sha256:
             fail("原件内容与已登记版本不一致，请核对文件", 409)
     try:
-        rows = table_segments(source_bytes, page)
+        rows = (table_segments(source_bytes, page) if kind == "pdf" else
+                [segment for segment in parse_original(source_bytes, "docx")[1]
+                 if segment.get("kind") == "table_row"])
     except (ValueError, IndexError, RuntimeError) as exc:
         fail(f"表格识别失败：{exc}")
     if len(rows) > 400 or sum(len(row["text"]) for row in rows) > 100000:
@@ -1026,9 +1029,9 @@ def document_tables(project_id: str, document_id: str, page: int = Query(1, ge=1
         existing_refs = {segment["ref"] for segment in item.segments}
         prepared = []
         for segment in item.segments:
-            if segment["ref"] in by_ref and segment.get("kind") == "table_row":
+            if segment["ref"] in by_ref:
                 updated = dict(segment)
-                for field in ("caption", "headers", "cells"):
+                for field in ("kind", "table_id", "caption", "headers", "cells", "facts"):
                     updated[field] = by_ref[segment["ref"]][field]
                 prepared.append(updated)
             else:
