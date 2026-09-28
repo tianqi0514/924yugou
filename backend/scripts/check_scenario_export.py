@@ -20,6 +20,7 @@ def main() -> None:
     parser.add_argument("--run", required=True)
     parser.add_argument("--text", action="append", default=[])
     parser.add_argument("--result", action="append", default=[])
+    parser.add_argument("--input-source-ref", action="append", default=[])
     args = parser.parse_args()
 
     with ZipFile(args.archive) as archive:
@@ -48,9 +49,24 @@ def main() -> None:
     for entry in args.result:
         key, value = entry.split("=", 1)
         assert audit["analysis_run"]["results"][key]["value"] == value, entry
+    for reference in args.input_source_ref:
+        matches = [row for row in audit.get("run_input_sources", [])
+                   if reference in row.get("source_refs", [])]
+        assert len(matches) == 1, f"缺少运行输入来源：{reference}"
+        source = matches[0]
+        assert source["status"] == "source_locator_reviewed"
+        assert source["document_sha256"] and source["parse_revision_id"] and source["evidence_id"]
+        assert source["location_labels"]
+        for content in (docx_text, pdf_text):
+            assert source["document_filename"] in content
+            # The PDF CID font omits the middle dot used in Word table locators.
+            visible = re.sub(r"[\s·，,]+", "", content)
+            assert any(re.sub(r"[\s·，,]+", "", label) in visible
+                       for label in source["location_labels"]), reference
     print(json.dumps({"report_version": audit["report_version"], "run_id": args.run,
                       "docx_tables": len(word.tables), "pdf_pages": pdf_pages,
-                      "checked_text": args.text, "checked_results": args.result}, ensure_ascii=False))
+                      "checked_text": args.text, "checked_results": args.result,
+                      "checked_source_refs": args.input_source_ref}, ensure_ascii=False))
 
 
 if __name__ == "__main__":

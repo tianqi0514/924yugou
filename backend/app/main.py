@@ -27,7 +27,7 @@ from .corpus import CorpusRepository
 from .db import AnalysisConfig, AnalysisRun, AnalysisScenario, AnalysisWritingEvent, ExtractionCandidate, ExtractionRun, FactEvidenceBinding, FactRevision, Project, ProjectCorpus, ProjectEvidence, ProjectFact, ProjectIssue, ReportDraft, ReportExport, ReportFactProposal, ReportVersion, RuleRecord, RuleRevision, SessionLocal, SourceDocument, SourceParseRevision, WorkTask, WritingBinding, WritingCommitEvent, WritingReference, init_db, utcnow
 from .document_pipeline import MAX_FILE_BYTES, STORAGE, model_candidates, parse_original, sha256, source_supports, table_segments
 from .model_settings import is_configured, parse_document_page, resolve_model, router as model_router
-from .report_pipeline import EXPORT_RENDER_VERSION, change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
+from .report_pipeline import EXPORT_RENDER_VERSION, analysis_cited_keys, change_impact, content_hash, export_bundle, gate, model_section, numeric_tokens, plain, report_fact_impacts, validate_content
 from .report_sections import change_section
 from .rules import MAX_DECIMAL_EXPONENT, EvalValue, RuleError, evaluate, parse_expression, sort_rules, unit_dimension, unit_signature
 from .writing import SLOTS, SLOT_BY_ID, render_cases, source_cases
@@ -2372,6 +2372,63 @@ def _report_export(project_id: str, report_id: str, level: str,
                                    "project_rule": {"rule_id": rule.id, "expression": rule.expression,
                                                     "target_key": rule.target_key, "deps": rule.deps} if rule else None,
                                    "input_fact_refs": input_fact_refs})
+        run_input_sources = []
+        if selected_run:
+            snapshot = selected_run.snapshot
+            cited_refs = [{"refs": block.get("analysis_refs", [])} for block in item.content
+                          if block.get("analysis_refs")]
+            cited_keys = analysis_cited_keys(snapshot, cited_refs)
+            for key in sorted(cited_keys & snapshot.get("inputs", {}).keys()):
+                frozen = snapshot["inputs"][key]
+                if frozen.get("origin") != "project_fact":
+                    continue
+                source = frozen.get("source_ref")
+                if not isinstance(source, dict):
+                    source = {}
+                revision = source.get("revision")
+                entry = {"key": key, "fact_revision": revision, "value": frozen.get("value"),
+                         "status": "source_unverified", "document_id": None,
+                         "document_filename": None, "document_sha256": None,
+                         "parse_revision_id": None, "evidence_id": None,
+                         "source_refs": [], "location_labels": []}
+                if (source.get("project_id") == project_id and source.get("fact_key") == key
+                        and isinstance(revision, int) and revision >= 0):
+                    binding = session.scalar(select(FactEvidenceBinding).where(
+                        FactEvidenceBinding.project_id == project_id,
+                        FactEvidenceBinding.fact_key == key,
+                        FactEvidenceBinding.fact_revision == revision))
+                    if binding and binding.value_text == frozen.get("value"):
+                        document = session.scalar(select(SourceDocument).where(
+                            SourceDocument.id == binding.document_id,
+                            SourceDocument.project_id == project_id))
+                        evidence_rows = session.scalars(select(ProjectEvidence).where(
+                            ProjectEvidence.project_id == project_id,
+                            ProjectEvidence.fact_key == key,
+                            ProjectEvidence.fact_revision == revision,
+                            ProjectEvidence.document_id == binding.document_id,
+                            ProjectEvidence.source_type == "original",
+                        ).order_by(ProjectEvidence.created_at.desc(), ProjectEvidence.id.desc())).all()
+                        evidence = next((row for row in evidence_rows if document
+                                         and row.document_sha256 == document.sha256
+                                         and row.source_refs == binding.source_refs), None)
+                        if document and evidence:
+                            parsed = session.get(SourceParseRevision, evidence.parse_revision_id) if evidence.parse_revision_id else None
+                            if parsed and parsed.document_id == document.id and parsed.document_sha256 == document.sha256:
+                                segments = {part.get("ref"): part for part in parsed.segments}
+                                refs = binding.source_refs
+                                if (refs and all(ref in segments for ref in refs)
+                                        and any(source_supports(binding.value_text, str(segments[ref].get("text", "")))
+                                                for ref in refs)):
+                                    entry.update({"status": "source_locator_reviewed",
+                                                  "document_id": document.id,
+                                                  "document_filename": document.filename,
+                                                  "document_sha256": document.sha256,
+                                                  "parse_revision_id": parsed.id,
+                                                  "evidence_id": evidence.id,
+                                                  "source_refs": refs,
+                                                  "location_labels": [str(segments[ref].get("locator") or f"片段 {ref}")
+                                                                      for ref in refs]})
+                run_input_sources.append(entry)
         refresh_events = session.scalars(select(AnalysisWritingEvent).where(
             AnalysisWritingEvent.project_id == project_id,
             AnalysisWritingEvent.report_id == report_id,
@@ -2388,6 +2445,7 @@ def _report_export(project_id: str, report_id: str, level: str,
                                   "项目原文位置由操作者核对；不代表原件真实性经独立认证",
                  "analysis_run_id": item.analysis_run_id,
                  "analysis_run": selected_run.snapshot if selected_run else None,
+                 "run_input_sources": run_input_sources,
                  "analysis_refs": [{"block_id": block.get("id"), "refs": block.get("analysis_refs", [])}
                                    for block in item.content if block.get("analysis_refs")],
                  "source_refs": [{"block_id": block.get("id"), "section_id": block.get("section_id"),

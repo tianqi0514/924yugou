@@ -29,7 +29,7 @@ from .model_settings import chat_json
 
 ALLOWED_BLOCKS = {"p", "h1", "h2", "h3", "blockquote", "table"}
 TEXT_MARKS = {"bold", "italic", "underline", "strikethrough"}
-EXPORT_RENDER_VERSION = "chapter-layout-v4"
+EXPORT_RENDER_VERSION = "chapter-layout-v5"
 
 
 def _valid_url(url: str) -> bool:
@@ -542,18 +542,13 @@ def _fact_basis(fact: dict, audit: dict) -> str:
     return f"来源：{source_display(fact.get('source') or '')}"
 
 
-def _analysis_basis(audit: dict) -> list[str]:
-    """Render only cited run values and their explicit upstream calculation steps."""
-    snapshot = audit.get("analysis_run") or {}
+def analysis_cited_keys(snapshot: dict, analysis_refs: list[dict]) -> set[str]:
+    """Find cited run values and their upstream inputs in one frozen run."""
     results = snapshot.get("results") or {}
-    inputs = snapshot.get("inputs") or {}
     traces = {step.get("target"): step for step in snapshot.get("trace", [])
               if step.get("status") == "COMPUTED"}
-    cited = {ref.get("result_key") for block in audit.get("analysis_refs", [])
+    cited = {ref.get("result_key") for block in analysis_refs
              for ref in block.get("refs", []) if ref.get("result_key") in results}
-    if not cited:
-        return []
-
     needed: set[str] = set()
 
     def collect(key: str) -> None:
@@ -566,7 +561,21 @@ def _analysis_basis(audit: dict) -> list[str]:
 
     for key in cited:
         collect(key)
+    return needed
+
+
+def _analysis_basis(audit: dict) -> list[str]:
+    """Render only cited run values and their explicit upstream calculation steps."""
+    snapshot = audit.get("analysis_run") or {}
+    results = snapshot.get("results") or {}
+    inputs = snapshot.get("inputs") or {}
+    traces = {step.get("target"): step for step in snapshot.get("trace", [])
+              if step.get("status") == "COMPUTED"}
+    needed = analysis_cited_keys(snapshot, audit.get("analysis_refs", []))
+    if not needed:
+        return []
     labels = {key: row.get("label") or key for key, row in results.items()}
+    input_sources = {row["key"]: row for row in audit.get("run_input_sources", [])}
     origin_labels = {"project_fact": "项目事实快照", "historical_reference": "历史参考",
                      "scenario_assumption": "方案假设", "missing": "待补"}
     lines = []
@@ -577,7 +586,13 @@ def _analysis_basis(audit: dict) -> list[str]:
         row = results[key]
         value = row.get("value")
         origin = origin_labels.get(inputs[key].get("origin"), "方案输入")
-        lines.append(f"输入：{labels[key]} {value if value is not None else '未定义'}{row.get('unit') or ''}（{origin}）")
+        source = input_sources.get(key, {})
+        locations = source.get("location_labels") or []
+        location = (f"；原件：{source['document_filename']}，{'、'.join(locations).replace(' · ', '，')}"
+                    if source.get("status") == "source_locator_reviewed" and locations else "")
+        if inputs[key].get("origin") == "project_fact" and not location:
+            location = "；原件位置待核"
+        lines.append(f"输入：{labels[key]} {value if value is not None else '未定义'}{row.get('unit') or ''}（{origin}{location}）")
     for step in snapshot.get("trace", []):
         key = step.get("target")
         if key not in needed or step.get("status") != "COMPUTED" or key not in results:

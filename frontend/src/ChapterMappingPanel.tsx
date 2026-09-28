@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, post } from './api'
+import { ruleExpressionForDisplay } from './rule-display'
 
 type Source = { verified: boolean; location: { document_id: string; filename: string; ref: string; page: number } | null }
 type FactOption = { key: string; label: string; data_type: string; value: string | null; unit: string; revision: number; status: string; source: Source }
@@ -67,6 +68,7 @@ export default function ChapterMappingPanel({ projectId, reportId, sectionId, on
     finally { setBusy(false) }
   }
   const visible = options?.facts.filter((fact) => `${fact.label} ${fact.key}`.toLowerCase().includes(query.toLowerCase())) || []
+  const factLabels = Object.fromEntries((options?.facts || []).map((fact) => [fact.key, fact.label]))
   const hasText = options?.facts.some((fact) => keys.includes(fact.key) && fact.data_type === 'text') || false
 
   return <div className="chapter-mapping">
@@ -98,7 +100,7 @@ export default function ChapterMappingPanel({ projectId, reportId, sectionId, on
     {preview ? <div className="scenario-preview"><strong>本章要求预览</strong><div>{keys.length} 项事实 · {mode === 'narrative' ? '原文文字' : `${results.length} 项指标`}</div>
       {preview.results.map((row) => <div key={row.key}><span>{row.label}</span><strong>{row.value ?? '不可评估'}{row.unit}</strong></div>)}
       {!!preview.trace.length && <details><summary>查看计算依据</summary>{preview.trace.map((step) =>
-        <p key={step.rule_id}>{step.expression} · {Object.entries(step.inputs).map(([key, value]) => `${key}=${value ?? '未定义'}`).join('、')} → {step.result ?? '不可评估'}</p>)}</details>}
+        <p key={step.rule_id}>{ruleExpressionForDisplay(step.expression, factLabels)} · {Object.entries(step.inputs).map(([key, value]) => `${factLabels[key] || key}=${value ?? '未定义'}`).join('、')} → {step.result ?? '不可评估'}</p>)}</details>}
       <div className="scenario-panel-actions"><button type="button" disabled={busy} onClick={() => setPreview(null)}>返回修改</button><button type="button" className="primary-button" disabled={busy} onClick={() => void commit()}>确认本章要求</button></div>
     </div> : <div className="scenario-panel-actions"><button type="button" className="primary-button" disabled={busy || !keys.length || mode === 'narrative' && (keys.length > 3 || !hasText) || mode === 'calculation' && !results.length} onClick={() => void makePreview()}>预览要求</button></div>}
   </div>

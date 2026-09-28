@@ -79,7 +79,7 @@ test('从本项目原文事实配置章节、预览取消、生成候选并保�
   await page.getByRole('button', { name: '预览要求' }).click()
   await expect(page.locator('.scenario-preview')).toContainText('254016')
   await page.locator('.scenario-preview').getByText('查看计算依据').click()
-  await expect(page.locator('.scenario-preview')).toContainText('min(first_year_demand, qualified_capacity)')
+  await expect(page.locator('.scenario-preview')).toContainText('min(首年需求, 合格能力)')
   await page.getByRole('button', { name: '确认本章要求' }).click()
   await expect(page.getByRole('heading', { name: '输入数据' })).toBeVisible()
   await page.locator('.scenario-panel').getByRole('button', { name: '新建' }).click()
